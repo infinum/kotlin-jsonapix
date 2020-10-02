@@ -19,3 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.infinum.jsonapix.**$$serializer { *; }
+-keepclassmembers class com.infinum.jsonapix.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.infinum.jsonapix.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
