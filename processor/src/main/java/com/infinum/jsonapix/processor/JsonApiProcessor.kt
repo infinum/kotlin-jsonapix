@@ -2,8 +2,7 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiSerializable
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
-import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -48,63 +47,11 @@ class JsonApiProcessor : AbstractProcessor() {
         val className = element.simpleName.toString()
         val pack = processingEnv.elementUtils.getPackageOf(element).toString()
 
-        val dataClass = ClassName(pack, className)
-        val serialName = ClassName("kotlinx.serialization", "SerialName")
-        val serializable = ClassName("kotlinx.serialization", "Serializable")
-        val file = FileSpec.builder(pack, "JsonApiSerializable_$className")
-            .addType(
-                TypeSpec.classBuilder("JsonApiSerializable_$className")
-                    .addSuperinterface(
-                        JsonApiWrapper::class.asClassName().parameterizedBy(dataClass)
-                    )
-                    .addAnnotation(serializable)
-                    .primaryConstructor(
-                        FunSpec.constructorBuilder()
-                            .addParameter(
-                                ParameterSpec.builder("data", dataClass).build()
-                            )
-                            .build()
-                    )
-                    .addProperty(
-                        PropertySpec.builder(
-                            "id", Int::class, KModifier.OVERRIDE
-                        ).addAnnotation(
-                            AnnotationSpec.builder(serialName)
-                                .addMember("value = %S", "id").build()
-                        )
-                            .initializer("%L", 0).build()
-                    )
-                    .addProperty(
-                        PropertySpec.builder(
-                            "type", String::class, KModifier.OVERRIDE
-                        ).addAnnotation(
-                            AnnotationSpec.builder(serialName)
-                                .addMember("value = %S", "type").build()
-                        )
-                            .initializer("%S", type).build()
-                    )
-                    .addProperty(
-                        PropertySpec.builder(
-                            "data", dataClass
-                        ).addAnnotation(
-                            AnnotationSpec.builder(serialName)
-                                .addMember("value = %S", "data").build()
-                        )
-                            .initializer("data").addModifiers(KModifier.OVERRIDE)
-                            .build()
-                    )
-                    .build()
-            )
-            .build()
+        val fileSpec = JsonApiWrapperSpecBuilder.build(pack, className, type)
 
         val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
 
-        file.writeTo(File(kaptKotlinGeneratedDir!!))
+        fileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
     }
 }
 
-interface JsonApiWrapper<out T> {
-    val id: Int
-    val type: String
-    val data: T
-}

@@ -4,9 +4,9 @@ apply plugin: 'kotlin'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
     api project(':processor')
     api project(':annotations')
+    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
 }
 
 compileKotlin {

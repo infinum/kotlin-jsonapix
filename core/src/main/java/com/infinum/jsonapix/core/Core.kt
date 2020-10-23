@@ -1,5 +1,7 @@
 package com.infinum.jsonapix.core
 
+import kotlinx.serialization.json.Json
+
 
 //inline fun <reified T> T.toJsonApiString(type: String): String {
 //    return Json.encodeToString(this)
