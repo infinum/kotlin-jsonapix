@@ -2,7 +2,9 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiSerializable
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
+import com.infinum.jsonapix.processor.specs.JsonApiCollectionSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
+import com.squareup.kotlinpoet.ClassName
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -23,13 +25,15 @@ class JsonApiProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-
     override fun process(
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
+        val collector = JsonApiCollectionSpecBuilder()
+        var hasAnnotatedElements = false
         roundEnv?.getElementsAnnotatedWith(JsonApiSerializable::class.java)
             ?.forEach {
+                hasAnnotatedElements = true
                 if (it.kind != ElementKind.CLASS) {
                     processingEnv.messager.printMessage(
                         Diagnostic.Kind.ERROR,
@@ -38,8 +42,19 @@ class JsonApiProcessor : AbstractProcessor() {
                     return true
                 }
                 processAnnotation(it)
+                val className = it.simpleName.toString()
+                val pack = processingEnv.elementUtils.getPackageOf(it).toString()
+                val dataClass = ClassName(pack, className)
+                val generatedName = "JsonApiSerializable_$className"
+                val wrapperClass = ClassName(pack, generatedName)
+                collector.add(dataClass, wrapperClass)
             }
-        return false
+
+        val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
+        if (hasAnnotatedElements) {
+            collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
+        }
+        return true
     }
 
     private fun processAnnotation(element: Element) {

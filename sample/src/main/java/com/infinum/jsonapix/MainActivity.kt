@@ -16,10 +16,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val json =  Json { encodeDefaults = true }.encodeToString(JsonApiSerializable_Person(Person("Stef", "Banek")))
+        val json =  Json { encodeDefaults = true }.encodeToString(Person("Stef", "Banek").getWrapper())
         text.text = json
 
        textDecoded.text = Json { encodeDefaults = true }.decodeFromString<JsonApiSerializable_Person>(json).data.name
+
     }
 }
 
