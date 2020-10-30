@@ -30,10 +30,10 @@ class JsonApiProcessor : AbstractProcessor() {
         roundEnv: RoundEnvironment?
     ): Boolean {
         val collector = JsonApiCollectionSpecBuilder()
-        var hasAnnotatedElements = false
-        roundEnv?.getElementsAnnotatedWith(JsonApiSerializable::class.java)
-            ?.forEach {
-                hasAnnotatedElements = true
+        val elements = roundEnv?.getElementsAnnotatedWith(JsonApiSerializable::class.java)
+        // process method might get called multiple times and not finding elements is a possibility
+        if (elements?.isNullOrEmpty() == false) {
+            elements.forEach {
                 if (it.kind != ElementKind.CLASS) {
                     processingEnv.messager.printMessage(
                         Diagnostic.Kind.ERROR,
@@ -50,8 +50,7 @@ class JsonApiProcessor : AbstractProcessor() {
                 collector.add(dataClass, wrapperClass)
             }
 
-        val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
-        if (hasAnnotatedElements) {
+            val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
             collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
         }
         return true
