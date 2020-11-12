@@ -52,6 +52,7 @@ internal object JsonApiWrapperSpecBuilder {
         AnnotationSpec.builder(SerialName::class).addMember(SERIAL_NAME_PLACEHOLDER, name)
             .build()
 
+    // TODO id doesn't need to have a value, but it needs to be present here because API should return id
     private fun idProperty(): PropertySpec = PropertySpec.builder(
         ID_KEY, Int::class, KModifier.OVERRIDE
     ).addAnnotation(serialNameSpec(ID_KEY))

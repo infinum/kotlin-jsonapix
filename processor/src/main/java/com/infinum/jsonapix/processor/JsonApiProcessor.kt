@@ -2,7 +2,7 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiSerializable
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
-import com.infinum.jsonapix.processor.specs.JsonApiCollectionSpecBuilder
+import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import java.io.File
@@ -29,7 +29,7 @@ class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val collector = JsonApiCollectionSpecBuilder()
+        val collector = JsonApiExtensionsSpecBuilder()
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiSerializable::class.java)
         // process method might get called multiple times and not finding elements is a possibility
         if (elements?.isNullOrEmpty() == false) {
