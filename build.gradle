@@ -1,14 +1,17 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.kotlin_version = "1.4.10"
     repositories {
         google()
         jcenter()
     }
+
+    apply from: "dependencies.gradle"
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
+        classpath packages.gradle
+        classpath packages.kotlin.plugin
+        classpath packages.kotlin.serialization_plugin
+        classpath packages.detekt.plugin
     }
 }
 
@@ -21,4 +24,14 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+task detektAll(dependsOn: [
+        ':annotations:detekt',
+        ':core:detekt',
+        ':processor:detekt',
+        ':sample:detekt'
+]) {
+    group = "Verification"
+    description = "Run detekt on all modules"
 }

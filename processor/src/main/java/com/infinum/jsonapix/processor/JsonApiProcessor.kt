@@ -68,4 +68,3 @@ class JsonApiProcessor : AbstractProcessor() {
         fileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
     }
 }
-

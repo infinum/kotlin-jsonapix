@@ -19,8 +19,3 @@ class MainActivity : AppCompatActivity() {
        textDecoded.text = jsonApiString.decodeJsonApiString<Person>().name
     }
 }
-
-
-
-
-
