@@ -5,8 +5,8 @@ apply from: '../detekt.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'com.squareup:kotlinpoet:1.7.2'
+    implementation packages.kotlin.core
+    implementation packages.kotlin.poet
     api project(':annotations')
     compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
 }

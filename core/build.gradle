@@ -4,10 +4,10 @@ apply from: '../detekt.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation packages.kotlin.core
     api project(':processor')
     api project(':annotations')
-    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
+    compileOnly packages.kotlin.serialization_core
 }
 
 compileKotlin {

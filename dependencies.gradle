@@ -26,8 +26,7 @@ ext.packages = [
         ],
         "androidx"   : [
                 "core"        : "androidx.core:core-ktx:${versions.core}",
-                "appcompat"   : "androidx.appcompat:appcompat:${versions.appcompat}",
-                "fragment"    : "androidx.fragment:fragment-ktx:${versions.fragment}",
+                "appcompat"   : "androidx.appcompat:appcompat:${versions.appcompat}"
         ],
         "detekt"     : [
                 "plugin"    : "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${versions.detekt}",
