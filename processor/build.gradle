@@ -10,7 +10,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
-    api project(':annotations')
+    compileOnly project(':annotations')
+    compileOnly project(':core')
     compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
 }
 

@@ -7,9 +7,7 @@ apply from: '../detekt.gradle'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation packages.kotlin.core
-    api project(':processor')
     api project(':annotations')
-    compileOnly packages.kotlin.serialization_core
 }
 
 compileKotlin {

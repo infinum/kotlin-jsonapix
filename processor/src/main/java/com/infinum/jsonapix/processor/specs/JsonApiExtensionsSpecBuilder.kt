@@ -1,6 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.processor.JsonApiWrapper
+import com.infinum.jsonapix.core.JsonApiWrapper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -31,7 +31,7 @@ internal class JsonApiExtensionsSpecBuilder {
         private const val SUBCLASS_FUNCTION_NAME = "subclass"
         private const val CLASS_DISCRIMINATOR = "#class"
 
-        private const val JSON_API_WRAPPER_IMPORT = "processor.JsonApiWrapper"
+        private const val JSON_API_WRAPPER_IMPORT = "core.JsonApiWrapper"
 
         private val KOTLINX_IMPORTS = arrayOf(
             "json.Json",

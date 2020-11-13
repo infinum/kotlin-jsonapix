@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor
+package com.infinum.jsonapix.core
 
 interface JsonApiWrapper<out T> {
     val id: Int
