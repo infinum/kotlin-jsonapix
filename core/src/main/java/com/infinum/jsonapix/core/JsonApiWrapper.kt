@@ -1,7 +1,8 @@
 package com.infinum.jsonapix.core
 
+import com.infinum.jsonapix.core.resources.ResourceObject
+
 interface JsonApiWrapper<out T> {
-    val id: Int
-    val type: String
-    val data: T
+    val data: ResourceObject<T>
+    val errors: List<String>?
 }

@@ -4,6 +4,7 @@ import com.infinum.jsonapix.annotations.JsonApiSerializable
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
+import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
@@ -61,10 +62,12 @@ class JsonApiProcessor : AbstractProcessor() {
         val className = element.simpleName.toString()
         val pack = processingEnv.elementUtils.getPackageOf(element).toString()
 
-        val fileSpec = JsonApiWrapperSpecBuilder.build(pack, className, type)
+        val resourceFileSpec = ResourceObjectSpecBuilder.build(pack, className, type)
+        val wrapperFileSpec = JsonApiWrapperSpecBuilder.build(pack, className, type)
 
         val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
 
-        fileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+        wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }
