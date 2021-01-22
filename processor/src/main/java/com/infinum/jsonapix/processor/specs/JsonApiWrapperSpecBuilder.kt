@@ -35,7 +35,9 @@ internal object JsonApiWrapperSpecBuilder {
                             .addParameters(
                                 listOf(
                                     ParameterSpec.builder(
-                                        DATA_KEY, dataClass
+                                        DATA_KEY,
+                                        ResourceObject::class.asClassName()
+                                            .parameterizedBy(dataClass)
                                     ).build(),
                                     ParameterSpec.builder(
                                         ERRORS_TYPE_KEY,

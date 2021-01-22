@@ -67,14 +67,13 @@ object ResourceObjectSpecBuilder {
             .build()
 
     private fun idProperty(): PropertySpec = PropertySpec.builder(
-        ID_KEY, Int::class, KModifier.OVERRIDE
+        ID_KEY, String::class, KModifier.OVERRIDE
     ).addAnnotation(serialNameSpec(ID_KEY))
         .initializer(ID_KEY)
         .build()
 
     private fun dataProperty(dataClass: ClassName): PropertySpec = PropertySpec.builder(
-        ATTRIBUTES_KEY,
-        ResourceObject::class.asClassName().parameterizedBy(dataClass)
+        ATTRIBUTES_KEY, dataClass
     ).addAnnotation(
         serialNameSpec(ATTRIBUTES_KEY)
     )

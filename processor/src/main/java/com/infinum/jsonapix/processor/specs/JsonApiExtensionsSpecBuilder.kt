@@ -1,16 +1,8 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiWrapper
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeVariableName
-import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.asClassName
+import com.infinum.jsonapix.core.resources.ResourceObject
+import com.squareup.kotlinpoet.*
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -31,7 +23,10 @@ internal class JsonApiExtensionsSpecBuilder {
         private const val SUBCLASS_FUNCTION_NAME = "subclass"
         private const val CLASS_DISCRIMINATOR = "#class"
 
-        private const val JSON_API_WRAPPER_IMPORT = "core.JsonApiWrapper"
+        private val JSON_API_WRAPPER_IMPORTS = arrayOf(
+            "core.JsonApiWrapper",
+            "core.resources.ResourceObject"
+        )
 
         private val KOTLINX_IMPORTS = arrayOf(
             "json.Json",
@@ -60,9 +55,9 @@ internal class JsonApiExtensionsSpecBuilder {
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
-            .returns(typeVariableName)
+            .returns(typeVariableName.copy(nullable = true))
             .addStatement(
-                "return format.%M<%T<%T>>(this).data",
+                "return format.%M<%T<%T>>(this).data.attributes",
                 decodeMember,
                 JsonApiWrapper::class,
                 typeVariableName
@@ -84,7 +79,7 @@ internal class JsonApiExtensionsSpecBuilder {
             .build()
     }
 
-    private fun serializerPropertySpec(): PropertySpec {
+    private fun jsonApiWrapperSerializerPropertySpec(): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
         val polymorpicMember = MemberName(
             KOTLINX_SERIALIZATION_MODULES_PACKAGE,
@@ -101,6 +96,16 @@ internal class JsonApiExtensionsSpecBuilder {
         specsMap.values.forEach {
             codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, it)
         }
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder.indent()
+            .addStatement("%M(%T::class) {", polymorpicMember, ResourceObject::class)
+        codeBlockBuilder.indent()
+        specsMap.keys.forEach {
+            // TODO FIX ME. Make collector smarter to find both JsonApiWrapper and ResourceObject implementations
+            codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, ClassName("com.infinum.jsonapix", "ResourceObject_${it.simpleName}"))
+        }
+
         codeBlockBuilder.unindent().addStatement("}")
         codeBlockBuilder.unindent().addStatement("}")
 
@@ -126,14 +131,14 @@ internal class JsonApiExtensionsSpecBuilder {
             *KOTLINX_MODULES_IMPORTS
         )
 
-        fileSpec.addImport(EXTENSIONS_PACKAGE, JSON_API_WRAPPER_IMPORT)
+        fileSpec.addImport(EXTENSIONS_PACKAGE, *JSON_API_WRAPPER_IMPORTS)
 
         specsMap.entries.forEach {
             fileSpec.addFunction(
                 FunSpec.builder(WRAPPER_GETTER_FUNCTION_NAME)
                     .receiver(it.key)
                     .returns(it.value)
-                    .addStatement("return %T(this)", it.value)
+                    .addStatement("return %T(%T_%T(this))", it.value, ResourceObject::class.asClassName(), it.key)
                     .build()
             )
 
@@ -153,7 +158,7 @@ internal class JsonApiExtensionsSpecBuilder {
             )
         }
 
-        fileSpec.addProperty(serializerPropertySpec())
+        fileSpec.addProperty(jsonApiWrapperSerializerPropertySpec())
         fileSpec.addProperty(formatPropertySpec())
         fileSpec.addFunction(deserializeFunSpec())
 
