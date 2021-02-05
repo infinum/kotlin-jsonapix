@@ -12,7 +12,7 @@ dependencies {
     implementation packages.kotlin.poet
     compileOnly project(':annotations')
     compileOnly project(':core')
-    compileOnly "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
+    compileOnly packages.kotlin.serialization_core
 }
 
 compileKotlin {
