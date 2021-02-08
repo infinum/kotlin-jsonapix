@@ -29,6 +29,7 @@ object ResourceObjectSpecBuilder {
                         ResourceObject::class.asClassName().parameterizedBy(dataClass)
                     )
                     .addAnnotation(serializableClassName)
+                    .addAnnotation(serialNameSpec(type))
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(

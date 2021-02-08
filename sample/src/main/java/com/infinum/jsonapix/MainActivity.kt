@@ -1,17 +1,10 @@
 package com.infinum.jsonapix
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import com.infinum.jsonapix.core.JsonApiWrapper
-import com.infinum.jsonapix.core.resources.ResourceObject
+import androidx.appcompat.app.AppCompatActivity
+import com.infinum.jsonapix.Container.extractClassDiscriminator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.json.*
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.modules.subclass
-import java.lang.Exception
-import kotlin.reflect.full.declaredMembers
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,92 +14,71 @@ class MainActivity : AppCompatActivity() {
         val jsonApiString = Person(
             "Stef",
             "Banek"
-        ).toJsonApiString()
+        ).toJsonApiString().extractClassDiscriminator("#class")
 
-        text.text = Container.findType("""{ "data": [{ "name": "Stef", "type": "Banek" }] }""")
+        text.text = jsonApiString
 
-//        textDecoded.text = jsonApiString.decodeJsonApiString<Person>()?.name
-//        textDecoded.text = jsonApiString.replace(
-//            "\"#class\":\"com.infinum.jsonapix.JsonApiSerializable_Person\",",
-//            ""
-//        ).decodeJsonApiString<Person>()?.name
-        Container.findType("""{ "data": { "name": "Stef", "type": "Banek" } }""")
-        Log.d("tag", "FAFALA SI")
-    }
-}
+        val personJson =
+            """{"data":{"#class":"person","attributes":{"name":"Stef","surname":"Banek"},"id":"0","type":"person"},"errors":null}"""
 
-inline fun <reified T> getType(): String? {
-    val member = T::class.declaredMembers.firstOrNull { it.name == "type" }
-    return if (member != null) {
-        try {
-            member.call() as String
-        } catch (e: Exception) {
-            null
-        }
-    } else {
-        null
+//        text.text =
+//            personJson.injectDiscriminator("#class", "person")?.decodeJsonApiString<Person>()?.name
     }
 }
 
 object Container {
-    public val jsonApiSerializerModule: SerializersModule = SerializersModule {
-        polymorphic(JsonApiWrapper::class) {
-            subclass(JsonApiSerializable_Person::class)
-            subclass(JsonApiSerializable_Dog::class)
-        }
-        polymorphic(ResourceObject::class) {
-            subclass(ResourceObject_Person::class)
-            subclass(ResourceObject_Dog::class)
-        }
-    }
-
-
-    public val format: Json = Json {
-        encodeDefaults = true
-        classDiscriminator = "#class"
-        serializersModule = jsonApiSerializerModule
-    }
 
     fun findType(input: String): String? {
         try {
             val element = Json.parseToJsonElement(input)
             val data = element.jsonObject["data"]
             val type = data?.jsonObject?.get("type")
-            val result = type?.jsonPrimitive?.content
-            return result.toString()
+            return type?.jsonPrimitive?.content
         } catch (e: Exception) {
             return try {
                 val element = Json.parseToJsonElement(input)
                 val data = element.jsonObject["data"]
                 val first = data?.jsonArray?.get(0)
                 val type = first?.jsonObject?.get("type")
-                type?.jsonPrimitive?.content.toString()
+                type?.jsonPrimitive?.content
             } catch (e: Exception) {
                 null
             }
         }
     }
 
-    fun injectDiscriminator(input: String, discriminatorName: String, discriminatorValue: String): String? {
-        try {
-            val element = Json.parseToJsonElement(input)
-            element.
-        } catch (e: Exception) {
-            return try {
-                val element = Json.parseToJsonElement(input)
-                val data = element.jsonObject["data"]
-                val first = data?.jsonArray?.get(0)
-                val type = first?.jsonObject?.get("type")
-                type?.jsonPrimitive?.content.toString()
-            } catch (e: Exception) {
-                null
-            }
+    fun String.injectDiscriminator(
+        discriminatorName: String,
+        discriminatorValue: String
+    ): String {
+        val element = Json.parseToJsonElement(this)
+        val entries = element.jsonObject.entries.toMutableSet()
+        val entry = object : Map.Entry<String, JsonElement> {
+            override val key = discriminatorName
+            override val value = JsonPrimitive(discriminatorValue)
         }
+        entries.add(entry)
+        val resultMap = mutableMapOf<String, JsonElement>()
+        resultMap.putAll(entries.map { Pair(it.key, it.value) })
+        val newJson = JsonObject(resultMap)
+        return newJson.toString()
     }
 
-
-
-    inline fun <reified T> String.decodeFromJsonApi(): T {
-
+    fun String.extractClassDiscriminator(
+        discriminatorName: String
+    ): String {
+        val element = Json.parseToJsonElement(this)
+        val entries = element.jsonObject.entries.toMutableSet()
+        entries.removeAll { it.key == discriminatorName }
+        val resultMap = mutableMapOf<String, JsonElement>()
+        resultMap.putAll(entries.map { Pair(it.key, it.value) })
+        val dataObject = element.jsonObject["data"]
+        if (dataObject != null) {
+            val dataEntries = dataObject.jsonObject.entries.toMutableSet()
+            dataEntries.removeAll { it.key == discriminatorName }
+            resultMap["data"] = JsonObject(mapOf(*dataEntries.map { Pair(it.key, it.value) }.toTypedArray()))
+        }
+        val newJson = JsonObject(resultMap)
+        return newJson.toString()
     }
 }
