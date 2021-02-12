@@ -1,8 +1,16 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.resources.ResourceObject
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -61,7 +69,6 @@ object ResourceObjectSpecBuilder {
             .build()
     }
 
-
     private fun serialNameSpec(name: String) =
         AnnotationSpec.builder(SerialName::class)
             .addMember(SERIAL_NAME_PLACEHOLDER, name)
@@ -86,5 +93,4 @@ object ResourceObjectSpecBuilder {
     ).addAnnotation(
         serialNameSpec(TYPE_KEY)
     ).initializer(TYPE_KEY).build()
-
 }
