@@ -9,6 +9,7 @@ dependencies {
     implementation packages.kotlin.core
     api project(':annotations')
     api "org.jetbrains.kotlin:kotlin-reflect:1.4.21"
+    compileOnly packages.kotlin.serialization_core
 }
 
 compileKotlin {

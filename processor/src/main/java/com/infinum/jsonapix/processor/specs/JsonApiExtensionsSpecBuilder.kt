@@ -42,10 +42,10 @@ internal class JsonApiExtensionsSpecBuilder {
         )
     }
 
-    private val specsMap = hashMapOf<ClassName, ClassName>()
+    private val specsMap = hashMapOf<ClassName, Pair<ClassName, String>>()
 
-    fun add(data: ClassName, wrapper: ClassName) {
-        specsMap[data] = wrapper
+    fun add(data: ClassName, wrapper: ClassName, type: String) {
+        specsMap[data] = Pair(wrapper, type)
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -57,10 +57,13 @@ internal class JsonApiExtensionsSpecBuilder {
             .addTypeVariable(typeVariableName.copy(reified = true))
             .returns(typeVariableName.copy(nullable = true))
             .addStatement(
-                "return format.%M<%T<%T>>(this).data.attributes",
+                "return format.%M<%T<%T>>(this.%L(%S, this.%L())).data.attributes",
                 decodeMember,
                 JsonApiWrapper::class,
-                typeVariableName
+                typeVariableName,
+                "injectClassDiscriminator",
+                CLASS_DISCRIMINATOR,
+                "findType"
             )
             .build()
     }
@@ -94,7 +97,7 @@ internal class JsonApiExtensionsSpecBuilder {
             .addStatement("%M(%T::class) {", polymorpicMember, JsonApiWrapper::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
-            codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, it)
+            codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, it.first)
         }
         codeBlockBuilder.unindent().addStatement("}")
 
@@ -103,7 +106,11 @@ internal class JsonApiExtensionsSpecBuilder {
         codeBlockBuilder.indent()
         specsMap.keys.forEach {
             // TODO FIX ME. Make collector smarter to find both JsonApiWrapper and ResourceObject implementations
-            codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, ClassName("com.infinum.jsonapix", "ResourceObject_${it.simpleName}"))
+            codeBlockBuilder.addStatement(
+                "%M(%T::class)",
+                subclassMember,
+                ClassName("com.infinum.jsonapix", "ResourceObject_${it.simpleName}")
+            )
         }
 
         codeBlockBuilder.unindent().addStatement("}")
@@ -127,6 +134,13 @@ internal class JsonApiExtensionsSpecBuilder {
         )
 
         fileSpec.addImport(
+            "com.infinum.jsonapix.core",
+            "extractClassDiscriminator",
+            "injectClassDiscriminator",
+            "findType"
+        )
+
+        fileSpec.addImport(
             KOTLINX_SERIALIZATION_MODULES_PACKAGE,
             *KOTLINX_MODULES_IMPORTS
         )
@@ -137,8 +151,13 @@ internal class JsonApiExtensionsSpecBuilder {
             fileSpec.addFunction(
                 FunSpec.builder(WRAPPER_GETTER_FUNCTION_NAME)
                     .receiver(it.key)
-                    .returns(it.value)
-                    .addStatement("return %T(%T_%T(this))", it.value, ResourceObject::class.asClassName(), it.key)
+                    .returns(it.value.first)
+                    .addStatement(
+                        "return %T(%T_%T(this))",
+                        it.value.first,
+                        ResourceObject::class.asClassName(),
+                        it.key
+                    )
                     .build()
             )
 
@@ -149,10 +168,12 @@ internal class JsonApiExtensionsSpecBuilder {
                     .receiver(it.key)
                     .returns(String::class)
                     .addStatement(
-                        "return format.encodeToString(%T(%T::class), this.%L())",
+                        "return format.encodeToString(%T(%T::class), this.%L()).%L(%S)",
                         polymorphicSerializerClass,
                         jsonApiWrapperClass,
-                        WRAPPER_GETTER_FUNCTION_NAME
+                        WRAPPER_GETTER_FUNCTION_NAME,
+                        "extractClassDiscriminator",
+                        CLASS_DISCRIMINATOR
                     )
                     .build()
             )

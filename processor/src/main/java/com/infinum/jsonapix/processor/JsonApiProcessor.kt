@@ -48,7 +48,7 @@ class JsonApiProcessor : AbstractProcessor() {
                 val dataClass = ClassName(pack, className)
                 val generatedName = "JsonApiSerializable_$className"
                 val wrapperClass = ClassName(pack, generatedName)
-                collector.add(dataClass, wrapperClass)
+                collector.add(dataClass, wrapperClass, it.getAnnotationParameterValue<JsonApiSerializable, String> { type })
             }
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
