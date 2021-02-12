@@ -57,7 +57,7 @@ internal class JsonApiExtensionsSpecBuilder {
             .addTypeVariable(typeVariableName.copy(reified = true))
             .returns(typeVariableName.copy(nullable = true))
             .addStatement(
-                "return format.%M<%T<%T>>(this.%L(%S, this.%L())).data.attributes",
+                "return format.%M<%T<%T>>(this.%L(%S, this.%L())).data?.attributes",
                 decodeMember,
                 JsonApiWrapper::class,
                 typeVariableName,
@@ -134,7 +134,7 @@ internal class JsonApiExtensionsSpecBuilder {
         )
 
         fileSpec.addImport(
-            "com.infinum.jsonapix.core",
+            "com.infinum.jsonapix.core.extensions",
             "extractClassDiscriminator",
             "injectClassDiscriminator",
             "findType"

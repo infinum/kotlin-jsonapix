@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.core
+package com.infinum.jsonapix.core.extensions
 
 import kotlinx.serialization.json.*
 
