@@ -18,7 +18,9 @@ import javax.tools.Diagnostic
 class JsonApiProcessor : AbstractProcessor() {
 
     companion object {
-        const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
+        private const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
+        private const val WRAPPER_NAME_PREFIX = "JsonApiSerializable_"
+        private const val RESOURCE_OBJECT_PREFIX = "ResourceObject_"
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
@@ -42,13 +44,16 @@ class JsonApiProcessor : AbstractProcessor() {
                     )
                     return true
                 }
-                processAnnotation(it)
+                val type = it.getAnnotationParameterValue<JsonApiSerializable, String> { type }
+                processAnnotation(it, type)
                 val className = it.simpleName.toString()
                 val pack = processingEnv.elementUtils.getPackageOf(it).toString()
                 val dataClass = ClassName(pack, className)
-                val generatedName = "JsonApiSerializable_$className"
-                val wrapperClass = ClassName(pack, generatedName)
-                collector.add(dataClass, wrapperClass, it.getAnnotationParameterValue<JsonApiSerializable, String> { type })
+                val generatedJsonWrapperName = "$WRAPPER_NAME_PREFIX$className"
+                val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
+                val jsonWrapperClass = ClassName(pack, generatedJsonWrapperName)
+                val resourceObjectClassName = ClassName(pack, generatedResourceObjectName)
+                collector.add(dataClass, jsonWrapperClass, resourceObjectClassName, type)
             }
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
@@ -57,8 +62,7 @@ class JsonApiProcessor : AbstractProcessor() {
         return true
     }
 
-    private fun processAnnotation(element: Element) {
-        val type = element.getAnnotationParameterValue<JsonApiSerializable, String> { type }
+    private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
         val pack = processingEnv.elementUtils.getPackageOf(element).toString()
 
