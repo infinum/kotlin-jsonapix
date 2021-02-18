@@ -5,4 +5,4 @@ package com.infinum.jsonapix.annotations
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiSerializable(val type: String)
+annotation class JsonApiX(val type: String)

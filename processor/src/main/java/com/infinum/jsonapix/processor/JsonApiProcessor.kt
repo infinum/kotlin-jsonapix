@@ -1,6 +1,6 @@
 package com.infinum.jsonapix.processor
 
-import com.infinum.jsonapix.annotations.JsonApiSerializable
+import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
@@ -24,7 +24,7 @@ class JsonApiProcessor : AbstractProcessor() {
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        mutableSetOf(JsonApiSerializable::class.java.name)
+        mutableSetOf(JsonApiX::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -33,7 +33,7 @@ class JsonApiProcessor : AbstractProcessor() {
         roundEnv: RoundEnvironment?
     ): Boolean {
         val collector = JsonApiExtensionsSpecBuilder()
-        val elements = roundEnv?.getElementsAnnotatedWith(JsonApiSerializable::class.java)
+        val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
         if (elements?.isNullOrEmpty() == false) {
             elements.forEach {
@@ -44,7 +44,7 @@ class JsonApiProcessor : AbstractProcessor() {
                     )
                     return true
                 }
-                val type = it.getAnnotationParameterValue<JsonApiSerializable, String> { type }
+                val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
                 processAnnotation(it, type)
                 val className = it.simpleName.toString()
                 val pack = processingEnv.elementUtils.getPackageOf(it).toString()

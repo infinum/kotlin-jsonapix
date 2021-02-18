@@ -1,8 +1,8 @@
 package com.infinum.jsonapix
 
-import com.infinum.jsonapix.annotations.JsonApiSerializable
+import com.infinum.jsonapix.annotations.JsonApiX
 import kotlinx.serialization.Serializable
 
-@JsonApiSerializable("dog")
+@JsonApiX("dog")
 @Serializable
 data class Dog(val name: String, val age: Int)
