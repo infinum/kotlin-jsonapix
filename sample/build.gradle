@@ -6,6 +6,8 @@ plugins {
 }
 
 apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/ktlint.gradle"
+apply from: "$rootDir/cpd.gradle"
 
 android {
     compileSdkVersion buildConfig.compileSdk

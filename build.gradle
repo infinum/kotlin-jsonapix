@@ -13,6 +13,8 @@ buildscript {
         classpath packages.kotlin.plugin
         classpath packages.kotlin.serialization_plugin
         classpath packages.detekt.plugin
+        classpath packages.cpd.plugin
+        classpath packages.ktlint.plugin
     }
 }
 
@@ -34,11 +36,40 @@ task clean(type: Delete) {
 }
 
 task detektAll(dependsOn: [
-        ":annotations:detekt",
-        ":core:detekt",
-        ":processor:detekt",
-        ":sample:detekt"
+        ':annotations:detekt',
+        ':core:detekt',
+        ':processor:detekt',
+        ':sample:detekt'
 ]) {
     group = "Verification"
     description = "Run detekt on all modules"
+}
+
+task ktlintAll(dependsOn: [
+        ':annotations:ktlintCheck',
+        ':core:ktlintCheck',
+        ':processor:ktlintCheck',
+        ':sample:ktlintCheck',
+]) {
+    group = "Verification"
+    description = "Run ktlint on all modules"
+}
+
+task cpdAll(dependsOn: [
+        ':annotations:cpdCheck',
+        ':core:cpdCheck',
+        ':processor:cpdCheck',
+        ':sample:cpdCheck',
+]) {
+    group = "Verification"
+    description = "Run CPD on all modules"
+}
+
+task runStaticChecks(dependsOn: [
+        ':detektAll',
+        ':ktlintAll',
+        ':cpdAll'
+]) {
+    group = "Verification"
+    description = "Run static checks on all modules"
 }
