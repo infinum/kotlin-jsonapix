@@ -8,7 +8,7 @@ buildscript {
     apply from: "dependencies.gradle"
 
     dependencies {
-        classpath "com.android.tools.build:gradle:${versions.gradle}"
+        classpath packages.gradle
         classpath packages.kotlin.plugin
         classpath packages.kotlin.serialization_plugin
         classpath packages.detekt.plugin

@@ -3,7 +3,7 @@ plugins {
     id "kotlin"
 }
 
-apply from: "../detekt.gradle"
+apply from: "$rootDir/detekt.gradle"
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
