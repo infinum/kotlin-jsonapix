@@ -1,12 +1,12 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-    id 'kotlinx-serialization'
-    id 'kotlin-kapt'
+    id "com.android.application"
+    id "kotlin-android"
+    id "kotlin-android-extensions"
+    id "kotlinx-serialization"
+    id "kotlin-kapt"
 }
 
-apply from: '../detekt.gradle'
+apply from: "../detekt.gradle"
 
 android {
     compileSdkVersion 30
@@ -39,8 +39,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(':core')
-    kapt project(':processor')
+    implementation project(":core")
+    kapt project(":processor")
     implementation packages.kotlin.core
     implementation packages.kotlin.serialization_core
     implementation packages.androidx.core

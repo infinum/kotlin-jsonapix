@@ -1,17 +1,17 @@
 plugins {
-    id 'java-library'
-    id 'kotlin'
-    id 'kotlin-kapt'
+    id "java-library"
+    id "kotlin"
+    id "kotlin-kapt"
 }
 
-apply from: '../detekt.gradle'
+apply from: "../detekt.gradle"
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
-    compileOnly project(':annotations')
-    compileOnly project(':core')
+    compileOnly project(":annotations")
+    compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core
 }
 

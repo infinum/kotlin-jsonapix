@@ -1,12 +1,12 @@
 plugins {
-    id 'java-library'
-    id 'kotlin'
+    id "java-library"
+    id "kotlin"
 }
 
-apply from: '../detekt.gradle'
+apply from: "../detekt.gradle"
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation packages.kotlin.core
 }
 

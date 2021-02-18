@@ -26,10 +26,10 @@ task clean(type: Delete) {
 }
 
 task detektAll(dependsOn: [
-        ':annotations:detekt',
-        ':core:detekt',
-        ':processor:detekt',
-        ':sample:detekt'
+        ":annotations:detekt",
+        ":core:detekt",
+        ":processor:detekt",
+        ":sample:detekt"
 ]) {
     group = "Verification"
     description = "Run detekt on all modules"
