@@ -2,6 +2,7 @@ plugins {
     id "java-library"
     id "kotlin"
 }
+
 apply from: "$rootDir/detekt.gradle"
 
 dependencies {
