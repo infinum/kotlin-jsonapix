@@ -2,7 +2,10 @@ package com.infinum.jsonapix
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.infinum.jsonapix.core.discriminators.CommonDiscriminator
 import com.infinum.jsonapix.databinding.ActivityMainBinding
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,15 +14,30 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
         val jsonApiString = Person(
             "Stef",
             "Banek"
         ).toJsonApiString()
 
-        binding.text.text = jsonApiString
+        val json = """
+            [
+            {
+                 "name":"Stef",
+                 "surname":"Banek"
+            },
+            {
+                 "name":"Marta",
+                 "surname":"Kekic"
+            }
+            ]
+        """.trimIndent()
 
-        binding.textDecoded.text =
-            jsonApiString.decodeJsonApiString<Person>()?.name
+        val discriminator = CommonDiscriminator("person")
+
+        val injected = discriminator.inject(Json.parseToJsonElement(json)).toString()
+        binding.text.text = injected
+
+        binding.textDecoded.text = discriminator.extract(Json.parseToJsonElement(injected)).toString()
     }
 }

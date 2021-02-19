@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.discriminators
+package com.infinum.jsonapix.core.discriminators
 
 import kotlinx.serialization.json.JsonElement
 
