@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiWrapper
+import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -22,7 +23,7 @@ internal class JsonApiExtensionsSpecBuilder {
     companion object {
         private const val EXTENSIONS_PACKAGE = "com.infinum.jsonapix"
         private const val EXTENSIONS_FILE_NAME = "JsonApiExtensions"
-        private const val CORE_EXTENSIONS_PACKAGE = "com.infinum.jsonapix.core.extensions"
+        private const val CORE_DISCRIMINATORS_PACKAGE = "com.infinum.jsonapix.core.discriminators"
         private const val WRAPPER_GETTER_FUNCTION_NAME = "toJsonApiWrapper"
         private const val SERIALIZER_EXTENSION_NAME = "toJsonApiString"
         private const val DESERIALIZER_EXTENSION_NAME = "decodeJsonApiString"
@@ -48,6 +49,7 @@ internal class JsonApiExtensionsSpecBuilder {
 
         private val KOTLINX_IMPORTS = arrayOf(
             "json.Json",
+            "json.jsonObject",
             "encodeToString",
             "decodeFromString",
             "PolymorphicSerializer"
@@ -60,9 +62,8 @@ internal class JsonApiExtensionsSpecBuilder {
         )
 
         private val CORE_EXTENSIONS_IMPORTS = arrayOf(
-            "extractClassDiscriminator",
-            "injectClassDiscriminator",
-            "findType"
+            "JsonApiDiscriminator",
+            "TypeExtractor"
         )
     }
 
@@ -81,15 +82,16 @@ internal class JsonApiExtensionsSpecBuilder {
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .returns(typeVariableName.copy(nullable = true))
+            .addStatement("val type = %L.findType(Json.parseToJsonElement(this).jsonObject[\"data\"]!!)", "TypeExtractor")
+            .addStatement("val discriminator = %T(type)", JsonApiDiscriminator::class)
+            .addStatement("val jsonElement = Json.parseToJsonElement(this)")
+            .addStatement("val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()")
             .addStatement(
-                "return %M.%M<%T<%T>>(this.%L(%S, this.%L())).data?.attributes",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes",
                 formatMember,
                 decodeMember,
                 JsonApiWrapper::class,
                 typeVariableName,
-                INJECT_CLASS_DISCRIMINATOR_FUNCTION_NAME,
-                CLASS_DISCRIMINATOR,
-                FIND_TYPE_FUNCTION_NAME
             )
             .build()
     }
@@ -159,7 +161,7 @@ internal class JsonApiExtensionsSpecBuilder {
         )
 
         fileSpec.addImport(
-            CORE_EXTENSIONS_PACKAGE,
+            CORE_DISCRIMINATORS_PACKAGE,
             *CORE_EXTENSIONS_IMPORTS
         )
 
@@ -192,16 +194,16 @@ internal class JsonApiExtensionsSpecBuilder {
                 FunSpec.builder(SERIALIZER_EXTENSION_NAME)
                     .receiver(it.key)
                     .returns(String::class)
+                    .addStatement("val type = this.toJsonApiWrapper()")
+                    .addStatement("val discriminator = JsonApiDiscriminator(type.data.type)")
                     .addStatement(
-                        "return %M.%M(%T(%T::class), this.%L()).%L(%S)",
+                        "val jsonString = %M.%M(%T(%T::class), type)",
                         formatMember,
                         encodeMember,
                         polymorphicSerializerClass,
-                        jsonApiWrapperClass,
-                        WRAPPER_GETTER_FUNCTION_NAME,
-                        EXTRACT_CLASS_DISCRIMINATOR_FUNCTION_NAME,
-                        CLASS_DISCRIMINATOR
+                        jsonApiWrapperClass
                     )
+                    .addStatement("return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()")
                     .build()
             )
         }

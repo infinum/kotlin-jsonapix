@@ -20,24 +20,8 @@ class MainActivity : AppCompatActivity() {
             "Banek"
         ).toJsonApiString()
 
-        val json = """
-            [
-            {
-                 "name":"Stef",
-                 "surname":"Banek"
-            },
-            {
-                 "name":"Marta",
-                 "surname":"Kekic"
-            }
-            ]
-        """.trimIndent()
+        binding.text.text = jsonApiString
 
-        val discriminator = CommonDiscriminator("person")
-
-        val injected = discriminator.inject(Json.parseToJsonElement(json)).toString()
-        binding.text.text = injected
-
-        binding.textDecoded.text = discriminator.extract(Json.parseToJsonElement(injected)).toString()
+        binding.textDecoded.text = jsonApiString.decodeJsonApiString<Person>()?.name
     }
 }
