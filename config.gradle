@@ -6,7 +6,7 @@ ext {
             "buildTools": "30.0.3"
     ]
     releaseConfig = [
-            "group"      : "com.infinum.collar",
+            "group"      : "com.infinum.jsonapix",
             "version"    : "0.0.1",
             "versionCode": 0 * 10000 + 0 * 100 + 1
     ]
