@@ -109,7 +109,9 @@ internal class JsonApiExtensionsSpecBuilder {
                 Json::class.asClassName(),
                 MEMBER_PARSE_TO_JSON_ELEMENT
             )
-            .addStatement("val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()")
+            .addStatement(
+                "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
+            )
             .addStatement(
                 "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes",
                 formatMember,
@@ -193,7 +195,9 @@ internal class JsonApiExtensionsSpecBuilder {
                 polymorphicSerializerClass,
                 jsonApiWrapperClass
             )
-            .addStatement("return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()")
+            .addStatement(
+                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()"
+            )
             .build()
     }
 

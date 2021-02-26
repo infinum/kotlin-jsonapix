@@ -82,8 +82,9 @@ internal object JsonApiWrapperSpecBuilder {
         .build()
 
     private fun errorsProperty(): PropertySpec = PropertySpec.builder(
-        ERRORS_TYPE_KEY, List::class.parameterizedBy(String::class)
-            .copy(nullable = true), KModifier.OVERRIDE
+        ERRORS_TYPE_KEY,
+        List::class.parameterizedBy(String::class).copy(nullable = true),
+        KModifier.OVERRIDE
     )
         .addAnnotation(serialNameSpec(ERRORS_TYPE_KEY))
         .initializer(ERRORS_TYPE_KEY)
