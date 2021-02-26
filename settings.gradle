@@ -1,6 +1,2 @@
-include ':generator'
-include ':processor'
-include ':annotations'
-include ':core'
-include ':sample'
+include ':processor', ':annotations', ':core', ':sample'
 rootProject.name = "android-jsonapix"

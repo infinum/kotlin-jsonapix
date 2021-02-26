@@ -1,10 +1,26 @@
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
-
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+plugins {
+    id "java-library"
+    id "kotlin"
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/ktlint.gradle"
+apply from: "$rootDir/cpd.gradle"
+
+dependencies {
+    implementation packages.kotlin.core
+    api project(":annotations")
+    compileOnly packages.kotlin.serialization_core
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

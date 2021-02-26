@@ -1,26 +1,75 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = "1.4.0"
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        gradlePluginPortal()
     }
-    dependencies {
-        classpath "com.android.tools.build:gradle:4.0.1"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+    apply from: "dependencies.gradle"
+    apply from: "config.gradle"
+
+    dependencies {
+        classpath packages.gradle
+        classpath packages.kotlin.plugin
+        classpath packages.kotlin.serialization_plugin
+        classpath packages.detekt.plugin
+        classpath packages.cpd.plugin
+        classpath packages.ktlint.plugin
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        jcenter() {
+            content {
+                includeModule("org.jetbrains.trove4j", "trove4j")
+                includeModule("org.jetbrains.kotlinx", "kotlinx-html-jvm")
+            }
+        }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+task detektAll(dependsOn: [
+        ':annotations:detekt',
+        ':core:detekt',
+        ':processor:detekt',
+        ':sample:detekt'
+]) {
+    group = "Verification"
+    description = "Run detekt on all modules"
+}
+
+task ktlintAll(dependsOn: [
+        ':annotations:ktlintCheck',
+        ':core:ktlintCheck',
+        ':processor:ktlintCheck',
+        ':sample:ktlintCheck',
+]) {
+    group = "Verification"
+    description = "Run ktlint on all modules"
+}
+
+task cpdAll(dependsOn: [
+        ':annotations:cpdCheck',
+        ':core:cpdCheck',
+        ':processor:cpdCheck',
+        ':sample:cpdCheck',
+]) {
+    group = "Verification"
+    description = "Run CPD on all modules"
+}
+
+task runStaticChecks(dependsOn: [
+        ':detektAll',
+        ':ktlintAll',
+        ':cpdAll'
+]) {
+    group = "Verification"
+    description = "Run static checks on all modules"
 }
