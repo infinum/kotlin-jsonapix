@@ -47,12 +47,12 @@ class JsonApiProcessor : AbstractProcessor() {
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
                 processAnnotation(it, type)
                 val className = it.simpleName.toString()
-                val pack = processingEnv.elementUtils.getPackageOf(it).toString()
-                val dataClass = ClassName(pack, className)
+                val elementPackage = processingEnv.elementUtils.getPackageOf(it).toString()
+                val dataClass = ClassName(elementPackage, className)
                 val generatedJsonWrapperName = "$WRAPPER_NAME_PREFIX$className"
                 val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
-                val jsonWrapperClass = ClassName(pack, generatedJsonWrapperName)
-                val resourceObjectClassName = ClassName(pack, generatedResourceObjectName)
+                val jsonWrapperClass = ClassName(elementPackage, generatedJsonWrapperName)
+                val resourceObjectClassName = ClassName(elementPackage, generatedResourceObjectName)
                 collector.add(dataClass, jsonWrapperClass, resourceObjectClassName, type)
             }
 
