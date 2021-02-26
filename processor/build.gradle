@@ -9,7 +9,6 @@ apply from: "$rootDir/ktlint.gradle"
 apply from: "$rootDir/cpd.gradle"
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
     compileOnly project(":annotations")

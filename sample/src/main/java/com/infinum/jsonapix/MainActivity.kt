@@ -2,10 +2,7 @@ package com.infinum.jsonapix
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.infinum.jsonapix.core.discriminators.CommonDiscriminator
 import com.infinum.jsonapix.databinding.ActivityMainBinding
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 
 class MainActivity : AppCompatActivity() {
 

@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
-class CommonDiscriminator(private val discriminator: String): Discriminator {
+class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
     companion object {
         private const val DISCRIMINATOR_NAME = "#class"
