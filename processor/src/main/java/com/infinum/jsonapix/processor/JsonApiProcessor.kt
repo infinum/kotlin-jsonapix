@@ -6,6 +6,12 @@ import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.SHORT
+import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.classinspector.elements.ElementsClassInspector
+import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
+import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
+import com.squareup.kotlinpoet.metadata.toImmutableKmClass
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -13,6 +19,7 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeKind
 import javax.tools.Diagnostic
 
 class JsonApiProcessor : AbstractProcessor() {
@@ -28,6 +35,7 @@ class JsonApiProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
+    @KotlinPoetMetadataPreview
     override fun process(
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
@@ -44,6 +52,9 @@ class JsonApiProcessor : AbstractProcessor() {
                     )
                     return true
                 }
+
+                processElementMembers(it)
+
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
                 processAnnotation(it, type)
                 val className = it.simpleName.toString()
@@ -73,5 +84,16 @@ class JsonApiProcessor : AbstractProcessor() {
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+    }
+
+    @KotlinPoetMetadataPreview
+    private fun processElementMembers(element: Element) {
+        val metadata = element.getAnnotation(Metadata::class.java)
+        val typeSpec = metadata.toImmutableKmClass().toTypeSpec(
+            ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
+        )
+        val membersSeparator = PropertyTypesSeparator(typeSpec)
+        val primitives = membersSeparator.getPrimitiveProperties()
+        val composites = membersSeparator.getCompositeProperties()
     }
 }

@@ -11,6 +11,9 @@ apply from: "$rootDir/cpd.gradle"
 dependencies {
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
+    implementation packages.kotlin.poet_metadata
+    implementation packages.kotlin.poet_metadata_specs
+    implementation packages.kotlin.poet_specs_elements
     compileOnly project(":annotations")
     compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core

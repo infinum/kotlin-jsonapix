@@ -17,6 +17,9 @@ ext.packages = [
                 "plugin"              : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                 "core"                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
                 "poet"                : "com.squareup:kotlinpoet:${versions.poet}",
+                "poet_metadata"       : "com.squareup:kotlinpoet-metadata:${versions.poet}",
+                "poet_metadata_specs" : "com.squareup:kotlinpoet-metadata-specs:${versions.poet}",
+                "poet_specs_elements" : "com.squareup:kotlinpoet-classinspector-elements:${versions.poet}",
                 "serialization_plugin": "org.jetbrains.kotlin:kotlin-serialization:${versions.kotlin}",
                 "serialization_core"  : "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
         ],
