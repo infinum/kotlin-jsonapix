@@ -11,7 +11,6 @@ import com.squareup.kotlinpoet.CHAR_SEQUENCE
 import com.squareup.kotlinpoet.COLLECTION
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.DOUBLE_ARRAY
-import com.squareup.kotlinpoet.ENUM
 import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.FLOAT_ARRAY
 import com.squareup.kotlinpoet.INT
@@ -66,7 +65,7 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
     private fun processClassParameters() {
         classType.propertySpecs.forEach { property ->
             if (property.type is ParameterizedTypeName) {
-                if ((property.type as ParameterizedTypeName).isSimple()) {
+                if ((property.type as ParameterizedTypeName).isCollection()) {
                     primitiveFields.add(property)
                 } else {
                     compositeFields.add(property)
@@ -141,7 +140,7 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
         }
     }
 
-    private fun ParameterizedTypeName.isSimple(): Boolean {
+    private fun ParameterizedTypeName.isCollection(): Boolean {
 
         return this.typeArguments.all { it.isPrimitiveOrString() } && when (rawType) {
             ARRAY,

@@ -19,8 +19,8 @@ internal object JsonApiWrapperSpecBuilder {
 
     private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
     private const val GENERATED_CLASS_PREFIX = "JsonApiSerializable_"
-    private const val DATA_KEY = "data"
-    private const val ERRORS_TYPE_KEY = "errors"
+    private const val KEY_DATA = "data"
+    private const val KEY_ERRORS = "errors"
     private val serializableClassName = Serializable::class.asClassName()
 
     fun build(
@@ -44,12 +44,12 @@ internal object JsonApiWrapperSpecBuilder {
                             .addParameters(
                                 listOf(
                                     ParameterSpec.builder(
-                                        DATA_KEY,
+                                        KEY_DATA,
                                         ResourceObject::class.asClassName()
                                             .parameterizedBy(dataClass)
                                     ).build(),
                                     ParameterSpec.builder(
-                                        ERRORS_TYPE_KEY,
+                                        KEY_ERRORS,
                                         List::class.parameterizedBy(String::class)
                                             .copy(nullable = true)
                                     ).defaultValue("%L", "null")
@@ -74,19 +74,19 @@ internal object JsonApiWrapperSpecBuilder {
             .build()
 
     private fun dataProperty(dataClass: ClassName): PropertySpec = PropertySpec.builder(
-        DATA_KEY, ResourceObject::class.asClassName().parameterizedBy(dataClass)
+        KEY_DATA, ResourceObject::class.asClassName().parameterizedBy(dataClass)
     ).addAnnotation(
-        serialNameSpec(DATA_KEY)
+        serialNameSpec(KEY_DATA)
     )
-        .initializer(DATA_KEY).addModifiers(KModifier.OVERRIDE)
+        .initializer(KEY_DATA).addModifiers(KModifier.OVERRIDE)
         .build()
 
     private fun errorsProperty(): PropertySpec = PropertySpec.builder(
-        ERRORS_TYPE_KEY,
+        KEY_ERRORS,
         List::class.parameterizedBy(String::class).copy(nullable = true),
         KModifier.OVERRIDE
     )
-        .addAnnotation(serialNameSpec(ERRORS_TYPE_KEY))
-        .initializer(ERRORS_TYPE_KEY)
+        .addAnnotation(serialNameSpec(KEY_ERRORS))
+        .initializer(KEY_ERRORS)
         .build()
 }

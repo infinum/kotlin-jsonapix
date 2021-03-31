@@ -7,11 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @JsonApiX("person")
 data class Person(
-    @SerialName("mName") val name: String,
-    val surname: String?,
-    val age: Int,
-    val dog: Dog,
-    val sample: Sample,
-    val listOfDogs: List<Dog>,
-    val listOfInts: List<Int>
+    val name: String,
+    val surname: String,
+    val age: Int
 )
