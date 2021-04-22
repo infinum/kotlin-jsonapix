@@ -62,7 +62,15 @@ class JsonApiProcessor : AbstractProcessor() {
                 val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
                 val jsonWrapperClass = ClassName(elementPackage, generatedJsonWrapperName)
                 val resourceObjectClassName = ClassName(elementPackage, generatedResourceObjectName)
-                collector.add(dataClass, jsonWrapperClass, resourceObjectClassName, type)
+
+                val metadata = it.getAnnotation(Metadata::class.java)
+                val typeSpec = metadata.toImmutableKmClass().toTypeSpec(
+                    ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
+                )
+                val membersSeparator = PropertyTypesSeparator(typeSpec)
+                val primitives = membersSeparator.getPrimitiveProperties()
+
+                collector.add(dataClass, jsonWrapperClass, resourceObjectClassName, type, primitives.map { primitive -> primitive.name })
             }
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
@@ -83,11 +91,16 @@ class JsonApiProcessor : AbstractProcessor() {
         val membersSeparator = PropertyTypesSeparator(typeSpec)
         val primitives = membersSeparator.getPrimitiveProperties()
 
-        val attributesTypeSpec = AttributesModelSpecBuilder.build(primitives, className)
+        val attributesTypeSpec = AttributesModelSpecBuilder.build(primitives, ClassName(generatedPackage, className))
         val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
             .addType(attributesTypeSpec).build()
         val resourceFileSpec =
-            ResourceObjectSpecBuilder.build(generatedPackage, className, type, attributesTypeSpec)
+            ResourceObjectSpecBuilder.build(
+                generatedPackage,
+                className,
+                type,
+                attributesTypeSpec.name!!
+            )
         val wrapperFileSpec = JsonApiWrapperSpecBuilder.build(generatedPackage, className, type)
 
         val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]

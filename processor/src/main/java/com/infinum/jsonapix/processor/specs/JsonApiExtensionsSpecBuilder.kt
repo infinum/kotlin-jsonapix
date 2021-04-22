@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.JsonApiWrapper
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
+import com.infinum.jsonapix.core.resources.AttributesModel
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -79,8 +80,14 @@ internal class JsonApiExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
 
-    fun add(data: ClassName, wrapper: ClassName, resourceObject: ClassName, type: String) {
-        specsMap[data] = ClassInfo(wrapper, resourceObject, type)
+    fun add(
+        data: ClassName,
+        wrapper: ClassName,
+        resourceObject: ClassName,
+        type: String,
+        propertyNames: List<String>
+    ) {
+        specsMap[data] = ClassInfo(wrapper, resourceObject, type, propertyNames)
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -113,7 +120,7 @@ internal class JsonApiExtensionsSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes?.toOriginalObject()",
                 formatMember,
                 decodeMember,
                 JsonApiWrapper::class,
@@ -201,17 +208,25 @@ internal class JsonApiExtensionsSpecBuilder {
             .build()
     }
 
-    private fun wrapperFunSpec(originalClass: ClassName, wrapperClass: ClassName): FunSpec =
-        FunSpec.builder(MEMBER_WRAPPER_GETTER)
+    private fun wrapperFunSpec(
+        originalClass: ClassName,
+        wrapperClass: ClassName,
+        properties: List<String>
+    ): FunSpec {
+        return FunSpec.builder(MEMBER_WRAPPER_GETTER)
             .receiver(originalClass)
             .returns(wrapperClass)
             .addStatement(
-                "return %T(%T_%T(this))",
+                "return %T(%T_%T(%T_%T.fromOriginalObject(this)))",
                 wrapperClass,
                 ResourceObject::class.asClassName(),
+                originalClass,
+                AttributesModel::class.asClassName(),
                 originalClass
             )
             .build()
+    }
+
 
     @SuppressWarnings("SpreadOperator")
     fun build(): FileSpec {
@@ -239,7 +254,13 @@ internal class JsonApiExtensionsSpecBuilder {
         fileSpec.addImport(PACKAGE_EXTENSIONS, *IMPORTS_JSON_API_WRAPPER)
 
         specsMap.entries.forEach {
-            fileSpec.addFunction(wrapperFunSpec(it.key, it.value.jsonWrapperClassName))
+            fileSpec.addFunction(
+                wrapperFunSpec(
+                    it.key,
+                    it.value.jsonWrapperClassName,
+                    it.value.propertyNames
+                )
+            )
             fileSpec.addFunction(serializeFunSpec(it.key))
         }
 

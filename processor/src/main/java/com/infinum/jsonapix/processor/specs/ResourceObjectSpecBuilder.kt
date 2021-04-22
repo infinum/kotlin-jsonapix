@@ -1,7 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.resources.ResourceObject
-import com.infinum.jsonapix.processor.PropertyTypesSeparator
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -27,7 +26,7 @@ object ResourceObjectSpecBuilder {
         pack: String,
         className: String,
         type: String,
-        attributes: TypeSpec
+        attributesClassName: String
     ): FileSpec {
 
         // TODO Atributi i compoziti moraju biti neki interfaceovi. Dodati ih u polymorphic.
@@ -49,7 +48,8 @@ object ResourceObjectSpecBuilder {
                             .addParameters(
                                 listOf(
                                     ParameterSpec.builder(
-                                        ATTRIBUTES_KEY, attributes
+                                        ATTRIBUTES_KEY,
+                                        ClassName(pack, attributesClassName).copy(nullable = true)
                                     ).build(),
                                     ParameterSpec.builder(
                                         ID_KEY, String::class
@@ -67,7 +67,7 @@ object ResourceObjectSpecBuilder {
                         listOf(
                             idProperty(),
                             typeProperty(),
-                            dataProperty(dataClass)
+                            attributesProperty(ClassName(pack, attributesClassName))
                         )
                     )
                     .build()
@@ -86,8 +86,8 @@ object ResourceObjectSpecBuilder {
         .initializer(ID_KEY)
         .build()
 
-    private fun dataProperty(dataClass: ClassName): PropertySpec = PropertySpec.builder(
-        ATTRIBUTES_KEY, dataClass
+    private fun attributesProperty(dataClass: ClassName): PropertySpec = PropertySpec.builder(
+        ATTRIBUTES_KEY, dataClass.copy(nullable = true)
     ).addAnnotation(
         serialNameSpec(ATTRIBUTES_KEY)
     )
