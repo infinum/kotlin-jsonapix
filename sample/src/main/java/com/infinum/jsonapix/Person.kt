@@ -1,7 +1,6 @@
 package com.infinum.jsonapix
 
 import com.infinum.jsonapix.annotations.JsonApiX
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable

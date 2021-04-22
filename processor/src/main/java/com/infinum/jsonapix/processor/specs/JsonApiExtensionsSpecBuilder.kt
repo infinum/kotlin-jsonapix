@@ -238,7 +238,6 @@ internal class JsonApiExtensionsSpecBuilder {
             .build()
     }
 
-
     @SuppressWarnings("SpreadOperator")
     fun build(): FileSpec {
         val fileSpec = FileSpec.builder(PACKAGE_EXTENSIONS, FILE_NAME_EXTENSIONS)
