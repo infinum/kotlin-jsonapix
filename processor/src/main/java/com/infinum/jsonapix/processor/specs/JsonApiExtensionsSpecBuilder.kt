@@ -84,10 +84,10 @@ internal class JsonApiExtensionsSpecBuilder {
         data: ClassName,
         wrapper: ClassName,
         resourceObject: ClassName,
-        type: String,
-        propertyNames: List<String>
+        attributesObject: ClassName,
+        type: String
     ) {
-        specsMap[data] = ClassInfo(wrapper, resourceObject, type, propertyNames)
+        specsMap[data] = ClassInfo(wrapper, resourceObject, attributesObject, type)
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -120,7 +120,7 @@ internal class JsonApiExtensionsSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes?.toOriginalObject()",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes",
                 formatMember,
                 decodeMember,
                 JsonApiWrapper::class,
@@ -172,8 +172,20 @@ internal class JsonApiExtensionsSpecBuilder {
                 it.resourceObjectClassName
             )
         }
-
         codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder
+            .addStatement("%M(%T::class) {", polymorpicMember, AttributesModel::class)
+        codeBlockBuilder.indent()
+        specsMap.values.forEach {
+            codeBlockBuilder.addStatement(
+                "%M(%T::class)",
+                subclassMember,
+                it.attributesWrapperClassName
+            )
+        }
+        codeBlockBuilder.unindent().addStatement("}")
+
         codeBlockBuilder.unindent().addStatement("}")
 
         return PropertySpec.builder(MEMBER_SERIALIZERS_MODULE, SerializersModule::class)
@@ -210,8 +222,7 @@ internal class JsonApiExtensionsSpecBuilder {
 
     private fun wrapperFunSpec(
         originalClass: ClassName,
-        wrapperClass: ClassName,
-        properties: List<String>
+        wrapperClass: ClassName
     ): FunSpec {
         return FunSpec.builder(MEMBER_WRAPPER_GETTER)
             .receiver(originalClass)
@@ -257,8 +268,7 @@ internal class JsonApiExtensionsSpecBuilder {
             fileSpec.addFunction(
                 wrapperFunSpec(
                     it.key,
-                    it.value.jsonWrapperClassName,
-                    it.value.propertyNames
+                    it.value.jsonWrapperClassName
                 )
             )
             fileSpec.addFunction(serializeFunSpec(it.key))
@@ -266,7 +276,8 @@ internal class JsonApiExtensionsSpecBuilder {
 
         fileSpec.addProperty(jsonApiWrapperSerializerPropertySpec())
         fileSpec.addProperty(formatPropertySpec())
-        fileSpec.addFunction(deserializeFunSpec())
+        // TODO To be added once complex objects are handled
+        // fileSpec.addFunction(deserializeFunSpec())
 
         return fileSpec.build()
     }

@@ -27,6 +27,7 @@ class JsonApiProcessor : AbstractProcessor() {
         private const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
         private const val WRAPPER_NAME_PREFIX = "JsonApiSerializable_"
         private const val RESOURCE_OBJECT_PREFIX = "ResourceObject_"
+        private const val ATTRIBUTES_OBJECT_PREFIX = "AttributesModel_"
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
@@ -60,17 +61,19 @@ class JsonApiProcessor : AbstractProcessor() {
                 val dataClass = ClassName(elementPackage, className)
                 val generatedJsonWrapperName = "$WRAPPER_NAME_PREFIX$className"
                 val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
-                val jsonWrapperClass = ClassName(elementPackage, generatedJsonWrapperName)
+                val generatedAttributesObjectName = "$ATTRIBUTES_OBJECT_PREFIX$className"
+                val jsonWrapperClassName = ClassName(elementPackage, generatedJsonWrapperName)
                 val resourceObjectClassName = ClassName(elementPackage, generatedResourceObjectName)
+                val attributesObjectClassName =
+                    ClassName(elementPackage, generatedAttributesObjectName)
 
-                val metadata = it.getAnnotation(Metadata::class.java)
-                val typeSpec = metadata.toImmutableKmClass().toTypeSpec(
-                    ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
+                collector.add(
+                    dataClass,
+                    jsonWrapperClassName,
+                    resourceObjectClassName,
+                    attributesObjectClassName,
+                    type
                 )
-                val membersSeparator = PropertyTypesSeparator(typeSpec)
-                val primitives = membersSeparator.getPrimitiveProperties()
-
-                collector.add(dataClass, jsonWrapperClass, resourceObjectClassName, type, primitives.map { primitive -> primitive.name })
             }
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
@@ -91,7 +94,8 @@ class JsonApiProcessor : AbstractProcessor() {
         val membersSeparator = PropertyTypesSeparator(typeSpec)
         val primitives = membersSeparator.getPrimitiveProperties()
 
-        val attributesTypeSpec = AttributesModelSpecBuilder.build(primitives, ClassName(generatedPackage, className))
+        val attributesTypeSpec =
+            AttributesModelSpecBuilder.build(primitives, ClassName(generatedPackage, className))
         val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
             .addType(attributesTypeSpec).build()
         val resourceFileSpec =

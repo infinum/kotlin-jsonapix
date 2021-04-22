@@ -28,10 +28,6 @@ object ResourceObjectSpecBuilder {
         type: String,
         attributesClassName: String
     ): FileSpec {
-
-        // TODO Atributi i compoziti moraju biti neki interfaceovi. Dodati ih u polymorphic.
-        // TODO Za atribute nije tesko no kompoziti moraju biti ResourceIdentifier i treba znati prepoznati dal je lista u pitanju ili objekt. Ako je lista rezultat je JsonArray. Ako nije onda obican json object
-        // TODO Included blok prima ResourceObject. Opet ista prica prepoznati dal je lista ili jedan objekt
         val dataClass = ClassName(pack, className)
         val generatedName = "${GENERATED_CLASS_PREFIX}$className"
 
