@@ -95,7 +95,11 @@ class JsonApiProcessor : AbstractProcessor() {
         val primitives = membersSeparator.getPrimitiveProperties()
 
         val attributesTypeSpec =
-            AttributesModelSpecBuilder.build(primitives, ClassName(generatedPackage, className))
+            AttributesModelSpecBuilder.build(
+                primitives,
+                ClassName(generatedPackage, className),
+                type
+            )
         val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
             .addType(attributesTypeSpec).build()
         val resourceFileSpec =
