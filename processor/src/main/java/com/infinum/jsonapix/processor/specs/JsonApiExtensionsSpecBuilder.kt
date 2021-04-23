@@ -228,7 +228,7 @@ internal class JsonApiExtensionsSpecBuilder {
             .receiver(originalClass)
             .returns(wrapperClass)
             .addStatement(
-                "return %T(%T_%T(%T_%T.fromOriginalObject(this)))",
+                "return %T(%T_%T(attributes = %T_%T.fromOriginalObject(this)))",
                 wrapperClass,
                 ResourceObject::class.asClassName(),
                 originalClass,

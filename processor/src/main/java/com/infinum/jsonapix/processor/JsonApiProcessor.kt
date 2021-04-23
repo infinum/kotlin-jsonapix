@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesModelSpecBuilder
+import com.infinum.jsonapix.processor.specs.IncludedModelSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
@@ -86,35 +87,58 @@ class JsonApiProcessor : AbstractProcessor() {
     private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
+        val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
 
         val metadata = element.getAnnotation(Metadata::class.java)
         val typeSpec = metadata.toImmutableKmClass().toTypeSpec(
             ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
         )
+
+        var hasPrimitives = false
+        var hasComposites = false
         val membersSeparator = PropertyTypesSeparator(typeSpec)
         val primitives = membersSeparator.getPrimitiveProperties()
+        val composites = membersSeparator.getCompositeProperties()
 
-        val attributesTypeSpec =
-            AttributesModelSpecBuilder.build(
-                primitives,
-                ClassName(generatedPackage, className),
-                type
-            )
-        val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
-            .addType(attributesTypeSpec).build()
+        if (primitives.isNotEmpty()) {
+            hasPrimitives = true
+            val attributesTypeSpec =
+                AttributesModelSpecBuilder.build(
+                    primitives,
+                    ClassName(generatedPackage, className),
+                    type
+                )
+            val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
+                .addType(attributesTypeSpec).build()
+
+            attributesFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+        }
+
+        if (composites.isNotEmpty()) {
+            hasComposites = true
+            val includedTypeSpec =
+                IncludedModelSpecBuilder.build(
+                    composites,
+                    ClassName(generatedPackage, className),
+                    type
+                )
+            val includedFileSpec = FileSpec.builder(generatedPackage, includedTypeSpec.name!!)
+                .addType(includedTypeSpec).build()
+
+            includedFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+        }
+
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
                 generatedPackage,
                 className,
                 type,
-                attributesTypeSpec.name!!
+                hasPrimitives,
+                hasComposites
             )
         val wrapperFileSpec = JsonApiWrapperSpecBuilder.build(generatedPackage, className, type)
 
-        val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
-
-        attributesFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
-        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }
