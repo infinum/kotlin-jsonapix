@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.JsonApiWrapper
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.AttributesModel
+import com.infinum.jsonapix.core.resources.IncludedModel
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -81,13 +82,14 @@ internal class JsonApiExtensionsSpecBuilder {
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
 
     fun add(
+        type: String,
         data: ClassName,
         wrapper: ClassName,
         resourceObject: ClassName,
-        attributesObject: ClassName,
-        type: String
+        attributesObject: ClassName?,
+        includedObject: ClassName?
     ) {
-        specsMap[data] = ClassInfo(wrapper, resourceObject, attributesObject, type)
+        specsMap[data] = ClassInfo(type, wrapper, resourceObject, attributesObject, includedObject)
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -178,11 +180,27 @@ internal class JsonApiExtensionsSpecBuilder {
             .addStatement("%M(%T::class) {", polymorpicMember, AttributesModel::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
-            codeBlockBuilder.addStatement(
-                "%M(%T::class)",
-                subclassMember,
-                it.attributesWrapperClassName
-            )
+            if (it.attributesWrapperClassName != null) {
+                codeBlockBuilder.addStatement(
+                    "%M(%T::class)",
+                    subclassMember,
+                    it.attributesWrapperClassName
+                )
+            }
+        }
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder
+            .addStatement("%M(%T::class) {", polymorpicMember, IncludedModel::class)
+        codeBlockBuilder.indent()
+        specsMap.values.forEach {
+            if (it.includedWrapperClassName != null) {
+                codeBlockBuilder.addStatement(
+                    "%M(%T::class)",
+                    subclassMember,
+                    it.includedWrapperClassName
+                )
+            }
         }
         codeBlockBuilder.unindent().addStatement("}")
 

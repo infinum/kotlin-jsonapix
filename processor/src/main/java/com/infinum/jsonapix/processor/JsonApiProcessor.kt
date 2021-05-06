@@ -29,7 +29,10 @@ class JsonApiProcessor : AbstractProcessor() {
         private const val WRAPPER_NAME_PREFIX = "JsonApiSerializable_"
         private const val RESOURCE_OBJECT_PREFIX = "ResourceObject_"
         private const val ATTRIBUTES_OBJECT_PREFIX = "AttributesModel_"
+        private const val INCLUDED_OBJECT_PREFIX = "IncludedModel_"
     }
+
+    private val collector = JsonApiExtensionsSpecBuilder()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
         mutableSetOf(JsonApiX::class.java.name)
@@ -41,7 +44,6 @@ class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val collector = JsonApiExtensionsSpecBuilder()
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
         if (elements?.isNullOrEmpty() == false) {
@@ -56,25 +58,6 @@ class JsonApiProcessor : AbstractProcessor() {
 
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
                 processAnnotation(it, type)
-
-                val className = it.simpleName.toString()
-                val elementPackage = processingEnv.elementUtils.getPackageOf(it).toString()
-                val dataClass = ClassName(elementPackage, className)
-                val generatedJsonWrapperName = "$WRAPPER_NAME_PREFIX$className"
-                val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
-                val generatedAttributesObjectName = "$ATTRIBUTES_OBJECT_PREFIX$className"
-                val jsonWrapperClassName = ClassName(elementPackage, generatedJsonWrapperName)
-                val resourceObjectClassName = ClassName(elementPackage, generatedResourceObjectName)
-                val attributesObjectClassName =
-                    ClassName(elementPackage, generatedAttributesObjectName)
-
-                collector.add(
-                    dataClass,
-                    jsonWrapperClassName,
-                    resourceObjectClassName,
-                    attributesObjectClassName,
-                    type
-                )
             }
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
@@ -94,8 +77,17 @@ class JsonApiProcessor : AbstractProcessor() {
             ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
         )
 
+        val inputDataClass = ClassName(generatedPackage, className)
+        val generatedJsonWrapperName = "$WRAPPER_NAME_PREFIX$className"
+        val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
+
+        val jsonWrapperClassName = ClassName(generatedPackage, generatedJsonWrapperName)
+        val resourceObjectClassName = ClassName(generatedPackage, generatedResourceObjectName)
+
         var hasPrimitives = false
         var hasComposites = false
+        var attributesClassName: ClassName? = null
+        var includedClassName: ClassName? = null
         val membersSeparator = PropertyTypesSeparator(typeSpec)
         val primitives = membersSeparator.getPrimitiveProperties()
         val composites = membersSeparator.getCompositeProperties()
@@ -112,6 +104,10 @@ class JsonApiProcessor : AbstractProcessor() {
                 .addType(attributesTypeSpec).build()
 
             attributesFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+
+            val generatedAttributesObjectName = "$ATTRIBUTES_OBJECT_PREFIX$className"
+            attributesClassName =
+                ClassName(generatedPackage, generatedAttributesObjectName)
         }
 
         if (composites.isNotEmpty()) {
@@ -126,7 +122,19 @@ class JsonApiProcessor : AbstractProcessor() {
                 .addType(includedTypeSpec).build()
 
             includedFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+
+            val generatedIncludedObjectName = "$INCLUDED_OBJECT_PREFIX$className"
+            includedClassName = ClassName(generatedPackage, generatedIncludedObjectName)
         }
+
+        collector.add(
+            type,
+            inputDataClass,
+            jsonWrapperClassName,
+            resourceObjectClassName,
+            attributesClassName,
+            includedClassName
+        )
 
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(

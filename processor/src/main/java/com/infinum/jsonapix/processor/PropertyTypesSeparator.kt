@@ -1,5 +1,7 @@
 package com.infinum.jsonapix.processor
 
+import com.infinum.jsonapix.annotations.HasMany
+import com.infinum.jsonapix.annotations.HasOne
 import com.squareup.kotlinpoet.ARRAY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BOOLEAN_ARRAY
@@ -44,6 +46,7 @@ import com.squareup.kotlinpoet.U_LONG
 import com.squareup.kotlinpoet.U_LONG_ARRAY
 import com.squareup.kotlinpoet.U_SHORT
 import com.squareup.kotlinpoet.U_SHORT_ARRAY
+import com.squareup.kotlinpoet.asTypeName
 
 internal class PropertyTypesSeparator(private val classType: TypeSpec) {
 
@@ -63,22 +66,19 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
     }
 
     private fun processClassParameters() {
-        classType.propertySpecs.forEach { property ->
-            if (property.type is ParameterizedTypeName) {
-                if ((property.type as ParameterizedTypeName).isCollection()) {
-                    primitiveFields.add(property)
-                } else {
-                    compositeFields.add(property)
-                }
+        classType.propertySpecs.filter { !it.delegated }.forEach { property ->
+            if (property.isRelationship()) {
+                compositeFields.add(property)
             } else {
-                if (property.type.isPrimitiveOrString()) {
-                    primitiveFields.add(property)
-                } else {
-                    compositeFields.add(property)
-                }
+                primitiveFields.add(property)
             }
         }
     }
+
+    private fun PropertySpec.isRelationship(): Boolean =
+        annotations.any {
+            it.typeName == HasOne::class.asTypeName() || it.typeName == HasMany::class.asTypeName()
+        }
 
     private fun TypeName.isPrimitiveOrString(): Boolean {
         return when (this) {
