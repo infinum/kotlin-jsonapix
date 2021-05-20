@@ -6,6 +6,7 @@ import com.infinum.jsonapix.processor.specs.AttributesModelSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedModelSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
+import com.infinum.jsonapix.processor.specs.ResourceIdentifierSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -145,8 +146,11 @@ class JsonApiProcessor : AbstractProcessor() {
                 hasComposites
             )
         val wrapperFileSpec = JsonApiWrapperSpecBuilder.build(generatedPackage, className, type)
+        val resourceIdentifierFileSpec = ResourceIdentifierSpecBuilder
+            .build(generatedPackage, className, type)
 
-        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+        resourceIdentifierFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
+        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }

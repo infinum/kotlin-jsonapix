@@ -12,5 +12,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val dog =
+            Person("Stef", "Banek", 27, listOf(Dog("Bella", 2), Dog("Bongo", 7)), Dog("Bella", 2))
+        binding.text.text = dog.toJsonApiString()
     }
 }

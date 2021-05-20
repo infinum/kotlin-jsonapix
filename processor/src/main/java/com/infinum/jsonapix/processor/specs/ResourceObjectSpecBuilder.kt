@@ -142,7 +142,7 @@ object ResourceObjectSpecBuilder {
 
     private fun nullParam(name: String, typeName: TypeName): ParameterSpec =
         ParameterSpec.builder(name, typeName, KModifier.OVERRIDE)
-            .defaultValue("%L", "null")
+            .defaultValue("%L", null)
             .build()
 
     private fun typeProperty(): PropertySpec = PropertySpec.builder(
