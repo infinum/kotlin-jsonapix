@@ -1,0 +1,25 @@
+plugins {
+    id "kotlin"
+    id "kotlinx-serialization"
+    id "kotlin-kapt"
+    id "java-library"
+}
+
+dependencies {
+    compileOnly "com.android.tools.lint:lint-api:27.2.1"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.5.0"
+    testImplementation "com.android.tools.lint:lint:27.2.1"
+    testImplementation "com.android.tools.lint:lint-tests:27.2.1"
+    testImplementation "com.google.truth:truth:0.44"
+}
+
+jar {
+    manifest {
+        attributes('Lint-Registry-v2': 'IssueRegistry')
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

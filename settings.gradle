@@ -1,2 +1,3 @@
 include ':processor', ':annotations', ':core', ':sample'
 rootProject.name = "android-jsonapix"
+include ':lint-rules'

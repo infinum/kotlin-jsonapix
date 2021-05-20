@@ -1,5 +1,5 @@
 ext.versions = [
-        "gradle"       : "4.1.2",
+        "gradle"       : '4.2.1',
         "kotlin"       : "1.4.30",
         "poet"         : "1.7.2",
         "serialization": "1.0.1",
