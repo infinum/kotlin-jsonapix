@@ -5,6 +5,10 @@ import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.AttributesModel
 import com.infinum.jsonapix.core.resources.IncludedModel
+import com.infinum.jsonapix.core.resources.LinksModel
+import com.infinum.jsonapix.core.resources.ManyRelationshipMemberModel
+import com.infinum.jsonapix.core.resources.OneRelationshipMemberModel
+import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -48,6 +52,7 @@ internal class JsonApiExtensionsSpecBuilder {
         private const val MEMBER_POLYMORPHIC = "polymorphic"
         private const val MEMBER_SUBCLASS = "subclass"
         private const val MEMBER_JSON_OBJECT = "jsonObject"
+        private const val MEMBER_CONTEXTUAL = "contextual"
 
         private const val CLASS_DISCRIMINATOR = "#class"
         private const val KEY_DATA = "data"
@@ -69,6 +74,7 @@ internal class JsonApiExtensionsSpecBuilder {
 
         private val IMPORTS_KOTLINX_MODULES = arrayOf(
             "polymorphic",
+            "contextual",
             "subclass",
             "SerializersModule"
         )
@@ -155,6 +161,10 @@ internal class JsonApiExtensionsSpecBuilder {
             PACKAGE_KOTLINX_SERIALIZATION_MODULES,
             MEMBER_SUBCLASS
         )
+        val contextualMember = MemberName(
+            PACKAGE_KOTLINX_SERIALIZATION_MODULES,
+            MEMBER_CONTEXTUAL
+        )
         codeBlockBuilder.addStatement("%T {", SerializersModule::class)
         codeBlockBuilder.indent()
             .addStatement("%M(%T::class) {", polymorpicMember, JsonApiWrapper::class)
@@ -204,6 +214,37 @@ internal class JsonApiExtensionsSpecBuilder {
         }
         codeBlockBuilder.unindent().addStatement("}")
 
+        codeBlockBuilder
+            .addStatement("%M(%T::class) {", polymorpicMember, ResourceIdentifier::class)
+        codeBlockBuilder.indent()
+        specsMap.keys.forEach {
+            codeBlockBuilder.addStatement(
+                "%M(%T_%T::class)",
+                subclassMember,
+                ResourceIdentifier::class,
+                it
+            )
+        }
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder.addStatement(
+            "%M(%T.serializer())",
+            contextualMember,
+            LinksModel::class.asClassName()
+        )
+
+        codeBlockBuilder.addStatement(
+            "%M(%T.serializer())",
+            contextualMember,
+            OneRelationshipMemberModel::class.asClassName()
+        )
+
+        codeBlockBuilder.addStatement(
+            "%M(%T.serializer())",
+            contextualMember,
+            ManyRelationshipMemberModel::class.asClassName()
+        )
+
         codeBlockBuilder.unindent().addStatement("}")
 
         return PropertySpec.builder(MEMBER_SERIALIZERS_MODULE, SerializersModule::class)
@@ -244,7 +285,8 @@ internal class JsonApiExtensionsSpecBuilder {
         attributesClass: ClassName?,
         includedClass: ClassName?
     ): FunSpec {
-        val builderArgs = mutableListOf<Any>(wrapperClass, ResourceObject::class.asClassName(), originalClass)
+        val builderArgs =
+            mutableListOf<Any>(wrapperClass, ResourceObject::class.asClassName(), originalClass)
         val returnStatement = StringBuilder("return %T(%T_%T(")
         if (attributesClass != null) {
             builderArgs.add(attributesClass)
