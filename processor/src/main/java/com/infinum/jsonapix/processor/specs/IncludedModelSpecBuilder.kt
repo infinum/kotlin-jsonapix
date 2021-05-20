@@ -1,6 +1,5 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.resources.AttributesModel
 import com.infinum.jsonapix.core.resources.IncludedModel
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -41,6 +40,17 @@ object IncludedModelSpecBuilder {
                     .addParameters(parameterSpecs)
                     .build()
             )
+            .addType(
+                TypeSpec.companionObjectBuilder()
+                    .addFunction(
+                        fromOriginalObjectSpec(
+                            className,
+                            generatedName,
+                            attributes
+                        )
+                    )
+                    .build()
+            )
             .addProperties(attributes)
             .build()
     }
@@ -49,4 +59,20 @@ object IncludedModelSpecBuilder {
         AnnotationSpec.builder(SerialName::class)
             .addMember(SERIAL_NAME_PLACEHOLDER, name)
             .build()
+
+    private fun fromOriginalObjectSpec(
+        originalClass: ClassName,
+        generatedName: String,
+        included: List<PropertySpec>
+    ): FunSpec {
+        val constructorString = included.joinToString(", ") {
+            "${it.name} = originalObject.${it.name}"
+        }
+        return FunSpec.builder("fromOriginalObject")
+            .addParameter(
+                ParameterSpec.builder("originalObject", originalClass).build()
+            )
+            .addStatement("return %L($constructorString)", generatedName)
+            .build()
+    }
 }

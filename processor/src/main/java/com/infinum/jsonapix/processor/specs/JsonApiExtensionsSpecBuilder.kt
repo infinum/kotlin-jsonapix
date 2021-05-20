@@ -240,18 +240,30 @@ internal class JsonApiExtensionsSpecBuilder {
 
     private fun wrapperFunSpec(
         originalClass: ClassName,
-        wrapperClass: ClassName
+        wrapperClass: ClassName,
+        attributesClass: ClassName?,
+        includedClass: ClassName?
     ): FunSpec {
+        val builderArgs = mutableListOf<Any>(wrapperClass, ResourceObject::class.asClassName(), originalClass)
+        val returnStatement = StringBuilder("return %T(%T_%T(")
+        if (attributesClass != null) {
+            builderArgs.add(attributesClass)
+            returnStatement.append("attributes = %T.fromOriginalObject(this)")
+        }
+        if (includedClass != null) {
+            if (attributesClass != null) {
+                returnStatement.append(", ")
+            }
+            builderArgs.add(includedClass)
+            returnStatement.append("included = %T.fromOriginalObject(this)")
+        }
+        returnStatement.append("))")
         return FunSpec.builder(MEMBER_WRAPPER_GETTER)
             .receiver(originalClass)
             .returns(wrapperClass)
             .addStatement(
-                "return %T(%T_%T(attributes = %T_%T.fromOriginalObject(this)))",
-                wrapperClass,
-                ResourceObject::class.asClassName(),
-                originalClass,
-                AttributesModel::class.asClassName(),
-                originalClass
+                returnStatement.toString(),
+                *builderArgs.toTypedArray()
             )
             .build()
     }
@@ -285,7 +297,9 @@ internal class JsonApiExtensionsSpecBuilder {
             fileSpec.addFunction(
                 wrapperFunSpec(
                     it.key,
-                    it.value.jsonWrapperClassName
+                    it.value.jsonWrapperClassName,
+                    it.value.attributesWrapperClassName,
+                    it.value.includedWrapperClassName
                 )
             )
             fileSpec.addFunction(serializeFunSpec(it.key))
@@ -293,8 +307,7 @@ internal class JsonApiExtensionsSpecBuilder {
 
         fileSpec.addProperty(jsonApiWrapperSerializerPropertySpec())
         fileSpec.addProperty(formatPropertySpec())
-        // TODO To be added once complex objects are handled
-        // fileSpec.addFunction(deserializeFunSpec())
+        //fileSpec.addFunction(deserializeFunSpec())
 
         return fileSpec.build()
     }
