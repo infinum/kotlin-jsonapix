@@ -65,6 +65,14 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
         return compositeFields.toList()
     }
 
+    fun getManyRelationships(): List<PropertySpec> {
+        return compositeFields.filter { it.isManyRelationship() }
+    }
+
+    fun getOneRelationships(): List<PropertySpec> {
+        return compositeFields.filter { it.isOneRelationship() }
+    }
+
     private fun processClassParameters() {
         classType.propertySpecs.filter { !it.delegated }.forEach { property ->
             if (property.isRelationship()) {
@@ -78,6 +86,16 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
     private fun PropertySpec.isRelationship(): Boolean =
         annotations.any {
             it.typeName == HasOne::class.asTypeName() || it.typeName == HasMany::class.asTypeName()
+        }
+
+    private fun PropertySpec.isManyRelationship(): Boolean =
+        annotations.any {
+            it.typeName == HasMany::class.asTypeName()
+        }
+
+    private fun PropertySpec.isOneRelationship(): Boolean =
+        annotations.any {
+            it.typeName == HasOne::class.asTypeName()
         }
 
     private fun TypeName.isPrimitiveOrString(): Boolean {

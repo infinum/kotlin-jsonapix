@@ -2,6 +2,7 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.resources.AttributesModel
 import com.infinum.jsonapix.core.resources.IncludedModel
+import com.infinum.jsonapix.core.resources.LinksModel
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -28,6 +29,8 @@ object ResourceObjectSpecBuilder {
     private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
     private const val ATTRIBUTES_KEY = "attributes"
     private const val INCLUDED_KEY = "included"
+    private const val RELATIONSHIPS_KEY = "relationships"
+    private const val LINKS_KEY = "links"
     private val serializableClassName = Serializable::class.asClassName()
     private val transientClassName = Transient::class.asClassName()
 
@@ -64,10 +67,13 @@ object ResourceObjectSpecBuilder {
             propsList.add(
                 nullProperty(
                     ATTRIBUTES_KEY,
-                    AttributesModel::class.asClassName().copy(nullable = true)
+                    AttributesModel::class.asClassName().copy(nullable = true),
+                    true
                 )
             )
         }
+
+        // TODO Add relationship model
 
         if (hasComposites) {
             paramsList.add(namedParam(pack, includedClassName, INCLUDED_KEY))
@@ -82,10 +88,19 @@ object ResourceObjectSpecBuilder {
             propsList.add(
                 nullProperty(
                     INCLUDED_KEY,
-                    IncludedModel::class.asClassName().copy(nullable = true)
+                    IncludedModel::class.asClassName().copy(nullable = true),
+                    true
                 )
             )
         }
+
+        paramsList.add(nullParam(LINKS_KEY, LinksModel::class.asClassName().copy(nullable = true)))
+        propsList.add(
+            nullProperty(
+                LINKS_KEY,
+                LinksModel::class.asClassName().copy(nullable = true)
+            )
+        )
 
         return FileSpec.builder(pack, generatedName)
             .addType(
@@ -131,14 +146,21 @@ object ResourceObjectSpecBuilder {
             .initializer(key)
             .build()
 
-    private fun nullProperty(name: String, typeName: TypeName): PropertySpec = PropertySpec.builder(
+    private fun nullProperty(
+        name: String,
+        typeName: TypeName,
+        isTransient: Boolean = false
+    ): PropertySpec = PropertySpec.builder(
         name,
         typeName,
         KModifier.OVERRIDE
-    )
-        .addAnnotation(transientClassName)
-        .initializer(name)
-        .build()
+    ).apply {
+        if (isTransient) {
+            addAnnotation(transientClassName)
+        }
+        initializer(name)
+    }.build()
+
 
     private fun nullParam(name: String, typeName: TypeName): ParameterSpec =
         ParameterSpec.builder(name, typeName, KModifier.OVERRIDE)

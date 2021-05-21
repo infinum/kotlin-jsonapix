@@ -46,7 +46,19 @@ object ResourceIdentifierSpecBuilder {
                             .addParameters(parameters)
                             .build()
                     )
-                    .addProperties(parameters.map { PropertySpec.builder(it.name, it.type).initializer(it.name).build() })
+                    .addType(
+                        TypeSpec.companionObjectBuilder()
+                            .addFunction(
+                                fromOriginalObjectSpec(
+                                    generatedName,
+                                    type
+                                )
+                            )
+                            .build()
+                    )
+                    .addProperties(parameters.map {
+                        PropertySpec.builder(it.name, it.type).initializer(it.name).build()
+                    })
                     .build()
             )
             .build()
@@ -56,4 +68,16 @@ object ResourceIdentifierSpecBuilder {
         AnnotationSpec.builder(SerialName::class)
             .addMember(SERIAL_NAME_PLACEHOLDER, name)
             .build()
+
+    private fun fromOriginalObjectSpec(
+        generatedName: String,
+        type: String
+    ): FunSpec {
+        return FunSpec.builder("fromOriginalObject")
+            .addParameter(
+                ParameterSpec.builder("id", String::class).defaultValue("%S", "").build()
+            )
+            .addStatement("return %L(id = id, type = %S)", generatedName, type)
+            .build()
+    }
 }
