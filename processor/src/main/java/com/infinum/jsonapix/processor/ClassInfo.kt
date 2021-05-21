@@ -7,5 +7,6 @@ data class ClassInfo(
     val jsonWrapperClassName: ClassName,
     val resourceObjectClassName: ClassName,
     val attributesWrapperClassName: ClassName?,
+    val relationshipsObjectClassName: ClassName?,
     val includedWrapperClassName: ClassName?
 )

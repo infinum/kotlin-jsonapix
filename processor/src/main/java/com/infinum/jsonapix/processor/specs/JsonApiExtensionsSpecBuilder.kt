@@ -8,6 +8,7 @@ import com.infinum.jsonapix.core.resources.IncludedModel
 import com.infinum.jsonapix.core.resources.LinksModel
 import com.infinum.jsonapix.core.resources.ManyRelationshipMemberModel
 import com.infinum.jsonapix.core.resources.OneRelationshipMemberModel
+import com.infinum.jsonapix.core.resources.RelationshipsModel
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
@@ -93,9 +94,17 @@ internal class JsonApiExtensionsSpecBuilder {
         wrapper: ClassName,
         resourceObject: ClassName,
         attributesObject: ClassName?,
+        relationshipsObject: ClassName?,
         includedObject: ClassName?
     ) {
-        specsMap[data] = ClassInfo(type, wrapper, resourceObject, attributesObject, includedObject)
+        specsMap[data] = ClassInfo(
+            type,
+            wrapper,
+            resourceObject,
+            attributesObject,
+            relationshipsObject,
+            includedObject
+        )
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -195,6 +204,20 @@ internal class JsonApiExtensionsSpecBuilder {
                     "%M(%T::class)",
                     subclassMember,
                     it.attributesWrapperClassName
+                )
+            }
+        }
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder
+            .addStatement("%M(%T::class) {", polymorpicMember, RelationshipsModel::class)
+        codeBlockBuilder.indent()
+        specsMap.values.forEach {
+            if (it.relationshipsObjectClassName != null) {
+                codeBlockBuilder.addStatement(
+                    "%M(%T::class)",
+                    subclassMember,
+                    it.relationshipsObjectClassName
                 )
             }
         }

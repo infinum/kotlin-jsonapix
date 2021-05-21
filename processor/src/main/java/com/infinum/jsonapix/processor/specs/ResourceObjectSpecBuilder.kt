@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.resources.AttributesModel
 import com.infinum.jsonapix.core.resources.IncludedModel
 import com.infinum.jsonapix.core.resources.LinksModel
+import com.infinum.jsonapix.core.resources.RelationshipsModel
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -26,6 +27,7 @@ object ResourceObjectSpecBuilder {
     private const val GENERATED_CLASS_PREFIX = "ResourceObject_"
     private const val ATTRIBUTES_PREFIX = "AttributesModel_"
     private const val INCLUDED_PREFIX = "IncludedModel_"
+    private const val RELATIONSHIPS_PREFIX = "RelationshipsModel_"
     private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
     private const val ATTRIBUTES_KEY = "attributes"
     private const val INCLUDED_KEY = "included"
@@ -42,9 +44,10 @@ object ResourceObjectSpecBuilder {
         hasComposites: Boolean
     ): FileSpec {
         val dataClass = ClassName(pack, className)
-        val generatedName = "${GENERATED_CLASS_PREFIX}$className"
-        val attributesClassName = "${ATTRIBUTES_PREFIX}$className"
-        val includedClassName = "${INCLUDED_PREFIX}$className"
+        val generatedName = "$GENERATED_CLASS_PREFIX$className"
+        val attributesClassName = "$ATTRIBUTES_PREFIX$className"
+        val includedClassName = "$INCLUDED_PREFIX$className"
+        val relationshipsClassName = "$RELATIONSHIPS_PREFIX$className"
 
         val paramsList = mutableListOf<ParameterSpec>()
         val propsList = mutableListOf<PropertySpec>()
@@ -73,12 +76,25 @@ object ResourceObjectSpecBuilder {
             )
         }
 
-        // TODO Add relationship model
-
         if (hasComposites) {
+            paramsList.add(namedParam(pack, relationshipsClassName, RELATIONSHIPS_KEY))
+            propsList.add(namedProperty(pack, relationshipsClassName, RELATIONSHIPS_KEY))
             paramsList.add(namedParam(pack, includedClassName, INCLUDED_KEY))
             propsList.add(namedProperty(pack, includedClassName, INCLUDED_KEY))
         } else {
+            paramsList.add(
+                nullParam(
+                    RELATIONSHIPS_KEY,
+                    RelationshipsModel::class.asClassName().copy(nullable = true)
+                )
+            )
+            propsList.add(
+                nullProperty(
+                    RELATIONSHIPS_KEY,
+                    RelationshipsModel::class.asClassName().copy(nullable = true),
+                    true
+                )
+            )
             paramsList.add(
                 nullParam(
                     INCLUDED_KEY,
