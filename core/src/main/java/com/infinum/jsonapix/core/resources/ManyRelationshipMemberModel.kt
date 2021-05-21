@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class ManyRelationshipMemberModel(
-    @SerialName("links") val links: LinksModel?,
-    @SerialName("data") val data: List<ResourceIdentifier>
+    @SerialName("data") val data: List<ResourceIdentifier>,
+    @SerialName("links") val links: LinksModel? = null
 )

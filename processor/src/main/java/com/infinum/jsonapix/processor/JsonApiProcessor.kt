@@ -7,7 +7,6 @@ import com.infinum.jsonapix.processor.specs.IncludedModelSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipModelSpecBuilder
-import com.infinum.jsonapix.processor.specs.ResourceIdentifierSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -142,9 +141,10 @@ class JsonApiProcessor : AbstractProcessor() {
                 manyRelationships
             )
 
-            val relationshipsFileSpec = FileSpec.builder(generatedPackage, relationshipsTypeSpec.name!!)
-                .addType(relationshipsTypeSpec)
-                .build()
+            val relationshipsFileSpec =
+                FileSpec.builder(generatedPackage, relationshipsTypeSpec.name!!)
+                    .addType(relationshipsTypeSpec)
+                    .build()
             relationshipsFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
             val generatedRelationshipsObjectName = "$RELATIONSHIPS_OBJECT_PREFIX$className"
@@ -170,11 +170,8 @@ class JsonApiProcessor : AbstractProcessor() {
                 hasComposites
             )
         val wrapperFileSpec = JsonApiWrapperSpecBuilder.build(generatedPackage, className, type)
-        val resourceIdentifierFileSpec = ResourceIdentifierSpecBuilder
-            .build(generatedPackage, className, type)
 
-        resourceIdentifierFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
-        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }

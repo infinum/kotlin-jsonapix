@@ -19,6 +19,8 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
@@ -26,6 +28,7 @@ import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import java.util.function.Function
 
 internal class JsonApiExtensionsSpecBuilder {
 
@@ -237,19 +240,6 @@ internal class JsonApiExtensionsSpecBuilder {
         }
         codeBlockBuilder.unindent().addStatement("}")
 
-        codeBlockBuilder
-            .addStatement("%M(%T::class) {", polymorpicMember, ResourceIdentifier::class)
-        codeBlockBuilder.indent()
-        specsMap.keys.forEach {
-            codeBlockBuilder.addStatement(
-                "%M(%T_%T::class)",
-                subclassMember,
-                ResourceIdentifier::class,
-                it
-            )
-        }
-        codeBlockBuilder.unindent().addStatement("}")
-
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
@@ -266,6 +256,12 @@ internal class JsonApiExtensionsSpecBuilder {
             "%M(%T.serializer())",
             contextualMember,
             ManyRelationshipMemberModel::class.asClassName()
+        )
+
+        codeBlockBuilder.addStatement(
+            "%M(%T.serializer())",
+            contextualMember,
+            ResourceIdentifier::class.asClassName()
         )
 
         codeBlockBuilder.unindent().addStatement("}")
@@ -333,6 +329,45 @@ internal class JsonApiExtensionsSpecBuilder {
             .build()
     }
 
+    private fun oneRelationshipModel(): FunSpec {
+        val typeVariableName = TypeVariableName.invoke(MEMBER_GENERIC_TYPE_VARIABLE)
+        return FunSpec.builder("toOneRelationshipModel")
+            .addModifiers(KModifier.INLINE)
+            .addTypeVariable(typeVariableName.copy(reified = true))
+            .receiver(typeVariableName)
+            .returns(OneRelationshipMemberModel::class)
+            .addParameter("type", String::class)
+            .addParameter(ParameterSpec.builder("id", String::class).defaultValue("%S", "").build())
+            .addStatement(
+                "return %T(data = %T(type, id))",
+                OneRelationshipMemberModel::class.asClassName(),
+                ResourceIdentifier::class.asClassName()
+            )
+            .build()
+    }
+
+    private fun manyRelationshipModel(): FunSpec {
+        val typeVariableName = TypeVariableName.invoke(MEMBER_GENERIC_TYPE_VARIABLE)
+        return FunSpec.builder("toManyRelationshipModel")
+            .receiver(Collection::class.asClassName().parameterizedBy(typeVariableName))
+            .returns(ManyRelationshipMemberModel::class)
+            .addModifiers(KModifier.INLINE)
+            .addTypeVariable(typeVariableName.copy(reified = true))
+            .addParameter("type", String::class)
+            .addParameter(
+                ParameterSpec.builder(
+                    "idMapper", Function1::class.asClassName()
+                        .parameterizedBy(typeVariableName, String::class.asClassName())
+                ).defaultValue("{ \"\" }").build()
+            )
+            .addStatement(
+                "return %T(data = map { %T(type, idMapper(it)) })",
+                ManyRelationshipMemberModel::class.asClassName(),
+                ResourceIdentifier::class.asClassName()
+            )
+            .build()
+    }
+
     @SuppressWarnings("SpreadOperator")
     fun build(): FileSpec {
         val fileSpec = FileSpec.builder(PACKAGE_EXTENSIONS, FILE_NAME_EXTENSIONS)
@@ -372,6 +407,8 @@ internal class JsonApiExtensionsSpecBuilder {
 
         fileSpec.addProperty(jsonApiWrapperSerializerPropertySpec())
         fileSpec.addProperty(formatPropertySpec())
+        fileSpec.addFunction(manyRelationshipModel())
+        fileSpec.addFunction(oneRelationshipModel())
         //fileSpec.addFunction(deserializeFunSpec())
 
         return fileSpec.build()
