@@ -15,6 +15,7 @@ class AnnotationDetectorTest {
             class Example {
             }""").indented())
             .issues(IssueAnnotationImport)
+            .allowMissingSdk()
             .run()
             .expectClean()
     }
@@ -24,15 +25,16 @@ class AnnotationDetectorTest {
         TestLintTask.lint()
             .files(TestFiles.java("""
           package foo;
-          import com.infinum.jsonapix.annotations.JsonApiX
+          import com.infinum.jsonapix.annotations.JsonApiX;
           class Example {
           }""").indented())
             .issues(IssueAnnotationImport)
+            .allowMissingSdk()
             .run()
             .expect("""
           |src/foo/Example.java:2: Warning: Required import [IssueAnnotationImport]
           |import com.infinum.jsonapix.annotations.JsonApiX;
-          |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           |0 errors, 1 warnings""".trimMargin())
     }
 }

@@ -1,16 +1,24 @@
 plugins {
+    id "java-library"
     id "kotlin"
     id "kotlinx-serialization"
     id "kotlin-kapt"
-    id "java-library"
 }
 
+apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/ktlint.gradle"
+apply from: "$rootDir/cpd.gradle"
+
 dependencies {
+    implementation packages.kotlin.core
+    implementation packages.kotlin.poet
+    compileOnly project(":annotations")
+    compileOnly project(":core")
+    compileOnly packages.kotlin.serialization_core
     compileOnly "com.android.tools.lint:lint-api:27.2.1"
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.5.0"
     testImplementation "com.android.tools.lint:lint:27.2.1"
     testImplementation "com.android.tools.lint:lint-tests:27.2.1"
-    testImplementation "com.google.truth:truth:0.44"
+    testImplementation 'com.google.truth:truth:1.1.3'
 }
 
 jar {
@@ -19,7 +27,13 @@ jar {
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
