@@ -302,15 +302,26 @@ internal class JsonApiExtensionsSpecBuilder {
         originalClass: ClassName,
         wrapperClass: ClassName,
         attributesClass: ClassName?,
+        relationshipsClass: ClassName?,
         includedClass: ClassName?
     ): FunSpec {
         val builderArgs =
             mutableListOf<Any>(wrapperClass, ResourceObject::class.asClassName(), originalClass)
         val returnStatement = StringBuilder("return %T(%T_%T(")
+
         if (attributesClass != null) {
             builderArgs.add(attributesClass)
             returnStatement.append("attributes = %T.fromOriginalObject(this)")
         }
+
+        if (relationshipsClass != null) {
+            if (attributesClass != null) {
+                returnStatement.append(", ")
+            }
+            returnStatement.append("relationships = %T.fromOriginalObject(this)")
+            builderArgs.add(relationshipsClass)
+        }
+
         returnStatement.append(")")
         if (includedClass != null) {
             returnStatement.append(", ")
@@ -398,7 +409,8 @@ internal class JsonApiExtensionsSpecBuilder {
                     it.key,
                     it.value.jsonWrapperClassName,
                     it.value.attributesWrapperClassName,
-                    it.value.includedWrapperClassName
+                    it.value.relationshipsObjectClassName,
+                    it.value.includedWrapperClassName,
                 )
             )
             fileSpec.addFunction(serializeFunSpec(it.key))
