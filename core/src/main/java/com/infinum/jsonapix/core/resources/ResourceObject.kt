@@ -5,6 +5,5 @@ interface ResourceObject<out Model> {
     val type: String
     val attributes: AttributesModel?
     val relationships: RelationshipsModel?
-    val included: IncludedModel?
     val links: LinksModel?
 }

@@ -169,7 +169,8 @@ class JsonApiProcessor : AbstractProcessor() {
                 hasPrimitives,
                 hasComposites
             )
-        val wrapperFileSpec = JsonApiWrapperSpecBuilder.build(generatedPackage, className, type)
+        val wrapperFileSpec =
+            JsonApiWrapperSpecBuilder.build(generatedPackage, className, type, hasComposites)
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))

@@ -26,11 +26,9 @@ object ResourceObjectSpecBuilder {
     private const val TYPE_KEY = "type"
     private const val GENERATED_CLASS_PREFIX = "ResourceObject_"
     private const val ATTRIBUTES_PREFIX = "AttributesModel_"
-    private const val INCLUDED_PREFIX = "IncludedModel_"
     private const val RELATIONSHIPS_PREFIX = "RelationshipsModel_"
     private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
     private const val ATTRIBUTES_KEY = "attributes"
-    private const val INCLUDED_KEY = "included"
     private const val RELATIONSHIPS_KEY = "relationships"
     private const val LINKS_KEY = "links"
     private val serializableClassName = Serializable::class.asClassName()
@@ -46,7 +44,6 @@ object ResourceObjectSpecBuilder {
         val dataClass = ClassName(pack, className)
         val generatedName = "$GENERATED_CLASS_PREFIX$className"
         val attributesClassName = "$ATTRIBUTES_PREFIX$className"
-        val includedClassName = "$INCLUDED_PREFIX$className"
         val relationshipsClassName = "$RELATIONSHIPS_PREFIX$className"
 
         val paramsList = mutableListOf<ParameterSpec>()
@@ -79,8 +76,6 @@ object ResourceObjectSpecBuilder {
         if (hasComposites) {
             paramsList.add(namedParam(pack, relationshipsClassName, RELATIONSHIPS_KEY))
             propsList.add(namedProperty(pack, relationshipsClassName, RELATIONSHIPS_KEY))
-            paramsList.add(namedParam(pack, includedClassName, INCLUDED_KEY))
-            propsList.add(namedProperty(pack, includedClassName, INCLUDED_KEY))
         } else {
             paramsList.add(
                 nullParam(
@@ -92,19 +87,6 @@ object ResourceObjectSpecBuilder {
                 nullProperty(
                     RELATIONSHIPS_KEY,
                     RelationshipsModel::class.asClassName().copy(nullable = true),
-                    true
-                )
-            )
-            paramsList.add(
-                nullParam(
-                    INCLUDED_KEY,
-                    IncludedModel::class.asClassName().copy(nullable = true)
-                )
-            )
-            propsList.add(
-                nullProperty(
-                    INCLUDED_KEY,
-                    IncludedModel::class.asClassName().copy(nullable = true),
                     true
                 )
             )
@@ -162,6 +144,13 @@ object ResourceObjectSpecBuilder {
             .initializer(key)
             .build()
 
+    private fun namedParam(pack: String, name: String, key: String): ParameterSpec =
+        ParameterSpec.builder(
+            key,
+            ClassName(pack, name).copy(nullable = true)
+        ).defaultValue("%L", null)
+            .build()
+
     private fun nullProperty(
         name: String,
         typeName: TypeName,
@@ -173,6 +162,8 @@ object ResourceObjectSpecBuilder {
     ).apply {
         if (isTransient) {
             addAnnotation(transientClassName)
+        } else {
+            addAnnotation(serialNameSpec(name))
         }
         initializer(name)
     }.build()
@@ -193,11 +184,4 @@ object ResourceObjectSpecBuilder {
         TYPE_KEY, String::class
     ).defaultValue("%S", type)
         .build()
-
-    private fun namedParam(pack: String, name: String, key: String): ParameterSpec =
-        ParameterSpec.builder(
-            key,
-            ClassName(pack, name).copy(nullable = true)
-        ).defaultValue("%L", null)
-            .build()
 }

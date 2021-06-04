@@ -311,14 +311,13 @@ internal class JsonApiExtensionsSpecBuilder {
             builderArgs.add(attributesClass)
             returnStatement.append("attributes = %T.fromOriginalObject(this)")
         }
+        returnStatement.append(")")
         if (includedClass != null) {
-            if (attributesClass != null) {
-                returnStatement.append(", ")
-            }
+            returnStatement.append(", ")
             builderArgs.add(includedClass)
             returnStatement.append("included = %T.fromOriginalObject(this)")
         }
-        returnStatement.append("))")
+        returnStatement.append(")")
         return FunSpec.builder(MEMBER_WRAPPER_GETTER)
             .receiver(originalClass)
             .returns(wrapperClass)
