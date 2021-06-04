@@ -378,6 +378,40 @@ internal class JsonApiExtensionsSpecBuilder {
             .build()
     }
 
+    private fun resourceObject(
+        originalClass: ClassName,
+        resourceObjectClass: ClassName,
+        attributesClass: ClassName?,
+        relationshipsClass: ClassName?
+    ): FunSpec {
+        val returnStatement = StringBuilder("return %T(")
+        val builderArgs = mutableListOf<Any>(resourceObjectClass)
+
+        if (attributesClass != null) {
+            returnStatement.append("attributes = %T.fromOriginalObject(this)")
+            builderArgs.add(attributesClass)
+        }
+
+        if (relationshipsClass != null) {
+            if (attributesClass != null) {
+                returnStatement.append(", ")
+            }
+            returnStatement.append("relationships = %T.fromOriginalObject(this)")
+            builderArgs.add(relationshipsClass)
+        }
+
+        returnStatement.append(")")
+
+        return FunSpec.builder("toResourceObject")
+            .receiver(originalClass)
+            .returns(resourceObjectClass)
+            .addStatement(
+                returnStatement.toString(),
+                *builderArgs.toTypedArray()
+            )
+            .build()
+    }
+
     @SuppressWarnings("SpreadOperator")
     fun build(): FileSpec {
         val fileSpec = FileSpec.builder(PACKAGE_EXTENSIONS, FILE_NAME_EXTENSIONS)
@@ -404,6 +438,14 @@ internal class JsonApiExtensionsSpecBuilder {
         fileSpec.addImport(PACKAGE_EXTENSIONS, *IMPORTS_JSON_API_WRAPPER)
 
         specsMap.entries.forEach {
+            fileSpec.addFunction(
+                resourceObject(
+                    it.key,
+                    it.value.resourceObjectClassName,
+                    it.value.attributesWrapperClassName,
+                    it.value.relationshipsObjectClassName
+                )
+            )
             fileSpec.addFunction(
                 wrapperFunSpec(
                     it.key,

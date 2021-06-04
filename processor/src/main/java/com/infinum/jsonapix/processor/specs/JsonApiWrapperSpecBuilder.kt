@@ -25,19 +25,16 @@ internal object JsonApiWrapperSpecBuilder {
     private const val KEY_DATA = "data"
     private const val KEY_ERRORS = "errors"
     private const val INCLUDED_KEY = "included"
-    private const val INCLUDED_PREFIX = "IncludedModel_"
     private val serializableClassName = Serializable::class.asClassName()
     private val transientClassName = Transient::class.asClassName()
 
     fun build(
         pack: String,
         className: String,
-        type: String,
-        hasComposites: Boolean
+        type: String
     ): FileSpec {
         val dataClass = ClassName(pack, className)
         val generatedName = "$GENERATED_CLASS_PREFIX$className"
-        val includedClassName = "${INCLUDED_PREFIX}$className"
 
         val properties = mutableListOf<PropertySpec>()
         val params = mutableListOf<ParameterSpec>()
@@ -52,24 +49,25 @@ internal object JsonApiWrapperSpecBuilder {
 
         properties.add(dataProperty(dataClass))
 
-        if (hasComposites) {
-            params.add(namedParam(pack, includedClassName, INCLUDED_KEY))
-            properties.add(namedProperty(pack, includedClassName, INCLUDED_KEY))
-        } else {
-            params.add(
-                nullParam(
-                    INCLUDED_KEY,
-                    IncludedModel::class.asClassName().copy(nullable = true)
-                )
+        params.add(
+            nullParam(
+                INCLUDED_KEY,
+                List::class.asClassName().parameterizedBy(
+                    ResourceObject::class.asClassName()
+                        .parameterizedBy(Any::class.asClassName())
+                ).copy(nullable = true)
             )
-            properties.add(
-                nullProperty(
-                    INCLUDED_KEY,
-                    IncludedModel::class.asClassName().copy(nullable = true),
-                    true
-                )
+        )
+        properties.add(
+            nullProperty(
+                INCLUDED_KEY,
+                List::class.asClassName().parameterizedBy(
+                    ResourceObject::class.asClassName()
+                        .parameterizedBy(Any::class.asClassName())
+                ).copy(nullable = true),
+                true
             )
-        }
+        )
 
         params.add(
             ParameterSpec.builder(

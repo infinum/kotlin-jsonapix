@@ -2,6 +2,7 @@ package com.infinum.jsonapix
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -15,5 +16,9 @@ class MainActivity : AppCompatActivity() {
         val dog =
             Person("Stef", "Banek", 27, listOf(Dog("Bella", 2), Dog("Bongo", 7)), Dog("Bella", 2))
         binding.text.text = dog.toJsonApiString()
+    }
+
+    private fun Person.toResourceObject(): ResourceObject_Person {
+        return ResourceObject_Person(attributes = AttributesModel_Person.fromOriginalObject(this), relationships = RelationshipsModel_Person.fromOriginalObject(this))
     }
 }
