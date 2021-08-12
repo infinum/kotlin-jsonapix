@@ -31,7 +31,6 @@ class JsonApiProcessor : AbstractProcessor() {
         private const val RESOURCE_OBJECT_PREFIX = "ResourceObject_"
         private const val ATTRIBUTES_OBJECT_PREFIX = "AttributesModel_"
         private const val RELATIONSHIPS_OBJECT_PREFIX = "RelationshipsModel_"
-        private const val INCLUDED_OBJECT_PREFIX = "IncludedModel_"
     }
 
     private val collector = JsonApiExtensionsSpecBuilder()
@@ -89,7 +88,6 @@ class JsonApiProcessor : AbstractProcessor() {
         var hasPrimitives = false
         var hasComposites = false
         var attributesClassName: ClassName? = null
-        var includedClassName: ClassName? = null
         var relationshipsClassName: ClassName? = null
         val membersSeparator = PropertyTypesSeparator(typeSpec)
         val primitives = membersSeparator.getPrimitiveProperties()
@@ -115,19 +113,6 @@ class JsonApiProcessor : AbstractProcessor() {
 
         if (composites.isNotEmpty()) {
             hasComposites = true
-            val includedTypeSpec =
-                IncludedModelSpecBuilder.build(
-                    composites,
-                    ClassName(generatedPackage, className),
-                    type
-                )
-            val includedFileSpec = FileSpec.builder(generatedPackage, includedTypeSpec.name!!)
-                .addType(includedTypeSpec).build()
-
-            includedFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
-
-            val generatedIncludedObjectName = "$INCLUDED_OBJECT_PREFIX$className"
-            includedClassName = ClassName(generatedPackage, generatedIncludedObjectName)
         }
 
         val oneRelationships = membersSeparator.getOneRelationships()
@@ -158,7 +143,7 @@ class JsonApiProcessor : AbstractProcessor() {
             resourceObjectClassName,
             attributesClassName,
             relationshipsClassName,
-            includedClassName
+            IncludedModelSpecBuilder.build(oneRelationships, manyRelationships)
         )
 
         val resourceFileSpec =

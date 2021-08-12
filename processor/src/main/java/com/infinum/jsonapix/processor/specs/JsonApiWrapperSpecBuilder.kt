@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.JsonApiWrapper
 import com.infinum.jsonapix.core.resources.IncludedModel
 import com.infinum.jsonapix.core.resources.ResourceObject
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -14,6 +15,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -54,7 +56,7 @@ internal object JsonApiWrapperSpecBuilder {
                 INCLUDED_KEY,
                 List::class.asClassName().parameterizedBy(
                     ResourceObject::class.asClassName()
-                        .parameterizedBy(Any::class.asClassName())
+                        .parameterizedBy(getAnnotatedAnyType())
                 ).copy(nullable = true)
             )
         )
@@ -63,9 +65,8 @@ internal object JsonApiWrapperSpecBuilder {
                 INCLUDED_KEY,
                 List::class.asClassName().parameterizedBy(
                     ResourceObject::class.asClassName()
-                        .parameterizedBy(Any::class.asClassName())
-                ).copy(nullable = true),
-                true
+                        .parameterizedBy(getAnnotatedAnyType())
+                ).copy(nullable = true)
             )
         )
 
@@ -99,21 +100,10 @@ internal object JsonApiWrapperSpecBuilder {
             .build()
     }
 
-    private fun namedProperty(pack: String, name: String, key: String): PropertySpec =
-        PropertySpec.builder(
-            key, ClassName(pack, name).copy(nullable = true), KModifier.OVERRIDE
-        ).addAnnotation(
-            serialNameSpec(key)
-        )
-            .initializer(key)
-            .build()
-
-    private fun namedParam(pack: String, name: String, key: String): ParameterSpec =
-        ParameterSpec.builder(
-            key,
-            ClassName(pack, name).copy(nullable = true)
-        ).defaultValue("%L", null)
-            .build()
+    private fun getAnnotatedAnyType(): TypeName {
+        val contextual = AnnotationSpec.builder(Contextual::class).build()
+        return ANY.copy(annotations = ANY.annotations + contextual)
+    }
 
     private fun nullProperty(
         name: String,

@@ -98,7 +98,7 @@ internal class JsonApiExtensionsSpecBuilder {
         resourceObject: ClassName,
         attributesObject: ClassName?,
         relationshipsObject: ClassName?,
-        includedObject: ClassName?
+        includedListStatement: CodeBlock?
     ) {
         specsMap[data] = ClassInfo(
             type,
@@ -106,7 +106,7 @@ internal class JsonApiExtensionsSpecBuilder {
             resourceObject,
             attributesObject,
             relationshipsObject,
-            includedObject
+            includedListStatement
         )
     }
 
@@ -226,20 +226,6 @@ internal class JsonApiExtensionsSpecBuilder {
         }
         codeBlockBuilder.unindent().addStatement("}")
 
-        codeBlockBuilder
-            .addStatement("%M(%T::class) {", polymorpicMember, IncludedModel::class)
-        codeBlockBuilder.indent()
-        specsMap.values.forEach {
-            if (it.includedWrapperClassName != null) {
-                codeBlockBuilder.addStatement(
-                    "%M(%T::class)",
-                    subclassMember,
-                    it.includedWrapperClassName
-                )
-            }
-        }
-        codeBlockBuilder.unindent().addStatement("}")
-
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
@@ -303,7 +289,7 @@ internal class JsonApiExtensionsSpecBuilder {
         wrapperClass: ClassName,
         attributesClass: ClassName?,
         relationshipsClass: ClassName?,
-        includedClass: ClassName?
+        includedListStatement: String?
     ): FunSpec {
         val builderArgs =
             mutableListOf<Any>(wrapperClass, ResourceObject::class.asClassName(), originalClass)
@@ -323,10 +309,9 @@ internal class JsonApiExtensionsSpecBuilder {
         }
 
         returnStatement.append(")")
-        if (includedClass != null) {
+        if (includedListStatement != null) {
             returnStatement.append(", ")
-            builderArgs.add(includedClass)
-            returnStatement.append("included = %T.fromOriginalObject(this)")
+            returnStatement.append("included = $includedListStatement")
         }
         returnStatement.append(")")
         return FunSpec.builder(MEMBER_WRAPPER_GETTER)
@@ -452,7 +437,7 @@ internal class JsonApiExtensionsSpecBuilder {
                     it.value.jsonWrapperClassName,
                     it.value.attributesWrapperClassName,
                     it.value.relationshipsObjectClassName,
-                    it.value.includedWrapperClassName,
+                    it.value.includedListStatement?.toString()
                 )
             )
             fileSpec.addFunction(serializeFunSpec(it.key))

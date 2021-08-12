@@ -18,7 +18,4 @@ class MainActivity : AppCompatActivity() {
         binding.text.text = dog.toJsonApiString()
     }
 
-    private fun Person.toResourceObject(): ResourceObject_Person {
-        return ResourceObject_Person(attributes = AttributesModel_Person.fromOriginalObject(this), relationships = RelationshipsModel_Person.fromOriginalObject(this))
-    }
 }

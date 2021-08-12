@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor
 
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 
 data class ClassInfo(
     val type: String,
@@ -8,5 +9,5 @@ data class ClassInfo(
     val resourceObjectClassName: ClassName,
     val attributesWrapperClassName: ClassName?,
     val relationshipsObjectClassName: ClassName?,
-    val includedWrapperClassName: ClassName?
+    val includedListStatement: CodeBlock?
 )
