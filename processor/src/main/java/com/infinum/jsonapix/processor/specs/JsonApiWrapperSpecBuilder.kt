@@ -37,6 +37,7 @@ internal object JsonApiWrapperSpecBuilder {
     ): FileSpec {
         val dataClass = ClassName(pack, className)
         val generatedName = "$GENERATED_CLASS_PREFIX$className"
+        val resourceObjectClassName = ClassName(pack, "ResourceObject_$className")
 
         val properties = mutableListOf<PropertySpec>()
         val params = mutableListOf<ParameterSpec>()
@@ -44,12 +45,11 @@ internal object JsonApiWrapperSpecBuilder {
         params.add(
             ParameterSpec.builder(
                 KEY_DATA,
-                ResourceObject::class.asClassName()
-                    .parameterizedBy(dataClass)
+                resourceObjectClassName
             ).build()
         )
 
-        properties.add(dataProperty(dataClass))
+        properties.add(dataProperty(resourceObjectClassName))
 
         params.add(
             nullParam(
@@ -132,8 +132,8 @@ internal object JsonApiWrapperSpecBuilder {
         AnnotationSpec.builder(SerialName::class).addMember(SERIAL_NAME_PLACEHOLDER, name)
             .build()
 
-    private fun dataProperty(dataClass: ClassName): PropertySpec = PropertySpec.builder(
-        KEY_DATA, ResourceObject::class.asClassName().parameterizedBy(dataClass)
+    private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
+        KEY_DATA, resourceObject
     ).addAnnotation(
         serialNameSpec(KEY_DATA)
     )

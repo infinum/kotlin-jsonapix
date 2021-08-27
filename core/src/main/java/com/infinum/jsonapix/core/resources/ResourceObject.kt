@@ -6,4 +6,6 @@ interface ResourceObject<out Model> {
     val attributes: AttributesModel?
     val relationships: RelationshipsModel?
     val links: LinksModel?
+
+    fun <Model> getOriginalOrNull(): Model?
 }
