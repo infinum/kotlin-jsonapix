@@ -22,6 +22,7 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
@@ -448,6 +449,31 @@ internal class JsonApiExtensionsSpecBuilder {
         fileSpec.addFunction(manyRelationshipModel())
         fileSpec.addFunction(oneRelationshipModel())
         //fileSpec.addFunction(deserializeFunSpec())
+
+        return fileSpec.build()
+    }
+
+    fun buildTypeMap(): FileSpec {
+        val fileSpec = FileSpec.builder(PACKAGE_EXTENSIONS, "TypeMap")
+        val typeSpec = TypeSpec.enumBuilder("TypeMap")
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("typeName", String::class)
+                    .build()
+            )
+
+        specsMap.forEach { (className, classInfo) ->
+            typeSpec.addEnumConstant(classInfo.type,
+                TypeSpec.anonymousClassBuilder().addSuperclassConstructorParameter("%S", className.simpleName)
+                    .build()
+            )
+        }
+        typeSpec.addProperty(
+            PropertySpec.builder("typeName", String::class)
+                .initializer("typeName")
+                .build()
+        )
+        fileSpec.addType(typeSpec.build())
 
         return fileSpec.build()
     }

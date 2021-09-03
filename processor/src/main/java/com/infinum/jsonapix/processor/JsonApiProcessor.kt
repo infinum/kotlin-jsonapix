@@ -63,6 +63,7 @@ class JsonApiProcessor : AbstractProcessor() {
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
             collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
+            collector.buildTypeMap().writeTo(File(kaptKotlinGeneratedDir))
         }
         return true
     }
