@@ -93,13 +93,18 @@ class JsonApiProcessor : AbstractProcessor() {
         val primitives = membersSeparator.getPrimitiveProperties()
         val composites = membersSeparator.getCompositeProperties()
 
+        if (composites.isNotEmpty()) {
+            hasComposites = true
+        }
+
         if (primitives.isNotEmpty()) {
             hasPrimitives = true
             val attributesTypeSpec =
                 AttributesModelSpecBuilder.build(
                     primitives,
                     ClassName(generatedPackage, className),
-                    type
+                    type,
+                    hasComposites
                 )
             val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
                 .addType(attributesTypeSpec).build()
@@ -109,10 +114,6 @@ class JsonApiProcessor : AbstractProcessor() {
             val generatedAttributesObjectName = "$ATTRIBUTES_OBJECT_PREFIX$className"
             attributesClassName =
                 ClassName(generatedPackage, generatedAttributesObjectName)
-        }
-
-        if (composites.isNotEmpty()) {
-            hasComposites = true
         }
 
         val oneRelationships = membersSeparator.getOneRelationships()

@@ -1,7 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiWrapper
-import com.infinum.jsonapix.core.resources.IncludedModel
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -148,4 +147,8 @@ internal object JsonApiWrapperSpecBuilder {
         .addAnnotation(serialNameSpec(KEY_ERRORS))
         .initializer(KEY_ERRORS)
         .build()
+
+//    private fun getOriginalFunSpec(): FunSpec {
+//
+//    }
 }

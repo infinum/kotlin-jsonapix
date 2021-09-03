@@ -61,13 +61,14 @@ object ResourceObjectSpecBuilder {
             paramsList.add(
                 nullParam(
                     ATTRIBUTES_KEY,
-                    AttributesModel::class.asClassName().copy(nullable = true)
+                    AttributesModel::class.asClassName().parameterizedBy(ClassName(pack, className))
+                        .copy(nullable = true)
                 )
             )
             propsList.add(
                 nullProperty(
                     ATTRIBUTES_KEY,
-                    AttributesModel::class.asClassName().copy(nullable = true),
+                    AttributesModel::class.asClassName().parameterizedBy(ClassName(pack, className)).copy(nullable = true),
                     true
                 )
             )
@@ -167,7 +168,6 @@ object ResourceObjectSpecBuilder {
         }
         initializer(name)
     }.build()
-
 
     private fun nullParam(name: String, typeName: TypeName): ParameterSpec =
         ParameterSpec.builder(name, typeName, KModifier.OVERRIDE)
