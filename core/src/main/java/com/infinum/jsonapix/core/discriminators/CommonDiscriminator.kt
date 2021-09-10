@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.core.discriminators
 
+import com.infinum.jsonapix.core.common.JsonApiConstants
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -7,14 +8,15 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
+/**
+ * Extracts and injects [discriminator] from a [JsonElement].
+ * Used to remove redundant class discriminator keys from output strings and inject the same
+ * key-value pair before the deserialization.
+ */
 class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
-    companion object {
-        private const val DISCRIMINATOR_NAME = "#class"
-    }
-
     private val discriminatorEntry = object : Map.Entry<String, JsonElement> {
-        override val key = DISCRIMINATOR_NAME
+        override val key = JsonApiConstants.CLASS_DISCRIMINATOR_KEY
         override val value = JsonPrimitive(discriminator)
     }
 
@@ -69,7 +71,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
     private fun removeDiscriminatorEntry(jsonObject: JsonObject): JsonObject {
         val entries = jsonObject.entries.toMutableSet()
-        entries.removeAll { it.key == DISCRIMINATOR_NAME }
+        entries.removeAll { it.key == JsonApiConstants.CLASS_DISCRIMINATOR_KEY }
         val resultMap = mutableMapOf<String, JsonElement>()
         resultMap.putAll(entries.map { Pair(it.key, it.value) })
 
