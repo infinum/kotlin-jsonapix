@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiWrapper
+import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -32,7 +33,10 @@ internal object JsonApiWrapperSpecBuilder {
     fun build(
         pack: String,
         className: String,
-        type: String
+        type: String,
+        attributes: List<String>,
+        oneRelationships: Map<String, TypeName>,
+        manyRelationships: Map<String, TypeName>
     ): FileSpec {
         val dataClass = ClassName(pack, className)
         val generatedName = "$GENERATED_CLASS_PREFIX$className"
@@ -81,6 +85,7 @@ internal object JsonApiWrapperSpecBuilder {
         properties.add(errorsProperty())
 
         return FileSpec.builder(pack, generatedName)
+            .addImport("com.infinum.jsonapix.core.resources", "ResourceIdentifier")
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
@@ -94,6 +99,7 @@ internal object JsonApiWrapperSpecBuilder {
                             .build()
                     )
                     .addProperties(properties)
+                    .addFunction(getOriginalFunSpec(dataClass, attributes, oneRelationships, manyRelationships))
                     .build()
             )
             .build()
@@ -148,7 +154,24 @@ internal object JsonApiWrapperSpecBuilder {
         .initializer(KEY_ERRORS)
         .build()
 
-//    private fun getOriginalFunSpec(): FunSpec {
-//
-//    }
+    private fun getOriginalFunSpec(className: ClassName, attributes: List<String>, oneRelationships: Map<String, TypeName>, manyRelationships: Map<String, TypeName>): FunSpec {
+        var codeString = "return ${className.simpleName}("
+        val builder = FunSpec.builder("getOriginal")
+            .returns(className)
+            .addModifiers(KModifier.OVERRIDE)
+        attributes.forEach {
+            codeString += "$it = data.attributes?.$it!!, "
+        }
+        val typeParams = mutableListOf<TypeName>()
+        oneRelationships.forEach {
+            codeString += "${it.key} = included?.firstOrNull { it.type == data.relationships?.${it.key}?.data?.type && it.id == data.relationships.${it.key}.data.id }?.getOriginalOrNull() as %T, "
+            typeParams.add(it.value)
+        }
+        manyRelationships.forEach {
+            codeString += "${it.key} = included?.filter { data.relationships?.${it.key}?.data?.contains(ResourceIdentifier(it.type, it.id)) == true }?.map { it.getOriginalOrNull() } as %T, "
+            typeParams.add(it.value)
+        }
+        codeString += ")"
+        return builder.addStatement(codeString, *typeParams.toTypedArray()).build()
+    }
 }

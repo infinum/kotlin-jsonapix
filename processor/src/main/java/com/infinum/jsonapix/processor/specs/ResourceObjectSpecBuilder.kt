@@ -108,7 +108,7 @@ object ResourceObjectSpecBuilder {
                         ResourceObject::class.asClassName().parameterizedBy(dataClass)
                     )
                     .addAnnotation(serializableClassName)
-                    .addAnnotation(serialNameSpec(type))
+                    .addAnnotation(serialNameSpec("$GENERATED_CLASS_PREFIX$type"))
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(paramsList)

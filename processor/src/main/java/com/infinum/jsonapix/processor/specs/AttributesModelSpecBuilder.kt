@@ -37,7 +37,7 @@ object AttributesModelSpecBuilder {
             .addModifiers(KModifier.DATA)
             .addSuperinterface(AttributesModel::class.asClassName().parameterizedBy(className))
             .addAnnotation(serializableClassName)
-            .addAnnotation(serialNameSpec(type))
+            .addAnnotation(serialNameSpec("$GENERATED_NAME_PREFIX$type"))
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(parameterSpecs)

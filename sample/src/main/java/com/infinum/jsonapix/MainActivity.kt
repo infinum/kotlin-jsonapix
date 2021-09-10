@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
         val dog =
             Person("Stef", "Banek", 27, listOf(Dog("Bella", 2), Dog("Bongo", 7)), Dog("Bella", 2))
         binding.text.text = dog.toJsonApiString()
+
+        binding.textDecoded.text = dog.toJsonApiString().decodeJsonApiString<Person>()?.name
     }
 
 }

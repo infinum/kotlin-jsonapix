@@ -6,4 +6,6 @@ interface JsonApiWrapper<out Model> {
     val data: ResourceObject<Model>?
     val included: List<ResourceObject<*>>?
     val errors: List<String>?
+
+    fun getOriginal(): Model
 }

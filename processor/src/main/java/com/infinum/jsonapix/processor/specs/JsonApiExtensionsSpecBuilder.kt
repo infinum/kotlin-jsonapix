@@ -4,7 +4,6 @@ import com.infinum.jsonapix.core.JsonApiWrapper
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.AttributesModel
-import com.infinum.jsonapix.core.resources.IncludedModel
 import com.infinum.jsonapix.core.resources.LinksModel
 import com.infinum.jsonapix.core.resources.ManyRelationshipMemberModel
 import com.infinum.jsonapix.core.resources.OneRelationshipMemberModel
@@ -22,14 +21,12 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import java.util.function.Function
 
 internal class JsonApiExtensionsSpecBuilder {
 
@@ -141,7 +138,7 @@ internal class JsonApiExtensionsSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).data?.attributes",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).getOriginal()",
                 formatMember,
                 decodeMember,
                 JsonApiWrapper::class,
@@ -157,6 +154,7 @@ internal class JsonApiExtensionsSpecBuilder {
             .addStatement(STATEMENT_ENCODE_DEFAULTS)
             .addStatement("classDiscriminator = %S", CLASS_DISCRIMINATOR)
             .addStatement("serializersModule = %L", MEMBER_SERIALIZERS_MODULE)
+            .addStatement("ignoreUnknownKeys = true")
             .unindent()
             .addStatement("}")
         return PropertySpec.builder(MEMBER_FORMAT, Json::class)
@@ -448,32 +446,7 @@ internal class JsonApiExtensionsSpecBuilder {
         fileSpec.addProperty(formatPropertySpec())
         fileSpec.addFunction(manyRelationshipModel())
         fileSpec.addFunction(oneRelationshipModel())
-        //fileSpec.addFunction(deserializeFunSpec())
-
-        return fileSpec.build()
-    }
-
-    fun buildTypeMap(): FileSpec {
-        val fileSpec = FileSpec.builder(PACKAGE_EXTENSIONS, "TypeMap")
-        val typeSpec = TypeSpec.enumBuilder("TypeMap")
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("typeName", String::class)
-                    .build()
-            )
-
-        specsMap.forEach { (className, classInfo) ->
-            typeSpec.addEnumConstant(classInfo.type,
-                TypeSpec.anonymousClassBuilder().addSuperclassConstructorParameter("%S", className.simpleName)
-                    .build()
-            )
-        }
-        typeSpec.addProperty(
-            PropertySpec.builder("typeName", String::class)
-                .initializer("typeName")
-                .build()
-        )
-        fileSpec.addType(typeSpec.build())
+        fileSpec.addFunction(deserializeFunSpec())
 
         return fileSpec.build()
     }

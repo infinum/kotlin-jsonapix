@@ -63,7 +63,6 @@ class JsonApiProcessor : AbstractProcessor() {
 
             val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
             collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
-            collector.buildTypeMap().writeTo(File(kaptKotlinGeneratedDir))
         }
         return true
     }
@@ -157,7 +156,9 @@ class JsonApiProcessor : AbstractProcessor() {
                 hasComposites
             )
         val wrapperFileSpec =
-            JsonApiWrapperSpecBuilder.build(generatedPackage, className, type)
+            JsonApiWrapperSpecBuilder.build(generatedPackage, className, type, primitives.map { it.name },
+                mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
+                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()))
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))

@@ -52,7 +52,7 @@ object RelationshipModelSpecBuilder {
             .addModifiers(KModifier.DATA)
             .addSuperinterface(RelationshipsModel::class)
             .addAnnotation(serializableClassName)
-            .addAnnotation(serialNameSpec(type))
+            .addAnnotation(serialNameSpec("$GENERATED_NAME_PREFIX$type"))
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(params)
