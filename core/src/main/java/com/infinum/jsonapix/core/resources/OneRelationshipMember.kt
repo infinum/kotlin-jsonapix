@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class OneRelationshipMemberModel(
+class OneRelationshipMember(
     @SerialName("data") val data: ResourceIdentifier,
-    @SerialName("links") val links: LinksModel? = null
+    @SerialName("links") val links: Links? = null
 )

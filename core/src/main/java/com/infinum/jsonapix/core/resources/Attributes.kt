@@ -1,5 +1,5 @@
 package com.infinum.jsonapix.core.resources
 
-interface AttributesModel<out Model> {
+interface Attributes<out Model> {
     fun toOriginalOrNull(): Model?
 }

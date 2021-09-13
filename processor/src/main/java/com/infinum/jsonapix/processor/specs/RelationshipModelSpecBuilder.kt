@@ -2,9 +2,9 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
-import com.infinum.jsonapix.core.resources.ManyRelationshipMemberModel
-import com.infinum.jsonapix.core.resources.OneRelationshipMemberModel
-import com.infinum.jsonapix.core.resources.RelationshipsModel
+import com.infinum.jsonapix.core.resources.ManyRelationshipMember
+import com.infinum.jsonapix.core.resources.OneRelationshipMember
+import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -33,13 +33,13 @@ object RelationshipModelSpecBuilder {
         val generatedName = "${GENERATED_NAME_PREFIX}${className.simpleName}"
 
         val properties: MutableList<PropertySpec> = oneRelationships.map {
-            PropertySpec.builder(it.name, OneRelationshipMemberModel::class).initializer(it.name)
+            PropertySpec.builder(it.name, OneRelationshipMember::class).initializer(it.name)
                 .build()
         }.toMutableList()
 
         properties.addAll(
             manyRelationships.map {
-                PropertySpec.builder(it.name, ManyRelationshipMemberModel::class)
+                PropertySpec.builder(it.name, ManyRelationshipMember::class)
                     .initializer(it.name).build()
             }
         )
@@ -50,7 +50,7 @@ object RelationshipModelSpecBuilder {
 
         return TypeSpec.classBuilder(generatedName)
             .addModifiers(KModifier.DATA)
-            .addSuperinterface(RelationshipsModel::class)
+            .addSuperinterface(Relationships::class)
             .addAnnotation(serializableClassName)
             .addAnnotation(serialNameSpec("$GENERATED_NAME_PREFIX$type"))
             .primaryConstructor(
@@ -89,7 +89,7 @@ object RelationshipModelSpecBuilder {
         val builderArgs = mutableListOf<Any>(generatedName)
         oneRelationships.forEachIndexed { index, property ->
             constructorStringBuilder.append("${property.name} = %T(%T(%L))")
-            builderArgs.add(OneRelationshipMemberModel::class.asClassName())
+            builderArgs.add(OneRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
             if (index != oneRelationships.lastIndex
@@ -101,7 +101,7 @@ object RelationshipModelSpecBuilder {
 
         manyRelationships.forEachIndexed { index, property ->
             constructorStringBuilder.append("${property.name} = %T(originalObject.${property.name}.map { %T(%L) })")
-            builderArgs.add(ManyRelationshipMemberModel::class.asClassName())
+            builderArgs.add(ManyRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
             if (index != manyRelationships.lastIndex) {

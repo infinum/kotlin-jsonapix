@@ -1,9 +1,8 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.resources.AttributesModel
-import com.infinum.jsonapix.core.resources.IncludedModel
-import com.infinum.jsonapix.core.resources.LinksModel
-import com.infinum.jsonapix.core.resources.RelationshipsModel
+import com.infinum.jsonapix.core.resources.Attributes
+import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -19,7 +18,6 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlin.reflect.KClass
 
 object ResourceObjectSpecBuilder {
     private const val ID_KEY = "id"
@@ -61,14 +59,14 @@ object ResourceObjectSpecBuilder {
             paramsList.add(
                 nullParam(
                     ATTRIBUTES_KEY,
-                    AttributesModel::class.asClassName().parameterizedBy(ClassName(pack, className))
+                    Attributes::class.asClassName().parameterizedBy(ClassName(pack, className))
                         .copy(nullable = true)
                 )
             )
             propsList.add(
                 nullProperty(
                     ATTRIBUTES_KEY,
-                    AttributesModel::class.asClassName().parameterizedBy(ClassName(pack, className)).copy(nullable = true),
+                    Attributes::class.asClassName().parameterizedBy(ClassName(pack, className)).copy(nullable = true),
                     true
                 )
             )
@@ -81,23 +79,23 @@ object ResourceObjectSpecBuilder {
             paramsList.add(
                 nullParam(
                     RELATIONSHIPS_KEY,
-                    RelationshipsModel::class.asClassName().copy(nullable = true)
+                    Relationships::class.asClassName().copy(nullable = true)
                 )
             )
             propsList.add(
                 nullProperty(
                     RELATIONSHIPS_KEY,
-                    RelationshipsModel::class.asClassName().copy(nullable = true),
+                    Relationships::class.asClassName().copy(nullable = true),
                     true
                 )
             )
         }
 
-        paramsList.add(nullParam(LINKS_KEY, LinksModel::class.asClassName().copy(nullable = true)))
+        paramsList.add(nullParam(LINKS_KEY, Links::class.asClassName().copy(nullable = true)))
         propsList.add(
             nullProperty(
                 LINKS_KEY,
-                LinksModel::class.asClassName().copy(nullable = true)
+                Links::class.asClassName().copy(nullable = true)
             )
         )
 

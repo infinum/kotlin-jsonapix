@@ -1,7 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.JsonApiWrapper
-import com.infinum.jsonapix.core.resources.ResourceIdentifier
+import com.infinum.jsonapix.core.JsonApModel
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -89,7 +88,7 @@ internal object JsonApiWrapperSpecBuilder {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiWrapper::class.asClassName().parameterizedBy(dataClass)
+                        JsonApModel::class.asClassName().parameterizedBy(dataClass)
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(serialNameSpec(type))

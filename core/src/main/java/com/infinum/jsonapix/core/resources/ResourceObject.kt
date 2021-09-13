@@ -4,11 +4,11 @@ package com.infinum.jsonapix.core.resources
 interface ResourceObject<out Model> {
     val id: String
     val type: String
-    val attributes: AttributesModel<Model>?
-    val relationships: RelationshipsModel?
-    val links: LinksModel?
+    val attributes: Attributes<Model>?
+    val relationships: Relationships?
+    val links: Links?
 
-     fun getOriginalOrNull(): Model? {
+     fun toOriginalOrNull(): Model? {
          return attributes?.toOriginalOrNull()
      }
 }

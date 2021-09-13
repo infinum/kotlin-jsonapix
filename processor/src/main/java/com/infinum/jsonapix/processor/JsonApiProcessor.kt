@@ -2,7 +2,7 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
-import com.infinum.jsonapix.processor.specs.AttributesModelSpecBuilder
+import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedModelSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
@@ -100,9 +100,9 @@ class JsonApiProcessor : AbstractProcessor() {
         if (primitives.isNotEmpty()) {
             hasPrimitives = true
             val attributesTypeSpec =
-                AttributesModelSpecBuilder.build(
-                    primitives,
+                AttributesSpecBuilder.build(
                     ClassName(generatedPackage, className),
+                    primitives ,
                     type,
                     hasComposites
                 )

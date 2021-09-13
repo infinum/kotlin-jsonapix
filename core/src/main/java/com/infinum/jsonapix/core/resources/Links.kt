@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("links")
-class LinksModel(
+class Links(
     @SerialName("self") val self: String? = null,
     @SerialName("related") val related: String? = null,
     @SerialName("first") val first: String? = null,

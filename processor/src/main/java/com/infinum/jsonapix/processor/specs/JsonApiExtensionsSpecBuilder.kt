@@ -1,13 +1,13 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.JsonApiWrapper
+import com.infinum.jsonapix.core.JsonApModel
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
-import com.infinum.jsonapix.core.resources.AttributesModel
-import com.infinum.jsonapix.core.resources.LinksModel
-import com.infinum.jsonapix.core.resources.ManyRelationshipMemberModel
-import com.infinum.jsonapix.core.resources.OneRelationshipMemberModel
-import com.infinum.jsonapix.core.resources.RelationshipsModel
+import com.infinum.jsonapix.core.resources.Attributes
+import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.ManyRelationshipMember
+import com.infinum.jsonapix.core.resources.OneRelationshipMember
+import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
@@ -141,7 +141,7 @@ internal class JsonApiExtensionsSpecBuilder {
                 "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).getOriginal()",
                 formatMember,
                 decodeMember,
-                JsonApiWrapper::class,
+                JsonApModel::class,
                 typeVariableName
             )
             .build()
@@ -178,7 +178,7 @@ internal class JsonApiExtensionsSpecBuilder {
         )
         codeBlockBuilder.addStatement("%T {", SerializersModule::class)
         codeBlockBuilder.indent()
-            .addStatement("%M(%T::class) {", polymorpicMember, JsonApiWrapper::class)
+            .addStatement("%M(%T::class) {", polymorpicMember, JsonApModel::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
             codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, it.jsonWrapperClassName)
@@ -198,7 +198,7 @@ internal class JsonApiExtensionsSpecBuilder {
         codeBlockBuilder.unindent().addStatement("}")
 
         codeBlockBuilder
-            .addStatement("%M(%T::class) {", polymorpicMember, AttributesModel::class)
+            .addStatement("%M(%T::class) {", polymorpicMember, Attributes::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
             if (it.attributesWrapperClassName != null) {
@@ -212,7 +212,7 @@ internal class JsonApiExtensionsSpecBuilder {
         codeBlockBuilder.unindent().addStatement("}")
 
         codeBlockBuilder
-            .addStatement("%M(%T::class) {", polymorpicMember, RelationshipsModel::class)
+            .addStatement("%M(%T::class) {", polymorpicMember, Relationships::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
             if (it.relationshipsObjectClassName != null) {
@@ -228,19 +228,19 @@ internal class JsonApiExtensionsSpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            LinksModel::class.asClassName()
+            Links::class.asClassName()
         )
 
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            OneRelationshipMemberModel::class.asClassName()
+            OneRelationshipMember::class.asClassName()
         )
 
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            ManyRelationshipMemberModel::class.asClassName()
+            ManyRelationshipMember::class.asClassName()
         )
 
         codeBlockBuilder.addStatement(
@@ -257,7 +257,7 @@ internal class JsonApiExtensionsSpecBuilder {
 
     private fun serializeFunSpec(originalClass: ClassName): FunSpec {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
-        val jsonApiWrapperClass = JsonApiWrapper::class.asClassName()
+        val jsonApiWrapperClass = JsonApModel::class.asClassName()
         val formatMember = MemberName(PACKAGE_EXTENSIONS, MEMBER_FORMAT)
         val encodeMember =
             MemberName(PACKAGE_KOTLINX_SERIALIZATION, MEMBER_ENCODE_TO_STRING)
@@ -329,12 +329,12 @@ internal class JsonApiExtensionsSpecBuilder {
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .receiver(typeVariableName)
-            .returns(OneRelationshipMemberModel::class)
+            .returns(OneRelationshipMember::class)
             .addParameter("type", String::class)
             .addParameter(ParameterSpec.builder("id", String::class).defaultValue("%S", "").build())
             .addStatement(
                 "return %T(data = %T(type, id))",
-                OneRelationshipMemberModel::class.asClassName(),
+                OneRelationshipMember::class.asClassName(),
                 ResourceIdentifier::class.asClassName()
             )
             .build()
@@ -344,7 +344,7 @@ internal class JsonApiExtensionsSpecBuilder {
         val typeVariableName = TypeVariableName.invoke(MEMBER_GENERIC_TYPE_VARIABLE)
         return FunSpec.builder("toManyRelationshipModel")
             .receiver(Collection::class.asClassName().parameterizedBy(typeVariableName))
-            .returns(ManyRelationshipMemberModel::class)
+            .returns(ManyRelationshipMember::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .addParameter("type", String::class)
@@ -356,7 +356,7 @@ internal class JsonApiExtensionsSpecBuilder {
             )
             .addStatement(
                 "return %T(data = map { %T(type, idMapper(it)) })",
-                ManyRelationshipMemberModel::class.asClassName(),
+                ManyRelationshipMember::class.asClassName(),
                 ResourceIdentifier::class.asClassName()
             )
             .build()

@@ -7,6 +7,7 @@ package com.infinum.jsonapix.core.common
 object JsonApiConstants {
 
     const val CLASS_DISCRIMINATOR_KEY = "#class"
+    const val SERIAL_NAME_FORMAT = "value = %S"
 
     object Keys {
         const val DATA = "data"
