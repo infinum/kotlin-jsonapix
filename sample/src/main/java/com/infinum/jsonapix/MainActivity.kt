@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val dog =
             Person("Stef", "Banek", 27, listOf(Dog("Bella", 2), Dog("Bongo", 7)), Dog("Bella", 2))
-        binding.text.text = dog.toJsonApiString()
+        binding.text.text = dog.toJsonXString()
 
-        binding.textDecoded.text = dog.toJsonApiString().decodeJsonApiString<Person>()?.name
+        binding.textDecoded.text = dog.toJsonXString().decodeJsonXString<Person>()?.name
     }
 
 }

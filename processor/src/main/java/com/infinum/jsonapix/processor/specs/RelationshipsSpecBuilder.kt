@@ -2,6 +2,8 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
+import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
@@ -20,8 +22,6 @@ import kotlinx.serialization.Serializable
 
 internal object RelationshipsSpecBuilder {
 
-    private const val GENERATED_NAME_PREFIX = "RelationshipsModel_"
-    private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
     private val serializableClassName = Serializable::class.asClassName()
 
     fun build(
@@ -30,7 +30,7 @@ internal object RelationshipsSpecBuilder {
         oneRelationships: List<PropertySpec>,
         manyRelationships: List<PropertySpec>
     ): TypeSpec {
-        val generatedName = "${GENERATED_NAME_PREFIX}${className.simpleName}"
+        val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 
         val properties: MutableList<PropertySpec> = oneRelationships.map {
             PropertySpec.builder(it.name, OneRelationshipMember::class).initializer(it.name)
@@ -45,14 +45,21 @@ internal object RelationshipsSpecBuilder {
         )
 
         val params = properties.map {
-            ParameterSpec.builder(it.name, it.type).addAnnotation(serialNameSpec(it.name)).build()
+            ParameterSpec.builder(it.name, it.type).addAnnotation(Specs.getSerialNameSpec(it.name))
+                .build()
         }
 
         return TypeSpec.classBuilder(generatedName)
             .addModifiers(KModifier.DATA)
             .addSuperinterface(Relationships::class)
             .addAnnotation(serializableClassName)
-            .addAnnotation(serialNameSpec("$GENERATED_NAME_PREFIX$type"))
+            .addAnnotation(
+                Specs.getSerialNameSpec(
+                    JsonApiConstants.Prefix.RELATIONSHIPS.withName(
+                        type
+                    )
+                )
+            )
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(params)
@@ -73,11 +80,6 @@ internal object RelationshipsSpecBuilder {
             .addProperties(properties)
             .build()
     }
-
-    private fun serialNameSpec(name: String) =
-        AnnotationSpec.builder(SerialName::class)
-            .addMember(SERIAL_NAME_PLACEHOLDER, name)
-            .build()
 
     private fun fromOriginalObjectSpec(
         originalClass: ClassName,
@@ -109,7 +111,7 @@ internal object RelationshipsSpecBuilder {
             }
         }
 
-        return FunSpec.builder("fromOriginalObject")
+        return FunSpec.builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
             .addParameter(
                 ParameterSpec.builder("originalObject", originalClass).build()
             )

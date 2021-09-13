@@ -25,11 +25,10 @@ internal object JsonXSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
 
-
     fun build(
         className: ClassName,
         type: String,
-        attributes: List<String>,
+        attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
     ): FileSpec {
@@ -122,7 +121,7 @@ internal object JsonXSpecBuilder {
     ).addAnnotation(
         Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA)
     )
-        .initializer(JsonApiConstants.Keys.DATA,).addModifiers(KModifier.OVERRIDE)
+        .initializer(JsonApiConstants.Keys.DATA).addModifiers(KModifier.OVERRIDE)
         .build()
 
     private fun errorsProperty(): PropertySpec = PropertySpec.builder(
@@ -136,24 +135,28 @@ internal object JsonXSpecBuilder {
 
     private fun getOriginalFunSpec(
         className: ClassName,
-        attributes: List<String>,
+        attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
     ): FunSpec {
         var codeString = "return ${className.simpleName}("
-        val builder = FunSpec.builder("getOriginal")
+        val builder = FunSpec.builder(JsonApiConstants.Members.GET_ORIGINAL)
             .returns(className)
             .addModifiers(KModifier.OVERRIDE)
         attributes.forEach {
-            codeString += "$it = data.attributes?.$it!!, "
+            codeString += "${it.name} = data.attributes?.${it.name}"
+            if (!it.type.isNullable) {
+                codeString += "!!"
+            }
+            codeString += ", "
         }
         val typeParams = mutableListOf<TypeName>()
         oneRelationships.forEach {
-            codeString += "${it.key} = included?.firstOrNull { it.type == data.relationships?.${it.key}?.data?.type && it.id == data.relationships.${it.key}.data.id }?.getOriginalOrNull() as %T, "
+            codeString += "${it.key} = included?.firstOrNull { it.type == data.relationships?.${it.key}?.data?.type && it.id == data.relationships.${it.key}.data.id }?.${JsonApiConstants.Members.GET_ORIGINAL_OR_NULL}() as %T, "
             typeParams.add(it.value)
         }
         manyRelationships.forEach {
-            codeString += "${it.key} = included?.filter { data.relationships?.${it.key}?.data?.contains(ResourceIdentifier(it.type, it.id)) == true }?.map { it.getOriginalOrNull() } as %T, "
+            codeString += "${it.key} = included?.filter { data.relationships?.${it.key}?.data?.contains(ResourceIdentifier(it.type, it.id)) == true }?.map { it.${JsonApiConstants.Members.GET_ORIGINAL_OR_NULL}() } as %T, "
             typeParams.add(it.value)
         }
         codeString += ")"

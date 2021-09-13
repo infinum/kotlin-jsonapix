@@ -1,6 +1,8 @@
 package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
+import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
@@ -24,14 +26,6 @@ import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
 class JsonApiProcessor : AbstractProcessor() {
-
-    companion object {
-        private const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
-        private const val WRAPPER_NAME_PREFIX = "JsonApiSerializable_"
-        private const val RESOURCE_OBJECT_PREFIX = "ResourceObject_"
-        private const val ATTRIBUTES_OBJECT_PREFIX = "AttributesModel_"
-        private const val RELATIONSHIPS_OBJECT_PREFIX = "RelationshipsModel_"
-    }
 
     private val collector = JsonXExtensionsSpecBuilder()
 
@@ -61,7 +55,8 @@ class JsonApiProcessor : AbstractProcessor() {
                 processAnnotation(it, type)
             }
 
-            val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
+            val kaptKotlinGeneratedDir =
+                processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
             collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
         }
         return true
@@ -71,7 +66,8 @@ class JsonApiProcessor : AbstractProcessor() {
     private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
-        val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
+        val kaptKotlinGeneratedDir =
+            processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
 
         val metadata = element.getAnnotation(Metadata::class.java)
         val typeSpec = metadata.toImmutableKmClass().toTypeSpec(
@@ -79,8 +75,9 @@ class JsonApiProcessor : AbstractProcessor() {
         )
 
         val inputDataClass = ClassName(generatedPackage, className)
-        val generatedJsonWrapperName = "$WRAPPER_NAME_PREFIX$className"
-        val generatedResourceObjectName = "$RESOURCE_OBJECT_PREFIX$className"
+        val generatedJsonWrapperName = JsonApiConstants.Prefix.JSONX.withName(className)
+        val generatedResourceObjectName =
+            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className)
 
         val jsonWrapperClassName = ClassName(generatedPackage, generatedJsonWrapperName)
         val resourceObjectClassName = ClassName(generatedPackage, generatedResourceObjectName)
@@ -102,7 +99,7 @@ class JsonApiProcessor : AbstractProcessor() {
             val attributesTypeSpec =
                 AttributesSpecBuilder.build(
                     ClassName(generatedPackage, className),
-                    primitives ,
+                    primitives,
                     type,
                     hasComposites
                 )
@@ -111,7 +108,8 @@ class JsonApiProcessor : AbstractProcessor() {
 
             attributesFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
-            val generatedAttributesObjectName = "$ATTRIBUTES_OBJECT_PREFIX$className"
+            val generatedAttributesObjectName =
+                JsonApiConstants.Prefix.ATTRIBUTES.withName(className)
             attributesClassName =
                 ClassName(generatedPackage, generatedAttributesObjectName)
         }
@@ -133,7 +131,8 @@ class JsonApiProcessor : AbstractProcessor() {
                     .build()
             relationshipsFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
-            val generatedRelationshipsObjectName = "$RELATIONSHIPS_OBJECT_PREFIX$className"
+            val generatedRelationshipsObjectName =
+                JsonApiConstants.Prefix.RELATIONSHIPS.withName(className)
             relationshipsClassName = ClassName(generatedPackage, generatedRelationshipsObjectName)
         }
 
@@ -149,16 +148,17 @@ class JsonApiProcessor : AbstractProcessor() {
 
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
-                generatedPackage,
-                className,
+                inputDataClass,
                 type,
                 hasPrimitives,
                 hasComposites
             )
         val wrapperFileSpec =
-            JsonXSpecBuilder.build(generatedPackage, inputDataClass, type, primitives.map { it.name },
+            JsonXSpecBuilder.build(
+                inputDataClass, type, primitives,
                 mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
-                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()))
+                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
+            )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))

@@ -7,5 +7,5 @@ interface JsonX<out Model> {
     val included: List<ResourceObject<*>>?
     val errors: List<String>?
 
-    fun toOriginal(): Model
+    fun getOriginal(): Model
 }

@@ -275,18 +275,22 @@ internal class JsonXExtensionsSpecBuilder {
 
         if (attributesClass != null) {
             builderArgs.add(attributesClass)
-            returnStatement.append("attributes = %T.${
-                JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
-            }(this)")
+            returnStatement.append(
+                "attributes = %T.${
+                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
+                }(this)"
+            )
         }
 
         if (relationshipsClass != null) {
             if (attributesClass != null) {
                 returnStatement.append(", ")
             }
-            returnStatement.append("relationships = %T.${
-                JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
-            }(this)")
+            returnStatement.append(
+                "relationships = %T.${
+                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
+                }(this)"
+            )
             builderArgs.add(relationshipsClass)
         }
 
@@ -309,7 +313,7 @@ internal class JsonXExtensionsSpecBuilder {
     private fun oneRelationshipModel(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        return FunSpec.builder("toOneRelationshipModel")
+        return FunSpec.builder(JsonApiConstants.Members.TO_ONE_RELATIONSHIP_MODEL)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .receiver(typeVariableName)
@@ -327,7 +331,7 @@ internal class JsonXExtensionsSpecBuilder {
     private fun manyRelationshipModel(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        return FunSpec.builder("toManyRelationshipModel")
+        return FunSpec.builder(JsonApiConstants.Members.TO_MANY_RELATIONSHIP_MODEL)
             .receiver(Collection::class.asClassName().parameterizedBy(typeVariableName))
             .returns(ManyRelationshipMember::class)
             .addModifiers(KModifier.INLINE)
@@ -357,7 +361,11 @@ internal class JsonXExtensionsSpecBuilder {
         val builderArgs = mutableListOf<Any>(resourceObjectClass)
 
         if (attributesClass != null) {
-            returnStatement.append("attributes = %T.fromOriginalObject(this)")
+            returnStatement.append(
+                "attributes = %T.${
+                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
+                }(this)"
+            )
             builderArgs.add(attributesClass)
         }
 
@@ -365,13 +373,17 @@ internal class JsonXExtensionsSpecBuilder {
             if (attributesClass != null) {
                 returnStatement.append(", ")
             }
-            returnStatement.append("relationships = %T.fromOriginalObject(this)")
+            returnStatement.append(
+                "relationships = %T.${
+                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
+                }(this)"
+            )
             builderArgs.add(relationshipsClass)
         }
 
         returnStatement.append(")")
 
-        return FunSpec.builder("toResourceObject")
+        return FunSpec.builder(JsonApiConstants.Members.TO_RESOURCE_OBJECT)
             .receiver(originalClass)
             .returns(resourceObjectClass)
             .addStatement(
@@ -411,7 +423,7 @@ internal class JsonXExtensionsSpecBuilder {
 
         fileSpec.addImport(
             JsonApiConstants.Packages.EXTENSIONS,
-            *JsonApiConstants.Imports.JSON_API_WRAPPER
+            *JsonApiConstants.Imports.JSON_X
         )
 
         specsMap.entries.forEach {

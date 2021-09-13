@@ -9,6 +9,7 @@ object JsonApiConstants {
     const val CLASS_DISCRIMINATOR_KEY = "#class"
     const val SERIAL_NAME_FORMAT = "value = %S"
     const val FILE_NAME_EXTENSIONS = "JsonXExtensions"
+    const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
 
     object Keys {
         const val DATA = "data"
@@ -26,14 +27,13 @@ object JsonApiConstants {
         const val RESOURCE_OBJECT = "ResourceObject_"
         const val ATTRIBUTES = "Attributes_"
         const val RELATIONSHIPS = "Relationships_"
-        const val RESOURCE_IDENTIFIER = "ResourceIdentifier_"
 
         fun String.withName(name: String): String = "$this$name"
     }
 
     object Members {
         const val FROM_ORIGINAL_OBJECT = "fromOriginalObject"
-        const val TO_ORIGINAL_OR_NULL = "toOriginalOrNull"
+        const val GET_ORIGINAL_OR_NULL = "getOriginalOrNull"
         const val TO_RESOURCE_OBJECT = "toResourceObject"
         const val GET_ORIGINAL = "getOriginal"
         const val POLYMORPHIC = "polymorphic"
@@ -51,6 +51,9 @@ object JsonApiConstants {
         const val FIND_TYPE = "findType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
         const val JSONX_SERIALIZER_MODULE = "jsonXSerializerModule"
+
+        const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
+        const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
     }
 
     object Packages {
@@ -64,8 +67,8 @@ object JsonApiConstants {
     }
 
     object Imports {
-        val JSON_API_WRAPPER = arrayOf(
-            "core.JsonApiWrapper",
+        val JSON_X = arrayOf(
+            "core.JsonX",
             "core.resources.ResourceObject"
         )
 

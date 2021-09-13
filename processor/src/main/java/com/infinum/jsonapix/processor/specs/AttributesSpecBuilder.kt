@@ -71,7 +71,7 @@ internal object AttributesSpecBuilder {
         hasRelationships: Boolean,
         returnType: ClassName
     ): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Members.TO_ORIGINAL_OR_NULL)
+        return FunSpec.builder(JsonApiConstants.Members.GET_ORIGINAL_OR_NULL)
             .addModifiers(KModifier.OVERRIDE)
             .returns(returnType.copy(nullable = true))
             .apply {

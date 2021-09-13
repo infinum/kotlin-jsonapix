@@ -1,5 +1,7 @@
 package com.infinum.jsonapix.processor.specs
 
+import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Relationships
@@ -20,29 +22,24 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 internal object ResourceObjectSpecBuilder {
-    private const val ID_KEY = "id"
-    private const val TYPE_KEY = "type"
-    private const val GENERATED_CLASS_PREFIX = "ResourceObject_"
-    private const val ATTRIBUTES_PREFIX = "AttributesModel_"
-    private const val RELATIONSHIPS_PREFIX = "RelationshipsModel_"
-    private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
-    private const val ATTRIBUTES_KEY = "attributes"
-    private const val RELATIONSHIPS_KEY = "relationships"
-    private const val LINKS_KEY = "links"
+
     private val serializableClassName = Serializable::class.asClassName()
-    private val transientClassName = Transient::class.asClassName()
 
     fun build(
-        pack: String,
-        className: String,
+        className: ClassName,
         type: String,
         hasPrimitives: Boolean,
         hasComposites: Boolean
     ): FileSpec {
-        val dataClass = ClassName(pack, className)
-        val generatedName = "$GENERATED_CLASS_PREFIX$className"
-        val attributesClassName = "$ATTRIBUTES_PREFIX$className"
-        val relationshipsClassName = "$RELATIONSHIPS_PREFIX$className"
+        val generatedName = JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
+        val attributesClassName = ClassName(
+            className.packageName,
+            JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
+        )
+        val relationshipsClassName = ClassName(
+            className.packageName,
+            JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
+        )
 
         val paramsList = mutableListOf<ParameterSpec>()
         val propsList = mutableListOf<PropertySpec>()
@@ -53,60 +50,96 @@ internal object ResourceObjectSpecBuilder {
         propsList.add(idProperty())
 
         if (hasPrimitives) {
-            paramsList.add(namedParam(pack, attributesClassName, ATTRIBUTES_KEY))
-            propsList.add(namedProperty(pack, attributesClassName, ATTRIBUTES_KEY))
+            paramsList.add(
+                Specs.getNamedParamSpec(
+                    attributesClassName,
+                    JsonApiConstants.Keys.ATTRIBUTES,
+                    nullable = true
+                )
+            )
+            propsList.add(
+                Specs.getNamedPropertySpec(
+                    attributesClassName,
+                    JsonApiConstants.Keys.ATTRIBUTES,
+                    nullable = true
+                )
+            )
         } else {
             paramsList.add(
-                nullParam(
-                    ATTRIBUTES_KEY,
-                    Attributes::class.asClassName().parameterizedBy(ClassName(pack, className))
+                Specs.getNullParamSpec(
+                    JsonApiConstants.Keys.ATTRIBUTES,
+                    Attributes::class.asClassName().parameterizedBy(className)
                         .copy(nullable = true)
                 )
             )
             propsList.add(
-                nullProperty(
-                    ATTRIBUTES_KEY,
-                    Attributes::class.asClassName().parameterizedBy(ClassName(pack, className)).copy(nullable = true),
-                    true
+                Specs.getNullPropertySpec(
+                    JsonApiConstants.Keys.ATTRIBUTES,
+                    Attributes::class.asClassName().parameterizedBy(className)
+                        .copy(nullable = true),
+                    isTransient = true
                 )
             )
         }
 
         if (hasComposites) {
-            paramsList.add(namedParam(pack, relationshipsClassName, RELATIONSHIPS_KEY))
-            propsList.add(namedProperty(pack, relationshipsClassName, RELATIONSHIPS_KEY))
+            paramsList.add(
+                Specs.getNamedParamSpec(
+                    relationshipsClassName,
+                    JsonApiConstants.Keys.RELATIONSHIPS,
+                    nullable = true
+                )
+            )
+            propsList.add(
+                Specs.getNamedPropertySpec(
+                    relationshipsClassName,
+                    JsonApiConstants.Keys.RELATIONSHIPS,
+                    nullable = true
+                )
+            )
         } else {
             paramsList.add(
-                nullParam(
-                    RELATIONSHIPS_KEY,
+                Specs.getNullParamSpec(
+                    JsonApiConstants.Keys.RELATIONSHIPS,
                     Relationships::class.asClassName().copy(nullable = true)
                 )
             )
             propsList.add(
-                nullProperty(
-                    RELATIONSHIPS_KEY,
+                Specs.getNullPropertySpec(
+                    JsonApiConstants.Keys.RELATIONSHIPS,
                     Relationships::class.asClassName().copy(nullable = true),
-                    true
+                    isTransient = true
                 )
             )
         }
 
-        paramsList.add(nullParam(LINKS_KEY, Links::class.asClassName().copy(nullable = true)))
+        paramsList.add(
+            Specs.getNullParamSpec(
+                JsonApiConstants.Keys.LINKS,
+                Links::class.asClassName().copy(nullable = true)
+            )
+        )
         propsList.add(
-            nullProperty(
-                LINKS_KEY,
+            Specs.getNullPropertySpec(
+                JsonApiConstants.Keys.LINKS,
                 Links::class.asClassName().copy(nullable = true)
             )
         )
 
-        return FileSpec.builder(pack, generatedName)
+        return FileSpec.builder(className.packageName, generatedName)
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        ResourceObject::class.asClassName().parameterizedBy(dataClass)
+                        ResourceObject::class.asClassName().parameterizedBy(className)
                     )
                     .addAnnotation(serializableClassName)
-                    .addAnnotation(serialNameSpec("$GENERATED_CLASS_PREFIX$type"))
+                    .addAnnotation(
+                        Specs.getSerialNameSpec(
+                            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
+                                type
+                            )
+                        )
+                    )
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(paramsList)
@@ -118,68 +151,25 @@ internal object ResourceObjectSpecBuilder {
             .build()
     }
 
-    private fun serialNameSpec(name: String) =
-        AnnotationSpec.builder(SerialName::class)
-            .addMember(SERIAL_NAME_PLACEHOLDER, name)
-            .build()
-
     private fun idProperty(): PropertySpec = PropertySpec.builder(
-        ID_KEY, String::class, KModifier.OVERRIDE
-    ).addAnnotation(serialNameSpec(ID_KEY))
-        .initializer(ID_KEY)
+        JsonApiConstants.Keys.ID, String::class, KModifier.OVERRIDE
+    ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ID))
+        .initializer(JsonApiConstants.Keys.ID)
         .build()
 
     private fun idParam(): ParameterSpec = ParameterSpec.builder(
-        ID_KEY, String::class
+        JsonApiConstants.Keys.ID, String::class
     ).defaultValue("%S", "0")
         .build()
 
-    private fun namedProperty(pack: String, name: String, key: String): PropertySpec =
-        PropertySpec.builder(
-            key, ClassName(pack, name).copy(nullable = true), KModifier.OVERRIDE
-        ).addAnnotation(
-            serialNameSpec(key)
-        )
-            .initializer(key)
-            .build()
-
-    private fun namedParam(pack: String, name: String, key: String): ParameterSpec =
-        ParameterSpec.builder(
-            key,
-            ClassName(pack, name).copy(nullable = true)
-        ).defaultValue("%L", null)
-            .build()
-
-    private fun nullProperty(
-        name: String,
-        typeName: TypeName,
-        isTransient: Boolean = false
-    ): PropertySpec = PropertySpec.builder(
-        name,
-        typeName,
-        KModifier.OVERRIDE
-    ).apply {
-        if (isTransient) {
-            addAnnotation(transientClassName)
-        } else {
-            addAnnotation(serialNameSpec(name))
-        }
-        initializer(name)
-    }.build()
-
-    private fun nullParam(name: String, typeName: TypeName): ParameterSpec =
-        ParameterSpec.builder(name, typeName, KModifier.OVERRIDE)
-            .defaultValue("%L", null)
-            .build()
-
     private fun typeProperty(): PropertySpec = PropertySpec.builder(
-        TYPE_KEY, String::class, KModifier.OVERRIDE
+        JsonApiConstants.Keys.TYPE, String::class, KModifier.OVERRIDE
     ).addAnnotation(
-        serialNameSpec(TYPE_KEY)
-    ).initializer(TYPE_KEY).build()
+        Specs.getSerialNameSpec(JsonApiConstants.Keys.TYPE)
+    ).initializer(JsonApiConstants.Keys.TYPE).build()
 
     private fun typeParam(type: String): ParameterSpec = ParameterSpec.builder(
-        TYPE_KEY, String::class
+        JsonApiConstants.Keys.TYPE, String::class
     ).defaultValue("%S", type)
         .build()
 }
