@@ -3,10 +3,10 @@ package com.infinum.jsonapix.processor
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
-import com.infinum.jsonapix.processor.specs.IncludedModelSpecBuilder
-import com.infinum.jsonapix.processor.specs.JsonApiExtensionsSpecBuilder
-import com.infinum.jsonapix.processor.specs.JsonApiWrapperSpecBuilder
-import com.infinum.jsonapix.processor.specs.RelationshipModelSpecBuilder
+import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
+import com.infinum.jsonapix.processor.specs.JsonXExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.JsonXSpecBuilder
+import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -33,7 +33,7 @@ class JsonApiProcessor : AbstractProcessor() {
         private const val RELATIONSHIPS_OBJECT_PREFIX = "RelationshipsModel_"
     }
 
-    private val collector = JsonApiExtensionsSpecBuilder()
+    private val collector = JsonXExtensionsSpecBuilder()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
         mutableSetOf(JsonApiX::class.java.name)
@@ -120,7 +120,7 @@ class JsonApiProcessor : AbstractProcessor() {
         val manyRelationships = membersSeparator.getManyRelationships()
 
         if (oneRelationships.isNotEmpty() || manyRelationships.isNotEmpty()) {
-            val relationshipsTypeSpec = RelationshipModelSpecBuilder.build(
+            val relationshipsTypeSpec = RelationshipsSpecBuilder.build(
                 inputDataClass,
                 type,
                 oneRelationships,
@@ -144,7 +144,7 @@ class JsonApiProcessor : AbstractProcessor() {
             resourceObjectClassName,
             attributesClassName,
             relationshipsClassName,
-            IncludedModelSpecBuilder.build(oneRelationships, manyRelationships)
+            IncludedSpecBuilder.build(oneRelationships, manyRelationships)
         )
 
         val resourceFileSpec =
@@ -156,7 +156,7 @@ class JsonApiProcessor : AbstractProcessor() {
                 hasComposites
             )
         val wrapperFileSpec =
-            JsonApiWrapperSpecBuilder.build(generatedPackage, className, type, primitives.map { it.name },
+            JsonXSpecBuilder.build(generatedPackage, inputDataClass, type, primitives.map { it.name },
                 mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()))
 

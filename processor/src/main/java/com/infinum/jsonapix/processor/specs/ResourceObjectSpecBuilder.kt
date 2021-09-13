@@ -19,7 +19,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-object ResourceObjectSpecBuilder {
+internal object ResourceObjectSpecBuilder {
     private const val ID_KEY = "id"
     private const val TYPE_KEY = "type"
     private const val GENERATED_CLASS_PREFIX = "ResourceObject_"

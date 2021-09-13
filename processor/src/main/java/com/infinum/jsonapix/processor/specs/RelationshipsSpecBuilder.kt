@@ -18,7 +18,7 @@ import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-object RelationshipModelSpecBuilder {
+internal object RelationshipsSpecBuilder {
 
     private const val GENERATED_NAME_PREFIX = "RelationshipsModel_"
     private const val SERIAL_NAME_PLACEHOLDER = "value = %S"

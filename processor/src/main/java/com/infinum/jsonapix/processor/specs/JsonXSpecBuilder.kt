@@ -1,6 +1,8 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.JsonApModel
+import com.infinum.jsonapix.core.JsonX
+import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -19,34 +21,30 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-internal object JsonApiWrapperSpecBuilder {
+internal object JsonXSpecBuilder {
 
-    private const val SERIAL_NAME_PLACEHOLDER = "value = %S"
-    private const val GENERATED_CLASS_PREFIX = "JsonApiSerializable_"
-    private const val KEY_DATA = "data"
-    private const val KEY_ERRORS = "errors"
-    private const val INCLUDED_KEY = "included"
     private val serializableClassName = Serializable::class.asClassName()
-    private val transientClassName = Transient::class.asClassName()
+
 
     fun build(
-        pack: String,
-        className: String,
+        className: ClassName,
         type: String,
         attributes: List<String>,
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
     ): FileSpec {
-        val dataClass = ClassName(pack, className)
-        val generatedName = "$GENERATED_CLASS_PREFIX$className"
-        val resourceObjectClassName = ClassName(pack, "ResourceObject_$className")
+        val generatedName = JsonApiConstants.Prefix.JSONX.withName(className.simpleName)
+        val resourceObjectClassName = ClassName(
+            className.packageName,
+            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
+        )
 
         val properties = mutableListOf<PropertySpec>()
         val params = mutableListOf<ParameterSpec>()
 
         params.add(
             ParameterSpec.builder(
-                KEY_DATA,
+                JsonApiConstants.Keys.DATA,
                 resourceObjectClassName
             ).build()
         )
@@ -54,8 +52,8 @@ internal object JsonApiWrapperSpecBuilder {
         properties.add(dataProperty(resourceObjectClassName))
 
         params.add(
-            nullParam(
-                INCLUDED_KEY,
+            Specs.getNullParamSpec(
+                JsonApiConstants.Keys.INCLUDED,
                 List::class.asClassName().parameterizedBy(
                     ResourceObject::class.asClassName()
                         .parameterizedBy(getAnnotatedAnyType())
@@ -63,8 +61,8 @@ internal object JsonApiWrapperSpecBuilder {
             )
         )
         properties.add(
-            nullProperty(
-                INCLUDED_KEY,
+            Specs.getNullPropertySpec(
+                JsonApiConstants.Keys.INCLUDED,
                 List::class.asClassName().parameterizedBy(
                     ResourceObject::class.asClassName()
                         .parameterizedBy(getAnnotatedAnyType())
@@ -74,7 +72,7 @@ internal object JsonApiWrapperSpecBuilder {
 
         params.add(
             ParameterSpec.builder(
-                KEY_ERRORS,
+                JsonApiConstants.Keys.ERRORS,
                 List::class.parameterizedBy(String::class)
                     .copy(nullable = true)
             ).defaultValue("%L", "null")
@@ -83,22 +81,32 @@ internal object JsonApiWrapperSpecBuilder {
 
         properties.add(errorsProperty())
 
-        return FileSpec.builder(pack, generatedName)
-            .addImport("com.infinum.jsonapix.core.resources", "ResourceIdentifier")
+        return FileSpec.builder(className.packageName, generatedName)
+            .addImport(
+                JsonApiConstants.Packages.CORE_RESOURCES,
+                JsonApiConstants.Imports.RESOURCE_IDENTIFIER
+            )
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApModel::class.asClassName().parameterizedBy(dataClass)
+                        JsonX::class.asClassName().parameterizedBy(className)
                     )
                     .addAnnotation(serializableClassName)
-                    .addAnnotation(serialNameSpec(type))
+                    .addAnnotation(Specs.getSerialNameSpec(type))
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(params)
                             .build()
                     )
                     .addProperties(properties)
-                    .addFunction(getOriginalFunSpec(dataClass, attributes, oneRelationships, manyRelationships))
+                    .addFunction(
+                        getOriginalFunSpec(
+                            className,
+                            attributes,
+                            oneRelationships,
+                            manyRelationships
+                        )
+                    )
                     .build()
             )
             .build()
@@ -109,51 +117,29 @@ internal object JsonApiWrapperSpecBuilder {
         return ANY.copy(annotations = ANY.annotations + contextual)
     }
 
-    private fun nullProperty(
-        name: String,
-        typeName: TypeName,
-        isTransient: Boolean = false
-    ): PropertySpec = PropertySpec.builder(
-        name,
-        typeName,
-        KModifier.OVERRIDE
-    ).apply {
-        if (isTransient) {
-            addAnnotation(transientClassName)
-        } else {
-            addAnnotation(serialNameSpec(name))
-        }
-        initializer(name)
-    }.build()
-
-
-    private fun nullParam(name: String, typeName: TypeName): ParameterSpec =
-        ParameterSpec.builder(name, typeName, KModifier.OVERRIDE)
-            .defaultValue("%L", null)
-            .build()
-
-    private fun serialNameSpec(name: String) =
-        AnnotationSpec.builder(SerialName::class).addMember(SERIAL_NAME_PLACEHOLDER, name)
-            .build()
-
     private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
-        KEY_DATA, resourceObject
+        JsonApiConstants.Keys.DATA, resourceObject
     ).addAnnotation(
-        serialNameSpec(KEY_DATA)
+        Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA)
     )
-        .initializer(KEY_DATA).addModifiers(KModifier.OVERRIDE)
+        .initializer(JsonApiConstants.Keys.DATA,).addModifiers(KModifier.OVERRIDE)
         .build()
 
     private fun errorsProperty(): PropertySpec = PropertySpec.builder(
-        KEY_ERRORS,
+        JsonApiConstants.Keys.ERRORS,
         List::class.parameterizedBy(String::class).copy(nullable = true),
         KModifier.OVERRIDE
     )
-        .addAnnotation(serialNameSpec(KEY_ERRORS))
-        .initializer(KEY_ERRORS)
+        .addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ERRORS))
+        .initializer(JsonApiConstants.Keys.ERRORS)
         .build()
 
-    private fun getOriginalFunSpec(className: ClassName, attributes: List<String>, oneRelationships: Map<String, TypeName>, manyRelationships: Map<String, TypeName>): FunSpec {
+    private fun getOriginalFunSpec(
+        className: ClassName,
+        attributes: List<String>,
+        oneRelationships: Map<String, TypeName>,
+        manyRelationships: Map<String, TypeName>
+    ): FunSpec {
         var codeString = "return ${className.simpleName}("
         val builder = FunSpec.builder("getOriginal")
             .returns(className)

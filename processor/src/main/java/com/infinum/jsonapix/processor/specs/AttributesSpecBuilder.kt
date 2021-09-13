@@ -13,7 +13,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Serializable
 
-object AttributesSpecBuilder {
+internal object AttributesSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
 
@@ -58,7 +58,7 @@ object AttributesSpecBuilder {
         val constructorString = attributes.joinToString(", ") {
             "${it.name} = originalObject.${it.name}"
         }
-        return FunSpec.builder("fromOriginalObject")
+        return FunSpec.builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
             .addParameter(
                 ParameterSpec.builder("originalObject", originalClass).build()
             )
@@ -71,12 +71,12 @@ object AttributesSpecBuilder {
         hasRelationships: Boolean,
         returnType: ClassName
     ): FunSpec {
-        return FunSpec.builder("toOriginalOrNull")
+        return FunSpec.builder(JsonApiConstants.Members.TO_ORIGINAL_OR_NULL)
             .addModifiers(KModifier.OVERRIDE)
             .returns(returnType.copy(nullable = true))
             .apply {
                 if (hasRelationships) {
-                    addStatement("return null")
+                    addStatement(JsonApiConstants.Statements.RETURN_NULL)
                 } else {
                     val constructorString = attributes.joinToString(", ") {
                         "${it.name} = ${it.name}"

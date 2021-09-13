@@ -1,10 +1,11 @@
 package com.infinum.jsonapix.processor.specs
 
+import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.PropertySpec
 import java.lang.StringBuilder
 
-object IncludedModelSpecBuilder {
+internal object IncludedSpecBuilder {
 
     fun build(
         oneRelationships: List<PropertySpec>,
@@ -12,14 +13,18 @@ object IncludedModelSpecBuilder {
     ): CodeBlock {
         val statement = StringBuilder("listOf(")
         oneRelationships.forEachIndexed { index, prop ->
-            statement.append("${prop.name}.toResourceObject()")
-            if (index != oneRelationships.lastIndex || (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())) {
+            statement.append("${prop.name}.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
+            if (index != oneRelationships.lastIndex ||
+                (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
+            ) {
                 statement.append(", ")
             }
         }
 
         manyRelationships.forEachIndexed { index, prop ->
-            statement.append("*${prop.name}.map { it.toResourceObject() }.toTypedArray()")
+            statement.append(
+                "*${prop.name}.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+            )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
             }
