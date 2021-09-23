@@ -33,7 +33,7 @@ object JsonApiConstants {
 
     object Members {
         const val FROM_ORIGINAL_OBJECT = "fromOriginalObject"
-        const val GET_ORIGINAL_OR_NULL = "getOriginalOrNull"
+        const val GET_ORIGINAL_OR_NULL = "originalOrNull"
         const val TO_RESOURCE_OBJECT = "toResourceObject"
         const val ORIGINAL = "original"
         const val POLYMORPHIC = "polymorphic"
