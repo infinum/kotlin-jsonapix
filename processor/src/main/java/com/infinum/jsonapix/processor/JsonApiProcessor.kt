@@ -12,10 +12,10 @@ import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.classinspector.elements.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
+import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
-import com.squareup.kotlinpoet.metadata.toImmutableKmClass
+import com.squareup.kotlinpoet.metadata.toKmClass
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -70,7 +70,7 @@ class JsonApiProcessor : AbstractProcessor() {
             processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
 
         val metadata = element.getAnnotation(Metadata::class.java)
-        val typeSpec = metadata.toImmutableKmClass().toTypeSpec(
+        val typeSpec = metadata.toKmClass().toTypeSpec(
             ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
         )
 
