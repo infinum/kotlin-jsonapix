@@ -23,7 +23,7 @@ object JsonApiConstants {
     }
 
     object Prefix {
-        const val JSONX = "JsonX_"
+        const val JSON_API_X = "JsonApiX_"
         const val RESOURCE_OBJECT = "ResourceObject_"
         const val ATTRIBUTES = "Attributes_"
         const val RELATIONSHIPS = "Relationships_"
@@ -41,16 +41,16 @@ object JsonApiConstants {
         const val JSON_OBJECT = "jsonObject"
         const val CONTEXTUAL = "contextual"
 
-        const val JSONX_WRAPPER_GETTER = "toJsonX"
-        const val JSONX_SERIALIZE = "toJsonXString"
-        const val JSONX_DESERIALIZE = "decodeJsonXString"
+        const val JSONX_WRAPPER_GETTER = "toJsonApiX"
+        const val JSONX_SERIALIZE = "toJsonApiXString"
+        const val JSONX_DESERIALIZE = "decodeJsonApiXString"
         const val DECODE_FROM_STRING = "decodeFromString"
         const val ENCODE_TO_STRING = "encodeToString"
         const val FORMAT = "format"
         const val GENERIC_TYPE_VARIABLE = "Model"
         const val FIND_TYPE = "findType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
-        const val JSONX_SERIALIZER_MODULE = "jsonXSerializerModule"
+        const val JSONX_SERIALIZER_MODULE = "jsonApiXSerializerModule"
 
         const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
         const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
@@ -68,7 +68,7 @@ object JsonApiConstants {
 
     object Imports {
         val JSON_X = arrayOf(
-            "core.JsonX",
+            "core.JsonApiX",
             "core.resources.ResourceObject"
         )
 

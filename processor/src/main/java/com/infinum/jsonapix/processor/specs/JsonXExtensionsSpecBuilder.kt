@@ -1,6 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.JsonX
+import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
@@ -101,7 +101,7 @@ internal class JsonXExtensionsSpecBuilder {
                 }()",
                 formatMember,
                 decodeMember,
-                JsonX::class,
+                JsonApiX::class,
                 typeVariableName
             )
             .build()
@@ -144,7 +144,7 @@ internal class JsonXExtensionsSpecBuilder {
         )
         codeBlockBuilder.addStatement("%T {", SerializersModule::class)
         codeBlockBuilder.indent()
-            .addStatement("%M(%T::class) {", polymorpicMember, JsonX::class)
+            .addStatement("%M(%T::class) {", polymorpicMember, JsonApiX::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
             codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, it.jsonWrapperClassName)
@@ -226,7 +226,7 @@ internal class JsonXExtensionsSpecBuilder {
 
     private fun serializeFunSpec(originalClass: ClassName): FunSpec {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
-        val jsonXClass = JsonX::class.asClassName()
+        val jsonXClass = JsonApiX::class.asClassName()
         val formatMember = MemberName(
             JsonApiConstants.Packages.EXTENSIONS,
             JsonApiConstants.Members.FORMAT

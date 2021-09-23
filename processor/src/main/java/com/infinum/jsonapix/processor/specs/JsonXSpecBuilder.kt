@@ -1,6 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.core.JsonX
+import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.ResourceObject
@@ -17,9 +17,7 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 internal object JsonXSpecBuilder {
 
@@ -32,7 +30,7 @@ internal object JsonXSpecBuilder {
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
     ): FileSpec {
-        val generatedName = JsonApiConstants.Prefix.JSONX.withName(className.simpleName)
+        val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
             className.packageName,
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
@@ -88,7 +86,7 @@ internal object JsonXSpecBuilder {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonX::class.asClassName().parameterizedBy(className)
+                        JsonApiX::class.asClassName().parameterizedBy(className)
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))

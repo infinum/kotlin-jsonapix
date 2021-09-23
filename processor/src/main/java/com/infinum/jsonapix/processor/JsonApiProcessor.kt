@@ -75,7 +75,7 @@ class JsonApiProcessor : AbstractProcessor() {
         )
 
         val inputDataClass = ClassName(generatedPackage, className)
-        val generatedJsonWrapperName = JsonApiConstants.Prefix.JSONX.withName(className)
+        val generatedJsonWrapperName = JsonApiConstants.Prefix.JSON_API_X.withName(className)
         val generatedResourceObjectName =
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className)
 
