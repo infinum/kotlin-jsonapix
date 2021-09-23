@@ -7,7 +7,7 @@ import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonXExtensionsSpecBuilder
-import com.infinum.jsonapix.processor.specs.JsonXSpecBuilder
+import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
@@ -154,7 +154,7 @@ class JsonApiProcessor : AbstractProcessor() {
                 hasComposites
             )
         val wrapperFileSpec =
-            JsonXSpecBuilder.build(
+            JsonApiXSpecBuilder.build(
                 inputDataClass, type, primitives,
                 mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())

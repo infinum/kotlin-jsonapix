@@ -97,8 +97,8 @@ internal class JsonXExtensionsSpecBuilder {
             )
             .addStatement(
                 "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).${
-                    JsonApiConstants.Members.GET_ORIGINAL
-                }()",
+                    JsonApiConstants.Members.ORIGINAL
+                }",
                 formatMember,
                 decodeMember,
                 JsonApiX::class,

@@ -19,7 +19,7 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
-internal object JsonXSpecBuilder {
+internal object JsonApiXSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
 
@@ -96,8 +96,8 @@ internal object JsonXSpecBuilder {
                             .build()
                     )
                     .addProperties(properties)
-                    .addFunction(
-                        getOriginalFunSpec(
+                    .addProperty(
+                        originalProperty(
                             className,
                             attributes,
                             oneRelationships,
@@ -131,16 +131,14 @@ internal object JsonXSpecBuilder {
         .initializer(JsonApiConstants.Keys.ERRORS)
         .build()
 
-    private fun getOriginalFunSpec(
+    private fun originalProperty(
         className: ClassName,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
-    ): FunSpec {
-        var codeString = "return ${className.simpleName}("
-        val builder = FunSpec.builder(JsonApiConstants.Members.GET_ORIGINAL)
-            .returns(className)
-            .addModifiers(KModifier.OVERRIDE)
+    ): PropertySpec {
+        var codeString = "${className.simpleName}("
+        val builder = PropertySpec.builder(JsonApiConstants.Members.ORIGINAL, className, KModifier.OVERRIDE)
         attributes.forEach {
             codeString += "${it.name} = data.attributes?.${it.name}"
             if (!it.type.isNullable) {
@@ -158,6 +156,6 @@ internal object JsonXSpecBuilder {
             typeParams.add(it.value)
         }
         codeString += ")"
-        return builder.addStatement(codeString, *typeParams.toTypedArray()).build()
+        return builder.initializer(codeString, *typeParams.toTypedArray()).build()
     }
 }

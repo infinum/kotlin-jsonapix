@@ -7,5 +7,5 @@ interface JsonApiX<out Model> {
     val included: List<ResourceObject<*>>?
     val errors: List<String>?
 
-    fun getOriginal(): Model
+    val original: Model
 }
