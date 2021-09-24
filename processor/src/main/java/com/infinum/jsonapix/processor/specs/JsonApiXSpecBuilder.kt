@@ -138,7 +138,10 @@ internal object JsonApiXSpecBuilder {
         manyRelationships: Map<String, TypeName>
     ): PropertySpec {
         var codeString = "${className.simpleName}("
-        val builder = PropertySpec.builder(JsonApiConstants.Members.ORIGINAL, className, KModifier.OVERRIDE)
+        val builder = PropertySpec.builder(
+            JsonApiConstants.Members.ORIGINAL,
+            className, KModifier.OVERRIDE
+        )
         attributes.forEach {
             codeString += "${it.name} = data.attributes?.${it.name}"
             if (!it.type.isNullable) {

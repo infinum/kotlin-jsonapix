@@ -20,11 +20,19 @@ dependencies {
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += [
+                '-Xopt-in=com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview',
+                '-Xexplicit-api=strict'
+        ]
     }
 }
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += [
+                '-Xopt-in=com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview',
+                '-Xexplicit-api=strict'
+        ]
     }
 }
 java {

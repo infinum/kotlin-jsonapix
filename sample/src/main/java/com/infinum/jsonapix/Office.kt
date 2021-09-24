@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 class Office(
     @HasOne("person")
     val manager: Person
-    )
+)

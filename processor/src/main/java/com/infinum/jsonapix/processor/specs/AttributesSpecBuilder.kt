@@ -34,7 +34,9 @@ internal object AttributesSpecBuilder {
             .addModifiers(KModifier.DATA)
             .addSuperinterface(Attributes::class.asClassName().parameterizedBy(className))
             .addAnnotation(serializableClassName)
-            .addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Prefix.ATTRIBUTES.withName(type)))
+            .addAnnotation(
+                Specs.getSerialNameSpec(JsonApiConstants.Prefix.ATTRIBUTES.withName(type))
+            )
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(parameterSpecs)

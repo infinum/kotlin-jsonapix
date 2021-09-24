@@ -12,7 +12,6 @@ import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
 import com.squareup.kotlinpoet.metadata.toKmClass
@@ -25,7 +24,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
-class JsonApiProcessor : AbstractProcessor() {
+public class JsonApiProcessor : AbstractProcessor() {
 
     private val collector = JsonXExtensionsSpecBuilder()
 
@@ -34,7 +33,6 @@ class JsonApiProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-    @KotlinPoetMetadataPreview
     override fun process(
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
@@ -62,7 +60,6 @@ class JsonApiProcessor : AbstractProcessor() {
         return true
     }
 
-    @KotlinPoetMetadataPreview
     private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
