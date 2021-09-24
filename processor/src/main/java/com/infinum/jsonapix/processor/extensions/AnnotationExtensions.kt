@@ -18,4 +18,3 @@ public inline fun <reified T : Annotation> Element.getAnnotationClassValue(
 } catch (e: MirroredTypeException) {
     e.typeMirror
 }
-
