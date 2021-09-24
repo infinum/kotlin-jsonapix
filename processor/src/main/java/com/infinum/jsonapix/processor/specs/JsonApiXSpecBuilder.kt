@@ -151,11 +151,21 @@ internal object JsonApiXSpecBuilder {
         }
         val typeParams = mutableListOf<TypeName>()
         oneRelationships.forEach {
-            codeString += "${it.key} = included?.firstOrNull { it.type == data.relationships?.${it.key}?.data?.type && it.id == data.relationships.${it.key}.data.id }?.${JsonApiConstants.Members.GET_ORIGINAL_OR_NULL}() as %T, "
+            codeString += "${it.key} = included?.firstOrNull { it.type == data.relationships?.${
+                it.key
+            }?.data?.type && it.id == data.relationships.${
+                it.key
+            }.data.id }?.${
+                JsonApiConstants.Members.GET_ORIGINAL_OR_NULL
+            }() as %T, "
             typeParams.add(it.value)
         }
         manyRelationships.forEach {
-            codeString += "${it.key} = included?.filter { data.relationships?.${it.key}?.data?.contains(ResourceIdentifier(it.type, it.id)) == true }?.map { it.${JsonApiConstants.Members.GET_ORIGINAL_OR_NULL}() } as %T, "
+            codeString += "${it.key} = included?.filter { data.relationships?.${
+                it.key
+            }?.data?.contains(ResourceIdentifier(it.type, it.id)) == true }?.map { it.${
+                JsonApiConstants.Members.GET_ORIGINAL_OR_NULL
+            }() } as %T, "
             typeParams.add(it.value)
         }
         codeString += ")"
