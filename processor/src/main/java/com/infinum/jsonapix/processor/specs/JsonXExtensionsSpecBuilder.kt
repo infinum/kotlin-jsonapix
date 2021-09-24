@@ -268,36 +268,12 @@ internal class JsonXExtensionsSpecBuilder {
     private fun wrapperFunSpec(
         originalClass: ClassName,
         wrapperClass: ClassName,
-        attributesClass: ClassName?,
-        relationshipsClass: ClassName?,
         includedListStatement: String?
     ): FunSpec {
         val builderArgs =
-            mutableListOf<Any>(wrapperClass, ResourceObject::class.asClassName(), originalClass)
-        val returnStatement = StringBuilder("return %T(%T_%T(")
+            mutableListOf<Any>(wrapperClass)
+        val returnStatement = StringBuilder("return %T(this.toResourceObject()")
 
-        if (attributesClass != null) {
-            builderArgs.add(attributesClass)
-            returnStatement.append(
-                "attributes = %T.${
-                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
-                }(this)"
-            )
-        }
-
-        if (relationshipsClass != null) {
-            if (attributesClass != null) {
-                returnStatement.append(", ")
-            }
-            returnStatement.append(
-                "relationships = %T.${
-                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
-                }(this)"
-            )
-            builderArgs.add(relationshipsClass)
-        }
-
-        returnStatement.append(")")
         if (includedListStatement != null) {
             returnStatement.append(", ")
             returnStatement.append("included = $includedListStatement")
@@ -342,7 +318,8 @@ internal class JsonXExtensionsSpecBuilder {
             .addParameter("type", String::class)
             .addParameter(
                 ParameterSpec.builder(
-                    "idMapper", Function1::class.asClassName()
+                    "idMapper",
+                    Function1::class.asClassName()
                         .parameterizedBy(typeVariableName, String::class.asClassName())
                 ).defaultValue("{ \"\" }").build()
             )
@@ -442,8 +419,6 @@ internal class JsonXExtensionsSpecBuilder {
                 wrapperFunSpec(
                     it.key,
                     it.value.jsonWrapperClassName,
-                    it.value.attributesWrapperClassName,
-                    it.value.relationshipsObjectClassName,
                     it.value.includedListStatement?.toString()
                 )
             )
