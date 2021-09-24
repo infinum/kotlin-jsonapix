@@ -24,6 +24,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
+@SuppressWarnings("SpreadOperator")
 public class JsonApiProcessor : AbstractProcessor() {
 
     private val collector = JsonXExtensionsSpecBuilder()
@@ -60,6 +61,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         return true
     }
 
+    @SuppressWarnings("LongMethod")
     private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()

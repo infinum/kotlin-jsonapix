@@ -15,6 +15,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 object TypeExtractor {
 
+    @SuppressWarnings("SwallowedException")
     fun findType(jsonElement: JsonElement): String {
         return try {
             when (jsonElement) {
@@ -28,11 +29,17 @@ object TypeExtractor {
                     type?.jsonPrimitive?.content!!
                 }
                 else -> {
-                    throw IllegalArgumentException()
+                    throw IllegalArgumentException(
+                        "Input must be either JSON object or array with the key type defined"
+                    )
                 }
             }
         } catch (e: IllegalArgumentException) {
-            throw e
+            // TODO Add Timber and custom exceptions
+            throw IllegalArgumentException(
+                "Input must be either JSON object or array with the key type defined",
+                e.cause
+            )
         }
     }
 }

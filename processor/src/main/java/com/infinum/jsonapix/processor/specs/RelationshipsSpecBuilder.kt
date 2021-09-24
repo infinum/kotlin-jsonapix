@@ -79,6 +79,7 @@ internal object RelationshipsSpecBuilder {
             .build()
     }
 
+    @SuppressWarnings("SpreadOperator")
     private fun fromOriginalObjectSpec(
         originalClass: ClassName,
         generatedName: String,
@@ -92,15 +93,17 @@ internal object RelationshipsSpecBuilder {
             builderArgs.add(OneRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
-            if (index != oneRelationships.lastIndex
-                || (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
+            if (index != oneRelationships.lastIndex ||
+                (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
                 constructorStringBuilder.append(", ")
             }
         }
 
         manyRelationships.forEachIndexed { index, property ->
-            constructorStringBuilder.append("${property.name} = %T(originalObject.${property.name}.map { %T(%L) })")
+            constructorStringBuilder.append(
+                "${property.name} = %T(originalObject.${property.name}.map { %T(%L) })"
+            )
             builderArgs.add(ManyRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
@@ -113,13 +116,14 @@ internal object RelationshipsSpecBuilder {
             .addParameter(
                 ParameterSpec.builder("originalObject", originalClass).build()
             )
-            .addStatement("return %L(${constructorStringBuilder})", *builderArgs.toTypedArray())
+            .addStatement("return %L($constructorStringBuilder)", *builderArgs.toTypedArray())
             .build()
     }
 
     private fun getTypeOfRelationship(property: PropertySpec): String {
         return property.annotations.first { annotation ->
-            annotation.typeName == HasOne::class.asTypeName() || annotation.typeName == HasMany::class.asTypeName()
+            annotation.typeName == HasOne::class.asTypeName() ||
+                annotation.typeName == HasMany::class.asTypeName()
         }.members.first { member ->
             member.toString().trim().startsWith("type")
         }.toString().split("=")[1].trim()

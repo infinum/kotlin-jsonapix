@@ -29,10 +29,12 @@ import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 
+@SuppressWarnings("SpreadOperator")
 internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
 
+    @SuppressWarnings("LongParameterList")
     fun add(
         type: String,
         data: ClassName,
@@ -128,6 +130,7 @@ internal class JsonXExtensionsSpecBuilder {
             .build()
     }
 
+    @SuppressWarnings("LongMethod")
     private fun jsonApiWrapperSerializerPropertySpec(): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
         val polymorpicMember = MemberName(

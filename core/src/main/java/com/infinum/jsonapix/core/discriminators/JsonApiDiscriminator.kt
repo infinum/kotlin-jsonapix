@@ -27,6 +27,7 @@ class JsonApiDiscriminator(
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
 
+    @SuppressWarnings("SwallowedException")
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
             val dataObject = getDataObject(jsonElement)
@@ -77,10 +78,15 @@ class JsonApiDiscriminator(
             )
             return rootDiscriminator.inject(newJsonElement)
         } catch (e: Exception) {
-            throw e
+            // TODO Add Timber and custom exceptions
+            throw IllegalArgumentException(
+                "Input must be either JSON object or array with the key type defined",
+                e.cause
+            )
         }
     }
 
+    @SuppressWarnings("SwallowedException")
     override fun extract(jsonElement: JsonElement): JsonElement {
         try {
             val dataObject = getDataObject(jsonElement)?.let {
@@ -102,7 +108,11 @@ class JsonApiDiscriminator(
             )
             return rootDiscriminator.extract(newJsonElement)
         } catch (e: Exception) {
-            throw e
+            // TODO Add Timber and custom exceptions
+            throw IllegalArgumentException(
+                "Input must be either JSON object or array with the key type defined",
+                e.cause
+            )
         }
     }
 

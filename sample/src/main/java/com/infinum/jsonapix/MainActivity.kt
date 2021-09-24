@@ -16,9 +16,9 @@ class MainActivity : AppCompatActivity() {
             Person(
                 name = "Stef",
                 surname = "Banek",
-                age = 27,
-                allMyDogs = listOf(Dog("Bella", 2), Dog("Bongo", 7)),
-                myFavoriteDog = Dog("Bella", 2)
+                age = 1,
+                allMyDogs = listOf(Dog("Bella", 1), Dog("Bongo", 1)),
+                myFavoriteDog = Dog("Bella", 1)
             )
         binding.text.text = dog.toJsonApiXString()
 

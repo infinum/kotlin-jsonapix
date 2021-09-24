@@ -21,6 +21,7 @@ internal object ResourceObjectSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
 
+    @SuppressWarnings("LongMethod")
     fun build(
         className: ClassName,
         type: String,

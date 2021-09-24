@@ -35,7 +35,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 JsonArray(newJsonArray)
             }
             else -> {
-                throw IllegalArgumentException()
+                throw IllegalArgumentException("Input must be either JSON object or array")
             }
         }
     }
@@ -55,7 +55,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 JsonArray(newJsonArray)
             }
             else -> {
-                throw IllegalArgumentException()
+                throw IllegalArgumentException("Input must be either JSON object or array")
             }
         }
     }
