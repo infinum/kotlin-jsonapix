@@ -18,6 +18,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 internal object JsonApiXSpecBuilder {
 
@@ -141,7 +142,7 @@ internal object JsonApiXSpecBuilder {
         val builder = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
             className, KModifier.OVERRIDE
-        )
+        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
         attributes.forEach {
             codeString += "${it.name} = data.attributes?.${it.name}"
             if (!it.type.isNullable) {
