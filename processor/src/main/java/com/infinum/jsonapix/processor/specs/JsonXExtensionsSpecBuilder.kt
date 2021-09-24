@@ -272,7 +272,11 @@ internal class JsonXExtensionsSpecBuilder {
     ): FunSpec {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
-        val returnStatement = StringBuilder("return %T(this.toResourceObject()")
+        val returnStatement = StringBuilder(
+            "return %T(this.${
+                JsonApiConstants.Members.TO_RESOURCE_OBJECT
+            }()"
+        )
 
         if (includedListStatement != null) {
             returnStatement.append(", ")
