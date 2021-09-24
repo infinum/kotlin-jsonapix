@@ -137,21 +137,21 @@ class JsonApiDiscriminator(
         dataObject: JsonElement?,
         includedArray: JsonArray?
     ): JsonObject {
-        val entries = original.jsonObject.entries.toMutableSet().apply {
+        return original.jsonObject.entries.toMutableSet().let { entries ->
             dataObject?.let { data ->
-                removeAll { it.key == JsonApiConstants.Keys.DATA }
-                add(getJsonObjectEntry(JsonApiConstants.Keys.DATA, data))
+                entries.removeAll { it.key == JsonApiConstants.Keys.DATA }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.DATA, data))
             }
+
             includedArray?.let { included ->
-                removeAll { it.key == JsonApiConstants.Keys.INCLUDED }
-                add(getJsonArrayEntry(JsonApiConstants.Keys.INCLUDED, included))
+                entries.removeAll { it.key == JsonApiConstants.Keys.INCLUDED }
+                entries.add(getJsonArrayEntry(JsonApiConstants.Keys.INCLUDED, included))
             }
+
+            val resultMap = mutableMapOf<String, JsonElement>()
+            resultMap.putAll(entries.map { Pair(it.key, it.value) })
+            JsonObject(resultMap)
         }
-
-        val resultMap = mutableMapOf<String, JsonElement>()
-        resultMap.putAll(entries.map { Pair(it.key, it.value) })
-
-        return JsonObject(resultMap)
     }
 
     private fun getNewDataObject(
@@ -159,20 +159,20 @@ class JsonApiDiscriminator(
         attributesObject: JsonElement?,
         relationshipsObject: JsonElement?
     ): JsonObject {
-        val entries = original.jsonObject.entries.toMutableSet().apply {
+        return original.jsonObject.entries.toMutableSet().let { entries ->
             attributesObject?.let { attributes ->
-                removeAll { it.key == JsonApiConstants.Keys.ATTRIBUTES }
-                add(getJsonObjectEntry(JsonApiConstants.Keys.ATTRIBUTES, attributes))
+                entries.removeAll { it.key == JsonApiConstants.Keys.ATTRIBUTES }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.ATTRIBUTES, attributes))
             }
 
             relationshipsObject?.let { relationships ->
-                removeAll { it.key == JsonApiConstants.Keys.RELATIONSHIPS }
-                add(getJsonObjectEntry(JsonApiConstants.Keys.RELATIONSHIPS, relationships))
+                entries.removeAll { it.key == JsonApiConstants.Keys.RELATIONSHIPS }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.RELATIONSHIPS, relationships))
             }
-        }
 
-        val resultMap = mutableMapOf<String, JsonElement>()
-        resultMap.putAll(entries.map { Pair(it.key, it.value) })
-        return JsonObject(resultMap)
+            val resultMap = mutableMapOf<String, JsonElement>()
+            resultMap.putAll(entries.map { Pair(it.key, it.value) })
+            JsonObject(resultMap)
+        }
     }
 }

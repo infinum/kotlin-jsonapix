@@ -61,20 +61,24 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
     }
 
     private fun addDiscriminatorEntry(jsonObject: JsonObject): JsonObject {
-        val entries = jsonObject.entries.toMutableSet()
-        entries.add(discriminatorEntry)
-        val resultMap = mutableMapOf<String, JsonElement>()
-        resultMap.putAll(entries.map { Pair(it.key, it.value) })
-
-        return JsonObject(resultMap)
+        return jsonObject.entries
+            .toMutableSet()
+            .let { entries ->
+                entries.add(discriminatorEntry)
+                val resultMap = mutableMapOf<String, JsonElement>()
+                resultMap.putAll(entries.map { Pair(it.key, it.value) })
+                JsonObject(resultMap)
+            }
     }
 
     private fun removeDiscriminatorEntry(jsonObject: JsonObject): JsonObject {
-        val entries = jsonObject.entries.toMutableSet()
-        entries.removeAll { it.key == JsonApiConstants.CLASS_DISCRIMINATOR_KEY }
-        val resultMap = mutableMapOf<String, JsonElement>()
-        resultMap.putAll(entries.map { Pair(it.key, it.value) })
-
-        return JsonObject(resultMap)
+        return jsonObject.entries
+            .toMutableSet()
+            .let { entries ->
+                entries.removeAll { it.key == JsonApiConstants.CLASS_DISCRIMINATOR_KEY }
+                val resultMap = mutableMapOf<String, JsonElement>()
+                resultMap.putAll(entries.map { Pair(it.key, it.value) })
+                JsonObject(resultMap)
+            }
     }
 }
