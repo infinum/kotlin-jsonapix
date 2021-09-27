@@ -5,12 +5,12 @@ import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
-inline fun <reified T : Annotation, reified R : Any> Element.getAnnotationParameterValue(
+public inline fun <reified T : Annotation, reified R : Any> Element.getAnnotationParameterValue(
     f: T.() -> R
-) = getAnnotation(T::class.java).f()
+): R = getAnnotation(T::class.java).f()
 
 @SuppressWarnings("TooGenericExceptionThrown")
-inline fun <reified T : Annotation> Element.getAnnotationClassValue(
+public inline fun <reified T : Annotation> Element.getAnnotationClassValue(
     f: T.() -> KClass<*>
 ): TypeMirror = try {
     getAnnotation(T::class.java).f()

@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.core.discriminators
 
+import com.infinum.jsonapix.core.common.JsonApiConstants
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -7,14 +8,15 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
+/**
+ * Extracts and injects [discriminator] from a [JsonElement].
+ * Used to remove redundant class discriminator keys from output strings and inject the same
+ * key-value pair before the deserialization.
+ */
 class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
-    companion object {
-        private const val DISCRIMINATOR_NAME = "#class"
-    }
-
     private val discriminatorEntry = object : Map.Entry<String, JsonElement> {
-        override val key = DISCRIMINATOR_NAME
+        override val key = JsonApiConstants.CLASS_DISCRIMINATOR_KEY
         override val value = JsonPrimitive(discriminator)
     }
 
@@ -33,7 +35,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 JsonArray(newJsonArray)
             }
             else -> {
-                throw IllegalArgumentException()
+                throw IllegalArgumentException("Input must be either JSON object or array")
             }
         }
     }
@@ -53,26 +55,30 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 JsonArray(newJsonArray)
             }
             else -> {
-                throw IllegalArgumentException()
+                throw IllegalArgumentException("Input must be either JSON object or array")
             }
         }
     }
 
     private fun addDiscriminatorEntry(jsonObject: JsonObject): JsonObject {
-        val entries = jsonObject.entries.toMutableSet()
-        entries.add(discriminatorEntry)
-        val resultMap = mutableMapOf<String, JsonElement>()
-        resultMap.putAll(entries.map { Pair(it.key, it.value) })
-
-        return JsonObject(resultMap)
+        return jsonObject.entries
+            .toMutableSet()
+            .let { entries ->
+                entries.add(discriminatorEntry)
+                val resultMap = mutableMapOf<String, JsonElement>()
+                resultMap.putAll(entries.map { Pair(it.key, it.value) })
+                JsonObject(resultMap)
+            }
     }
 
     private fun removeDiscriminatorEntry(jsonObject: JsonObject): JsonObject {
-        val entries = jsonObject.entries.toMutableSet()
-        entries.removeAll { it.key == DISCRIMINATOR_NAME }
-        val resultMap = mutableMapOf<String, JsonElement>()
-        resultMap.putAll(entries.map { Pair(it.key, it.value) })
-
-        return JsonObject(resultMap)
+        return jsonObject.entries
+            .toMutableSet()
+            .let { entries ->
+                entries.removeAll { it.key == JsonApiConstants.CLASS_DISCRIMINATOR_KEY }
+                val resultMap = mutableMapOf<String, JsonElement>()
+                resultMap.putAll(entries.map { Pair(it.key, it.value) })
+                JsonObject(resultMap)
+            }
     }
 }

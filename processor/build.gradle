@@ -11,6 +11,7 @@ apply from: "$rootDir/cpd.gradle"
 dependencies {
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
+    implementation packages.kotlin.poet_metadata
     compileOnly project(":annotations")
     compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core
@@ -19,10 +20,23 @@ dependencies {
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += [
+                '-Xopt-in=com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview',
+                '-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi',
+                '-Xexplicit-api=strict'
+        ]
     }
 }
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += [
+                '-Xopt-in=com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview',
+                '-Xexplicit-api=strict'
+        ]
     }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }

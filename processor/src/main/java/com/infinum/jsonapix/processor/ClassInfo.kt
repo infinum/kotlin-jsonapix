@@ -1,9 +1,13 @@
 package com.infinum.jsonapix.processor
 
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 
-data class ClassInfo(
+internal data class ClassInfo(
+    val type: String,
     val jsonWrapperClassName: ClassName,
     val resourceObjectClassName: ClassName,
-    val type: String
+    val attributesWrapperClassName: ClassName?,
+    val relationshipsObjectClassName: ClassName?,
+    val includedListStatement: CodeBlock?
 )
