@@ -26,8 +26,6 @@ internal object ResourceObjectSpecBuilder {
     fun build(
         className: ClassName,
         type: String,
-        hasPrimitives: Boolean,
-        hasComposites: Boolean,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
@@ -50,7 +48,7 @@ internal object ResourceObjectSpecBuilder {
         propsList.add(typeProperty())
         propsList.add(idProperty())
 
-        if (hasPrimitives) {
+        if (attributes.isNotEmpty()) {
             paramsList.add(
                 Specs.getNamedParamSpec(
                     attributesClassName,
@@ -83,7 +81,7 @@ internal object ResourceObjectSpecBuilder {
             )
         }
 
-        if (hasComposites) {
+        if (oneRelationships.isNotEmpty() || manyRelationships.isNotEmpty()) {
             paramsList.add(
                 Specs.getNamedParamSpec(
                     relationshipsClassName,
@@ -161,6 +159,7 @@ internal object ResourceObjectSpecBuilder {
             .build()
     }
 
+    @SuppressWarnings("SpreadOperator")
     private fun originalFunSpec(
         className: ClassName,
         attributes: List<PropertySpec>,
@@ -173,7 +172,9 @@ internal object ResourceObjectSpecBuilder {
         builder.returns(className)
         builder.addParameter(
             JsonApiConstants.Keys.INCLUDED,
-            List::class.asClassName().parameterizedBy(ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName()))
+            List::class.asClassName().parameterizedBy(
+                ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName())
+            )
         )
         attributes.forEach {
             codeString += "${it.name} = attributes?.${it.name}"
@@ -184,21 +185,22 @@ internal object ResourceObjectSpecBuilder {
         }
         val typeParams = mutableListOf<TypeName>()
         oneRelationships.forEach {
-            codeString += "${it.key} = included.first { it.type == relationships!!.${
-                it.key
-            }.data.type && it.id == relationships.${
-                it.key
-            }.data.id }.${
-                JsonApiConstants.Members.ORIGINAL
-            }(included) as %T, "
+            codeString +=
+                """
+                    ${it.key} = included.first { 
+                    it.type == relationships!!.${it.key}.data.type && 
+                    it.id == relationships.${it.key}.data.id }
+                    .${JsonApiConstants.Members.ORIGINAL}(included) as %T, 
+                """.trimIndent()
             typeParams.add(it.value)
         }
         manyRelationships.forEach {
-            codeString += "${it.key} = included.filter { relationships!!.${
-                it.key
-            }.data.contains(ResourceIdentifier(it.type, it.id)) }.map { it.${
-                JsonApiConstants.Members.ORIGINAL
-            }(included) } as %T, "
+            codeString +=
+                """
+                    ${it.key} = included.filter { relationships!!.${it.key}
+                    .data.contains(ResourceIdentifier(it.type, it.id)) }
+                    .map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T, 
+                """.trimIndent()
             typeParams.add(it.value)
         }
         codeString += ")"

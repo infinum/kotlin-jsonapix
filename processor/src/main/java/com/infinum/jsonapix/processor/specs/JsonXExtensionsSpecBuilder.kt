@@ -98,9 +98,7 @@ internal class JsonXExtensionsSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).${
-                    JsonApiConstants.Members.ORIGINAL
-                }",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).${JsonApiConstants.Members.ORIGINAL}",
                 formatMember,
                 decodeMember,
                 JsonApiX::class,
@@ -273,9 +271,7 @@ internal class JsonXExtensionsSpecBuilder {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
         val returnStatement = StringBuilder(
-            "return %T(this.${
-                JsonApiConstants.Members.TO_RESOURCE_OBJECT
-            }()"
+            "return %T(this.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()"
         )
 
         if (includedListStatement != null) {
@@ -346,9 +342,7 @@ internal class JsonXExtensionsSpecBuilder {
 
         if (attributesClass != null) {
             returnStatement.append(
-                "attributes = %T.${
-                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
-                }(this)"
+                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this)"
             )
             builderArgs.add(attributesClass)
         }
@@ -358,9 +352,7 @@ internal class JsonXExtensionsSpecBuilder {
                 returnStatement.append(", ")
             }
             returnStatement.append(
-                "relationships = %T.${
-                    JsonApiConstants.Members.FROM_ORIGINAL_OBJECT
-                }(this)"
+                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this)"
             )
             builderArgs.add(relationshipsClass)
         }
