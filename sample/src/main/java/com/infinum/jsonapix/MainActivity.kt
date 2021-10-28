@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val dog =
+        val person =
             Person(
                 name = "Stef",
                 surname = "Banek",
@@ -20,8 +20,8 @@ class MainActivity : AppCompatActivity() {
                 allMyDogs = listOf(Dog("Bella", 1), Dog("Bongo", 1)),
                 myFavoriteDog = Dog("Bella", 1)
             )
-        binding.text.text = dog.toJsonApiXString()
+        binding.text.text = personTestJsonString.decodeJsonApiXString<Person>().toString()
 
-        binding.textDecoded.text = dog.toJsonApiXString().decodeJsonApiXString<Person>()?.name
+        binding.textDecoded.text = person.toJsonApiXString().decodeJsonApiXString<Person>()?.name
     }
 }

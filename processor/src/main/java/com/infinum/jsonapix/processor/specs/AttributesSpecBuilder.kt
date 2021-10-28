@@ -7,7 +7,6 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
@@ -20,8 +19,7 @@ internal object AttributesSpecBuilder {
     fun build(
         className: ClassName,
         attributes: List<PropertySpec>,
-        type: String,
-        hasRelationships: Boolean
+        type: String
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
         val parameterSpecs = attributes.map {
@@ -32,7 +30,7 @@ internal object AttributesSpecBuilder {
 
         return TypeSpec.classBuilder(generatedName)
             .addModifiers(KModifier.DATA)
-            .addSuperinterface(Attributes::class.asClassName().parameterizedBy(className))
+            .addSuperinterface(Attributes::class.asClassName())
             .addAnnotation(serializableClassName)
             .addAnnotation(
                 Specs.getSerialNameSpec(JsonApiConstants.Prefix.ATTRIBUTES.withName(type))
@@ -47,7 +45,6 @@ internal object AttributesSpecBuilder {
                     .addFunction(fromOriginalObjectSpec(className, generatedName, attributes))
                     .build()
             )
-            .addFunction(toOriginalOrNullFunSpec(attributes, hasRelationships, className))
             .addProperties(attributes)
             .build()
     }
@@ -65,27 +62,6 @@ internal object AttributesSpecBuilder {
                 ParameterSpec.builder("originalObject", originalClass).build()
             )
             .addStatement("return %L($constructorString)", generatedName)
-            .build()
-    }
-
-    private fun toOriginalOrNullFunSpec(
-        attributes: List<PropertySpec>,
-        hasRelationships: Boolean,
-        returnType: ClassName
-    ): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Members.GET_ORIGINAL_OR_NULL)
-            .addModifiers(KModifier.OVERRIDE)
-            .returns(returnType.copy(nullable = true))
-            .apply {
-                if (hasRelationships) {
-                    addStatement(JsonApiConstants.Statements.RETURN_NULL)
-                } else {
-                    val constructorString = attributes.joinToString(", ") {
-                        "${it.name} = ${it.name}"
-                    }
-                    addStatement("return %T($constructorString)", returnType)
-                }
-            }
             .build()
     }
 }
