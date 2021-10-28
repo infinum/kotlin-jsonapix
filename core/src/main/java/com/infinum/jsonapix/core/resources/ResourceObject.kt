@@ -7,7 +7,5 @@ interface ResourceObject<out Model> {
     val relationships: Relationships?
     val links: Links?
 
-    fun originalOrNull(): Model? {
-        return attributes?.originalOrNull()
-    }
+    fun original(included: List<ResourceObject<Any>>): Model
 }

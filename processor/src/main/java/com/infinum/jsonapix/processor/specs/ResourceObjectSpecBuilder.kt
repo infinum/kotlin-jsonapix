@@ -5,7 +5,9 @@ import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Relationships
+import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -13,9 +15,12 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 internal object ResourceObjectSpecBuilder {
 
@@ -26,7 +31,10 @@ internal object ResourceObjectSpecBuilder {
         className: ClassName,
         type: String,
         hasPrimitives: Boolean,
-        hasComposites: Boolean
+        hasComposites: Boolean,
+        attributes: List<PropertySpec>,
+        oneRelationships: Map<String, TypeName>,
+        manyRelationships: Map<String, TypeName>
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         val attributesClassName = ClassName(
@@ -124,6 +132,7 @@ internal object ResourceObjectSpecBuilder {
         )
 
         return FileSpec.builder(className.packageName, generatedName)
+            .addImport(JsonApiConstants.Packages.CORE_RESOURCES, JsonApiConstants.Imports.RESOURCE_IDENTIFIER)
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
@@ -142,10 +151,62 @@ internal object ResourceObjectSpecBuilder {
                             .addParameters(paramsList)
                             .build()
                     )
+                    .addFunction(
+                        originalFunSpec(
+                            className,
+                            attributes,
+                            oneRelationships,
+                            manyRelationships
+                        )
+                    )
                     .addProperties(propsList)
                     .build()
             )
             .build()
+    }
+
+    private fun originalFunSpec(
+        className: ClassName,
+        attributes: List<PropertySpec>,
+        oneRelationships: Map<String, TypeName>,
+        manyRelationships: Map<String, TypeName>
+    ): FunSpec {
+        var codeString = "return ${className.simpleName}("
+        val builder = FunSpec.builder(JsonApiConstants.Members.ORIGINAL)
+        builder.addModifiers(KModifier.OVERRIDE)
+        builder.returns(className)
+        builder.addParameter(
+            JsonApiConstants.Keys.INCLUDED,
+            List::class.asClassName().parameterizedBy(ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName()))
+        )
+        attributes.forEach {
+            codeString += "${it.name} = attributes?.${it.name}"
+            if (!it.type.isNullable) {
+                codeString += "!!"
+            }
+            codeString += ", "
+        }
+        val typeParams = mutableListOf<TypeName>()
+        oneRelationships.forEach {
+            codeString += "${it.key} = included.first { it.type == relationships!!.${
+                it.key
+            }.data.type && it.id == relationships.${
+                it.key
+            }.data.id }.${
+                JsonApiConstants.Members.ORIGINAL
+            }(included) as %T, "
+            typeParams.add(it.value)
+        }
+        manyRelationships.forEach {
+            codeString += "${it.key} = included.filter { relationships!!.${
+                it.key
+            }.data.contains(ResourceIdentifier(it.type, it.id)) }.map { it.${
+                JsonApiConstants.Members.ORIGINAL
+            }(included) } as %T, "
+            typeParams.add(it.value)
+        }
+        codeString += ")"
+        return builder.addStatement(codeString, *typeParams.toTypedArray()).build()
     }
 
     private fun idProperty(): PropertySpec = PropertySpec.builder(

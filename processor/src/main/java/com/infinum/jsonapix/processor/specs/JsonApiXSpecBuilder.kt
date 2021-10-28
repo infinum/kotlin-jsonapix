@@ -28,10 +28,7 @@ internal object JsonApiXSpecBuilder {
     @SuppressWarnings("LongMethod")
     fun build(
         className: ClassName,
-        type: String,
-        attributes: List<PropertySpec>,
-        oneRelationships: Map<String, TypeName>,
-        manyRelationships: Map<String, TypeName>
+        type: String
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
@@ -101,10 +98,7 @@ internal object JsonApiXSpecBuilder {
                     .addProperties(properties)
                     .addProperty(
                         originalProperty(
-                            className,
-                            attributes,
-                            oneRelationships,
-                            manyRelationships
+                            className
                         )
                     )
                     .build()
@@ -135,43 +129,14 @@ internal object JsonApiXSpecBuilder {
         .build()
 
     private fun originalProperty(
-        className: ClassName,
-        attributes: List<PropertySpec>,
-        oneRelationships: Map<String, TypeName>,
-        manyRelationships: Map<String, TypeName>
+        className: ClassName
     ): PropertySpec {
-        var codeString = "${className.simpleName}("
+        val codeString = "data.original(included!!)"
         val builder = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
             className, KModifier.OVERRIDE
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
-        attributes.forEach {
-            codeString += "${it.name} = data.attributes?.${it.name}"
-            if (!it.type.isNullable) {
-                codeString += "!!"
-            }
-            codeString += ", "
-        }
-        val typeParams = mutableListOf<TypeName>()
-        oneRelationships.forEach {
-            codeString += "${it.key} = included?.firstOrNull { it.type == data.relationships?.${
-                it.key
-            }?.data?.type && it.id == data.relationships.${
-                it.key
-            }.data.id }?.${
-                JsonApiConstants.Members.GET_ORIGINAL_OR_NULL
-            }() as %T, "
-            typeParams.add(it.value)
-        }
-        manyRelationships.forEach {
-            codeString += "${it.key} = included?.filter { data.relationships?.${
-                it.key
-            }?.data?.contains(ResourceIdentifier(it.type, it.id)) == true }?.map { it.${
-                JsonApiConstants.Members.GET_ORIGINAL_OR_NULL
-            }() } as %T, "
-            typeParams.add(it.value)
-        }
-        codeString += ")"
-        return builder.initializer(codeString, *typeParams.toTypedArray()).build()
+
+        return builder.initializer(codeString).build()
     }
 }

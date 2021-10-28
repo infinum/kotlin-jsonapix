@@ -150,13 +150,14 @@ public class JsonApiProcessor : AbstractProcessor() {
                 inputDataClass,
                 type,
                 hasPrimitives,
-                hasComposites
+                hasComposites,
+                primitives,
+                mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
+                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
             JsonApiXSpecBuilder.build(
-                inputDataClass, type, primitives,
-                mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
-                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
+                inputDataClass, type
             )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
