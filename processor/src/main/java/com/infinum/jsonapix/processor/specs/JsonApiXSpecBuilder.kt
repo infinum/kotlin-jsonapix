@@ -131,7 +131,7 @@ internal object JsonApiXSpecBuilder {
     private fun originalProperty(
         className: ClassName
     ): PropertySpec {
-        val codeString = "data.original(included!!)"
+        val codeString = "${JsonApiConstants.Keys.DATA}.${JsonApiConstants.Members.ORIGINAL}(included!!)"
         val builder = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
             className, KModifier.OVERRIDE

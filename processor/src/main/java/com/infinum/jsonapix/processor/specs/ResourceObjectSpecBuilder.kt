@@ -5,9 +5,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Relationships
-import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
-import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -17,10 +15,8 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 internal object ResourceObjectSpecBuilder {
 
@@ -73,14 +69,14 @@ internal object ResourceObjectSpecBuilder {
             paramsList.add(
                 Specs.getNullParamSpec(
                     JsonApiConstants.Keys.ATTRIBUTES,
-                    Attributes::class.asClassName().parameterizedBy(className)
+                    Attributes::class.asClassName()
                         .copy(nullable = true)
                 )
             )
             propsList.add(
                 Specs.getNullPropertySpec(
                     JsonApiConstants.Keys.ATTRIBUTES,
-                    Attributes::class.asClassName().parameterizedBy(className)
+                    Attributes::class.asClassName()
                         .copy(nullable = true),
                     isTransient = true
                 )

@@ -99,8 +99,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 AttributesSpecBuilder.build(
                     ClassName(generatedPackage, className),
                     primitives,
-                    type,
-                    hasComposites
+                    type
                 )
             val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
                 .addType(attributesTypeSpec).build()
