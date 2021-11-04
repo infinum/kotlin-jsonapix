@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
                 allMyDogs = listOf(Dog("Bella", 1), Dog("Bongo", 1)),
                 myFavoriteDog = Dog("Bella", 1)
             )
-        binding.text.text = personTestJsonString.decodeJsonApiXString<Person>().toString()
+        binding.text.text = listOf(Dog("Bella", 2), Dog("Sparky", 4)).toJsonApiXString()
 
         binding.textDecoded.text = person.toJsonApiXString().decodeJsonApiXString<Person>()?.name
     }

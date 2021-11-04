@@ -1,8 +1,10 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiX
+import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
+import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
@@ -156,6 +158,13 @@ internal class JsonXExtensionsSpecBuilder {
         }
         codeBlockBuilder.unindent().addStatement("}")
 
+        codeBlockBuilder.addStatement("%M(%T::class) {", polymorpicMember, JsonApiXList::class)
+        codeBlockBuilder.indent()
+        specsMap.values.forEach {
+            codeBlockBuilder.addStatement("%M(%T::class)", subclassMember, it.jsonWrapperListClassName)
+        }
+        codeBlockBuilder.unindent().addStatement("}")
+
         codeBlockBuilder
             .addStatement("%M(%T::class) {", polymorpicMember, ResourceObject::class)
         codeBlockBuilder.indent()
@@ -267,6 +276,48 @@ internal class JsonXExtensionsSpecBuilder {
             .build()
     }
 
+    private fun serializeListFunSpec(originalClass: ClassName): FunSpec {
+        val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
+        val jsonXListClass = JsonApiXList::class.asClassName()
+        val formatMember = MemberName(
+            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Members.FORMAT
+        )
+        val encodeMember =
+            MemberName(
+                JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
+                JsonApiConstants.Members.ENCODE_TO_STRING
+            )
+        val jsonApiWrapperMember =
+            MemberName(
+                JsonApiConstants.Packages.EXTENSIONS,
+                JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER
+            )
+        return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
+            .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
+            .returns(String::class)
+            .addAnnotation(AnnotationSpec.builder(JvmName::class)
+                .addMember("%S", "${JsonApiConstants.Members.JSONX_SERIALIZE}${originalClass.simpleName}")
+                .build()
+            )
+            .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
+            .addStatement(
+                "val discriminator = %T(jsonX.data.first().type)",
+                JsonApiListDiscriminator::class.asClassName()
+            )
+            .addStatement(
+                "val jsonString = %M.%M(%T(%T::class), jsonX)",
+                formatMember,
+                encodeMember,
+                polymorphicSerializerClass,
+                jsonXListClass
+            )
+            .addStatement(
+                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()"
+            )
+            .build()
+    }
+
     private fun wrapperFunSpec(
         originalClass: ClassName,
         wrapperClass: ClassName,
@@ -310,7 +361,7 @@ internal class JsonXExtensionsSpecBuilder {
         }
         returnStatement.append(")")
         return FunSpec.builder(JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER)
-            .receiver(List::class.asClassName().parameterizedBy(originalClass))
+            .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
             .returns(wrapperClass)
             .addStatement(
                 returnStatement.toString(),
@@ -456,6 +507,7 @@ internal class JsonXExtensionsSpecBuilder {
                 )
             )
             fileSpec.addFunction(serializeFunSpec(it.key))
+            fileSpec.addFunction(serializeListFunSpec(it.key))
         }
 
         fileSpec.addProperty(jsonApiWrapperSerializerPropertySpec())
