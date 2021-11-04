@@ -24,6 +24,7 @@ object JsonApiConstants {
 
     object Prefix {
         const val JSON_API_X = "JsonApiX_"
+        const val JSON_API_X_LIST = "JsonApiXList_"
         const val RESOURCE_OBJECT = "ResourceObject_"
         const val ATTRIBUTES = "Attributes_"
         const val RELATIONSHIPS = "Relationships_"
@@ -41,6 +42,7 @@ object JsonApiConstants {
         const val CONTEXTUAL = "contextual"
 
         const val JSONX_WRAPPER_GETTER = "toJsonApiX"
+        const val JSONX_WRAPPER_LIST_GETTER = "toJsonApiXList"
         const val JSONX_SERIALIZE = "toJsonApiXString"
         const val JSONX_DESERIALIZE = "decodeJsonApiXString"
         const val DECODE_FROM_STRING = "decodeFromString"

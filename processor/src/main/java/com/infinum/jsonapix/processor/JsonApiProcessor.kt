@@ -6,6 +6,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
+import com.infinum.jsonapix.processor.specs.JsonApiXListSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonXExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
@@ -75,10 +76,12 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val inputDataClass = ClassName(generatedPackage, className)
         val generatedJsonWrapperName = JsonApiConstants.Prefix.JSON_API_X.withName(className)
+        val generatedJsonWrapperListName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className)
         val generatedResourceObjectName =
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className)
 
         val jsonWrapperClassName = ClassName(generatedPackage, generatedJsonWrapperName)
+        val jsonWrapperListClassName = ClassName(generatedPackage, generatedJsonWrapperListName)
         val resourceObjectClassName = ClassName(generatedPackage, generatedResourceObjectName)
 
         var attributesClassName: ClassName? = null
@@ -130,10 +133,12 @@ public class JsonApiProcessor : AbstractProcessor() {
             type,
             inputDataClass,
             jsonWrapperClassName,
+            jsonWrapperListClassName,
             resourceObjectClassName,
             attributesClassName,
             relationshipsClassName,
-            IncludedSpecBuilder.build(oneRelationships, manyRelationships)
+            IncludedSpecBuilder.build(oneRelationships, manyRelationships),
+            IncludedSpecBuilder.buildForList(oneRelationships, manyRelationships)
         )
 
         val resourceFileSpec =
@@ -144,12 +149,11 @@ public class JsonApiProcessor : AbstractProcessor() {
                 mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
-        val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(
-                inputDataClass, type
-            )
+        val wrapperFileSpec = JsonApiXSpecBuilder.build(inputDataClass, type)
+        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(inputDataClass, type)
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        wrapperListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }

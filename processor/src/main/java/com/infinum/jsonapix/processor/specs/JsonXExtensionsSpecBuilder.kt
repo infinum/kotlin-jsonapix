@@ -39,17 +39,21 @@ internal class JsonXExtensionsSpecBuilder {
         type: String,
         data: ClassName,
         wrapper: ClassName,
+        wrapperList: ClassName,
         resourceObject: ClassName,
         attributesObject: ClassName?,
         relationshipsObject: ClassName?,
-        includedListStatement: CodeBlock?
+        includedStatement: CodeBlock?,
+        includedListStatement: CodeBlock?,
     ) {
         specsMap[data] = ClassInfo(
             type,
             wrapper,
+            wrapperList,
             resourceObject,
             attributesObject,
             relationshipsObject,
+            includedStatement,
             includedListStatement
         )
     }
@@ -271,7 +275,7 @@ internal class JsonXExtensionsSpecBuilder {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
         val returnStatement = StringBuilder(
-            "return %T(this.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()"
+            "return %T(data = this.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()"
         )
 
         if (includedListStatement != null) {
@@ -281,6 +285,32 @@ internal class JsonXExtensionsSpecBuilder {
         returnStatement.append(")")
         return FunSpec.builder(JsonApiConstants.Members.JSONX_WRAPPER_GETTER)
             .receiver(originalClass)
+            .returns(wrapperClass)
+            .addStatement(
+                returnStatement.toString(),
+                *builderArgs.toTypedArray()
+            )
+            .build()
+    }
+
+    private fun wrapperListFunSpec(
+        originalClass: ClassName,
+        wrapperClass: ClassName,
+        includedListStatement: String?
+    ): FunSpec {
+        val builderArgs =
+            mutableListOf<Any>(wrapperClass)
+        val returnStatement = StringBuilder(
+            "return %T(data = map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }"
+        )
+
+        if (includedListStatement != null) {
+            returnStatement.append(", ")
+            returnStatement.append("included = $includedListStatement")
+        }
+        returnStatement.append(")")
+        return FunSpec.builder(JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER)
+            .receiver(List::class.asClassName().parameterizedBy(originalClass))
             .returns(wrapperClass)
             .addStatement(
                 returnStatement.toString(),
@@ -415,6 +445,13 @@ internal class JsonXExtensionsSpecBuilder {
                 wrapperFunSpec(
                     it.key,
                     it.value.jsonWrapperClassName,
+                    it.value.includedStatement?.toString()
+                )
+            )
+            fileSpec.addFunction(
+                wrapperListFunSpec(
+                    it.key,
+                    it.value.jsonWrapperListClassName,
                     it.value.includedListStatement?.toString()
                 )
             )
