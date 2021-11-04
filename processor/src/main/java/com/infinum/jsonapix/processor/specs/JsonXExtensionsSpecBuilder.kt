@@ -113,6 +113,59 @@ internal class JsonXExtensionsSpecBuilder {
             .build()
     }
 
+    private fun deserializeListFunSpec(): FunSpec {
+        val typeVariableName =
+            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
+        val decodeMember = MemberName(
+            JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
+            JsonApiConstants.Members.DECODE_FROM_STRING
+        )
+        val formatMember = MemberName(
+            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Members.FORMAT
+        )
+        val findTypeMember =
+            MemberName(
+                JsonApiConstants.Packages.TYPE_EXTRACTOR,
+                JsonApiConstants.Members.FIND_TYPE
+            )
+        val jsonObjectMember = MemberName(
+            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_JSON,
+            JsonApiConstants.Members.JSON_OBJECT
+        )
+        return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
+            .receiver(String::class)
+            .addModifiers(KModifier.INLINE)
+            .addTypeVariable(typeVariableName.copy(reified = true))
+            .returns(List::class.asClassName().parameterizedBy(typeVariableName).copy(nullable = true))
+            .addStatement(
+                "val type = %T.%M(%T.%L(this).%M[%S]!!)",
+                TypeExtractor::class.asTypeName(),
+                findTypeMember,
+                Json::class.asTypeName(),
+                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
+                jsonObjectMember,
+                JsonApiConstants.Keys.DATA
+            )
+            .addStatement("val discriminator = %T(type)", JsonApiListDiscriminator::class)
+            .addStatement(
+                "val jsonElement = %T.%L(this)",
+                Json::class.asClassName(),
+                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT
+            )
+            .addStatement(
+                "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
+            )
+            .addStatement(
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).${JsonApiConstants.Members.ORIGINAL}",
+                formatMember,
+                decodeMember,
+                JsonApiXList::class,
+                typeVariableName
+            )
+            .build()
+    }
+
     private fun formatPropertySpec(): PropertySpec {
         val formatCodeBuilder = CodeBlock.builder()
             .addStatement("%T {", Json::class)
@@ -515,6 +568,7 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addFunction(manyRelationshipModel())
         fileSpec.addFunction(oneRelationshipModel())
         fileSpec.addFunction(deserializeFunSpec())
+        fileSpec.addFunction(deserializeListFunSpec())
 
         return fileSpec.build()
     }

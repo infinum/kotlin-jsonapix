@@ -45,6 +45,7 @@ object JsonApiConstants {
         const val JSONX_WRAPPER_LIST_GETTER = "toJsonApiXList"
         const val JSONX_SERIALIZE = "toJsonApiXString"
         const val JSONX_DESERIALIZE = "decodeJsonApiXString"
+        const val JSONX_LIST_DESERIALIZE = "decodeJsonApiXListString"
         const val DECODE_FROM_STRING = "decodeFromString"
         const val ENCODE_TO_STRING = "encodeToString"
         const val FORMAT = "format"
