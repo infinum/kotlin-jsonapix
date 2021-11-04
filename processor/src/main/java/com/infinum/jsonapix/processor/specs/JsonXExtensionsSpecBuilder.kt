@@ -349,9 +349,10 @@ internal class JsonXExtensionsSpecBuilder {
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
             .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
             .returns(String::class)
-            .addAnnotation(AnnotationSpec.builder(JvmName::class)
-                .addMember("%S", "${JsonApiConstants.Members.JSONX_SERIALIZE}${originalClass.simpleName}")
-                .build()
+            .addAnnotation(
+                AnnotationSpec.builder(JvmName::class)
+                    .addMember("%S", "${JsonApiConstants.Members.JSONX_SERIALIZE}${originalClass.simpleName}")
+                    .build()
             )
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
             .addStatement(
