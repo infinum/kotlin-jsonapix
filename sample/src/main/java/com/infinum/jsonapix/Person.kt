@@ -173,3 +173,82 @@ val personWithWrongTypeTestJsonString = """
         ]
     }
 """.trimIndent()
+
+val personListTestJsonString = """
+    {
+        "errors":null,
+        "data":[{
+            "type":"person",
+            "id":"1",
+            "attributes":{
+                "age":28,
+                "name":"Stef",
+                "surname":"Banek"
+            },
+            "relationships":{
+                "myFavoriteDog":{
+                    "data":{
+                        "type":"dog",
+                        "id":"1"
+                    }
+                },
+                "allMyDogs":{
+                    "data":[
+                        { "type":"dog", "id":"2" },
+                        { "type":"dog", "id":"3" }
+                    ]
+                }
+            }
+        },
+        {
+            "type":"person",
+            "id":"2",
+            "attributes":{
+                "age":26,
+                "name":"Filip",
+                "surname":"Floreani"
+            },
+            "relationships":{
+                "myFavoriteDog":{
+                    "data":{
+                        "type":"dog",
+                        "id":"3"
+                    }
+                },
+                "allMyDogs":{
+                    "data":[
+                        { "type":"dog", "id":"1" },
+                        { "type":"dog", "id":"3" }
+                    ]
+                }
+            }
+        }
+        ],
+        "included":[
+            {
+                "type":"dog",
+                "id":"1",
+                "attributes":{
+                    "age":1,
+                    "name":"Bella"
+                }
+            },
+            {
+                "type":"dog",
+                "id":"2",
+                "attributes":{
+                    "age":2,
+                    "name":"Bongo"
+                }
+            },
+            {
+                "type":"dog",
+                "id":"3",
+                "attributes":{
+                    "age":3,
+                    "name":"Sonic"
+                }
+            }
+        ]
+    }
+""".trimIndent()

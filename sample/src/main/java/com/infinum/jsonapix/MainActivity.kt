@@ -12,16 +12,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val person =
-            Person(
-                name = "Stef",
-                surname = "Banek",
-                age = 1,
-                allMyDogs = listOf(Dog("Bella", 1), Dog("Bongo", 1)),
-                myFavoriteDog = Dog("Bella", 1)
-            )
-        binding.text.text = personTestJsonString.decodeJsonApiXString<Person>().toString()
-
-        binding.textDecoded.text = person.toJsonApiXString().decodeJsonApiXString<Person>()?.name
+        val dogs = listOf(Dog("Bella", 2), Dog("Sparky", 4))
+        val dogsJsonString = dogs.toJsonApiXString()
+        binding.text.text = personListTestJsonString.decodeJsonApiXListString<Person>().toString()
+        binding.textDecoded.text = dogsJsonString.decodeJsonApiXListString<Dog>().toString()
     }
 }
