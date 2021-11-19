@@ -8,7 +8,7 @@ object JsonApiConstants {
 
     const val CLASS_DISCRIMINATOR_KEY = "#class"
     const val SERIAL_NAME_FORMAT = "value = %S"
-    const val FILE_NAME_EXTENSIONS = "JsonXExtensions"
+
     const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
 
     object Keys {
@@ -60,16 +60,22 @@ object JsonApiConstants {
 
         const val CONVERT_TO_STRING = "convertToString"
         const val CONVERT_FROM_STRING = "convertFromString"
+        const val GET_ADAPTER = "getAdapter"
     }
 
     object Packages {
-        const val EXTENSIONS = "com.infinum.jsonapix"
+        const val JSONX = "com.infinum.jsonapix"
         const val KOTLINX_SERIALIZATION = "kotlinx.serialization"
         const val KOTLINX_SERIALIZATION_MODULES = "kotlinx.serialization.modules"
         const val CORE_DISCRIMINATORS = "com.infinum.jsonapix.core.discriminators"
         const val KOTLINX_SERIALIZATION_JSON = "kotlinx.serialization.json"
         const val TYPE_EXTRACTOR = "com.infinum.jsonapix.core.discriminators.TypeExtractor"
         const val CORE_RESOURCES = "com.infinum.jsonapix.core.resources"
+    }
+
+    object FileNames {
+        const val EXTENSIONS = "JsonXExtensions"
+        const val TYPE_ADAPTER_FACTORY = "TypeAdapterFactory"
     }
 
     object Imports {

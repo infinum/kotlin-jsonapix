@@ -68,7 +68,7 @@ internal class JsonXExtensionsSpecBuilder {
             JsonApiConstants.Members.DECODE_FROM_STRING
         )
         val formatMember = MemberName(
-            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Packages.JSONX,
             JsonApiConstants.Members.FORMAT
         )
         val findTypeMember =
@@ -121,7 +121,7 @@ internal class JsonXExtensionsSpecBuilder {
             JsonApiConstants.Members.DECODE_FROM_STRING
         )
         val formatMember = MemberName(
-            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Packages.JSONX,
             JsonApiConstants.Members.FORMAT
         )
         val findTypeMember =
@@ -295,7 +295,7 @@ internal class JsonXExtensionsSpecBuilder {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
         val formatMember = MemberName(
-            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Packages.JSONX,
             JsonApiConstants.Members.FORMAT
         )
         val encodeMember =
@@ -305,7 +305,7 @@ internal class JsonXExtensionsSpecBuilder {
             )
         val jsonApiWrapperMember =
             MemberName(
-                JsonApiConstants.Packages.EXTENSIONS,
+                JsonApiConstants.Packages.JSONX,
                 JsonApiConstants.Members.JSONX_WRAPPER_GETTER
             )
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
@@ -333,7 +333,7 @@ internal class JsonXExtensionsSpecBuilder {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXListClass = JsonApiXList::class.asClassName()
         val formatMember = MemberName(
-            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Packages.JSONX,
             JsonApiConstants.Members.FORMAT
         )
         val encodeMember =
@@ -343,7 +343,7 @@ internal class JsonXExtensionsSpecBuilder {
             )
         val jsonApiWrapperMember =
             MemberName(
-                JsonApiConstants.Packages.EXTENSIONS,
+                JsonApiConstants.Packages.JSONX,
                 JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER
             )
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
@@ -508,12 +508,12 @@ internal class JsonXExtensionsSpecBuilder {
     fun build(): FileSpec {
         val fileSpec =
             FileSpec.builder(
-                JsonApiConstants.Packages.EXTENSIONS,
-                JsonApiConstants.FILE_NAME_EXTENSIONS
+                JsonApiConstants.Packages.JSONX,
+                JsonApiConstants.FileNames.EXTENSIONS
             )
         fileSpec.addAnnotation(
             AnnotationSpec.builder(JvmName::class)
-                .addMember("%S", JsonApiConstants.FILE_NAME_EXTENSIONS)
+                .addMember("%S", JsonApiConstants.FileNames.EXTENSIONS)
                 .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE).build()
         )
 
@@ -533,7 +533,7 @@ internal class JsonXExtensionsSpecBuilder {
         )
 
         fileSpec.addImport(
-            JsonApiConstants.Packages.EXTENSIONS,
+            JsonApiConstants.Packages.JSONX,
             *JsonApiConstants.Imports.JSON_X
         )
 
