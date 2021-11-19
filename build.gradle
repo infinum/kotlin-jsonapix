@@ -22,12 +22,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter() {
-            content {
-                includeModule("org.jetbrains.trove4j", "trove4j")
-                includeModule("org.jetbrains.kotlinx", "kotlinx-html-jvm")
-            }
-        }
     }
 }
 
@@ -39,7 +33,8 @@ task detektAll(dependsOn: [
         ':annotations:detekt',
         ':core:detekt',
         ':processor:detekt',
-        ':sample:detekt'
+        ':sample:detekt',
+        ':retrofit:detekt'
 ]) {
     group = "Verification"
     description = "Run detekt on all modules"
@@ -50,6 +45,7 @@ task ktlintAll(dependsOn: [
         ':core:ktlintCheck',
         ':processor:ktlintCheck',
         ':sample:ktlintCheck',
+        ':retrofit:ktlintCheck'
 ]) {
     group = "Verification"
     description = "Run ktlint on all modules"
@@ -60,6 +56,7 @@ task cpdAll(dependsOn: [
         ':core:cpdCheck',
         ':processor:cpdCheck',
         ':sample:cpdCheck',
+        ':retrofit:cpdCheck'
 ]) {
     group = "Verification"
     description = "Run CPD on all modules"

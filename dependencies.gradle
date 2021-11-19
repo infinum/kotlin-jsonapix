@@ -8,6 +8,7 @@ ext.versions = [
         "detekt"       : "1.18.1",
         "ktlint"       : "10.2.0",
         "cpd"          : "3.3",
+        "retrofit"     : "2.9.0"
 ]
 
 ext.packages = [
@@ -18,7 +19,7 @@ ext.packages = [
                 "poet"                : "com.squareup:kotlinpoet:${versions.poet}",
                 "poet_metadata"       : "com.squareup:kotlinpoet-metadata:${versions.poet}",
                 "serialization_plugin": "org.jetbrains.kotlin:kotlin-serialization:${versions.kotlin}",
-                "serialization_core"  : "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
+                "serialization_core"  : "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}",
         ],
         "androidx"   : [
                 "core"        : "androidx.core:core-ktx:${versions.core}",
@@ -34,4 +35,7 @@ ext.packages = [
         "cpd"        : [
                 "plugin": "de.aaschmid:gradle-cpd-plugin:${versions.cpd}"
         ],
+        "retrofit"   : [
+                "core": "com.squareup.retrofit2:retrofit:${versions.retrofit}"
+        ]
 ]
