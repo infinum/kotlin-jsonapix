@@ -45,6 +45,9 @@ android {
 dependencies {
     implementation project(":core")
     kapt project(":processor")
+    implementation project(":retrofit")
+    implementation packages.retromock.core
+    implementation packages.retrofit.core
     implementation packages.kotlin.core
     implementation packages.kotlin.serialization_core
     implementation packages.androidx.core
