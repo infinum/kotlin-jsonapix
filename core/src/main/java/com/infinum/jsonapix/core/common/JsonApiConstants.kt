@@ -28,6 +28,7 @@ object JsonApiConstants {
         const val RESOURCE_OBJECT = "ResourceObject_"
         const val ATTRIBUTES = "Attributes_"
         const val RELATIONSHIPS = "Relationships_"
+        const val TYPE_ADAPTER = "TypeAdapter_"
 
         fun String.withName(name: String): String = "$this$name"
     }
@@ -56,6 +57,9 @@ object JsonApiConstants {
 
         const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
         const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
+
+        const val CONVERT_TO_STRING = "convertToString"
+        const val CONVERT_FROM_STRING = "convertFromString"
     }
 
     object Packages {

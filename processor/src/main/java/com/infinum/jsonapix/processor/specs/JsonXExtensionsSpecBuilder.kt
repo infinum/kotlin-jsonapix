@@ -84,7 +84,7 @@ internal class JsonXExtensionsSpecBuilder {
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
-            .returns(typeVariableName.copy(nullable = true))
+            .returns(typeVariableName)
             .addStatement(
                 "val type = %T.%M(%T.%L(this).%M[%S]!!)",
                 TypeExtractor::class.asTypeName(),
