@@ -1,6 +1,6 @@
 ext.versions = [
-        "gradle"       : "7.0.2",
-        "kotlin"       : "1.5.31",
+        "gradle"       : "7.0.3",
+        "kotlin"       : "1.6.0",
         "poet"         : '1.10.1',
         "serialization": '1.2.2',
         "core"         : '1.6.0',
