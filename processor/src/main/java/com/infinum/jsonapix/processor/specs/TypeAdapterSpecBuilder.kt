@@ -25,6 +25,11 @@ public object TypeAdapterSpecBuilder {
                 .addFunction(convertToStringFunSpec(className))
                 .addFunction(convertFromStringFunSpec(className))
                 .build())
+            .addImport(
+                JsonApiConstants.Packages.JSONX,
+                JsonApiConstants.Members.JSONX_SERIALIZE,
+                JsonApiConstants.Members.JSONX_DESERIALIZE
+            )
             .build()
     }
 

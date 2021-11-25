@@ -29,6 +29,11 @@ public class TypeAdapterFactorySpecBuilder {
                     .addFunction(getAdapterFunSpec())
                     .build()
             )
+            .apply {
+                classNames.forEach {
+                    addImport(it.packageName, "TypeAdapter_${it.simpleName}")
+                }
+            }
             .build()
     }
 
