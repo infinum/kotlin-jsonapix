@@ -52,4 +52,6 @@ dependencies {
     implementation packages.kotlin.serialization_core
     implementation packages.androidx.core
     implementation packages.androidx.appcompat
+    implementation packages.hilt.core
+    kapt packages.hilt.compiler
 }

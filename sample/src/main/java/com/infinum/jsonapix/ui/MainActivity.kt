@@ -1,8 +1,13 @@
-package com.infinum.jsonapix
+package com.infinum.jsonapix.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.infinum.jsonapix.data.models.Dog
+import com.infinum.jsonapix.Person
 import com.infinum.jsonapix.databinding.ActivityMainBinding
+import com.infinum.jsonapix.decodeJsonApiXListString
+import com.infinum.jsonapix.personListTestJsonString
+import com.infinum.jsonapix.toJsonApiXString
 
 class MainActivity : AppCompatActivity() {
 

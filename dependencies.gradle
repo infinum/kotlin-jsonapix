@@ -9,7 +9,8 @@ ext.versions = [
         "ktlint"       : "10.2.0",
         "cpd"          : "3.3",
         "retrofit"     : "2.9.0",
-        "retromock"    : "1.1.1"
+        "retromock"    : "1.1.1",
+        "hilt"         : "2.40.1"
 ]
 
 ext.packages = [
@@ -41,5 +42,9 @@ ext.packages = [
         ],
         "retromock"  : [
                 "core": "co.infinum:retromock:${versions.retromock}"
+        ],
+        "hilt"       : [
+                "core": "com.google.dagger:hilt-android:${versions.hilt}",
+                "compiler": "com.google.dagger:hilt-compiler:${versions.hilt}"
         ]
 ]

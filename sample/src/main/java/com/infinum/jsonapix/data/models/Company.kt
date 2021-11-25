@@ -1,5 +1,6 @@
-package com.infinum.jsonapix
+package com.infinum.jsonapix.data.models
 
+import com.infinum.jsonapix.Person
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.JsonApiX
 import kotlinx.serialization.Serializable
