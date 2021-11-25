@@ -13,7 +13,8 @@ ext.versions = [
         "hilt"         : "2.40.2",
         "lifecycle"    : "2.4.0",
         "activity"     : "1.4.0",
-        "fragment"     : "1.4.0"
+        "fragment"     : "1.4.0",
+        "material"     : "1.4.0"
 ]
 
 ext.packages = [
@@ -61,5 +62,6 @@ ext.packages = [
         ],
         "fragment"  : [
                 "core": "androidx.fragment:fragment-ktx:${versions.fragment}"
-        ]
+        ],
+        "material" : "com.google.android.material:material:${versions.material}"
 ]

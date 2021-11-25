@@ -60,4 +60,5 @@ dependencies {
     implementation packages.activity.core
     implementation packages.fragment.core
     kapt packages.hilt.compiler
+    implementation packages.material
 }

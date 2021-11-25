@@ -1,31 +1,19 @@
 package com.infinum.jsonapix.ui
 
-import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.infinum.jsonapix.databinding.ActivityMainBinding
+import com.infinum.jsonapix.databinding.ActivitySampleBinding
+import com.infinum.jsonapix.extensions.viewBinding
+import com.infinum.jsonapix.ui.shared.BaseActivity
+import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
-class SampleActivity : AppCompatActivity() {
+class SampleActivity : BaseActivity<Unit, Unit>() {
 
-    private lateinit var binding: ActivityMainBinding
+    override val viewModel: BaseViewModel<Unit, Unit>? = null
 
-    private val viewModel by viewModels<SampleViewModel>()
+    override val binding by viewBinding(ActivitySampleBinding::inflate)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        lifecycleScope.launchWhenCreated {
-            viewModel.personStateFlow.collect {
-                it?.let { person ->
-                    binding.text.text = person.toString()
-                }
-            }
-        }
-        viewModel.getPerson()
-    }
+    override fun handleState(state: Unit) = Unit
+
+    override fun handleEvent(event: Unit) = Unit
 }
