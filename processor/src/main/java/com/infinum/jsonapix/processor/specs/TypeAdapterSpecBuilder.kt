@@ -20,11 +20,13 @@ public object TypeAdapterSpecBuilder {
             generatedName
         )
         return FileSpec.builder(className.packageName, generatedName)
-            .addType(TypeSpec.classBuilder(typeAdapterClassName)
-                .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(className))
-                .addFunction(convertToStringFunSpec(className))
-                .addFunction(convertFromStringFunSpec(className))
-                .build())
+            .addType(
+                TypeSpec.classBuilder(typeAdapterClassName)
+                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(className))
+                    .addFunction(convertToStringFunSpec(className))
+                    .addFunction(convertFromStringFunSpec(className))
+                    .build()
+            )
             .addImport(
                 JsonApiConstants.Packages.JSONX,
                 JsonApiConstants.Members.JSONX_SERIALIZE,
