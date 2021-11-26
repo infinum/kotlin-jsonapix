@@ -1,5 +1,8 @@
 package com.infinum.jsonapix.ui.examples.person
 
+import android.os.Bundle
+import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.infinum.jsonapix.R
 import com.infinum.jsonapix.databinding.FragmentPersonBinding
@@ -20,7 +23,19 @@ class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
 
     override val viewModel by viewModels<PersonViewModel>()
 
-    override fun handleState(state: PersonState) = Unit
+    override fun handleState(state: PersonState) = with(binding) {
+        responseHeader.isVisible = true
+        bodyContainer.text = state.bodyString
+        parsedHeader.isVisible = true
+        parsedContainer.text = state.person.toString()
+    }
 
     override fun handleEvent(event: PersonEvent) = Unit
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.downloadButton.setOnClickListener {
+            viewModel.fetchPerson()
+        }
+    }
 }

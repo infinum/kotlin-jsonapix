@@ -1,9 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.examples.person.PersonFragment">
 
-</FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Person example:"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            android:text="Press the button to download the following person:\nName: Jason\nSurname: Apix\nAge: 28\nDogs: [(Bella, age of 1), (Bongo age of 2)]\nFavorite dog: Bella"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/downloadButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Download"
+            android:layout_marginVertical="8dp"/>
+
+        <TextView
+            android:id="@+id/responseHeader"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Response body:"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/bodyContainer"
+            android:textSize="14sp"
+            android:layout_marginVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/parsedHeader"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Parsed class:"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/parsedContainer"
+            android:textSize="14sp"
+            android:layout_marginVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

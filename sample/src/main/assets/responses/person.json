@@ -5,8 +5,8 @@
     "id":"1",
     "attributes":{
       "age":28,
-      "name":"Stef",
-      "surname":"Banek"
+      "name":"Jason",
+      "surname":"Apix"
     },
     "relationships":{
       "myFavoriteDog":{
@@ -17,8 +17,8 @@
       },
       "allMyDogs":{
         "data":[
-          { "type":"dog", "id":"2" },
-          { "type":"dog", "id":"3" }
+          { "type":"dog", "id":"1" },
+          { "type":"dog", "id":"2" }
         ]
       }
     }
@@ -38,14 +38,6 @@
       "attributes":{
         "age":2,
         "name":"Bongo"
-      }
-    },
-    {
-      "type":"dog",
-      "id":"3",
-      "attributes":{
-        "age":3,
-        "name":"Sonic"
       }
     }
   ]

@@ -18,6 +18,7 @@ data class Person(
     val myFavoriteDog: Dog
 )
 
+// TODO To be moved to JSON files in assets
 val personWithMissingDogTestJsonString = """
     {
         "errors":null,
