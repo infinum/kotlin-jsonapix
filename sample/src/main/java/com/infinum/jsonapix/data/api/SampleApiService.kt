@@ -11,4 +11,9 @@ interface SampleApiService {
     @MockResponse(body = "responses/person.json")
     @GET("/person")
     suspend fun fetchPerson(): Person
+
+    @Mock
+    @MockResponse(body = "responses/error.json", code = 400, message = "ERROR")
+    @GET("/error")
+    suspend fun fetchError(): Person
 }
