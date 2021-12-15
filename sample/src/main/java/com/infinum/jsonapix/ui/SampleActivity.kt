@@ -6,6 +6,7 @@ import com.infinum.jsonapix.databinding.ActivitySampleBinding
 import com.infinum.jsonapix.extensions.viewBinding
 import com.infinum.jsonapix.ui.examples.company.CompanyFragment
 import com.infinum.jsonapix.ui.examples.dog.DogFragment
+import com.infinum.jsonapix.ui.examples.error.ErrorFragment
 import com.infinum.jsonapix.ui.examples.person.PersonFragment
 import com.infinum.jsonapix.ui.shared.BaseActivity
 import com.infinum.jsonapix.ui.shared.BaseViewModel
@@ -15,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class SampleActivity : BaseActivity<Unit, Unit>() {
 
     companion object {
-        private val TITLES = listOf("Person", "Dog", "Company")
+        private val TITLES = listOf("Person", "Dog", "Company", "Error")
     }
 
     override val viewModel: BaseViewModel<Unit, Unit>? = null
@@ -33,7 +34,8 @@ class SampleActivity : BaseActivity<Unit, Unit>() {
             listOf(
                 PersonFragment.newInstance(),
                 DogFragment.newInstance(),
-                CompanyFragment.newInstance()
+                CompanyFragment.newInstance(),
+                ErrorFragment.newInstance()
             )
         )
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->

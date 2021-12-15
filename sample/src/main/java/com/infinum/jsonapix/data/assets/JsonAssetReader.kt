@@ -4,7 +4,7 @@ import android.content.res.AssetManager
 import javax.inject.Inject
 
 interface JsonAssetReader {
-    fun readJsonAsset(path: String) : String
+    fun readJsonAsset(path: String): String
 }
 
 class JsonAssetReaderImpl @Inject constructor(
