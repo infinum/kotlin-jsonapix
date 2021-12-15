@@ -15,7 +15,8 @@ class JsonApiListDiscriminator(
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
 
-    @SuppressWarnings("SwallowedException")
+    // TODO Handle those in a future PR
+    @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught")
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
             val dataArray = getDataArray(jsonElement)
@@ -85,7 +86,8 @@ class JsonApiListDiscriminator(
         }
     }
 
-    @SuppressWarnings("SwallowedException")
+    // TODO Handle those in a future PR
+    @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught")
     override fun extract(jsonElement: JsonElement): JsonElement {
         try {
             val dataArray = getDataArray(jsonElement)?.let {

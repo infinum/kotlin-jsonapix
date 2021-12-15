@@ -11,6 +11,7 @@ dependencies {
     implementation packages.kotlin.core
     implementation packages.retrofit.core
     compileOnly project(":core")
+    compileOnly packages.kotlin.serialization_core
 }
 
 compileKotlin {

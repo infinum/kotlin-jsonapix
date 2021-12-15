@@ -4,4 +4,7 @@ ktlint {
     version = "0.40.0"
     debug = false
     android = true
+    outputToConsole = true
+    disabledRules = ["import-ordering"]
+    ignoreFailures = false
 }

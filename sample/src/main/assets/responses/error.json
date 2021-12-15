@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "code": "400",
+      "title": "Invalid Attribute",
+      "detail": "First name must contain at least three characters.",
+      "status": "Service error"
+    }
+  ]
+}
