@@ -11,6 +11,8 @@ import com.infinum.jsonapix.processor.specs.JsonXExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
+import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
+import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -29,6 +31,7 @@ import javax.tools.Diagnostic
 public class JsonApiProcessor : AbstractProcessor() {
 
     private val collector = JsonXExtensionsSpecBuilder()
+    private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
         mutableSetOf(JsonApiX::class.java.name)
@@ -58,6 +61,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             val kaptKotlinGeneratedDir =
                 processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
             collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
+            adapterFactoryCollector.build().writeTo(File(kaptKotlinGeneratedDir))
         }
         return true
     }
@@ -141,6 +145,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             IncludedSpecBuilder.buildForList(oneRelationships, manyRelationships)
         )
 
+        adapterFactoryCollector.add(inputDataClass)
+
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
                 inputDataClass,
@@ -151,9 +157,11 @@ public class JsonApiProcessor : AbstractProcessor() {
             )
         val wrapperFileSpec = JsonApiXSpecBuilder.build(inputDataClass, type)
         val wrapperListFileSpec = JsonApiXListSpecBuilder.build(inputDataClass, type)
+        val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(inputDataClass)
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         wrapperListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        typeAdapterFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }

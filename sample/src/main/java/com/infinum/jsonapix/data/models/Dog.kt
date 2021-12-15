@@ -1,4 +1,4 @@
-package com.infinum.jsonapix
+package com.infinum.jsonapix.data.models
 
 import com.infinum.jsonapix.annotations.JsonApiX
 import kotlinx.serialization.Serializable

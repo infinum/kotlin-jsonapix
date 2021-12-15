@@ -1,8 +1,9 @@
-package com.infinum.jsonapix
+package com.infinum.jsonapix.data.models
 
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
+import com.infinum.jsonapix.data.models.Dog
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,61 +18,7 @@ data class Person(
     val myFavoriteDog: Dog
 )
 
-val personTestJsonString = """
-    {
-        "errors":null,
-        "data":{
-            "type":"person",
-            "id":"1",
-            "attributes":{
-                "age":28,
-                "name":"Stef",
-                "surname":"Banek"
-            },
-            "relationships":{
-                "myFavoriteDog":{
-                    "data":{
-                        "type":"dog",
-                        "id":"1"
-                    }
-                },
-                "allMyDogs":{
-                    "data":[
-                        { "type":"dog", "id":"2" },
-                        { "type":"dog", "id":"3" }
-                    ]
-                }
-            }
-        },
-        "included":[
-            {
-                "type":"dog",
-                "id":"1",
-                "attributes":{
-                    "age":1,
-                    "name":"Bella"
-                }
-            },
-            {
-                "type":"dog",
-                "id":"2",
-                "attributes":{
-                    "age":2,
-                    "name":"Bongo"
-                }
-            },
-            {
-                "type":"dog",
-                "id":"3",
-                "attributes":{
-                    "age":3,
-                    "name":"Sonic"
-                }
-            }
-        ]
-    }
-""".trimIndent()
-
+// TODO To be moved to JSON files in assets
 val personWithMissingDogTestJsonString = """
     {
         "errors":null,

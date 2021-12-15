@@ -3,6 +3,7 @@ plugins {
     id "kotlin-android"
     id "kotlinx-serialization"
     id "kotlin-kapt"
+    id "dagger.hilt.android.plugin"
 }
 
 apply from: "$rootDir/detekt.gradle"
@@ -45,8 +46,19 @@ android {
 dependencies {
     implementation project(":core")
     kapt project(":processor")
+    implementation project(":retrofit")
+    implementation packages.retromock.core
+    implementation packages.retrofit.core
     implementation packages.kotlin.core
     implementation packages.kotlin.serialization_core
     implementation packages.androidx.core
     implementation packages.androidx.appcompat
+    implementation packages.hilt.core
+    implementation packages.lifecycle.runtime
+    implementation packages.lifecycle.common
+    implementation packages.lifecycle.viewmodel
+    implementation packages.activity.core
+    implementation packages.fragment.core
+    kapt packages.hilt.compiler
+    implementation packages.material
 }
