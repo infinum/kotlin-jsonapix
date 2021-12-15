@@ -28,4 +28,3 @@ class ErrorViewModel @Inject constructor(
         }
     }
 }
-

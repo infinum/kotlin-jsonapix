@@ -15,4 +15,3 @@ fun HttpException.asJsonXHttpException(): JsonXHttpException {
         response()?.errorBody()?.charStream()?.readText()?.let { Json.decodeFromString<Errors>(it) }?.errors
     )
 }
-
