@@ -5,6 +5,6 @@ ktlint {
     debug = false
     android = true
     outputToConsole = true
-    disabledRules = ["final-newline", "import-ordering"]
+    disabledRules = ["import-ordering"]
     ignoreFailures = false
 }
