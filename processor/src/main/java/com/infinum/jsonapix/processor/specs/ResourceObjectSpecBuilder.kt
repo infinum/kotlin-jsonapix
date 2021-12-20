@@ -3,7 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Attributes
-import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
@@ -115,13 +115,13 @@ internal object ResourceObjectSpecBuilder {
         paramsList.add(
             Specs.getNullParamSpec(
                 JsonApiConstants.Keys.LINKS,
-                Links::class.asClassName().copy(nullable = true)
+                DefaultLinks::class.asClassName().copy(nullable = true)
             )
         )
         propsList.add(
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.LINKS,
-                Links::class.asClassName().copy(nullable = true)
+                DefaultLinks::class.asClassName().copy(nullable = true)
             )
         )
 

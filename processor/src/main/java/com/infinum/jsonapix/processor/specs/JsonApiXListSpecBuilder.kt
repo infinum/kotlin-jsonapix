@@ -4,7 +4,7 @@ import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Error
-import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -81,9 +81,9 @@ internal object JsonApiXListSpecBuilder {
         properties.add(errorsProperty())
 
         properties.add(
-            Specs.getNamedPropertySpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true)
+            Specs.getNamedPropertySpec(DefaultLinks::class.asClassName(), JsonApiConstants.Keys.LINKS, true)
         )
-        params.add(Specs.getNamedParamSpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true))
+        params.add(Specs.getNamedParamSpec(DefaultLinks::class.asClassName(), JsonApiConstants.Keys.LINKS, true))
 
         return FileSpec.builder(className.packageName, generatedName)
             .addImport(

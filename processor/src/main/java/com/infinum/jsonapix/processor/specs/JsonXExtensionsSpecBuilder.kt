@@ -7,7 +7,7 @@ import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.Attributes
-import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
@@ -261,7 +261,7 @@ internal class JsonXExtensionsSpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            Links::class.asClassName()
+            DefaultLinks::class.asClassName()
         )
 
         codeBlockBuilder.addStatement(
