@@ -1,6 +1,8 @@
 package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
+import com.infinum.jsonapix.annotations.Links
+import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
@@ -34,7 +36,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        mutableSetOf(JsonApiX::class.java.name)
+        mutableSetOf(JsonApiX::class.java.name, Links::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -42,6 +44,8 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
+        val linksElements = roundEnv?.getElementsAnnotatedWith(Links::class.java)
+
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
         if (elements?.isNullOrEmpty() == false) {
@@ -55,7 +59,16 @@ public class JsonApiProcessor : AbstractProcessor() {
                 }
 
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
-                processAnnotation(it, type)
+                val links = linksElements.orEmpty().filter { link ->
+                    link.getAnnotationParameterValue<Links, String> { type } == type
+                }.map { link ->
+                    Pair(
+                        ClassName(processingEnv.elementUtils.getPackageOf(link).toString(), link.simpleName.toString()),
+                        link.getAnnotationParameterValue<Links, LinksPlacementStrategy> { placementStrategy }
+                    )
+                }
+
+                processAnnotation(it, type, links)
             }
 
             val kaptKotlinGeneratedDir =
@@ -67,7 +80,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     }
 
     @SuppressWarnings("LongMethod")
-    private fun processAnnotation(element: Element, type: String) {
+    private fun processAnnotation(element: Element, type: String, links: List<Pair<ClassName, LinksPlacementStrategy>>) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
         val kaptKotlinGeneratedDir =
@@ -142,7 +155,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             attributesClassName,
             relationshipsClassName,
             IncludedSpecBuilder.build(oneRelationships, manyRelationships),
-            IncludedSpecBuilder.buildForList(oneRelationships, manyRelationships)
+            IncludedSpecBuilder.buildForList(oneRelationships, manyRelationships),
+            links
         )
 
         adapterFactoryCollector.add(inputDataClass)

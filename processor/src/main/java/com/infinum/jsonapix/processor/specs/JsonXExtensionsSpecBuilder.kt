@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
+import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
@@ -48,6 +49,7 @@ internal class JsonXExtensionsSpecBuilder {
         relationshipsObject: ClassName?,
         includedStatement: CodeBlock?,
         includedListStatement: CodeBlock?,
+        links: List<Pair<ClassName, LinksPlacementStrategy>>?
     ) {
         specsMap[data] = ClassInfo(
             type,
@@ -57,7 +59,8 @@ internal class JsonXExtensionsSpecBuilder {
             attributesObject,
             relationshipsObject,
             includedStatement,
-            includedListStatement
+            includedListStatement,
+            links
         )
     }
 
@@ -272,6 +275,18 @@ internal class JsonXExtensionsSpecBuilder {
             subclassMember,
             DefaultLinks::class.asClassName()
         )
+
+        specsMap.values.forEach {
+            if (it.customLinks != null) {
+                it.customLinks.forEach { link ->
+                    codeBlockBuilder.addStatement(
+                        "%M(%T::class)",
+                        subclassMember,
+                        link.first
+                    )
+                }
+            }
+        }
 
         codeBlockBuilder.unindent().addStatement("}")
 
