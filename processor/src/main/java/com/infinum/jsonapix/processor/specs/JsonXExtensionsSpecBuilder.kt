@@ -88,7 +88,7 @@ internal class JsonXExtensionsSpecBuilder {
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
-            .returns(typeVariableName)
+            .returns(JsonApiX::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
                 "val type = %T.%M(%T.%L(this).%M[%S]!!)",
                 TypeExtractor::class.asTypeName(),
@@ -108,7 +108,7 @@ internal class JsonXExtensionsSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).${JsonApiConstants.Members.ORIGINAL}",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator)",
                 formatMember,
                 decodeMember,
                 JsonApiX::class,
@@ -141,7 +141,7 @@ internal class JsonXExtensionsSpecBuilder {
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
-            .returns(List::class.asClassName().parameterizedBy(typeVariableName).copy(nullable = true))
+            .returns(JsonApiXList::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
                 "val type = %T.%M(%T.%L(this).%M[%S]!!)",
                 TypeExtractor::class.asTypeName(),
@@ -161,7 +161,7 @@ internal class JsonXExtensionsSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator).${JsonApiConstants.Members.ORIGINAL}",
+                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator)",
                 formatMember,
                 decodeMember,
                 JsonApiXList::class,
