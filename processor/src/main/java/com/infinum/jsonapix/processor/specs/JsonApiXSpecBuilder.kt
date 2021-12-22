@@ -30,7 +30,8 @@ internal object JsonApiXSpecBuilder {
     @SuppressWarnings("LongMethod")
     fun build(
         className: ClassName,
-        type: String
+        type: String,
+        links: ClassName?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
         val resourceObjectClassName = ClassName(

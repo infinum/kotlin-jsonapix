@@ -28,7 +28,8 @@ internal object ResourceObjectSpecBuilder {
         type: String,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
-        manyRelationships: Map<String, TypeName>
+        manyRelationships: Map<String, TypeName>,
+        links: ClassName?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         val attributesClassName = ClassName(

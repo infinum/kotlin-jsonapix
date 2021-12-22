@@ -132,7 +132,8 @@ public class JsonApiProcessor : AbstractProcessor() {
                 inputDataClass,
                 type,
                 oneRelationships,
-                manyRelationships
+                manyRelationships,
+                links.firstOrNull { it.second == LinksPlacementStrategy.RELATIONSHIPS }?.first
             )
 
             val relationshipsFileSpec =
@@ -154,8 +155,14 @@ public class JsonApiProcessor : AbstractProcessor() {
             resourceObjectClassName,
             attributesClassName,
             relationshipsClassName,
-            IncludedSpecBuilder.build(oneRelationships, manyRelationships),
-            IncludedSpecBuilder.buildForList(oneRelationships, manyRelationships),
+            IncludedSpecBuilder.build(
+                oneRelationships,
+                manyRelationships
+            ),
+            IncludedSpecBuilder.buildForList(
+                oneRelationships,
+                manyRelationships
+            ),
             links
         )
 
@@ -167,10 +174,13 @@ public class JsonApiProcessor : AbstractProcessor() {
                 type,
                 primitives,
                 mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
-                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
+                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()),
+                links.firstOrNull { it.second == LinksPlacementStrategy.RESOURCE_OBJECT }?.first
             )
-        val wrapperFileSpec = JsonApiXSpecBuilder.build(inputDataClass, type)
-        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(inputDataClass, type)
+        val wrapperFileSpec =
+            JsonApiXSpecBuilder.build(inputDataClass, type, links.firstOrNull { it.second == LinksPlacementStrategy.ROOT }?.first)
+        val wrapperListFileSpec =
+            JsonApiXListSpecBuilder.build(inputDataClass, type, links.firstOrNull { it.second == LinksPlacementStrategy.ROOT }?.first)
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(inputDataClass)
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))

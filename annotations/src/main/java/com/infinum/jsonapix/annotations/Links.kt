@@ -6,5 +6,5 @@ package com.infinum.jsonapix.annotations
 annotation class Links(val type: String, val placementStrategy: LinksPlacementStrategy = LinksPlacementStrategy.ROOT)
 
 enum class LinksPlacementStrategy {
-    ROOT, RESOURCE_OBJECT, RELATIONSHIPS, INCLUDED
+    ROOT, RESOURCE_OBJECT, RELATIONSHIPS
 }
