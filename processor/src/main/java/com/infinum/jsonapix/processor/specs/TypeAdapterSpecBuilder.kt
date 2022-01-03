@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.processor.specs
 
+import com.infinum.jsonapix.core.JsonApiModel
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
@@ -49,7 +50,12 @@ public object TypeAdapterSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
             .returns(className)
-            .addStatement("return input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>()", className)
+            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>()", className)
+            .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
+            .addStatement("(original as? %T)?.let {", JsonApiModel::class)
+            .addStatement("it.links = data.links")
+            .addStatement("}")
+            .addStatement("return original")
             .build()
     }
 }
