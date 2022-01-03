@@ -1,6 +1,5 @@
 package com.infinum.jsonapix.processor.specs
 
-import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
@@ -37,6 +36,7 @@ import kotlinx.serialization.modules.SerializersModule
 internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
+    private val customLinks = mutableListOf<ClassName>()
 
     @SuppressWarnings("LongParameterList")
     fun add(
@@ -48,8 +48,7 @@ internal class JsonXExtensionsSpecBuilder {
         attributesObject: ClassName?,
         relationshipsObject: ClassName?,
         includedStatement: CodeBlock?,
-        includedListStatement: CodeBlock?,
-        links: List<Pair<ClassName, LinksPlacementStrategy>>?
+        includedListStatement: CodeBlock?
     ) {
         specsMap[data] = ClassInfo(
             type,
@@ -60,8 +59,11 @@ internal class JsonXExtensionsSpecBuilder {
             relationshipsObject,
             includedStatement,
             includedListStatement,
-            links
         )
+    }
+
+    fun addCustomLinks(links: List<ClassName>) {
+        customLinks.addAll(links)
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -276,16 +278,12 @@ internal class JsonXExtensionsSpecBuilder {
             DefaultLinks::class.asClassName()
         )
 
-        specsMap.values.forEach {
-            if (it.customLinks != null) {
-                it.customLinks.forEach { link ->
-                    codeBlockBuilder.addStatement(
-                        "%M(%T::class)",
-                        subclassMember,
-                        link.first
-                    )
-                }
-            }
+        customLinks.forEach { link ->
+            codeBlockBuilder.addStatement(
+                "%M(%T::class)",
+                subclassMember,
+                link
+            )
         }
 
         codeBlockBuilder.unindent().addStatement("}")

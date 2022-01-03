@@ -2,7 +2,6 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.annotations.Links
-import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
@@ -44,7 +43,10 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val linksElements = roundEnv?.getElementsAnnotatedWith(Links::class.java)
+        val linksElements = roundEnv?.getElementsAnnotatedWith(Links::class.java).orEmpty().map {
+            ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+        }
+        collector.addCustomLinks(linksElements)
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
@@ -59,16 +61,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 }
 
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
-                val links = linksElements.orEmpty().filter { link ->
-                    link.getAnnotationParameterValue<Links, String> { type } == type
-                }.map { link ->
-                    Pair(
-                        ClassName(processingEnv.elementUtils.getPackageOf(link).toString(), link.simpleName.toString()),
-                        link.getAnnotationParameterValue<Links, LinksPlacementStrategy> { placementStrategy }
-                    )
-                }
-
-                processAnnotation(it, type, links)
+                processAnnotation(it, type)
             }
 
             val kaptKotlinGeneratedDir =
@@ -80,7 +73,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     }
 
     @SuppressWarnings("LongMethod")
-    private fun processAnnotation(element: Element, type: String, links: List<Pair<ClassName, LinksPlacementStrategy>>) {
+    private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
         val kaptKotlinGeneratedDir =
@@ -132,8 +125,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 inputDataClass,
                 type,
                 oneRelationships,
-                manyRelationships,
-                links.firstOrNull { it.second == LinksPlacementStrategy.RELATIONSHIPS }?.first
+                manyRelationships
             )
 
             val relationshipsFileSpec =
@@ -162,8 +154,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             IncludedSpecBuilder.buildForList(
                 oneRelationships,
                 manyRelationships
-            ),
-            links
+            )
         )
 
         adapterFactoryCollector.add(inputDataClass)
@@ -174,13 +165,12 @@ public class JsonApiProcessor : AbstractProcessor() {
                 type,
                 primitives,
                 mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
-                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()),
-                links.firstOrNull { it.second == LinksPlacementStrategy.RESOURCE_OBJECT }?.first
+                mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, type, links.firstOrNull { it.second == LinksPlacementStrategy.ROOT }?.first)
+            JsonApiXSpecBuilder.build(inputDataClass, type)
         val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, type, links.firstOrNull { it.second == LinksPlacementStrategy.ROOT }?.first)
+            JsonApiXListSpecBuilder.build(inputDataClass, type)
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(inputDataClass)
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))

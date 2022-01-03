@@ -53,7 +53,7 @@ public object TypeAdapterSpecBuilder {
             .addStatement("val data = input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>()", className)
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("(original as? %T)?.let {", JsonApiModel::class)
-            .addStatement("it.links = data.links")
+            .addStatement("it.setRootLinks(data.links)")
             .addStatement("}")
             .addStatement("return original")
             .build()

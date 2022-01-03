@@ -26,8 +26,7 @@ internal object RelationshipsSpecBuilder {
         className: ClassName,
         type: String,
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>,
-        links: ClassName?
+        manyRelationships: List<PropertySpec>
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 

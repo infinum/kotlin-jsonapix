@@ -3,7 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Attributes
-import com.infinum.jsonapix.core.resources.DefaultLinks
+import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
@@ -28,8 +28,7 @@ internal object ResourceObjectSpecBuilder {
         type: String,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
-        manyRelationships: Map<String, TypeName>,
-        links: ClassName?
+        manyRelationships: Map<String, TypeName>
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         val attributesClassName = ClassName(
@@ -116,13 +115,13 @@ internal object ResourceObjectSpecBuilder {
         paramsList.add(
             Specs.getNullParamSpec(
                 JsonApiConstants.Keys.LINKS,
-                DefaultLinks::class.asClassName().copy(nullable = true)
+                Links::class.asClassName().copy(nullable = true)
             )
         )
         propsList.add(
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.LINKS,
-                DefaultLinks::class.asClassName().copy(nullable = true)
+                Links::class.asClassName().copy(nullable = true)
             )
         )
 
