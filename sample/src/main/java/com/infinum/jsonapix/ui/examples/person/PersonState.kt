@@ -4,7 +4,8 @@ import com.infinum.jsonapix.data.models.Person
 
 data class PersonState(
     val bodyString: String,
-    val person: Person
+    val person: Person,
+    val link: String?
 )
 
 class PersonEvent

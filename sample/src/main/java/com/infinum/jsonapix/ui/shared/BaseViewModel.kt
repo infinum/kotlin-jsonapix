@@ -24,7 +24,7 @@ abstract class BaseViewModel<State, Event> : ViewModel() {
     val eventFlow: SharedFlow<Event> = mutableEventFlow
     val errorFlow: SharedFlow<ErrorEvent> = mutableErrorFlow
 
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, _ ->
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
         hideLoading()
     }
 

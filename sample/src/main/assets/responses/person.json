@@ -1,5 +1,8 @@
 {
   "errors":null,
+  "links": {
+    "self": "https://some.link.com"
+  },
   "data":{
     "type":"person",
     "id":"1",
