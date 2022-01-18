@@ -2,6 +2,7 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.annotations.Links
+import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
@@ -33,6 +34,7 @@ public class JsonApiProcessor : AbstractProcessor() {
 
     private val collector = JsonXExtensionsSpecBuilder()
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
+    private val customLinks = mutableListOf<LinksInfo>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
         mutableSetOf(JsonApiX::class.java.name, Links::class.java.name)
@@ -44,7 +46,25 @@ public class JsonApiProcessor : AbstractProcessor() {
         roundEnv: RoundEnvironment?
     ): Boolean {
         val linksElements = roundEnv?.getElementsAnnotatedWith(Links::class.java).orEmpty().map {
-            ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            val type = it.getAnnotationParameterValue<Links, String> { type }
+            val placementStrategy = it.getAnnotationParameterValue<Links, LinksPlacementStrategy> { placementStrategy }
+            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
+                when (placementStrategy) {
+                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
+                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className.canonicalName
+                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className.canonicalName
+                }
+            } ?: kotlin.run {
+                val linksInfo = LinksInfo(type)
+                when (placementStrategy) {
+                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
+                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className.canonicalName
+                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className.canonicalName
+                }
+                customLinks.add(linksInfo)
+            }
+            className
         }
         collector.addCustomLinks(linksElements)
 
@@ -171,7 +191,13 @@ public class JsonApiProcessor : AbstractProcessor() {
             JsonApiXSpecBuilder.build(inputDataClass, type)
         val wrapperListFileSpec =
             JsonApiXListSpecBuilder.build(inputDataClass, type)
-        val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(inputDataClass)
+        val linksInfo = customLinks.firstOrNull { it.type == type }
+        val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
+            inputDataClass,
+            linksInfo?.rootLinks,
+            linksInfo?.resourceObjectLinks,
+            linksInfo?.relationshipsLinks
+        )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))

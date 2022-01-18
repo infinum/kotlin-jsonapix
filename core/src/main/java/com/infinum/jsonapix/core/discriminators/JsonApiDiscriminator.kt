@@ -22,7 +22,10 @@ import kotlinx.serialization.json.jsonObject
  * of a class called Person passed as a parameter to JsonApiX annotation.
  */
 class JsonApiDiscriminator(
-    private val rootType: String
+    private val rootType: String,
+    private val rootLinks: String,
+    private val resourceObjectLinks: String,
+    private val relationshipsLinks: String
 ) : Discriminator {
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
@@ -34,11 +37,19 @@ class JsonApiDiscriminator(
             val includedObject = getIncludedArray(jsonElement)
             val relationshipsObject = getRelationshipsObject(jsonElement)
             val attributesObject = getAttributesObject(jsonElement)
+            val rootLinksObject = getLinksObject(jsonElement)
+            val resourceLinksObject = dataObject?.let {
+                getLinksObject(it)
+            }
+            val relationshipsLinksObject = relationshipsObject?.let {
+                getLinksObject(it)
+            }
 
             val newRelationshipsObject = relationshipsObject?.let {
                 val relationshipsDiscriminator = CommonDiscriminator(
                     JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
                 )
+                val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
                 relationshipsDiscriminator.inject(it)
             }
 
@@ -141,6 +152,9 @@ class JsonApiDiscriminator(
 
     private fun getIncludedArray(jsonElement: JsonElement) =
         jsonElement.jsonObject[JsonApiConstants.Keys.INCLUDED]
+
+    private fun getLinksObject(jsonElement: JsonElement) =
+        jsonElement.jsonObject[JsonApiConstants.Keys.LINKS]
 
     private fun getJsonObjectWithDataDiscriminator(
         original: JsonElement,

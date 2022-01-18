@@ -14,7 +14,12 @@ import com.squareup.kotlinpoet.asClassName
 
 public object TypeAdapterSpecBuilder {
 
-    public fun build(className: ClassName): FileSpec {
+    public fun build(
+        className: ClassName,
+        rootLinks: String?,
+        resourceObjectLinks: String?,
+        relationshipsLinks: String?
+    ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER.withName(className.simpleName)
         val typeAdapterClassName = ClassName(
             className.packageName,
@@ -28,6 +33,17 @@ public object TypeAdapterSpecBuilder {
                     .addFunction(convertFromStringFunSpec(className))
                     .build()
             )
+            .apply {
+                if (rootLinks != null) {
+                    addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
+                }
+                if (resourceObjectLinks != null) {
+                    addFunction(linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks))
+                }
+                if (relationshipsLinks != null) {
+                    addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
+                }
+            }
             .addImport(
                 JsonApiConstants.Packages.JSONX,
                 JsonApiConstants.Members.JSONX_SERIALIZE,
@@ -41,7 +57,9 @@ public object TypeAdapterSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", className)
             .returns(String::class)
-            .addStatement("return input.${JsonApiConstants.Members.JSONX_SERIALIZE}()")
+            .addStatement(
+                "return input.${JsonApiConstants.Members.JSONX_SERIALIZE}(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}())"
+            )
             .build()
     }
 
@@ -50,12 +68,20 @@ public object TypeAdapterSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
             .returns(className)
-            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>()", className)
+            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>(rootLinks(), resourceObjectLinks(), relationshipsLinks())", className)
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("(original as? %T)?.let {", JsonApiModel::class)
             .addStatement("it.setRootLinks(data.links)")
             .addStatement("}")
             .addStatement("return original")
+            .build()
+    }
+
+    private fun linksFunSpec(methodName: String, links: String): FunSpec {
+        return FunSpec.builder(methodName)
+            .addModifiers(KModifier.OVERRIDE)
+            .returns(String::class)
+            .addStatement("return $links")
             .build()
     }
 }

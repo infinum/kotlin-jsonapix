@@ -10,7 +10,10 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 class JsonApiListDiscriminator(
-    private val rootType: String
+    private val rootType: String,
+    private val rootLinks: String,
+    private val resourceObjectLinks: String,
+    private val relationshipsLinks: String
 ) : Discriminator {
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
