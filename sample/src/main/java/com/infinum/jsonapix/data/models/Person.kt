@@ -3,6 +3,8 @@ package com.infinum.jsonapix.data.models
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
+import com.infinum.jsonapix.annotations.Links
+import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.JsonApiModel
 import kotlinx.serialization.Serializable
 
@@ -17,6 +19,10 @@ data class Person(
     @HasOne("dog")
     val myFavoriteDog: Dog
 ) : JsonApiModel()
+
+@Links("person", LinksPlacementStrategy.RELATIONSHIPS)
+@Serializable
+data class PersonLinks(val someData: String): com.infinum.jsonapix.core.resources.Links
 
 // TODO To be moved to JSON files in assets
 val personWithMissingDogTestJsonString = """

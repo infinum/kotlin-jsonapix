@@ -31,19 +31,19 @@ public object TypeAdapterSpecBuilder {
                     .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(className))
                     .addFunction(convertToStringFunSpec(className))
                     .addFunction(convertFromStringFunSpec(className))
+                    .apply {
+                        if (rootLinks != null) {
+                            addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
+                        }
+                        if (resourceObjectLinks != null) {
+                            addFunction(linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks))
+                        }
+                        if (relationshipsLinks != null) {
+                            addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
+                        }
+                    }
                     .build()
             )
-            .apply {
-                if (rootLinks != null) {
-                    addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
-                }
-                if (resourceObjectLinks != null) {
-                    addFunction(linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks))
-                }
-                if (relationshipsLinks != null) {
-                    addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
-                }
-            }
             .addImport(
                 JsonApiConstants.Packages.JSONX,
                 JsonApiConstants.Members.JSONX_SERIALIZE,
@@ -81,7 +81,7 @@ public object TypeAdapterSpecBuilder {
         return FunSpec.builder(methodName)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
-            .addStatement("return $links")
+            .addStatement("return %S", links)
             .build()
     }
 }
