@@ -58,7 +58,7 @@ internal class JsonXExtensionsSpecBuilder {
             attributesObject,
             relationshipsObject,
             includedStatement,
-            includedListStatement,
+            includedListStatement
         )
     }
 
