@@ -38,19 +38,33 @@ class JsonApiDiscriminator(
             val relationshipsObject = getRelationshipsObject(jsonElement)
             val attributesObject = getAttributesObject(jsonElement)
             val rootLinksObject = getLinksObject(jsonElement)
+            val newRootLinksObject = rootLinksObject?.let {
+                val linksDiscriminator = CommonDiscriminator(rootLinks)
+                linksDiscriminator.inject(it)
+            }
             val resourceLinksObject = dataObject?.let {
                 getLinksObject(it)
+            }
+            val newResourceLinksObject = resourceLinksObject?.let {
+                val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
+                resourceLinksDiscriminator.inject(it)
             }
             val relationshipsLinksObject = relationshipsObject?.let {
                 getLinksObject(it)
             }
+            val newRelationshipsLinksObject = relationshipsLinksObject?.let {
+                val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
+                relationshipsLinksDiscriminator.inject(it)
+            }
 
             val newRelationshipsObject = relationshipsObject?.let {
+
                 val relationshipsDiscriminator = CommonDiscriminator(
                     JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
                 )
-                val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
-                relationshipsDiscriminator.inject(it)
+                relationshipsDiscriminator.inject(it).apply {
+                    getNewRelationshipsObject(it, newRelationshipsLinksObject)
+                }
             }
 
             val newAttributesObject = attributesObject?.let {
@@ -78,14 +92,15 @@ class JsonApiDiscriminator(
                     JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType)
                 )
                 dataDiscriminator.inject(it).apply {
-                    getNewDataObject(this, newAttributesObject, newRelationshipsObject)
+                    getNewDataObject(this, newAttributesObject, newRelationshipsObject, newResourceLinksObject)
                 }
             }
 
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 jsonElement,
                 newDataObject,
-                newIncludedArray
+                newIncludedArray,
+                newRootLinksObject
             )
             return rootDiscriminator.inject(newJsonElement)
         } catch (e: Exception) {
@@ -115,7 +130,8 @@ class JsonApiDiscriminator(
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 jsonElement,
                 dataObject,
-                includedArray
+                includedArray,
+                null
             )
             return rootDiscriminator.extract(newJsonElement)
         } catch (e: Exception) {
@@ -159,7 +175,8 @@ class JsonApiDiscriminator(
     private fun getJsonObjectWithDataDiscriminator(
         original: JsonElement,
         dataObject: JsonElement?,
-        includedArray: JsonArray?
+        includedArray: JsonArray?,
+        linksObject: JsonElement?
     ): JsonObject {
         return original.jsonObject.entries.toMutableSet().let { entries ->
             dataObject?.let { data ->
@@ -172,6 +189,11 @@ class JsonApiDiscriminator(
                 entries.add(getJsonArrayEntry(JsonApiConstants.Keys.INCLUDED, included))
             }
 
+            linksObject?.let { links ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
             val resultMap = mutableMapOf<String, JsonElement>()
             resultMap.putAll(entries.map { Pair(it.key, it.value) })
             JsonObject(resultMap)
@@ -181,7 +203,8 @@ class JsonApiDiscriminator(
     private fun getNewDataObject(
         original: JsonElement,
         attributesObject: JsonElement?,
-        relationshipsObject: JsonElement?
+        relationshipsObject: JsonElement?,
+        linksObject: JsonElement?
     ): JsonObject {
         return original.jsonObject.entries.toMutableSet().let { entries ->
             attributesObject?.let { attributes ->
@@ -194,6 +217,26 @@ class JsonApiDiscriminator(
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.RELATIONSHIPS, relationships))
             }
 
+            linksObject?.let { links ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
+            val resultMap = mutableMapOf<String, JsonElement>()
+            resultMap.putAll(entries.map { Pair(it.key, it.value) })
+            JsonObject(resultMap)
+        }
+    }
+
+    private fun getNewRelationshipsObject(
+        original: JsonElement,
+        linksObject: JsonElement?
+    ) {
+        return original.jsonObject.entries.toMutableSet().let { entries ->
+            linksObject?.let {
+                entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, linksObject))
+            }
             val resultMap = mutableMapOf<String, JsonElement>()
             resultMap.putAll(entries.map { Pair(it.key, it.value) })
             JsonObject(resultMap)
