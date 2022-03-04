@@ -45,11 +45,3 @@ class SampleActivity : BaseActivity<Unit, Unit>() {
         }.attach()
     }
 }
-
-interface S {
-    fun root(): String = "root"
-}
-
-class A : S {
-    override fun root(): String = "A"
-}

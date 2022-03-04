@@ -33,17 +33,20 @@ class JsonApiDiscriminator(
     @SuppressWarnings("SwallowedException")
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
+            // Current objects
             val dataObject = getDataObject(jsonElement)
             val includedObject = getIncludedArray(jsonElement)
             val relationshipsObject = getRelationshipsObject(jsonElement)
             val attributesObject = getAttributesObject(jsonElement)
             val rootLinksObject = getLinksObject(jsonElement)
+            val resourceLinksObject = dataObject?.let {
+                getLinksObject(it)
+            }
+
+            // Injected objects
             val newRootLinksObject = rootLinksObject?.let {
                 val linksDiscriminator = CommonDiscriminator(rootLinks)
                 linksDiscriminator.inject(it)
-            }
-            val resourceLinksObject = dataObject?.let {
-                getLinksObject(it)
             }
             val newResourceLinksObject = resourceLinksObject?.let {
                 val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
@@ -58,7 +61,6 @@ class JsonApiDiscriminator(
             }
 
             val newRelationshipsObject = relationshipsObject?.let {
-
                 val relationshipsDiscriminator = CommonDiscriminator(
                     JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
                 )
