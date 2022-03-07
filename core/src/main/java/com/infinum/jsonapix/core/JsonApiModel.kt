@@ -6,12 +6,31 @@ import com.infinum.jsonapix.core.resources.Links
 @Suppress("UNCHECKED_CAST")
 abstract class JsonApiModel {
     private var rootLinks: Links? = null
+    private var resourceLinks: Links? = null
+    private var relationshipLinks: Map<String, Links?>? = null
 
     fun setRootLinks(links: Links?) {
         rootLinks = links
     }
 
+    fun setResourceLinks(links: Links?) {
+        resourceLinks = links
+    }
+
+    fun setRelationshipsLinks(linkMap: Map<String, Links?>) {
+        relationshipLinks = linkMap
+    }
+
     fun rootLinks(): DefaultLinks? = rootLinks as? DefaultLinks
 
     fun <T: Links> rootLinks(): T? = rootLinks as? T
+
+    fun resourceLinks(): DefaultLinks? = resourceLinks as? DefaultLinks
+
+    fun <T: Links> resourceLinks(): T? = resourceLinks as? T
+
+    fun relationshipsLinks(): Map<String, DefaultLinks?>? = relationshipLinks as? Map<String, DefaultLinks?>
+
+    @JvmName("customRelationshipLinks")
+    fun <T: Links> relationshipsLinks(): Map<String, T?>? = relationshipLinks as? Map<String, T?>
 }
