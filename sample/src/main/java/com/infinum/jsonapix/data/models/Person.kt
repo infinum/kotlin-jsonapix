@@ -20,10 +20,6 @@ data class Person(
     val myFavoriteDog: Dog
 ) : JsonApiModel()
 
-@Links("person", LinksPlacementStrategy.RELATIONSHIPS)
-@Serializable
-data class PersonLinks(val someData: String): com.infinum.jsonapix.core.resources.Links
-
 // TODO To be moved to JSON files in assets
 val personWithMissingDogTestJsonString = """
     {
