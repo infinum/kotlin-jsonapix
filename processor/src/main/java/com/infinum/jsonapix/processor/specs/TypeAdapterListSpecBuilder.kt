@@ -26,11 +26,11 @@ public object TypeAdapterListSpecBuilder {
             generatedName
         )
 
-        val listClassName = Iterable::class.asClassName().parameterizedBy(className)
+        val listType = Iterable::class.asClassName().parameterizedBy(className)
         return FileSpec.builder(className.packageName, generatedName)
             .addType(
                 TypeSpec.classBuilder(typeAdapterClassName)
-                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(listClassName))
+                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(listType))
                     .addFunction(convertToStringFunSpec(className))
                     .addFunction(convertFromStringFunSpec(className))
                     .apply {
