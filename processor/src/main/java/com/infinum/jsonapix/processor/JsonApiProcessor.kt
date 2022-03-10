@@ -14,6 +14,7 @@ import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
+import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -192,7 +193,15 @@ public class JsonApiProcessor : AbstractProcessor() {
         val wrapperListFileSpec =
             JsonApiXListSpecBuilder.build(inputDataClass, type)
         val linksInfo = customLinks.firstOrNull { it.type == type }
+
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
+            inputDataClass,
+            linksInfo?.rootLinks,
+            linksInfo?.resourceObjectLinks,
+            linksInfo?.relationshipsLinks
+        )
+
+        val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
@@ -203,5 +212,6 @@ public class JsonApiProcessor : AbstractProcessor() {
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         wrapperListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        typeAdapterListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 }

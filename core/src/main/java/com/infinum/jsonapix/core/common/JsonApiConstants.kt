@@ -29,6 +29,7 @@ object JsonApiConstants {
         const val ATTRIBUTES = "Attributes_"
         const val RELATIONSHIPS = "Relationships_"
         const val TYPE_ADAPTER = "TypeAdapter_"
+        const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
 
         fun String.withName(name: String): String = "$this$name"
     }

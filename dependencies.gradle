@@ -26,6 +26,7 @@ ext.packages = [
                 "poet_metadata"       : "com.squareup:kotlinpoet-metadata:${versions.poet}",
                 "serialization_plugin": "org.jetbrains.kotlin:kotlin-serialization:${versions.kotlin}",
                 "serialization_core"  : "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}",
+                "reflect"             : "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
         ],
         "androidx"   : [
                 "core"        : "androidx.core:core-ktx:${versions.core}",
