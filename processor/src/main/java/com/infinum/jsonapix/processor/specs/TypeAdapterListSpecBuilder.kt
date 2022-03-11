@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.JsonApiModel
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -72,10 +73,14 @@ public object TypeAdapterListSpecBuilder {
             .returns(Iterable::class.asClassName().parameterizedBy(className))
             .addStatement("val data = input.${JsonApiConstants.Members.JSONX_LIST_DESERIALIZE}<%T>(rootLinks(), resourceObjectLinks(), relationshipsLinks())", className)
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
-            .addStatement("(original as? %T)?.let {", JsonApiModel::class)
-            .addStatement("it.setRootLinks(data.links)")
-            .addStatement("it.setResourceLinks(data.data?.first()?.links)")
-            .addStatement("data.data?.first()?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")
+            .addStatement("data.data?.let { resourceData ->")
+            .addStatement("original.zip(resourceData) { model, resource ->")
+            .addStatement("(model as? %T)?.let { safeModel ->", JsonApiModel::class)
+            .addStatement("safeModel.setRootLinks(data.links)")
+            .addStatement("safeModel.setResourceLinks(resource.links)")
+            .addStatement("resource.relationshipsLinks()?.let { relationshipLinks -> safeModel.setRelationshipsLinks(relationshipLinks)}")
+            .addStatement("}")
+            .addStatement("}")
             .addStatement("}")
             .addStatement("return original")
             .build()
