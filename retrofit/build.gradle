@@ -10,7 +10,6 @@ apply from: "$rootDir/cpd.gradle"
 dependencies {
     implementation packages.kotlin.core
     implementation packages.retrofit.core
-    implementation packages.kotlin.reflect
     compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core
 }
