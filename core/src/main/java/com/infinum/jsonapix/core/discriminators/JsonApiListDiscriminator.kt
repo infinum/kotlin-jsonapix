@@ -2,6 +2,7 @@ package com.infinum.jsonapix.core.discriminators
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -222,7 +223,7 @@ class JsonApiListDiscriminator(
     ): JsonObject {
         val resultMap = mutableMapOf<String, JsonElement>()
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
-        original.jsonObject.entries.forEach { relationshipEntry ->
+        original.jsonObject.entries.filter { it.value is JsonObject }.forEach { relationshipEntry ->
             val set = relationshipEntry.value.jsonObject.entries.toMutableSet()
             getLinksObject(relationshipEntry.value)?.let { linksSafe ->
                 val newLinks = relationshipsLinksDiscriminator.inject(linksSafe)
