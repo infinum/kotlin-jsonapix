@@ -4,19 +4,23 @@ import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 internal object RelationshipsSpecBuilder {
 
@@ -76,6 +80,7 @@ internal object RelationshipsSpecBuilder {
                     .build()
             )
             .addProperties(properties)
+            .addProperty(linksPropertySpec(oneRelationships, manyRelationships))
             .build()
     }
 
@@ -118,6 +123,28 @@ internal object RelationshipsSpecBuilder {
             )
             .addStatement("return %L($constructorStringBuilder)", *builderArgs.toTypedArray())
             .build()
+    }
+
+    private fun linksPropertySpec(
+        oneRelationships: List<PropertySpec>,
+        manyRelationships: List<PropertySpec>
+    ): PropertySpec {
+        var returnStatement = "mapOf("
+        oneRelationships.forEach {
+            returnStatement += "\"${it.name}\" to ${it.name}.links, "
+        }
+        manyRelationships.forEach {
+            returnStatement += "\"${it.name}\" to ${it.name}.links, "
+        }
+        returnStatement += ")"
+
+        val builder = PropertySpec.builder(
+            JsonApiConstants.Keys.LINKS,
+            Map::class.asClassName().parameterizedBy(String::class.asTypeName(), Links::class.asTypeName().copy(nullable = true)),
+            KModifier.OVERRIDE
+        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
+
+        return builder.initializer(returnStatement).build()
     }
 
     private fun getTypeOfRelationship(property: PropertySpec): String {

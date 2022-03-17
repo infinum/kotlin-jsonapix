@@ -9,7 +9,7 @@ buildscript {
     apply from: "config.gradle"
 
     dependencies {
-        classpath packages.gradle
+        classpath "com.android.tools.build:gradle:7.0.4"
         classpath packages.kotlin.plugin
         classpath packages.kotlin.serialization_plugin
         classpath packages.detekt.plugin

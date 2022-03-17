@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.JsonApiModel
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -12,7 +13,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 
-public object TypeAdapterSpecBuilder {
+public object TypeAdapterListSpecBuilder {
 
     public fun build(
         className: ClassName,
@@ -20,15 +21,17 @@ public object TypeAdapterSpecBuilder {
         resourceObjectLinks: String?,
         relationshipsLinks: String?
     ): FileSpec {
-        val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER.withName(className.simpleName)
+        val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER_LIST.withName(className.simpleName)
         val typeAdapterClassName = ClassName(
             className.packageName,
             generatedName
         )
+
+        val listType = Iterable::class.asClassName().parameterizedBy(className)
         return FileSpec.builder(className.packageName, generatedName)
             .addType(
                 TypeSpec.classBuilder(typeAdapterClassName)
-                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(className))
+                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(listType))
                     .addFunction(convertToStringFunSpec(className))
                     .addFunction(convertFromStringFunSpec(className))
                     .apply {
@@ -47,7 +50,7 @@ public object TypeAdapterSpecBuilder {
             .addImport(
                 JsonApiConstants.Packages.JSONX,
                 JsonApiConstants.Members.JSONX_SERIALIZE,
-                JsonApiConstants.Members.JSONX_DESERIALIZE
+                JsonApiConstants.Members.JSONX_LIST_DESERIALIZE
             )
             .build()
     }
@@ -55,7 +58,7 @@ public object TypeAdapterSpecBuilder {
     private fun convertToStringFunSpec(className: ClassName): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_TO_STRING)
             .addModifiers(KModifier.OVERRIDE)
-            .addParameter("input", className)
+            .addParameter("input", Iterable::class.asClassName().parameterizedBy(className))
             .returns(String::class)
             .addStatement(
                 "return input.${JsonApiConstants.Members.JSONX_SERIALIZE}(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}())"
@@ -67,13 +70,17 @@ public object TypeAdapterSpecBuilder {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
-            .returns(className)
-            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>(rootLinks(), resourceObjectLinks(), relationshipsLinks())", className)
+            .returns(Iterable::class.asClassName().parameterizedBy(className))
+            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_LIST_DESERIALIZE}<%T>(rootLinks(), resourceObjectLinks(), relationshipsLinks())", className)
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
-            .addStatement("(original as? %T)?.let {", JsonApiModel::class)
-            .addStatement("it.setRootLinks(data.links)")
-            .addStatement("it.setResourceLinks(data.data?.links)")
-            .addStatement("data.data?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")
+            .addStatement("data.data?.let { resourceData ->")
+            .addStatement("original.zip(resourceData) { model, resource ->")
+            .addStatement("(model as? %T)?.let { safeModel ->", JsonApiModel::class)
+            .addStatement("safeModel.setRootLinks(data.links)")
+            .addStatement("safeModel.setResourceLinks(resource.links)")
+            .addStatement("resource.relationshipsLinks()?.let { relationshipLinks -> safeModel.setRelationshipsLinks(relationshipLinks)}")
+            .addStatement("}")
+            .addStatement("}")
             .addStatement("}")
             .addStatement("return original")
             .build()

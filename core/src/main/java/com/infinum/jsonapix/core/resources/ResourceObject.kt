@@ -8,4 +8,6 @@ interface ResourceObject<out Model> {
     val links: Links?
 
     fun original(included: List<ResourceObject<Any>>): Model
+
+    fun relationshipsLinks(): Map<String, Links?>? = relationships?.links
 }

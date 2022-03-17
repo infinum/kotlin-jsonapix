@@ -1,6 +1,12 @@
 {
   "errors":null,
+  "links": {
+    "self": "https://root.link.com"
+  },
   "data":{
+    "links": {
+      "self": "https://resource.link.com"
+    },
     "type":"person",
     "id":"1",
     "attributes":{
@@ -10,12 +16,18 @@
     },
     "relationships":{
       "myFavoriteDog":{
+        "links": {
+          "self": "https://relationship.link.com"
+        },
         "data":{
           "type":"dog",
           "id":"1"
         }
       },
       "allMyDogs":{
+        "links": {
+          "self": "https://relationship.link.com"
+        },
         "data":[
           { "type":"dog", "id":"1" },
           { "type":"dog", "id":"2" }

@@ -2,6 +2,7 @@ package com.infinum.jsonapix.ui
 
 import android.os.Bundle
 import com.google.android.material.tabs.TabLayoutMediator
+import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.databinding.ActivitySampleBinding
 import com.infinum.jsonapix.extensions.viewBinding
 import com.infinum.jsonapix.ui.examples.company.CompanyFragment
@@ -11,6 +12,7 @@ import com.infinum.jsonapix.ui.examples.person.PersonFragment
 import com.infinum.jsonapix.ui.shared.BaseActivity
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
 class SampleActivity : BaseActivity<Unit, Unit>() {

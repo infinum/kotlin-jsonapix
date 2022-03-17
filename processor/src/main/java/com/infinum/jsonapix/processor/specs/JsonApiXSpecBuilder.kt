@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Error
+import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -76,6 +77,11 @@ internal object JsonApiXSpecBuilder {
             ).defaultValue("%L", "null")
                 .build()
         )
+
+        properties.add(
+            Specs.getNamedPropertySpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true)
+        )
+        params.add(Specs.getNamedParamSpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true))
 
         properties.add(errorsProperty())
 

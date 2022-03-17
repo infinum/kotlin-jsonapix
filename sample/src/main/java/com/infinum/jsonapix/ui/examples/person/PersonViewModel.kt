@@ -18,7 +18,29 @@ class PersonViewModel @Inject constructor(
             val bodyString = io { jsonAssetReader.readJsonAsset("responses/person.json") }
             val person = io { sampleApiService.fetchPerson() }
             hideLoading()
-            viewState = PersonState(bodyString, person)
+            viewState = PersonState(
+                bodyString,
+                person,
+                person.rootLinks()?.self,
+                person.resourceLinks()?.self,
+                person.relationshipsLinks()?.values?.firstOrNull()?.self
+            )
+        }
+    }
+
+    fun fetchPersonList() {
+        launch {
+            showLoading()
+            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
+            val persons = io { sampleApiService.fetchPersons() }
+            hideLoading()
+            viewState = PersonState(
+                bodyString,
+                persons.first(),
+                persons.last().rootLinks()?.self,
+                persons.last().resourceLinks()?.self,
+                persons.first().relationshipsLinks()?.values?.firstOrNull()?.self
+            )
         }
     }
 }

@@ -27,7 +27,7 @@ class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
         responseHeader.isVisible = true
         bodyContainer.text = state.bodyString
         parsedHeader.isVisible = true
-        parsedContainer.text = state.person.toString()
+        parsedContainer.text = state.person.toString() + "\n" + state.rootLink + "\n" + state.resourceObjectLink + "\n" + state.relationshipsLink
     }
 
     override fun handleEvent(event: PersonEvent) = Unit
@@ -35,7 +35,7 @@ class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.downloadButton.setOnClickListener {
-            viewModel.fetchPerson()
+            viewModel.fetchPersonList()
         }
     }
 }
