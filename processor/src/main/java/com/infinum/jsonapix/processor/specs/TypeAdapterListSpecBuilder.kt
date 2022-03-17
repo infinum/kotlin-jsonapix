@@ -78,6 +78,7 @@ public object TypeAdapterListSpecBuilder {
             .addStatement("(model as? %T)?.let { safeModel ->", JsonApiModel::class)
             .addStatement("safeModel.setRootLinks(data.links)")
             .addStatement("safeModel.setResourceLinks(resource.links)")
+            .addStatement("safeModel.setMeta(data.meta)")
             .addStatement("resource.relationshipsLinks()?.let { relationshipLinks -> safeModel.setRelationshipsLinks(relationshipLinks)}")
             .addStatement("}")
             .addStatement("}")

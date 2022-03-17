@@ -74,6 +74,7 @@ public object TypeAdapterSpecBuilder {
             .addStatement("it.setRootLinks(data.links)")
             .addStatement("it.setResourceLinks(data.data?.links)")
             .addStatement("data.data?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")
+            .addStatement("it.setMeta(data.meta)")
             .addStatement("}")
             .addStatement("return original")
             .build()
