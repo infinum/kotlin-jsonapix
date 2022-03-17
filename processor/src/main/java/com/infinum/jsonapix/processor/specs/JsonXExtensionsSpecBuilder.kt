@@ -10,6 +10,7 @@ import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
+import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
@@ -37,6 +38,7 @@ internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
     private val customLinks = mutableListOf<ClassName>()
+    private val metas = mutableListOf<ClassName>()
 
     @SuppressWarnings("LongParameterList")
     fun add(
@@ -64,6 +66,10 @@ internal class JsonXExtensionsSpecBuilder {
 
     fun addCustomLinks(links: List<ClassName>) {
         customLinks.addAll(links)
+    }
+
+    fun addCustomMeta(metaList: List<ClassName>) {
+        metas.addAll(metaList)
     }
 
     private fun deserializeFunSpec(): FunSpec {
@@ -295,6 +301,24 @@ internal class JsonXExtensionsSpecBuilder {
                 "%M(%T::class)",
                 subclassMember,
                 link
+            )
+        }
+
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder.addStatement(
+            "%M(%T::class) {",
+            polymorpicMember,
+            Meta::class.asClassName()
+        )
+
+        codeBlockBuilder.indent()
+
+        metas.forEach { meta ->
+            codeBlockBuilder.addStatement(
+                "%M(%T::class)",
+                subclassMember,
+                meta
             )
         }
 

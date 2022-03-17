@@ -2,6 +2,7 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.annotations.JsonApiXLinks
+import com.infinum.jsonapix.annotations.JsonApiXMeta
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
@@ -36,9 +37,10 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val collector = JsonXExtensionsSpecBuilder()
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
     private val customLinks = mutableListOf<LinksInfo>()
+    private val customMetas = mutableListOf<String>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name)
+        mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name, JsonApiXMeta::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -67,7 +69,16 @@ public class JsonApiProcessor : AbstractProcessor() {
             }
             className
         }
+
         collector.addCustomLinks(linksElements)
+
+        val metaElements = roundEnv?.getElementsAnnotatedWith(JsonApiXMeta::class.java).orEmpty().map {
+            val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
+            customMetas.add(type)
+            ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+        }
+
+        collector.addCustomMeta(metaElements)
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
