@@ -203,7 +203,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         val wrapperFileSpec =
             JsonApiXSpecBuilder.build(inputDataClass, type, customMetas[type])
         val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, type)
+            JsonApiXListSpecBuilder.build(inputDataClass, type, customMetas[type])
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
