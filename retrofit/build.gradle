@@ -6,6 +6,7 @@ plugins {
 apply from: "$rootDir/detekt.gradle"
 apply from: "$rootDir/ktlint.gradle"
 apply from: "$rootDir/cpd.gradle"
+apply from: "publish.gradle"
 
 dependencies {
     implementation packages.kotlin.core
