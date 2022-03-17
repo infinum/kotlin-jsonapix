@@ -37,7 +37,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val collector = JsonXExtensionsSpecBuilder()
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
     private val customLinks = mutableListOf<LinksInfo>()
-    private val customMetas = mutableListOf<String>()
+    private val customMetas = mutableMapOf<String, ClassName>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
         mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name, JsonApiXMeta::class.java.name)
@@ -74,8 +74,9 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val metaElements = roundEnv?.getElementsAnnotatedWith(JsonApiXMeta::class.java).orEmpty().map {
             val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
-            customMetas.add(type)
-            ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            customMetas[type] = className
+            className
         }
 
         collector.addCustomMeta(metaElements)
@@ -200,7 +201,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, type)
+            JsonApiXSpecBuilder.build(inputDataClass, type, customMetas[type])
         val wrapperListFileSpec =
             JsonApiXListSpecBuilder.build(inputDataClass, type)
         val linksInfo = customLinks.firstOrNull { it.type == type }
