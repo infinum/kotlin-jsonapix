@@ -19,7 +19,8 @@ public object TypeAdapterListSpecBuilder {
         className: ClassName,
         rootLinks: String?,
         resourceObjectLinks: String?,
-        relationshipsLinks: String?
+        relationshipsLinks: String?,
+        meta: String?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER_LIST.withName(className.simpleName)
         val typeAdapterClassName = ClassName(
@@ -44,6 +45,9 @@ public object TypeAdapterListSpecBuilder {
                         if (relationshipsLinks != null) {
                             addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
                         }
+                        if (meta != null) {
+                            addFunction(metaFunSpec(meta))
+                        }
                     }
                     .build()
             )
@@ -61,7 +65,7 @@ public object TypeAdapterListSpecBuilder {
             .addParameter("input", Iterable::class.asClassName().parameterizedBy(className))
             .returns(String::class)
             .addStatement(
-                "return input.${JsonApiConstants.Members.JSONX_SERIALIZE}(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}())"
+                "return input.${JsonApiConstants.Members.JSONX_SERIALIZE}(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}(), ${JsonApiConstants.Keys.META}())"
             )
             .build()
     }
@@ -71,7 +75,7 @@ public object TypeAdapterListSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
             .returns(Iterable::class.asClassName().parameterizedBy(className))
-            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_LIST_DESERIALIZE}<%T>(rootLinks(), resourceObjectLinks(), relationshipsLinks())", className)
+            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_LIST_DESERIALIZE}<%T>(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}(), ${JsonApiConstants.Keys.META}())", className)
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("data.data?.let { resourceData ->")
             .addStatement("original.zip(resourceData) { model, resource ->")
@@ -92,6 +96,14 @@ public object TypeAdapterListSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
             .addStatement("return %S", links)
+            .build()
+    }
+
+    private fun metaFunSpec(meta: String): FunSpec {
+        return FunSpec.builder(JsonApiConstants.Keys.META)
+            .addModifiers(KModifier.OVERRIDE)
+            .returns(String::class)
+            .addStatement("return %S", meta)
             .build()
     }
 }

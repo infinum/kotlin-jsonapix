@@ -72,14 +72,13 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         collector.addCustomLinks(linksElements)
 
-        val metaElements = roundEnv?.getElementsAnnotatedWith(JsonApiXMeta::class.java).orEmpty().map {
+        roundEnv?.getElementsAnnotatedWith(JsonApiXMeta::class.java).orEmpty().forEach {
             val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
             val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
             customMetas[type] = className
-            className
         }
 
-        collector.addCustomMeta(metaElements)
+        collector.addCustomMetas(customMetas)
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
@@ -210,14 +209,16 @@ public class JsonApiProcessor : AbstractProcessor() {
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
-            linksInfo?.relationshipsLinks
+            linksInfo?.relationshipsLinks,
+            customMetas[type]?.canonicalName
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
-            linksInfo?.relationshipsLinks
+            linksInfo?.relationshipsLinks,
+            customMetas[type]?.canonicalName
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
