@@ -3,8 +3,6 @@ package com.infinum.jsonapix.data.models
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
-import com.infinum.jsonapix.annotations.Links
-import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.JsonApiModel
 import kotlinx.serialization.Serializable
 

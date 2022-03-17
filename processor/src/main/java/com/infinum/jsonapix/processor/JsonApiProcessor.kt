@@ -1,7 +1,7 @@
 package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
-import com.infinum.jsonapix.annotations.Links
+import com.infinum.jsonapix.annotations.JsonApiXLinks
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
@@ -38,7 +38,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val customLinks = mutableListOf<LinksInfo>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        mutableSetOf(JsonApiX::class.java.name, Links::class.java.name)
+        mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -46,9 +46,9 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val linksElements = roundEnv?.getElementsAnnotatedWith(Links::class.java).orEmpty().map {
-            val type = it.getAnnotationParameterValue<Links, String> { type }
-            val placementStrategy = it.getAnnotationParameterValue<Links, LinksPlacementStrategy> { placementStrategy }
+        val linksElements = roundEnv?.getElementsAnnotatedWith(JsonApiXLinks::class.java).orEmpty().map {
+            val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
+            val placementStrategy = it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
             val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
             customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
                 when (placementStrategy) {
