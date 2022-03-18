@@ -6,13 +6,23 @@ tasks.named("dokkaJavadoc") {
     dokkaSourceSets {
         named("main") {
             includeNonPublic.set(false)
-            skipDeprecated.set(true)
+            skipDeprecated.set(false)
             reportUndocumented.set(true)
             skipEmptyPackages.set(true)
             platform.set(org.jetbrains.dokka.Platform.jvm)
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(uri("https://github.com/infinum/android-jsonapix/"))
+                remoteLineSuffix.set("#L")
+            }
             jdkVersion.set(8)
             noStdlibLink.set(false)
+            noAndroidSdkLink.set(false)
             noJdkLink.set(false)
+            perPackageOption {
+                prefix = "com.infinum.jsonapix.sample"
+                suppress = true
+            }
         }
     }
 }

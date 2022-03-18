@@ -17,6 +17,7 @@ buildscript {
         classpath packages.cpd.plugin
         classpath packages.ktlint.plugin
         classpath packages.hilt.plugin
+        classpath packages.dokka.plugin
     }
 }
 

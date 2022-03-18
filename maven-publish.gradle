@@ -3,8 +3,7 @@ apply plugin: "signing"
 
 task javadocsJar(type: Jar, dependsOn: "dokkaJavadoc") {
     getArchiveClassifier().set("javadoc")
-//    from dokkaJavadoc.outputDirectory
-    from javadoc.destinationDir
+    from dokkaJavadoc.outputDirectory
 }
 
 task sourcesJar(type: Jar) {
