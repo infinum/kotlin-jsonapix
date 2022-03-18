@@ -252,3 +252,6 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/android,androidstudio,kotlin,java
 .idea/codeStyles/Project.xml
 .idea/runConfigurations.xml
+
+publish.properties
+*.gpg

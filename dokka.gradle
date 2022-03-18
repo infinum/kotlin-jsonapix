@@ -1,0 +1,18 @@
+apply plugin: "org.jetbrains.dokka"
+
+tasks.named("dokkaJavadoc") {
+    outputDirectory.set(file("$buildDir/javadoc"))
+
+    dokkaSourceSets {
+        named("main") {
+            includeNonPublic.set(false)
+            skipDeprecated.set(true)
+            reportUndocumented.set(true)
+            skipEmptyPackages.set(true)
+            platform.set(org.jetbrains.dokka.Platform.jvm)
+            jdkVersion.set(8)
+            noStdlibLink.set(false)
+            noJdkLink.set(false)
+        }
+    }
+}

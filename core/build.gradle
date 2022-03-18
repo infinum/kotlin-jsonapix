@@ -22,7 +22,7 @@ ext.mavenPublishProperties = [
         description: "JsonApiX Core module",
         url        : "https://github.com/infinum/android-jsonapix",
         scm        : [
-                connection: "'https://github.com/infinum/android-jsonapix.git'",
+                connection: "https://github.com/infinum/android-jsonapix.git",
                 url       : "https://github.com/infinum/android-jsonapix"
         ]
 ]
