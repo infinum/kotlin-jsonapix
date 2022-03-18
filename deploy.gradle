@@ -1,77 +1,55 @@
-task deployJsonApiX(dependsOn: [
-        ':jsonapix:clean',
-        ':jsonapix:publishReleasePublicationToSonatypeRepository'
-]) {
-    group = "Deploy"
-    description = "Deploy module to repositories"
-}
-
-task deployJsonApiXNoOp(dependsOn: [
-        ':jsonapix-no-op:clean',
-        ':jsonapix-no-op:publishReleasePublicationToSonatypeRepository'
-]) {
-    group = "Deploy"
-    description = "Deploy module to repositories"
-}
-
-task deployAnnotations(dependsOn: [
-        ':annotations:clean',
-        ':annotations:publishReleasePublicationToSonatypeRepository'
-]) {
-    group = "Deploy"
-    description = "Deploy module to repositories"
-}
-
-task deployCore(dependsOn: [
-        ':core:clean',
-        ':core:publishReleasePublicationToSonatypeRepository'
-]) {
-    group = "Deploy"
-    description = "Deploy module to repositories"
-}
-
-task deployProcessor(dependsOn: [
-        ':processor:clean',
-        ':processor:publishReleasePublicationToSonatypeRepository'
-]) {
-    group = "Deploy"
-    description = "Deploy module to repositories"
-}
-
-task deployRetrofit(dependsOn: [
-        ':retrofit:clean',
-        ':retrofit:publishReleasePublicationToSonatypeRepository'
-]) {
-    group = "Deploy"
-    description = "Deploy module to repositories"
-}
-
-task deployAll(dependsOn: [
-        'deployJsonApiX',
-        'deployJsonApiXNoOp',
-        'deployAnnotations',
-        'deployCore',
-        'deployProcessor',
-        'deployRetrofit',
-]) {
-    group = "Deploy"
-    description = "Deploy all modules to repositories"
-}
-
-task deployDebug(dependsOn: [
-        ':jsonapix:clean',
-        ':jsonapix-no-op:clean',
-        ':annotations:clean',
-        ':core:clean',
-        ':processor:clean',
-        ':retrofit:clean',
-        ':jsonapix:publishReleasePublicationToMavenLocal',
-        ':jsonapix-no-op:publishReleasePublicationToMavenLocal',
-        ':annotations:publishReleasePublicationToMavenLocal',
-        ':core:publishReleasePublicationToMavenLocal',
-        ':processor:publishReleasePublicationToMavenLocal',
-        ':retrofit:publishReleasePublicationToMavenLocal',
-]) {
-    group = "Deploy"
-    description = "Deploy all modules to Mavel Local repository"
-}
+//task deployAnnotations(dependsOn: [
+//        ':annotations:clean',
+//        ':annotations:publishReleasePublicationToSonatypeMavenCentralRepository'
+//]) {
+//    group = "Deploy"
+//    description = "Deploy module to repositories"
+//}
+//
+//task deployCore(dependsOn: [
+//        ':core:clean',
+//        ':core:publishReleasePublicationToSonatypeMavenCentralRepository'
+//]) {
+//    group = "Deploy"
+//    description = "Deploy module to repositories"
+//}
+//
+//task deployProcessor(dependsOn: [
+//        ':processor:clean',
+//        ':processor:publishReleasePublicationToSonatypeMavenCentralRepository'
+//]) {
+//    group = "Deploy"
+//    description = "Deploy module to repositories"
+//}
+//
+//task deployRetrofit(dependsOn: [
+//        ':retrofit:clean',
+//        ':retrofit:publishReleasePublicationToSonatypeMavenCentralRepository'
+//]) {
+//    group = "Deploy"
+//    description = "Deploy module to repositories"
+//}
+//
+//task deployAll(dependsOn: [
+//        'deployAnnotations',
+//        'deployCore',
+//        'deployProcessor',
+//        'deployRetrofit',
+//]) {
+//    group = "Deploy"
+//    description = "Deploy all modules to repositories"
+//}
+//
+//task deployDebug(dependsOn: [
+//        ':annotations:clean',
+//        ':core:clean',
+//        ':processor:clean',
+//        ':retrofit:clean',
+//        ':annotations:publishToMavenLocal',
+//        ':core:publishToMavenLocal',
+//        ':processor:publishToMavenLocal',
+//        ':retrofit:publishToMavenLocal',
+//]) {
+//    group = "Deploy"
+//    description = "Deploy all modules to Mavel Local repository"
+//}

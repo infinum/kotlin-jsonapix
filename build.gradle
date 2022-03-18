@@ -6,6 +6,7 @@ buildscript {
     }
 
     apply from: "dependencies.gradle"
+    apply from: "maven.gradle"
     apply from: "config.gradle"
 
     dependencies {

@@ -6,7 +6,25 @@ plugins {
 apply from: "$rootDir/detekt.gradle"
 apply from: "$rootDir/ktlint.gradle"
 apply from: "$rootDir/cpd.gradle"
-apply from: "publish.gradle"
+apply from: "$rootDir/maven-publish.gradle"
+
+ext.mavenPublishProperties = [
+        group      : releaseConfig.group,
+        version    : releaseConfig.version,
+        artifactId   : "retrofit",
+        repository : [
+                url     : sonatype.url,
+                username: sonatype.username,
+                password: sonatype.password
+        ],
+        name       : "JsonApiX Retrofit",
+        description: "JsonApiX Retrofit module",
+        url        : "https://github.com/infinum/android-jsonapix",
+        scm        : [
+                connection: "'https://github.com/infinum/android-jsonapix.git'",
+                url       : "https://github.com/infinum/android-jsonapix"
+        ]
+]
 
 dependencies {
     implementation packages.kotlin.core
