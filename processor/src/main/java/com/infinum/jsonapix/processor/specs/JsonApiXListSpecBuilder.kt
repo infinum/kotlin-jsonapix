@@ -5,6 +5,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -30,7 +31,8 @@ internal object JsonApiXListSpecBuilder {
     @SuppressWarnings("LongMethod")
     fun build(
         className: ClassName,
-        type: String
+        type: String,
+        metaClassName: ClassName?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
@@ -85,6 +87,15 @@ internal object JsonApiXListSpecBuilder {
         )
         params.add(Specs.getNamedParamSpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true))
 
+        params.add(
+            ParameterSpec.builder(
+                JsonApiConstants.Keys.META,
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
+            ).defaultValue("%L", "null").build()
+        )
+
+        properties.add(metaProperty(metaClassName))
+
         return FileSpec.builder(className.packageName, generatedName)
             .addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
@@ -134,6 +145,18 @@ internal object JsonApiXListSpecBuilder {
         .addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ERRORS))
         .initializer(JsonApiConstants.Keys.ERRORS)
         .build()
+
+    private fun metaProperty(
+        metaClassName: ClassName?
+    ): PropertySpec {
+        return PropertySpec.builder(
+            JsonApiConstants.Keys.META,
+            metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
+            KModifier.OVERRIDE
+        ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.META))
+            .initializer(JsonApiConstants.Keys.META)
+            .build()
+    }
 
     private fun originalProperty(
         className: ClassName

@@ -20,6 +20,7 @@ object JsonApiConstants {
         const val ID = "id"
         const val LINKS = "links"
         const val ERRORS = "errors"
+        const val META = "meta"
     }
 
     object Prefix {

@@ -26,7 +26,8 @@ class JsonApiDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
     private val resourceObjectLinks: String,
-    private val relationshipsLinks: String
+    private val relationshipsLinks: String,
+    private val meta: String
 ) : Discriminator {
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
@@ -43,6 +44,7 @@ class JsonApiDiscriminator(
             val resourceLinksObject = dataObject?.let {
                 getLinksObject(it)
             }
+            val metaObject = getMetaObject(jsonElement)
 
             // Injected objects
             val newRootLinksObject = rootLinksObject?.let {
@@ -88,11 +90,14 @@ class JsonApiDiscriminator(
                 getNewDataObject(dataDiscriminator.inject(it), newAttributesObject, newRelationshipsObject, newResourceLinksObject)
             }
 
+            val newMetaObject = metaObject?.let { getNewMetaObject(it) }
+
             val newJsonElement = getJsonObjectWithDataDiscriminator(
-                jsonElement,
-                newDataObject,
-                newIncludedArray,
-                newRootLinksObject
+                original = jsonElement,
+                dataObject = newDataObject,
+                includedArray = newIncludedArray,
+                linksObject = newRootLinksObject,
+                metaObject = newMetaObject
             )
             return rootDiscriminator.inject(newJsonElement)
         } catch (e: Exception) {
@@ -120,10 +125,11 @@ class JsonApiDiscriminator(
                 }
             }
             val newJsonElement = getJsonObjectWithDataDiscriminator(
-                jsonElement,
-                dataObject,
-                includedArray,
-                null
+                original = jsonElement,
+                dataObject = dataObject,
+                includedArray = includedArray,
+                linksObject = null,
+                metaObject = null
             )
             return rootDiscriminator.extract(newJsonElement)
         } catch (e: Exception) {
@@ -164,11 +170,15 @@ class JsonApiDiscriminator(
     private fun getLinksObject(jsonElement: JsonElement) =
         jsonElement.jsonObject[JsonApiConstants.Keys.LINKS]
 
+    private fun getMetaObject(jsonElement: JsonElement) =
+        jsonElement.jsonObject[JsonApiConstants.Keys.META]
+
     private fun getJsonObjectWithDataDiscriminator(
         original: JsonElement,
         dataObject: JsonElement?,
         includedArray: JsonArray?,
-        linksObject: JsonElement?
+        linksObject: JsonElement?,
+        metaObject: JsonElement?
     ): JsonObject {
         return original.jsonObject.entries.toMutableSet().let { entries ->
             dataObject?.let { data ->
@@ -184,6 +194,11 @@ class JsonApiDiscriminator(
             linksObject?.let { links ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
+            metaObject?.let { meta ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.META }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.META, meta))
             }
 
             val resultMap = mutableMapOf<String, JsonElement>()
@@ -225,7 +240,7 @@ class JsonApiDiscriminator(
     ): JsonObject {
         val resultMap = mutableMapOf<String, JsonElement>()
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
-        original.jsonObject.entries.forEach { relationshipEntry ->
+        original.jsonObject.entries.filter { it.value is JsonObject }.forEach { relationshipEntry ->
             val set = relationshipEntry.value.jsonObject.entries.toMutableSet()
             getLinksObject(relationshipEntry.value)?.let { linksSafe ->
                 val newLinks = relationshipsLinksDiscriminator.inject(linksSafe)
@@ -237,5 +252,10 @@ class JsonApiDiscriminator(
             resultMap[relationshipEntry.key] = JsonObject(tempMap)
         }
         return JsonObject(resultMap)
+    }
+
+    private fun getNewMetaObject(original: JsonElement): JsonElement {
+        val metaDiscriminator = CommonDiscriminator(meta)
+        return metaDiscriminator.inject(original)
     }
 }

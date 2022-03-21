@@ -2,12 +2,14 @@ package com.infinum.jsonapix.core
 
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.Meta
 
 @Suppress("UNCHECKED_CAST")
 abstract class JsonApiModel {
     private var rootLinks: Links? = null
     private var resourceLinks: Links? = null
     private var relationshipLinks: Map<String, Links?>? = null
+    private var meta: Meta? = null
 
     fun setRootLinks(links: Links?) {
         rootLinks = links
@@ -19,6 +21,10 @@ abstract class JsonApiModel {
 
     fun setRelationshipsLinks(linkMap: Map<String, Links?>) {
         relationshipLinks = linkMap
+    }
+
+    fun setMeta(meta: Meta?) {
+        this.meta = meta
     }
 
     fun rootLinks(): DefaultLinks? = rootLinks as? DefaultLinks
@@ -33,4 +39,6 @@ abstract class JsonApiModel {
 
     @JvmName("customRelationshipLinks")
     fun <T: Links> relationshipsLinks(): Map<String, T?>? = relationshipLinks as? Map<String, T?>
+
+    fun <T: Meta> meta() = meta as? T
 }
