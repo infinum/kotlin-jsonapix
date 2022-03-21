@@ -27,11 +27,12 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
+                from components.java
+
                 groupId = properties.group
                 version = properties.version
                 artifactId = properties.artifactId
 
-//                artifact bundleReleaseAar
                 artifact sourcesJar
                 artifact javadocsJar
 

@@ -4,6 +4,14 @@ if (propsFile.exists()) {
     properties.load(propsFile.newInputStream())
 }
 
+/*
+* 1. findProperty("sonatypeUsername"): use parameter from the command (if attached) so you can run ->
+* /gradlew deploy -PsonatypeUsername={yourMavenUsername} -PsonatypePassword={yourMavenPassword}.
+* 2. properties["sonatype.user"]: use property defined in publish.properties file in the root directory. If you have that file in the root
+* of the project you can run -> ./gradlew deploy
+* 3. System.getenv("SONATYPE_PASS"): use global variable defined in the system. No need to create publish.properties file, you can simply
+* run -> ./gradlew deploy.
+*/
 ext.sonatype = [
 
         url     : properties["sonatype.url"]
