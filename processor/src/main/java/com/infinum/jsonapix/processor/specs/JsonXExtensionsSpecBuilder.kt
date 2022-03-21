@@ -65,10 +65,12 @@ internal class JsonXExtensionsSpecBuilder {
     }
 
     fun addCustomLinks(links: List<ClassName>) {
+        customLinks.clear()
         customLinks.addAll(links)
     }
 
     fun addCustomMetas(map: Map<String, ClassName>) {
+        metas.clear()
         metas.putAll(map)
     }
 
