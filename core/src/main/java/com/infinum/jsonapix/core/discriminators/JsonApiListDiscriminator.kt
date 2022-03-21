@@ -14,7 +14,8 @@ class JsonApiListDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
     private val resourceObjectLinks: String,
-    private val relationshipsLinks: String
+    private val relationshipsLinks: String,
+    private val meta: String
 ) : Discriminator {
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
@@ -27,6 +28,7 @@ class JsonApiListDiscriminator(
             val includedObject = getIncludedArray(jsonElement)
             val newDataEntries = mutableListOf<JsonElement>()
             val rootLinksObject = getLinksObject(jsonElement)
+            val metaObject = getMetaObject(jsonElement)
 
             val newRootLinksObject = rootLinksObject?.let {
                 val linksDiscriminator = CommonDiscriminator(rootLinks)
@@ -85,11 +87,14 @@ class JsonApiListDiscriminator(
                 }
             }
 
+            val newMetaObject = metaObject?.let { getNewMetaObject(it) }
+
             val newJsonElement = getJsonObjectWithDataDiscriminator(
-                jsonElement,
-                newDataArray,
-                newIncludedArray,
-                newRootLinksObject
+                original = jsonElement,
+                dataArray = newDataArray,
+                includedArray = newIncludedArray,
+                linksObject = newRootLinksObject,
+                metaObject = newMetaObject
             )
             return rootDiscriminator.inject(newJsonElement)
         } catch (e: Exception) {
@@ -118,10 +123,11 @@ class JsonApiListDiscriminator(
                 }
             }
             val newJsonElement = getJsonObjectWithDataDiscriminator(
-                jsonElement,
-                dataArray?.jsonArray,
-                includedArray,
-                null
+                original = jsonElement,
+                dataArray = dataArray?.jsonArray,
+                includedArray = includedArray,
+                linksObject = null,
+                metaObject = null
             )
             return rootDiscriminator.extract(newJsonElement)
         } catch (e: Exception) {
@@ -162,11 +168,15 @@ class JsonApiListDiscriminator(
     private fun getLinksObject(jsonElement: JsonElement) =
         jsonElement.jsonObject[JsonApiConstants.Keys.LINKS]
 
+    private fun getMetaObject(jsonElement: JsonElement) =
+        jsonElement.jsonObject[JsonApiConstants.Keys.META]
+
     private fun getJsonObjectWithDataDiscriminator(
         original: JsonElement,
         dataArray: JsonArray?,
         includedArray: JsonArray?,
-        linksObject: JsonElement?
+        linksObject: JsonElement?,
+        metaObject: JsonElement?
     ): JsonObject {
         return original.jsonObject.entries.toMutableSet().let { entries ->
             dataArray?.let { data ->
@@ -182,6 +192,11 @@ class JsonApiListDiscriminator(
             linksObject?.let { links ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
+            metaObject?.let { meta ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.META }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.META, meta))
             }
 
             val resultMap = mutableMapOf<String, JsonElement>()
@@ -235,5 +250,10 @@ class JsonApiListDiscriminator(
             resultMap[relationshipEntry.key] = JsonObject(tempMap)
         }
         return JsonObject(resultMap)
+    }
+
+    private fun getNewMetaObject(original: JsonElement): JsonElement {
+        val metaDiscriminator = CommonDiscriminator(meta)
+        return metaDiscriminator.inject(original)
     }
 }

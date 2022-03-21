@@ -1,7 +1,8 @@
 package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
-import com.infinum.jsonapix.annotations.Links
+import com.infinum.jsonapix.annotations.JsonApiXLinks
+import com.infinum.jsonapix.annotations.JsonApiXMeta
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
@@ -36,9 +37,10 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val collector = JsonXExtensionsSpecBuilder()
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
     private val customLinks = mutableListOf<LinksInfo>()
+    private val customMetas = mutableMapOf<String, ClassName>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        mutableSetOf(JsonApiX::class.java.name, Links::class.java.name)
+        mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name, JsonApiXMeta::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -46,9 +48,9 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val linksElements = roundEnv?.getElementsAnnotatedWith(Links::class.java).orEmpty().map {
-            val type = it.getAnnotationParameterValue<Links, String> { type }
-            val placementStrategy = it.getAnnotationParameterValue<Links, LinksPlacementStrategy> { placementStrategy }
+        val linksElements = roundEnv?.getElementsAnnotatedWith(JsonApiXLinks::class.java).orEmpty().map {
+            val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
+            val placementStrategy = it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
             val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
             customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
                 when (placementStrategy) {
@@ -67,7 +69,16 @@ public class JsonApiProcessor : AbstractProcessor() {
             }
             className
         }
+
         collector.addCustomLinks(linksElements)
+
+        roundEnv?.getElementsAnnotatedWith(JsonApiXMeta::class.java).orEmpty().forEach {
+            val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
+            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            customMetas[type] = className
+        }
+
+        collector.addCustomMetas(customMetas)
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
@@ -189,23 +200,25 @@ public class JsonApiProcessor : AbstractProcessor() {
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, type)
+            JsonApiXSpecBuilder.build(inputDataClass, type, customMetas[type])
         val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, type)
+            JsonApiXListSpecBuilder.build(inputDataClass, type, customMetas[type])
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
-            linksInfo?.relationshipsLinks
+            linksInfo?.relationshipsLinks,
+            customMetas[type]?.canonicalName
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
-            linksInfo?.relationshipsLinks
+            linksInfo?.relationshipsLinks,
+            customMetas[type]?.canonicalName
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))

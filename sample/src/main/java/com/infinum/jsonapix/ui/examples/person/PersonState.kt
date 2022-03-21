@@ -7,7 +7,8 @@ data class PersonState(
     val person: Person,
     val rootLink: String?,
     val resourceObjectLink: String?,
-    val relationshipsLink: String?
+    val relationshipsLink: String?,
+    val meta: String?
 )
 
 class PersonEvent

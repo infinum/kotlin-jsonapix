@@ -27,7 +27,8 @@ class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
         responseHeader.isVisible = true
         bodyContainer.text = state.bodyString
         parsedHeader.isVisible = true
-        parsedContainer.text = state.person.toString() + "\n" + state.rootLink + "\n" + state.resourceObjectLink + "\n" + state.relationshipsLink
+        parsedContainer.text =
+            "${state.person}\n ${state.rootLink}\n ${state.resourceObjectLink}\n ${state.relationshipsLink}\n ${state.meta}"
     }
 
     override fun handleEvent(event: PersonEvent) = Unit

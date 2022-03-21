@@ -2,6 +2,7 @@ package com.infinum.jsonapix.ui.examples.person
 
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
+import com.infinum.jsonapix.data.models.PersonMeta
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -23,7 +24,8 @@ class PersonViewModel @Inject constructor(
                 person,
                 person.rootLinks()?.self,
                 person.resourceLinks()?.self,
-                person.relationshipsLinks()?.values?.firstOrNull()?.self
+                person.relationshipsLinks()?.values?.firstOrNull()?.self,
+                person.meta<PersonMeta>()?.owner
             )
         }
     }
@@ -39,7 +41,8 @@ class PersonViewModel @Inject constructor(
                 persons.first(),
                 persons.last().rootLinks()?.self,
                 persons.last().resourceLinks()?.self,
-                persons.first().relationshipsLinks()?.values?.firstOrNull()?.self
+                persons.first().relationshipsLinks()?.values?.firstOrNull()?.self,
+                persons.first().meta<PersonMeta>()?.owner
             )
         }
     }
