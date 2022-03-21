@@ -159,11 +159,11 @@ internal object JsonApiXSpecBuilder {
     }
 
     private fun metaProperty(
-        className: ClassName?
+        metaClassName: ClassName?
     ): PropertySpec {
         return PropertySpec.builder(
             JsonApiConstants.Keys.META,
-            className?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
+            metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
             KModifier.OVERRIDE
         ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.META))
             .initializer(JsonApiConstants.Keys.META)
