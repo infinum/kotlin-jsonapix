@@ -6,22 +6,26 @@ buildscript {
     }
 
     apply from: "dependencies.gradle"
+    apply from: "maven.gradle"
     apply from: "config.gradle"
+    apply from: "deploy.gradle"
 
     dependencies {
-        classpath "com.android.tools.build:gradle:7.0.4"
+        classpath packages.gradle
         classpath packages.kotlin.plugin
         classpath packages.kotlin.serialization_plugin
         classpath packages.detekt.plugin
         classpath packages.cpd.plugin
         classpath packages.ktlint.plugin
         classpath packages.hilt.plugin
+        classpath packages.dokka.plugin
     }
 }
 
 allprojects {
     repositories {
         google()
+        mavenLocal()
         mavenCentral()
     }
 }

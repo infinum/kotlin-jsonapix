@@ -14,7 +14,8 @@ ext.versions = [
         "lifecycle"    : "2.4.0",
         "activity"     : "1.4.0",
         "fragment"     : "1.4.0",
-        "material"     : "1.4.0"
+        "material"     : "1.4.0",
+        "dokka"        : "1.6.0"
 ]
 
 ext.packages = [
@@ -57,11 +58,14 @@ ext.packages = [
                 "common": "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}",
                 "viewmodel": "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"
         ],
-        "activity"  : [
+        "activity"   : [
                 "core": "androidx.activity:activity-ktx:${versions.activity}"
         ],
-        "fragment"  : [
+        "fragment"   : [
                 "core": "androidx.fragment:fragment-ktx:${versions.fragment}"
         ],
-        "material" : "com.google.android.material:material:${versions.material}"
+        "material"   : "com.google.android.material:material:${versions.material}",
+        "dokka"      : [
+                "plugin": "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}"
+        ]
 ]
