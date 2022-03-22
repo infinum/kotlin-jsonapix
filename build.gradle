@@ -8,6 +8,7 @@ buildscript {
     apply from: "dependencies.gradle"
     apply from: "maven.gradle"
     apply from: "config.gradle"
+    apply from: "deploy.gradle"
 
     dependencies {
         classpath packages.gradle
