@@ -4,7 +4,6 @@ import com.infinum.jsonapix.core.JsonApiModel
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
-import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -40,10 +39,20 @@ public object TypeAdapterListSpecBuilder {
                             addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
                         }
                         if (resourceObjectLinks != null) {
-                            addFunction(linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks))
+                            addFunction(
+                                linksFunSpec(
+                                    JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                                    resourceObjectLinks
+                                )
+                            )
                         }
                         if (relationshipsLinks != null) {
-                            addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
+                            addFunction(
+                                linksFunSpec(
+                                    JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                                    relationshipsLinks
+                                )
+                            )
                         }
                         if (meta != null) {
                             addFunction(metaFunSpec(meta))
@@ -65,8 +74,14 @@ public object TypeAdapterListSpecBuilder {
             .addParameter("input", Iterable::class.asClassName().parameterizedBy(className))
             .returns(String::class)
             .addStatement(
-                "return input.${JsonApiConstants.Members.JSONX_SERIALIZE}(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}(), ${JsonApiConstants.Keys.META}())"
+                "return input.%N(%N(), %N(), %N(), %N())",
+                JsonApiConstants.Members.JSONX_SERIALIZE,
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
             )
+
             .build()
     }
 
@@ -75,7 +90,15 @@ public object TypeAdapterListSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
             .returns(Iterable::class.asClassName().parameterizedBy(className))
-            .addStatement("val data = input.${JsonApiConstants.Members.JSONX_LIST_DESERIALIZE}<%T>(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}(), ${JsonApiConstants.Keys.META}())", className)
+            .addStatement(
+                "val data = input.%N<%T>(%N(), %N(), %N(), %N())",
+                JsonApiConstants.Members.JSONX_LIST_DESERIALIZE,
+                className,
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
+            )
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("data.data?.let { resourceData ->")
             .addStatement("original.zip(resourceData) { model, resource ->")
@@ -83,7 +106,9 @@ public object TypeAdapterListSpecBuilder {
             .addStatement("safeModel.setRootLinks(data.links)")
             .addStatement("safeModel.setResourceLinks(resource.links)")
             .addStatement("safeModel.setMeta(data.meta)")
-            .addStatement("resource.relationshipsLinks()?.let { relationshipLinks -> safeModel.setRelationshipsLinks(relationshipLinks)}")
+            .addStatement("resource.relationshipsLinks()?.let {")
+            .addStatement("relationshipLinks -> safeModel.setRelationshipsLinks(relationshipLinks)")
+            .addStatement("}")
             .addStatement("}")
             .addStatement("}")
             .addStatement("}")
