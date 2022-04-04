@@ -45,8 +45,13 @@ internal object DeserializeFunSpecBuilder {
                 JsonApiConstants.Keys.DATA
             )
             .addStatement(
-                "val discriminator = %T(${JsonApiConstants.Keys.TYPE}, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})",
-                JsonApiDiscriminator::class
+                "val discriminator = %T(%L, %L, %L, %L, %L)",
+                JsonApiDiscriminator::class,
+                JsonApiConstants.Keys.TYPE,
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
             )
             .addStatement(
                 "val jsonElement = %T.%L(this)",
