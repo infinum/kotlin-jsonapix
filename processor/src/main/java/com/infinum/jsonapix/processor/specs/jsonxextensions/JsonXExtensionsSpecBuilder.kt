@@ -8,6 +8,7 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Many
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ResourceObjectFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.SerializeFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.SerializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.WrapperFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.FormatPropertySpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.WrapperSerializerPropertySpecBuilder
@@ -113,8 +114,8 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.includedListStatement?.toString()
                 )
             )
-            fileSpec.addFunction(SerializeFunSpecBuilder.buildObject(it.key))
-            fileSpec.addFunction(SerializeFunSpecBuilder.buildList(it.key))
+            fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key))
+            fileSpec.addFunction(SerializeListFunSpecBuilder.build(it.key))
         }
 
         fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, metas))

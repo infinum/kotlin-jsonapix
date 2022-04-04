@@ -1,9 +1,7 @@
 package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
-import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.squareup.kotlinpoet.FunSpec
@@ -16,7 +14,6 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 
-@Suppress("LongMethod")
 internal object DeserializeListFunSpecBuilder {
 
     fun build(): FunSpec {
