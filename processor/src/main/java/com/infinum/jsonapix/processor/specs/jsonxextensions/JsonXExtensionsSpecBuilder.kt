@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.processor.ClassInfo
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ResourceObjectFunSpecBuilder
@@ -121,8 +122,8 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
 
-        fileSpec.addFunction(DeserializeFunSpecBuilder.buildObject())
-        fileSpec.addFunction(DeserializeFunSpecBuilder.buildList())
+        fileSpec.addFunction(DeserializeFunSpecBuilder.build())
+        fileSpec.addFunction(DeserializeListFunSpecBuilder.build())
 
         return fileSpec.build()
     }

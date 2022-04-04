@@ -1,8 +1,10 @@
 package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.JsonApiX
+import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
+import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -14,7 +16,8 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 
-internal object DeserializeFunSpecBuilder {
+@Suppress("LongMethod")
+internal object DeserializeListFunSpecBuilder {
 
     fun build(): FunSpec {
         val typeVariableName =
@@ -41,13 +44,13 @@ internal object DeserializeFunSpecBuilder {
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
         )
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
+        return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .addParameters(linksParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
-            .returns(JsonApiX::class.asClassName().parameterizedBy(typeVariableName))
+            .returns(JsonApiXList::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
                 "val type = %T.%M(%T.%L(this).%M[%S]!!)",
                 TypeExtractor::class.asTypeName(),
@@ -59,7 +62,7 @@ internal object DeserializeFunSpecBuilder {
             )
             .addStatement(
                 "val discriminator = %T(${JsonApiConstants.Keys.TYPE}, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})",
-                JsonApiDiscriminator::class
+                JsonApiListDiscriminator::class
             )
             .addStatement(
                 "val jsonElement = %T.%L(this)",
@@ -73,7 +76,7 @@ internal object DeserializeFunSpecBuilder {
                 "return %M.%M<%T<%T>>(jsonStringWithDiscriminator)",
                 formatMember,
                 decodeMember,
-                JsonApiX::class,
+                JsonApiXList::class,
                 typeVariableName
             )
             .build()
