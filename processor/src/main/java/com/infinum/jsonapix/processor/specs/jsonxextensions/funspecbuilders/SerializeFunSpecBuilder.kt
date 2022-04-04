@@ -8,7 +8,6 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeF
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.jsonApiWrapperMember
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.PolymorphicSerializer
@@ -31,8 +30,12 @@ internal object SerializeFunSpecBuilder {
             .returns(String::class)
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
             .addStatement(
-                "val discriminator = %T(jsonX.data.type, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})",
-                JsonApiDiscriminator::class.asClassName()
+                "val discriminator = %T(jsonX.data.type, %L, %L, %L, %L)",
+                JsonApiDiscriminator::class.asClassName(),
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
             )
             .addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",
