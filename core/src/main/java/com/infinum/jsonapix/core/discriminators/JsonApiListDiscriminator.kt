@@ -2,7 +2,6 @@ package com.infinum.jsonapix.core.discriminators
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -10,6 +9,7 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
+@SuppressWarnings("TooManyFunctions")
 class JsonApiListDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
@@ -21,7 +21,7 @@ class JsonApiListDiscriminator(
     private val rootDiscriminator = CommonDiscriminator(rootType)
 
     // TODO Handle those in a future PR
-    @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught")
+    @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught", "LongMethod")
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
             val dataArray = getDataArray(jsonElement)
@@ -62,7 +62,12 @@ class JsonApiListDiscriminator(
                     val dataDiscriminator = CommonDiscriminator(
                         JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType)
                     )
-                    getNewDataObject(dataDiscriminator.inject(it), newAttributesObject, newRelationshipsObject, newResourceLinksObject)
+                    getNewDataObject(
+                        dataDiscriminator.inject(it),
+                        newAttributesObject,
+                        newRelationshipsObject,
+                        newResourceLinksObject
+                    )
                 }
                 newDataEntries.add(newDataObject)
             }

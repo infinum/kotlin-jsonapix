@@ -16,6 +16,8 @@ import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.ClassInfo
+import com.infinum.jsonapix.processor.specs.deserializers.FunSpecDeserializer
+import com.infinum.jsonapix.processor.specs.serializers.FunSpecSerializer
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
@@ -72,128 +74,6 @@ internal class JsonXExtensionsSpecBuilder {
     fun addCustomMetas(map: Map<String, ClassName>) {
         metas.clear()
         metas.putAll(map)
-    }
-
-    private fun deserializeFunSpec(): FunSpec {
-        val typeVariableName =
-            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        val decodeMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-            JsonApiConstants.Members.DECODE_FROM_STRING
-        )
-        val formatMember = MemberName(
-            JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.FORMAT
-        )
-        val findTypeMember =
-            MemberName(
-                JsonApiConstants.Packages.TYPE_EXTRACTOR,
-                JsonApiConstants.Members.FIND_TYPE
-            )
-        val jsonObjectMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_JSON,
-            JsonApiConstants.Members.JSON_OBJECT
-        )
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
-        )
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
-            .receiver(String::class)
-            .addModifiers(KModifier.INLINE)
-            .addTypeVariable(typeVariableName.copy(reified = true))
-            .addParameters(linksParams)
-            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
-            .returns(JsonApiX::class.asClassName().parameterizedBy(typeVariableName))
-            .addStatement(
-                "val type = %T.%M(%T.%L(this).%M[%S]!!)",
-                TypeExtractor::class.asTypeName(),
-                findTypeMember,
-                Json::class.asTypeName(),
-                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
-                jsonObjectMember,
-                JsonApiConstants.Keys.DATA
-            )
-            .addStatement(
-                "val discriminator = %T(${JsonApiConstants.Keys.TYPE}, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})", JsonApiDiscriminator::class
-            )
-            .addStatement(
-                "val jsonElement = %T.%L(this)",
-                Json::class.asClassName(),
-                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT
-            )
-            .addStatement(
-                "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
-            )
-            .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator)",
-                formatMember,
-                decodeMember,
-                JsonApiX::class,
-                typeVariableName
-            )
-            .build()
-    }
-
-    private fun deserializeListFunSpec(): FunSpec {
-        val typeVariableName =
-            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        val decodeMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-            JsonApiConstants.Members.DECODE_FROM_STRING
-        )
-        val formatMember = MemberName(
-            JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.FORMAT
-        )
-        val findTypeMember =
-            MemberName(
-                JsonApiConstants.Packages.TYPE_EXTRACTOR,
-                JsonApiConstants.Members.FIND_TYPE
-            )
-        val jsonObjectMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_JSON,
-            JsonApiConstants.Members.JSON_OBJECT
-        )
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
-        )
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
-            .receiver(String::class)
-            .addModifiers(KModifier.INLINE)
-            .addTypeVariable(typeVariableName.copy(reified = true))
-            .addParameters(linksParams)
-            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
-            .returns(JsonApiXList::class.asClassName().parameterizedBy(typeVariableName))
-            .addStatement(
-                "val type = %T.%M(%T.%L(this).%M[%S]!!)",
-                TypeExtractor::class.asTypeName(),
-                findTypeMember,
-                Json::class.asTypeName(),
-                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
-                jsonObjectMember,
-                JsonApiConstants.Keys.DATA
-            )
-            .addStatement("val discriminator = %T(${JsonApiConstants.Keys.TYPE}, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})", JsonApiListDiscriminator::class)
-            .addStatement(
-                "val jsonElement = %T.%L(this)",
-                Json::class.asClassName(),
-                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT
-            )
-            .addStatement(
-                "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
-            )
-            .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator)",
-                formatMember,
-                decodeMember,
-                JsonApiXList::class,
-                typeVariableName
-            )
-            .build()
     }
 
     private fun formatPropertySpec(): PropertySpec {
@@ -357,101 +237,6 @@ internal class JsonXExtensionsSpecBuilder {
             .initializer(codeBlockBuilder.build()).build()
     }
 
-    private fun serializeFunSpec(originalClass: ClassName): FunSpec {
-        val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
-        val jsonXClass = JsonApiX::class.asClassName()
-        val formatMember = MemberName(
-            JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.FORMAT
-        )
-        val encodeMember =
-            MemberName(
-                JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-                JsonApiConstants.Members.ENCODE_TO_STRING
-            )
-        val jsonApiWrapperMember =
-            MemberName(
-                JsonApiConstants.Packages.JSONX,
-                JsonApiConstants.Members.JSONX_WRAPPER_GETTER
-            )
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
-        )
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
-            .receiver(originalClass)
-            .addParameters(linksParams)
-            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
-            .returns(String::class)
-            .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
-            .addStatement(
-                "val discriminator = %T(jsonX.data.type, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})",
-                JsonApiDiscriminator::class.asClassName()
-            )
-            .addStatement(
-                "val jsonString = %M.%M(%T(%T::class), jsonX)",
-                formatMember,
-                encodeMember,
-                polymorphicSerializerClass,
-                jsonXClass
-            )
-            .addStatement(
-                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()"
-            )
-            .build()
-    }
-
-    private fun serializeListFunSpec(originalClass: ClassName): FunSpec {
-        val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
-        val jsonXListClass = JsonApiXList::class.asClassName()
-        val formatMember = MemberName(
-            JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.FORMAT
-        )
-        val encodeMember =
-            MemberName(
-                JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-                JsonApiConstants.Members.ENCODE_TO_STRING
-            )
-        val jsonApiWrapperMember =
-            MemberName(
-                JsonApiConstants.Packages.JSONX,
-                JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER
-            )
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
-        )
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
-            .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
-            .addParameters(linksParams)
-            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
-            .returns(String::class)
-            .addAnnotation(
-                AnnotationSpec.builder(JvmName::class)
-                    .addMember("%S", "${JsonApiConstants.Members.JSONX_SERIALIZE}${originalClass.simpleName}")
-                    .build()
-            )
-            .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
-            .addStatement(
-                "val discriminator = %T(jsonX.data.first().type, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})",
-                JsonApiListDiscriminator::class.asClassName()
-            )
-            .addStatement(
-                "val jsonString = %M.%M(%T(%T::class), jsonX)",
-                formatMember,
-                encodeMember,
-                polymorphicSerializerClass,
-                jsonXListClass
-            )
-            .addStatement(
-                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()"
-            )
-            .build()
-    }
-
     private fun wrapperFunSpec(
         originalClass: ClassName,
         wrapperClass: ClassName,
@@ -584,7 +369,7 @@ internal class JsonXExtensionsSpecBuilder {
             .build()
     }
 
-    @SuppressWarnings("SpreadOperator")
+    @SuppressWarnings("SpreadOperator", "LongMethod")
     fun build(): FileSpec {
         val fileSpec =
             FileSpec.builder(
@@ -640,16 +425,17 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.includedListStatement?.toString()
                 )
             )
-            fileSpec.addFunction(serializeFunSpec(it.key))
-            fileSpec.addFunction(serializeListFunSpec(it.key))
+            fileSpec.addFunction(FunSpecSerializer.serialize(it.key))
+            fileSpec.addFunction(FunSpecSerializer.serializeList(it.key))
         }
 
         fileSpec.addProperty(jsonApiWrapperSerializerPropertySpec())
         fileSpec.addProperty(formatPropertySpec())
         fileSpec.addFunction(manyRelationshipModel())
         fileSpec.addFunction(oneRelationshipModel())
-        fileSpec.addFunction(deserializeFunSpec())
-        fileSpec.addFunction(deserializeListFunSpec())
+
+        fileSpec.addFunction(FunSpecDeserializer.deserialize())
+        fileSpec.addFunction(FunSpecDeserializer.deserializeList())
 
         return fileSpec.build()
     }

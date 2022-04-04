@@ -4,7 +4,6 @@ package com.infinum.jsonapix.core.discriminators
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
-import java.awt.geom.PathIterator
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -22,6 +21,7 @@ import kotlinx.serialization.json.jsonObject
  * Child objects -> Child prefix + type parameter e.g. Attributes_person where person is the type
  * of a class called Person passed as a parameter to JsonApiX annotation.
  */
+@SuppressWarnings("TooManyFunctions")
 class JsonApiDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
@@ -32,7 +32,7 @@ class JsonApiDiscriminator(
 
     private val rootDiscriminator = CommonDiscriminator(rootType)
 
-    @SuppressWarnings("SwallowedException")
+    @SuppressWarnings("SwallowedException", "LongMethod")
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
             // Current objects
@@ -87,7 +87,12 @@ class JsonApiDiscriminator(
                 val dataDiscriminator = CommonDiscriminator(
                     JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType)
                 )
-                getNewDataObject(dataDiscriminator.inject(it), newAttributesObject, newRelationshipsObject, newResourceLinksObject)
+                getNewDataObject(
+                    dataDiscriminator.inject(it),
+                    newAttributesObject,
+                    newRelationshipsObject,
+                    newResourceLinksObject
+                )
             }
 
             val newMetaObject = metaObject?.let { getNewMetaObject(it) }
