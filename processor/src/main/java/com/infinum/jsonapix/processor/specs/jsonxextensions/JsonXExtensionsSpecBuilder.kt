@@ -10,6 +10,7 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Reso
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.SerializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.SerializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.WrapperFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.WrapperListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.FormatPropertySpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.WrapperSerializerPropertySpecBuilder
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -101,14 +102,14 @@ internal class JsonXExtensionsSpecBuilder {
                 )
             )
             fileSpec.addFunction(
-                WrapperFunSpecBuilder.buildSingle(
+                WrapperFunSpecBuilder.build(
                     it.key,
                     it.value.jsonWrapperClassName,
                     it.value.includedStatement?.toString()
                 )
             )
             fileSpec.addFunction(
-                WrapperFunSpecBuilder.buildList(
+                WrapperListFunSpecBuilder.build(
                     it.key,
                     it.value.jsonWrapperListClassName,
                     it.value.includedListStatement?.toString()
