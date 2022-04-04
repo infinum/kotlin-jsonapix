@@ -6,11 +6,9 @@ import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.encodeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.formatMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.jsonApiListWrapperMember
-import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.jsonApiWrapperMember
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
@@ -39,8 +37,12 @@ internal object SerializeListFunSpecBuilder {
             )
             .addStatement("val jsonX = this.%M()", jsonApiListWrapperMember)
             .addStatement(
-                "val discriminator = %T(jsonX.data.first().type, ${JsonApiConstants.Members.ROOT_LINKS}, ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}, ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}, ${JsonApiConstants.Keys.META})",
-                JsonApiListDiscriminator::class.asClassName()
+                "val discriminator = %T(jsonX.data.first().type, %N, %N, %N, %N)",
+                JsonApiListDiscriminator::class.asClassName(),
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
             )
             .addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",
