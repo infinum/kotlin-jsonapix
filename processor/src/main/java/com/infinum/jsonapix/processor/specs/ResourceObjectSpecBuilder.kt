@@ -192,7 +192,10 @@ internal object ResourceObjectSpecBuilder {
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
             codeBlockBuilder.indent().addStatement("included.first {")
-            codeBlockBuilder.indent().addStatement("safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)", it.key)
+            codeBlockBuilder.indent().addStatement(
+                "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
+                it.key
+            )
             codeBlockBuilder.unindent().addStatement("}.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
             codeBlockBuilder.unindent().addStatement("} ?: throw %T(),", JsonApiXMissingArgumentException::class)
         }
@@ -200,8 +203,14 @@ internal object ResourceObjectSpecBuilder {
         manyRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
             codeBlockBuilder.indent().addStatement("included.filter {")
-            codeBlockBuilder.indent().addStatement("safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))", it.key)
-            codeBlockBuilder.unindent().addStatement("}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T", it.value)
+            codeBlockBuilder.indent().addStatement(
+                "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
+                it.key
+            )
+            codeBlockBuilder.unindent().addStatement(
+                "}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
+                it.value
+            )
             codeBlockBuilder.unindent().addStatement("} ?: throw %T(),", JsonApiXMissingArgumentException::class)
         }
         codeBlockBuilder.addStatement(")")
