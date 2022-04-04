@@ -4,9 +4,12 @@ import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
+import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.decodeMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.findTypeMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.formatMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.jsonObjectMember
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
@@ -19,23 +22,7 @@ internal object DeserializeListFunSpecBuilder {
     fun build(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        val decodeMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-            JsonApiConstants.Members.DECODE_FROM_STRING
-        )
-        val formatMember = MemberName(
-            JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.FORMAT
-        )
-        val findTypeMember =
-            MemberName(
-                JsonApiConstants.Packages.TYPE_EXTRACTOR,
-                JsonApiConstants.Members.FIND_TYPE
-            )
-        val jsonObjectMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_JSON,
-            JsonApiConstants.Members.JSON_OBJECT
-        )
+
         val linksParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
