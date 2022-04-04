@@ -10,7 +10,7 @@ import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXListSpecBuilder
-import com.infinum.jsonapix.processor.specs.JsonXExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder

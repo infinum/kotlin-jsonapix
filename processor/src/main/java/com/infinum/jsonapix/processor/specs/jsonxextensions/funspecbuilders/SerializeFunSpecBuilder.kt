@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs.serializers
+package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
@@ -15,9 +15,9 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.PolymorphicSerializer
 
 @Suppress("LongMethod")
-internal object FunSpecSerializer {
+internal object SerializeFunSpecBuilder {
 
-    fun serialize(originalClass: ClassName): FunSpec {
+    fun buildObject(originalClass: ClassName): FunSpec {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
         val formatMember = MemberName(
@@ -62,7 +62,7 @@ internal object FunSpecSerializer {
             .build()
     }
 
-    fun serializeList(originalClass: ClassName): FunSpec {
+    fun buildList(originalClass: ClassName): FunSpec {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXListClass = JsonApiXList::class.asClassName()
         val formatMember = MemberName(

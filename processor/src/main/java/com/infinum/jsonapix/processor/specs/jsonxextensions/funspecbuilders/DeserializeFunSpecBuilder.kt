@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs.deserializers
+package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
@@ -17,9 +17,9 @@ import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 
 @Suppress("LongMethod")
-internal object FunSpecDeserializer {
+internal object DeserializeFunSpecBuilder {
 
-    fun deserialize(): FunSpec {
+    fun buildObject(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
         val decodeMember = MemberName(
@@ -82,7 +82,7 @@ internal object FunSpecDeserializer {
             .build()
     }
 
-    fun deserializeList(): FunSpec {
+    fun buildList(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
         val decodeMember = MemberName(
