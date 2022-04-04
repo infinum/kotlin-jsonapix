@@ -64,7 +64,12 @@ public object TypeAdapterSpecBuilder {
             .addParameter("input", className)
             .returns(String::class)
             .addStatement(
-                "return input.${JsonApiConstants.Members.JSONX_SERIALIZE}(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}(), ${JsonApiConstants.Keys.META}())"
+                "return input.%N(%N(), %N(), %N(), %N())",
+                JsonApiConstants.Members.JSONX_SERIALIZE,
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
             )
             .build()
     }
