@@ -80,8 +80,13 @@ public object TypeAdapterSpecBuilder {
             .addParameter("input", String::class)
             .returns(className)
             .addStatement(
-                "val data = input.${JsonApiConstants.Members.JSONX_DESERIALIZE}<%T>(${JsonApiConstants.Members.ROOT_LINKS}(), ${JsonApiConstants.Members.RESOURCE_OBJECT_LINKS}(), ${JsonApiConstants.Members.RELATIONSHIPS_LINKS}(), ${JsonApiConstants.Keys.META}())",
-                className
+                "val data = input.%N<%T>(%N(), %N(), %N(), %N())",
+                JsonApiConstants.Members.JSONX_DESERIALIZE,
+                className,
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Keys.META
             )
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("(original as? %T)?.let {", JsonApiModel::class)
