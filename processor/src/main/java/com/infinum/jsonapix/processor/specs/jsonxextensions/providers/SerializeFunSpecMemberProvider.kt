@@ -17,4 +17,10 @@ internal object SerializeFunSpecMemberProvider {
         JsonApiConstants.Packages.JSONX,
         JsonApiConstants.Members.JSONX_WRAPPER_GETTER
     )
+
+    val jsonApiListWrapperMember =
+        MemberName(
+            JsonApiConstants.Packages.JSONX,
+            JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER
+        )
 }
