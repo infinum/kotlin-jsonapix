@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs.jsonxextensions
+package com.infinum.jsonapix.processor.specs.jsonxextensions.providers
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.squareup.kotlinpoet.MemberName

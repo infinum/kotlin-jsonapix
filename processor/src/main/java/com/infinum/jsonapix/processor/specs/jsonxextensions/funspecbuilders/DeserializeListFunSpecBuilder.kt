@@ -4,10 +4,10 @@ import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
-import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.decodeMember
-import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.findTypeMember
-import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.formatMember
-import com.infinum.jsonapix.processor.specs.jsonxextensions.DeserializeFunSpecMemberProvider.jsonObjectMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.decodeMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.findTypeMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.formatMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.jsonObjectMember
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec

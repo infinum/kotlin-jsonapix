@@ -3,6 +3,9 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.encodeMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.formatMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.jsonApiWrapperMember
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
@@ -15,20 +18,7 @@ internal object SerializeFunSpecBuilder {
     fun build(originalClass: ClassName): FunSpec {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
-        val formatMember = MemberName(
-            JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.FORMAT
-        )
-        val encodeMember =
-            MemberName(
-                JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-                JsonApiConstants.Members.ENCODE_TO_STRING
-            )
-        val jsonApiWrapperMember =
-            MemberName(
-                JsonApiConstants.Packages.JSONX,
-                JsonApiConstants.Members.JSONX_WRAPPER_GETTER
-            )
+
         val linksParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
