@@ -59,13 +59,12 @@ internal class JsonXExtensionsSpecBuilder {
         metas.putAll(map)
     }
 
-    @SuppressWarnings("SpreadOperator")
+    @SuppressWarnings("SpreadOperator", "LongMethod")
     fun build(): FileSpec {
-        val fileSpec =
-            FileSpec.builder(
-                JsonApiConstants.Packages.JSONX,
-                JsonApiConstants.FileNames.EXTENSIONS
-            )
+        val fileSpec = FileSpec.builder(
+            JsonApiConstants.Packages.JSONX,
+            JsonApiConstants.FileNames.EXTENSIONS
+        )
         fileSpec.addAnnotation(
             AnnotationSpec.builder(JvmName::class)
                 .addMember("%S", JsonApiConstants.FileNames.EXTENSIONS)
