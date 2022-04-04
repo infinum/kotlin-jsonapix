@@ -50,7 +50,8 @@ public class JsonApiProcessor : AbstractProcessor() {
     ): Boolean {
         val linksElements = roundEnv?.getElementsAnnotatedWith(JsonApiXLinks::class.java).orEmpty().map {
             val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
-            val placementStrategy = it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
+            val placementStrategy =
+                it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
             val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
             customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
                 when (placementStrategy) {
