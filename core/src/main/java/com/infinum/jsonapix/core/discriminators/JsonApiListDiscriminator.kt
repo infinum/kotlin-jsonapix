@@ -13,8 +13,8 @@ class JsonApiListDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
     private val resourceObjectLinks: String,
-    private val relationshipsLinks: String,
-    private val meta: String
+    relationshipsLinks: String,
+    meta: String
 ) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta) {
 
     // TODO Handle those in a future PR
@@ -68,7 +68,7 @@ class JsonApiListDiscriminator(
                 newDataEntries.add(newDataObject)
             }
 
-            val newIncludedArray = getNewIncludedArray(jsonElement)
+            val newIncludedArray = buildTypeDiscriminatedIncludedArray(jsonElement)
 
             val newDataArray = buildJsonArray {
                 newDataEntries.forEach {
@@ -102,15 +102,7 @@ class JsonApiListDiscriminator(
             val dataArray = getDataObject(jsonElement)?.let {
                 rootDiscriminator.extract(it)
             }
-            val includedArray = getIncludedArray(jsonElement)?.let { included ->
-                included.jsonArray.let {
-                    buildJsonArray {
-                        it.forEach {
-                            add(rootDiscriminator.extract(it))
-                        }
-                    }
-                }
-            }
+            val includedArray = buildRootDiscriminatedIncludedArray(jsonElement)
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 original = jsonElement,
                 dataArray = dataArray?.jsonArray,
@@ -141,29 +133,15 @@ class JsonApiListDiscriminator(
         linksObject: JsonElement?,
         metaObject: JsonElement?
     ): JsonObject {
-        return original.jsonObject.entries.toMutableSet().let { entries ->
+        return getDiscriminatedBaseEntries(original, includedArray, linksObject, metaObject).let { entries ->
             dataArray?.let { data ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.DATA }
                 entries.add(getJsonArrayEntry(JsonApiConstants.Keys.DATA, data))
             }
 
-            includedArray?.let { included ->
-                entries.removeAll { it.key == JsonApiConstants.Keys.INCLUDED }
-                entries.add(getJsonArrayEntry(JsonApiConstants.Keys.INCLUDED, included))
+            val resultMap = mutableMapOf<String, JsonElement>().apply {
+                putAll(entries.map { Pair(it.key, it.value) })
             }
-
-            linksObject?.let { links ->
-                entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
-                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
-            }
-
-            metaObject?.let { meta ->
-                entries.removeAll { it.key == JsonApiConstants.Keys.META }
-                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.META, meta))
-            }
-
-            val resultMap = mutableMapOf<String, JsonElement>()
-            resultMap.putAll(entries.map { Pair(it.key, it.value) })
             JsonObject(resultMap)
         }
     }

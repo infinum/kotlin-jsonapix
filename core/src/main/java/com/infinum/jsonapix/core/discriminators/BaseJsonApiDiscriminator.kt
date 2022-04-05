@@ -104,10 +104,19 @@ abstract class BaseJsonApiDiscriminator(
         return JsonObject(resultMap)
     }
 
-    fun getNewIncludedArray(jsonElement: JsonElement) =
-        getIncludedArray(jsonElement)?.let {
+    fun buildRootDiscriminatedIncludedArray(jsonElement: JsonElement) =
+        getIncludedArray(jsonElement)?.let { included ->
             buildJsonArray {
-                it.jsonArray.forEach {
+                included.jsonArray.forEach {
+                    add(rootDiscriminator.extract(it))
+                }
+            }
+        }
+
+    fun buildTypeDiscriminatedIncludedArray(jsonElement: JsonElement) =
+        getIncludedArray(jsonElement)?.let { included ->
+            buildJsonArray {
+                included.jsonArray.forEach {
                     val includedDiscriminator =
                         CommonDiscriminator(
                             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
@@ -118,4 +127,30 @@ abstract class BaseJsonApiDiscriminator(
                 }
             }
         }
+
+    fun getDiscriminatedBaseEntries(
+        original: JsonElement,
+        includedArray: JsonArray?,
+        linksObject: JsonElement?,
+        metaObject: JsonElement?
+    ): MutableSet<Map.Entry<String, JsonElement>> {
+        original.jsonObject.entries.toMutableSet().let { entries ->
+            includedArray?.let { included ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.INCLUDED }
+                entries.add(getJsonArrayEntry(JsonApiConstants.Keys.INCLUDED, included))
+            }
+
+            linksObject?.let { links ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
+            metaObject?.let { meta ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.META }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.META, meta))
+            }
+
+            return entries
+        }
+    }
 }
