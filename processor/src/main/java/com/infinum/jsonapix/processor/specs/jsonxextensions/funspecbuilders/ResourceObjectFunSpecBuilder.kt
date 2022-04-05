@@ -38,8 +38,8 @@ internal object ResourceObjectFunSpecBuilder {
             .receiver(originalClass)
             .returns(resourceObjectClass)
             .addStatement(
-                returnStatement.toString(),
-                *builderArgs.toTypedArray()
+                format = returnStatement.toString(),
+                args = builderArgs.toTypedArray()
             )
             .build()
     }

@@ -26,8 +26,8 @@ internal object WrapperFunSpecBuilder {
             .receiver(originalClass)
             .returns(wrapperClass)
             .addStatement(
-                returnStatement.toString(),
-                *builderArgs.toTypedArray()
+                format = returnStatement.toString(),
+                args = builderArgs.toTypedArray()
             )
             .build()
     }

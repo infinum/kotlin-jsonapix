@@ -28,8 +28,8 @@ internal object WrapperListFunSpecBuilder {
             .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
             .returns(wrapperClass)
             .addStatement(
-                returnStatement.toString(),
-                *builderArgs.toTypedArray()
+                format = returnStatement.toString(),
+                args = builderArgs.toTypedArray()
             )
             .build()
     }
