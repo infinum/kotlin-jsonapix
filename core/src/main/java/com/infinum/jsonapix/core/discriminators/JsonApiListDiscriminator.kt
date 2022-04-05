@@ -15,9 +15,7 @@ class JsonApiListDiscriminator(
     private val resourceObjectLinks: String,
     private val relationshipsLinks: String,
     private val meta: String
-) : BaseJsonApiDiscriminator(relationshipsLinks, meta) {
-
-    private val rootDiscriminator = CommonDiscriminator(rootType)
+) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta) {
 
     // TODO Handle those in a future PR
     @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught", "LongMethod")

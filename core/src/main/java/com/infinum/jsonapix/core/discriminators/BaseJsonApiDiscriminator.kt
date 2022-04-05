@@ -8,9 +8,12 @@ import kotlinx.serialization.json.jsonObject
 
 @Suppress("TooManyFunctions")
 abstract class BaseJsonApiDiscriminator(
+    rootType: String,
     private val relationshipsLinks: String,
     private val meta: String
 ) : Discriminator {
+
+    val rootDiscriminator = CommonDiscriminator(rootType)
 
     abstract override fun inject(jsonElement: JsonElement): JsonElement
 

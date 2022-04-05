@@ -25,11 +25,9 @@ class JsonApiDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
     private val resourceObjectLinks: String,
-    private val relationshipsLinks: String,
-    private val meta: String
-) : BaseJsonApiDiscriminator(relationshipsLinks, meta) {
-
-    private val rootDiscriminator = CommonDiscriminator(rootType)
+    relationshipsLinks: String,
+    meta: String
+) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta) {
 
     @SuppressWarnings("SwallowedException", "LongMethod")
     override fun inject(jsonElement: JsonElement): JsonElement {
