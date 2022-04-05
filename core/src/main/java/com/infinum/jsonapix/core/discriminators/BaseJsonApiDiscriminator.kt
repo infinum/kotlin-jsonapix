@@ -1,9 +1,12 @@
 package com.infinum.jsonapix.core.discriminators
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 @Suppress("TooManyFunctions")
@@ -100,4 +103,19 @@ abstract class BaseJsonApiDiscriminator(
         }
         return JsonObject(resultMap)
     }
+
+    fun getNewIncludedArray(jsonElement: JsonElement) =
+        getIncludedArray(jsonElement)?.let {
+            buildJsonArray {
+                it.jsonArray.forEach {
+                    val includedDiscriminator =
+                        CommonDiscriminator(
+                            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
+                                TypeExtractor.findType(it)
+                            )
+                        )
+                    add(includedDiscriminator.inject(it))
+                }
+            }
+        }
 }

@@ -22,7 +22,6 @@ class JsonApiListDiscriminator(
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
             val dataArray = getDataObject(jsonElement)
-            val includedObject = getIncludedArray(jsonElement)
             val newDataEntries = mutableListOf<JsonElement>()
             val rootLinksObject = getLinksObject(jsonElement)
             val metaObject = getMetaObject(jsonElement)
@@ -69,19 +68,7 @@ class JsonApiListDiscriminator(
                 newDataEntries.add(newDataObject)
             }
 
-            val newIncludedArray = includedObject?.let {
-                buildJsonArray {
-                    it.jsonArray.forEach {
-                        val includedDiscriminator =
-                            CommonDiscriminator(
-                                JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
-                                    TypeExtractor.findType(it)
-                                )
-                            )
-                        add(includedDiscriminator.inject(it))
-                    }
-                }
-            }
+            val newIncludedArray = getNewIncludedArray(jsonElement)
 
             val newDataArray = buildJsonArray {
                 newDataEntries.forEach {

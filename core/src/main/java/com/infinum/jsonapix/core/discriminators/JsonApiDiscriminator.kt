@@ -34,7 +34,6 @@ class JsonApiDiscriminator(
         try {
             // Current objects
             val dataObject = getDataObject(jsonElement)
-            val includedObject = getIncludedArray(jsonElement)
             val relationshipsObject = getRelationshipsObject(jsonElement)
             val attributesObject = getAttributesObject(jsonElement)
             val rootLinksObject = getLinksObject(jsonElement)
@@ -66,19 +65,7 @@ class JsonApiDiscriminator(
                 attributesDiscriminator.inject(it)
             }
 
-            val newIncludedArray = includedObject?.let {
-                buildJsonArray {
-                    it.jsonArray.forEach {
-                        val includedDiscriminator =
-                            CommonDiscriminator(
-                                JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
-                                    TypeExtractor.findType(it)
-                                )
-                            )
-                        add(includedDiscriminator.inject(it))
-                    }
-                }
-            }
+            val newIncludedArray = getNewIncludedArray(jsonElement)
 
             val newDataObject = dataObject?.let {
                 val dataDiscriminator = CommonDiscriminator(
