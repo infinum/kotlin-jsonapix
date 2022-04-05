@@ -14,6 +14,7 @@ class ErrorViewModel @Inject constructor(
     private val jsonAssetReader: JsonAssetReader
 ) : BaseViewModel<ErrorState, ErrorEvent>() {
 
+    @Suppress("UnusedPrivateMember")
     fun fetchError() {
         launch {
             showLoading()
