@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
+@Suppress("TooManyFunctions")
 abstract class BaseJsonApiDiscriminator(
     private val relationshipsLinks: String,
     private val meta: String
