@@ -23,7 +23,6 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-@SuppressWarnings("SpreadOperator")
 internal object JsonApiXSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
