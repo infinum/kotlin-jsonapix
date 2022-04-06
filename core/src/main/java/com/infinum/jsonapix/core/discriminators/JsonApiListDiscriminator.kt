@@ -105,8 +105,8 @@ class JsonApiListDiscriminator(
             val includedArray = buildRootDiscriminatedIncludedArray(jsonElement)
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 original = jsonElement,
-                dataArray = dataArray?.jsonArray,
                 includedArray = includedArray,
+                dataArray = dataArray?.jsonArray,
                 linksObject = null,
                 metaObject = null
             )
