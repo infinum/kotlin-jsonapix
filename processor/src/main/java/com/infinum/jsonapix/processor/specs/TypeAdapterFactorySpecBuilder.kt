@@ -11,6 +11,8 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
+import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KClass
 
 public class TypeAdapterFactorySpecBuilder {
 
@@ -26,6 +28,7 @@ public class TypeAdapterFactorySpecBuilder {
                 TypeSpec.classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
                     .addSuperinterface(AdapterFactory::class)
                     .addFunction(getAdapterFunSpec())
+                    .addFunction(getListAdapterFunSpec())
                     .build()
             )
             .apply {
@@ -40,17 +43,41 @@ public class TypeAdapterFactorySpecBuilder {
     private fun getAdapterFunSpec(): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.GET_ADAPTER)
             .addModifiers(KModifier.OVERRIDE)
-            .addParameter("type", String::class.asClassName())
+//            .addParameter("type", String::class.asClassName())
+            .addParameter("type", KClass::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(Any::class)))
             .returns(
                 TypeAdapter::class
                     .asClassName()
                     .parameterizedBy(WildcardTypeName.producerOf(Any::class))
                     .copy(nullable = true)
             )
-            .beginControlFlow("return when(type)")
+            .beginControlFlow("return when(type.qualifiedName)")
             .apply {
                 classNames.forEach {
                     addStatement("%S -> TypeAdapter_${it.simpleName}()", it.canonicalName)
+                }
+            }
+            .addStatement("else -> null")
+            .endControlFlow()
+            .build()
+    }
+
+    private fun getListAdapterFunSpec(): FunSpec {
+        val listQualifiedName = "java.util.List<" + "$" + "{listType.kotlin.qualifiedName}>"
+        return FunSpec.builder(JsonApiConstants.Members.GET_ADAPTER)
+            .addModifiers(KModifier.OVERRIDE)
+            .addParameter("type", ParameterizedType::class.asClassName())
+            .returns(
+                TypeAdapter::class
+                    .asClassName()
+                    .parameterizedBy(WildcardTypeName.producerOf(Any::class))
+                    .copy(nullable = true)
+            )
+            .addStatement("val listType = type.actualTypeArguments.first() as Class<*>")
+            .addStatement("val qualifiedName = %P", listQualifiedName)
+            .beginControlFlow("return when(qualifiedName)")
+            .apply {
+                classNames.forEach {
                     addStatement("%S -> TypeAdapterList_${it.simpleName}()", "java.util.List<${it.canonicalName}>")
                 }
             }

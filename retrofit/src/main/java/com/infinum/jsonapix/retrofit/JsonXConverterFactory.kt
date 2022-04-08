@@ -7,6 +7,8 @@ import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KClass
+import kotlin.reflect.typeOf
 
 class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Converter.Factory() {
 
@@ -16,12 +18,11 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
         retrofit: Retrofit
     ): Converter<ResponseBody, *>? =
         when (type) {
-            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let {
+            is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {
                 JsonXResponseBodyConverter(it)
             }
             is ParameterizedType -> {
-                val listType = type.actualTypeArguments.first() as Class<*>
-                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let {
+                adapterFactory.getAdapter(type)?.let {
                     JsonXResponseBodyConverter(it)
                 }
             }
@@ -35,12 +36,11 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
         retrofit: Retrofit
     ): Converter<*, RequestBody>? =
         when (type) {
-            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let {
+            is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {
                 JsonXRequestBodyConverter(it)
             }
             is ParameterizedType -> {
-                val listType = type.actualTypeArguments.first() as Class<*>
-                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let {
+                adapterFactory.getAdapter(type)?.let {
                     JsonXRequestBodyConverter(it)
                 }
             }
