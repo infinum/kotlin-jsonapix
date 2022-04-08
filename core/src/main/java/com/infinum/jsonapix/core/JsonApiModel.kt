@@ -4,8 +4,8 @@ import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 
-@Suppress("UNCHECKED_CAST", "TooManyFunctions")
-open class JsonApiModel {
+@Suppress("UNCHECKED_CAST", "TooManyFunctions", "UnnecessaryAbstractClass")
+abstract class JsonApiModel {
     private var rootLinks: Links? = null
     private var resourceLinks: Links? = null
     private var relationshipLinks: Map<String, Links?>? = null
