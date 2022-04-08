@@ -182,13 +182,15 @@ internal object ResourceObjectSpecBuilder {
         codeBlockBuilder.addStatement("return %T(", className).indent()
         attributes.forEach {
             codeBlockBuilder.addStatement(
-                "%N = requireNotNull(attributes?.%N, { throw %T() }),",
+                "%N = requireNotNull(attributes?.%N, { throw %T(%S) }),",
                 it.name,
                 it.name,
-                JsonApiXMissingArgumentException::class
+                JsonApiXMissingArgumentException::class,
+                it.name
             )
         }
 
+        val relationshipsLiteral = "relationships"
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
             codeBlockBuilder.indent().addStatement("included.first {")
@@ -197,7 +199,11 @@ internal object ResourceObjectSpecBuilder {
                 it.key
             )
             codeBlockBuilder.unindent().addStatement("}.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
-            codeBlockBuilder.unindent().addStatement("} ?: throw %T(),", JsonApiXMissingArgumentException::class)
+            codeBlockBuilder.unindent().addStatement(
+                "} ?: throw %T(%S),",
+                JsonApiXMissingArgumentException::class,
+                relationshipsLiteral
+            )
         }
 
         manyRelationships.forEach {
@@ -211,7 +217,11 @@ internal object ResourceObjectSpecBuilder {
                 "}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
                 it.value
             )
-            codeBlockBuilder.unindent().addStatement("} ?: throw %T(),", JsonApiXMissingArgumentException::class)
+            codeBlockBuilder.unindent().addStatement(
+                "} ?: throw %T(%S),",
+                JsonApiXMissingArgumentException::class,
+                relationshipsLiteral
+            )
         }
         codeBlockBuilder.addStatement(")")
 
