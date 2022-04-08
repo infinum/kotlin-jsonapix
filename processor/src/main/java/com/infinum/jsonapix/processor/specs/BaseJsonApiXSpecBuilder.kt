@@ -38,7 +38,6 @@ internal abstract class BaseJsonApiXSpecBuilder {
             )
         )
 
-
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.ERRORS,
@@ -47,7 +46,6 @@ internal abstract class BaseJsonApiXSpecBuilder {
             ).defaultValue("%L", "null")
                 .build()
         )
-
 
         params.add(Specs.getNamedParamSpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true))
 

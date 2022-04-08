@@ -29,7 +29,6 @@ abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // CPD-OFF
         lifecycleScope.launchWhenCreated {
             viewModel?.stateFlow?.collect { state ->
                 state?.let { handleState(it) }
@@ -50,7 +49,6 @@ abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
             viewModel?.errorFlow
                 ?.collect { event -> showMessage("Error", event.message) }
         }
-        // CPD-ON
     }
 
     open fun handleLoading(loadingState: LoadingState) {

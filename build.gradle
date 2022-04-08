@@ -15,7 +15,6 @@ buildscript {
         classpath packages.kotlin.plugin
         classpath packages.kotlin.serialization_plugin
         classpath packages.detekt.plugin
-        classpath packages.cpd.plugin
         classpath packages.ktlint.plugin
         classpath packages.hilt.plugin
         classpath packages.dokka.plugin
@@ -56,21 +55,9 @@ task ktlintAll(dependsOn: [
     description = "Run ktlint on all modules"
 }
 
-task cpdAll(dependsOn: [
-        ':annotations:cpdCheck',
-        ':core:cpdCheck',
-        ':processor:cpdCheck',
-        ':sample:cpdCheck',
-        ':retrofit:cpdCheck'
-]) {
-    group = "Verification"
-    description = "Run CPD on all modules"
-}
-
 task runStaticChecks(dependsOn: [
         ':detektAll',
         ':ktlintAll',
-        ':cpdAll'
 ]) {
     group = "Verification"
     description = "Run static checks on all modules"

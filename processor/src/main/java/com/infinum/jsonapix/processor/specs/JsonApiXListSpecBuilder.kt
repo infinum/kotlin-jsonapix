@@ -16,7 +16,7 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-internal object JsonApiXListSpecBuilder: BaseJsonApiXSpecBuilder() {
+internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private val serializableClassName = Serializable::class.asClassName()
 

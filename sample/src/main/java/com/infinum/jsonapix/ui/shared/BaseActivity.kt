@@ -21,7 +21,6 @@ abstract class BaseActivity<State : Any, Event : Any> : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        // CPD-OFF
         lifecycleScope.launchWhenCreated {
             viewModel?.stateFlow?.collect { state ->
                 state?.let { handleState(it) }
@@ -42,7 +41,6 @@ abstract class BaseActivity<State : Any, Event : Any> : AppCompatActivity() {
             viewModel?.errorFlow
                 ?.collect { event -> showMessage("Error", event.message) }
         }
-        // CPD-ON
     }
 
     override fun onStop() {
