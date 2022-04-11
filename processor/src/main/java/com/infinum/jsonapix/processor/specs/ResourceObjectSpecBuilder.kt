@@ -181,13 +181,21 @@ internal object ResourceObjectSpecBuilder {
         val codeBlockBuilder = CodeBlock.builder()
         codeBlockBuilder.addStatement("return %T(", className).indent()
         attributes.forEach {
-            codeBlockBuilder.addStatement(
-                "%N = requireNotNull(attributes?.%N, { throw %T(%S) }),",
-                it.name,
-                it.name,
-                JsonApiXMissingArgumentException::class,
-                it.name
-            )
+            if (it.type.isNullable) {
+                codeBlockBuilder.addStatement(
+                    "%N = attributes?.%N,",
+                    it.name,
+                    it.name
+                )
+            } else {
+                codeBlockBuilder.addStatement(
+                    "%N = requireNotNull(attributes?.%N, { throw %T(%S) }),",
+                    it.name,
+                    it.name,
+                    JsonApiXMissingArgumentException::class,
+                    it.name
+                )
+            }
         }
 
         val relationshipsLiteral = "relationships"
