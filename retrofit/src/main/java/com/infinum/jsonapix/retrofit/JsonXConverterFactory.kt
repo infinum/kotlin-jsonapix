@@ -7,8 +7,6 @@ import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
-import kotlin.reflect.KClass
-import kotlin.reflect.typeOf
 
 class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Converter.Factory() {
 
@@ -22,7 +20,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
                 JsonXResponseBodyConverter(it)
             }
             is ParameterizedType -> {
-                adapterFactory.getAdapter(type)?.let {
+                adapterFactory.getListAdapter(type)?.let {
                     JsonXResponseBodyConverter(it)
                 }
             }
@@ -40,7 +38,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
                 JsonXRequestBodyConverter(it)
             }
             is ParameterizedType -> {
-                adapterFactory.getAdapter(type)?.let {
+                adapterFactory.getListAdapter(type)?.let {
                     JsonXRequestBodyConverter(it)
                 }
             }

@@ -63,6 +63,7 @@ object JsonApiConstants {
         const val CONVERT_TO_STRING = "convertToString"
         const val CONVERT_FROM_STRING = "convertFromString"
         const val GET_ADAPTER = "getAdapter"
+        const val GET_LIST_ADAPTER = "getListAdapter"
 
         const val ROOT_LINKS = "rootLinks"
         const val RESOURCE_OBJECT_LINKS = "resourceObjectLinks"
