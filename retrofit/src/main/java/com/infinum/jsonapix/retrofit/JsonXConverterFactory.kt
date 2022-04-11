@@ -10,12 +10,20 @@ import java.lang.reflect.ParameterizedType
 
 class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Converter.Factory() {
 
-    override fun responseBodyConverter(type: Type, annotations: Array<out Annotation>, retrofit: Retrofit): Converter<ResponseBody, *>? =
+    override fun responseBodyConverter(
+        type: Type,
+        annotations: Array<out Annotation>,
+        retrofit: Retrofit
+    ): Converter<ResponseBody, *>? =
         when (type) {
-            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let { JsonXResponseBodyConverter(it) }
+            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let {
+                JsonXResponseBodyConverter(it)
+            }
             is ParameterizedType -> {
                 val listType = type.actualTypeArguments.first() as Class<*>
-                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let { JsonXResponseBodyConverter(it) }
+                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let {
+                    JsonXResponseBodyConverter(it)
+                }
             }
             else -> null
         }
@@ -27,10 +35,14 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
         retrofit: Retrofit
     ): Converter<*, RequestBody>? =
         when (type) {
-            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let { JsonXRequestBodyConverter(it) }
+            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let {
+                JsonXRequestBodyConverter(it)
+            }
             is ParameterizedType -> {
                 val listType = type.actualTypeArguments.first() as Class<*>
-                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let { JsonXRequestBodyConverter(it) }
+                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let {
+                    JsonXRequestBodyConverter(it)
+                }
             }
             else -> null
         }

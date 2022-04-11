@@ -7,5 +7,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CompanyViewModel @Inject constructor(
+    @Suppress("UnusedPrivateMember")
     private val sampleApiService: SampleApiService
 ) : BaseViewModel<CompanyState, CompanyEvent>()

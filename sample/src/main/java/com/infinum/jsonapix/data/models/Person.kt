@@ -22,5 +22,4 @@ data class Person(
 
 @Serializable
 @JsonApiXMeta("person")
-data class PersonMeta(val owner: String): Meta
-
+data class PersonMeta(val owner: String) : Meta

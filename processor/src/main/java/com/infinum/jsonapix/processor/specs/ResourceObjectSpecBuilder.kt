@@ -2,11 +2,13 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiXMissingArgumentException
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -166,7 +168,6 @@ internal object ResourceObjectSpecBuilder {
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
     ): FunSpec {
-        var codeString = "return ${className.simpleName}("
         val builder = FunSpec.builder(JsonApiConstants.Members.ORIGINAL)
         builder.addModifiers(KModifier.OVERRIDE)
         builder.returns(className)
@@ -176,35 +177,55 @@ internal object ResourceObjectSpecBuilder {
                 ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName())
             )
         )
+
+        val codeBlockBuilder = CodeBlock.builder()
+        codeBlockBuilder.addStatement("return %T(", className).indent()
         attributes.forEach {
-            codeString += "${it.name} = attributes?.${it.name}"
-            if (!it.type.isNullable) {
-                codeString += "!!"
-            }
-            codeString += ", "
+            codeBlockBuilder.addStatement(
+                "%N = requireNotNull(attributes?.%N, { throw %T(%S) }),",
+                it.name,
+                it.name,
+                JsonApiXMissingArgumentException::class,
+                it.name
+            )
         }
-        val typeParams = mutableListOf<TypeName>()
+
+        val relationshipsLiteral = "relationships"
         oneRelationships.forEach {
-            codeString +=
-                """
-                    ${it.key} = included.first { 
-                    it.type == relationships!!.${it.key}.data.type && 
-                    it.id == relationships.${it.key}.data.id }
-                    .${JsonApiConstants.Members.ORIGINAL}(included) as %T, 
-                """.trimIndent()
-            typeParams.add(it.value)
+            codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
+            codeBlockBuilder.indent().addStatement("included.first {")
+            codeBlockBuilder.indent().addStatement(
+                "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
+                it.key
+            )
+            codeBlockBuilder.unindent().addStatement("}.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
+            codeBlockBuilder.unindent().addStatement(
+                "} ?: throw %T(%S),",
+                JsonApiXMissingArgumentException::class,
+                relationshipsLiteral
+            )
         }
+
         manyRelationships.forEach {
-            codeString +=
-                """
-                    ${it.key} = included.filter { relationships!!.${it.key}
-                    .data.contains(ResourceIdentifier(it.type, it.id)) }
-                    .map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T, 
-                """.trimIndent()
-            typeParams.add(it.value)
+            codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
+            codeBlockBuilder.indent().addStatement("included.filter {")
+            codeBlockBuilder.indent().addStatement(
+                "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
+                it.key
+            )
+            codeBlockBuilder.unindent().addStatement(
+                "}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
+                it.value
+            )
+            codeBlockBuilder.unindent().addStatement(
+                "} ?: throw %T(%S),",
+                JsonApiXMissingArgumentException::class,
+                relationshipsLiteral
+            )
         }
-        codeString += ")"
-        return builder.addStatement(codeString, *typeParams.toTypedArray()).build()
+        codeBlockBuilder.addStatement(")")
+
+        return builder.addCode(codeBlockBuilder.build().toString()).build()
     }
 
     private fun idProperty(): PropertySpec = PropertySpec.builder(

@@ -22,10 +22,8 @@ abstract class BaseActivity<State : Any, Event : Any> : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         lifecycleScope.launchWhenCreated {
-            viewModel?.stateFlow?.collect {
-                if (it != null) {
-                    handleState(it)
-                }
+            viewModel?.stateFlow?.collect { state ->
+                state?.let { handleState(it) }
             }
         }
 

@@ -4,7 +4,7 @@ import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "TooManyFunctions", "UnnecessaryAbstractClass")
 abstract class JsonApiModel {
     private var rootLinks: Links? = null
     private var resourceLinks: Links? = null
@@ -29,16 +29,16 @@ abstract class JsonApiModel {
 
     fun rootLinks(): DefaultLinks? = rootLinks as? DefaultLinks
 
-    fun <T: Links> rootLinks(): T? = rootLinks as? T
+    fun <T : Links> rootLinks(): T? = rootLinks as? T
 
     fun resourceLinks(): DefaultLinks? = resourceLinks as? DefaultLinks
 
-    fun <T: Links> resourceLinks(): T? = resourceLinks as? T
+    fun <T : Links> resourceLinks(): T? = resourceLinks as? T
 
     fun relationshipsLinks(): Map<String, DefaultLinks?>? = relationshipLinks as? Map<String, DefaultLinks?>
 
     @JvmName("customRelationshipLinks")
-    fun <T: Links> relationshipsLinks(): Map<String, T?>? = relationshipLinks as? Map<String, T?>
+    fun <T : Links> relationshipsLinks(): Map<String, T?>? = relationshipLinks as? Map<String, T?>
 
-    fun <T: Meta> meta() = meta as? T
+    fun <T : Meta> meta() = meta as? T
 }

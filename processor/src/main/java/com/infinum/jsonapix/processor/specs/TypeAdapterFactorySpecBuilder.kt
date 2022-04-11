@@ -41,7 +41,12 @@ public class TypeAdapterFactorySpecBuilder {
         return FunSpec.builder(JsonApiConstants.Members.GET_ADAPTER)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("type", String::class.asClassName())
-            .returns(TypeAdapter::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(Any::class)).copy(nullable = true))
+            .returns(
+                TypeAdapter::class
+                    .asClassName()
+                    .parameterizedBy(WildcardTypeName.producerOf(Any::class))
+                    .copy(nullable = true)
+            )
             .beginControlFlow("return when(type)")
             .apply {
                 classNames.forEach {

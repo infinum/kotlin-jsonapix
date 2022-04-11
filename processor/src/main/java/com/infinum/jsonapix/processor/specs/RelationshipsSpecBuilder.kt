@@ -140,7 +140,12 @@ internal object RelationshipsSpecBuilder {
 
         val builder = PropertySpec.builder(
             JsonApiConstants.Keys.LINKS,
-            Map::class.asClassName().parameterizedBy(String::class.asTypeName(), Links::class.asTypeName().copy(nullable = true)),
+            Map::class
+                .asClassName()
+                .parameterizedBy(
+                    String::class.asTypeName(),
+                    Links::class.asTypeName().copy(nullable = true)
+                ),
             KModifier.OVERRIDE
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 

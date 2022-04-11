@@ -7,7 +7,6 @@ ext.versions = [
         "appcompat"    : '1.4.0',
         "detekt"       : "1.18.1",
         "ktlint"       : "10.2.0",
-        "cpd"          : "3.3",
         "retrofit"     : "2.9.0",
         "retromock"    : "1.1.1",
         "hilt"         : "2.40.2",
@@ -38,9 +37,6 @@ ext.packages = [
         ],
         "ktlint"     : [
                 "plugin": "org.jlleitschuh.gradle:ktlint-gradle:${versions.ktlint}"
-        ],
-        "cpd"        : [
-                "plugin": "de.aaschmid:gradle-cpd-plugin:${versions.cpd}"
         ],
         "retrofit"   : [
                 "core": "com.squareup.retrofit2:retrofit:${versions.retrofit}"
