@@ -20,7 +20,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
                 JsonXResponseBodyConverter(it)
             }
             is ParameterizedType -> {
-                adapterFactory.getListAdapter(type)?.let {
+                adapterFactory.getListAdapter((type.actualTypeArguments.first() as Class<*>).kotlin)?.let {
                     JsonXResponseBodyConverter(it)
                 }
             }
@@ -38,7 +38,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
                 JsonXRequestBodyConverter(it)
             }
             is ParameterizedType -> {
-                adapterFactory.getListAdapter(type)?.let {
+                adapterFactory.getListAdapter((type.actualTypeArguments.first() as Class<*>).kotlin)?.let {
                     JsonXRequestBodyConverter(it)
                 }
             }
