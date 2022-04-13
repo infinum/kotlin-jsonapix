@@ -1,5 +1,9 @@
 package com.infinum.jsonapix.core.adapters
 
+import kotlin.reflect.KClass
+
 interface AdapterFactory {
-    fun getAdapter(type: String): TypeAdapter<*>?
+    fun getAdapter(type: KClass<*>): TypeAdapter<*>?
+
+    fun getListAdapter(type: KClass<*>): TypeAdapter<*>?
 }

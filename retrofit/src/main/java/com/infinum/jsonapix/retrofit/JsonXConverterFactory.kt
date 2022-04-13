@@ -16,12 +16,11 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
         retrofit: Retrofit
     ): Converter<ResponseBody, *>? =
         when (type) {
-            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let {
+            is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {
                 JsonXResponseBodyConverter(it)
             }
             is ParameterizedType -> {
-                val listType = type.actualTypeArguments.first() as Class<*>
-                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let {
+                adapterFactory.getListAdapter((type.actualTypeArguments.first() as Class<*>).kotlin)?.let {
                     JsonXResponseBodyConverter(it)
                 }
             }
@@ -35,12 +34,11 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
         retrofit: Retrofit
     ): Converter<*, RequestBody>? =
         when (type) {
-            is Class<*> -> adapterFactory.getAdapter(type.kotlin.qualifiedName.orEmpty())?.let {
+            is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {
                 JsonXRequestBodyConverter(it)
             }
             is ParameterizedType -> {
-                val listType = type.actualTypeArguments.first() as Class<*>
-                adapterFactory.getAdapter("java.util.List<${listType.kotlin.qualifiedName}>")?.let {
+                adapterFactory.getListAdapter((type.actualTypeArguments.first() as Class<*>).kotlin)?.let {
                     JsonXRequestBodyConverter(it)
                 }
             }
