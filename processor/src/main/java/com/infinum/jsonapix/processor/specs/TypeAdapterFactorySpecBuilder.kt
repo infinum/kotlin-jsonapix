@@ -11,7 +11,6 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
-import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KClass
 
 public class TypeAdapterFactorySpecBuilder {
@@ -64,15 +63,14 @@ public class TypeAdapterFactorySpecBuilder {
     private fun getListAdapterFunSpec(): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.GET_LIST_ADAPTER)
             .addModifiers(KModifier.OVERRIDE)
-            .addParameter("type", ParameterizedType::class.asClassName())
+            .addParameter("type", KClass::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(Any::class)))
             .returns(
                 TypeAdapter::class
                     .asClassName()
                     .parameterizedBy(WildcardTypeName.producerOf(Any::class))
                     .copy(nullable = true)
             )
-            .addStatement("val qualifiedName = (type.actualTypeArguments.first() as Class<*>).kotlin.qualifiedName")
-            .beginControlFlow("return when(qualifiedName)")
+            .beginControlFlow("return when(type.qualifiedName)")
             .apply {
                 classNames.forEach {
                     addStatement("%S -> TypeAdapterList_${it.simpleName}()", it.canonicalName)
