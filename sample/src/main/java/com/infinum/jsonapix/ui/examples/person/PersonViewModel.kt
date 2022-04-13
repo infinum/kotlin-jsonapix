@@ -33,7 +33,8 @@ class PersonViewModel @Inject constructor(
     fun fetchPersonList() {
         launch {
             showLoading()
-            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
+//            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
+            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list_no_relationships.json") }
             val persons = io { sampleApiService.fetchPersons() }
             hideLoading()
             viewState = PersonState(

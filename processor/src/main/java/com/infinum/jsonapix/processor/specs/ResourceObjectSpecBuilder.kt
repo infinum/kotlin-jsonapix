@@ -207,11 +207,15 @@ internal object ResourceObjectSpecBuilder {
                 it.key
             )
             codeBlockBuilder.unindent().addStatement("}.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
-            codeBlockBuilder.unindent().addStatement(
-                "} ?: throw %T(%S),",
-                JsonApiXMissingArgumentException::class,
-                relationshipsLiteral
-            )
+            if (it.value.isNullable) {
+                codeBlockBuilder.unindent().addStatement("},")
+            } else {
+                codeBlockBuilder.unindent().addStatement(
+                    "} ?: throw %T(%S),",
+                    JsonApiXMissingArgumentException::class,
+                    relationshipsLiteral
+                )
+            }
         }
 
         manyRelationships.forEach {
@@ -225,11 +229,15 @@ internal object ResourceObjectSpecBuilder {
                 "}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
                 it.value
             )
-            codeBlockBuilder.unindent().addStatement(
-                "} ?: throw %T(%S),",
-                JsonApiXMissingArgumentException::class,
-                relationshipsLiteral
-            )
+            if (it.value.isNullable) {
+                codeBlockBuilder.unindent().addStatement("},")
+            } else {
+                codeBlockBuilder.unindent().addStatement(
+                    "} ?: throw %T(%S),",
+                    JsonApiXMissingArgumentException::class,
+                    relationshipsLiteral
+                )
+            }
         }
         codeBlockBuilder.addStatement(")")
 

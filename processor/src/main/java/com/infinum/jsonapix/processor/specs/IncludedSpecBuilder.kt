@@ -13,7 +13,7 @@ internal object IncludedSpecBuilder {
     ): CodeBlock {
         val statement = StringBuilder("listOf(")
         oneRelationships.forEachIndexed { index, prop ->
-            statement.append("${prop.name}.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
+            statement.append("${prop.name}!!.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
@@ -40,7 +40,7 @@ internal object IncludedSpecBuilder {
     ): CodeBlock {
         val statement = StringBuilder("listOf(")
         oneRelationships.forEachIndexed { index, prop ->
-            statement.append("*map { it.${prop.name}.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()")
+            statement.append("*map { it.${prop.name}!!.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()")
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
