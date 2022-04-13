@@ -23,7 +23,7 @@ internal object IncludedSpecBuilder {
 
         manyRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*${prop.name}.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                "*${prop.name}!!.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
             )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
@@ -49,7 +49,7 @@ internal object IncludedSpecBuilder {
         }
 
         manyRelationships.forEachIndexed { index, prop ->
-            statement.append("*flatMap { it.${prop.name}.map {")
+            statement.append("*flatMap { it.${prop.name}!!.map {")
             statement.append("it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
             statement.append("} }.toTypedArray()")
             if (index != manyRelationships.lastIndex) {

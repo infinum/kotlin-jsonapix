@@ -83,7 +83,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
     private fun originalProperty(
         className: ClassName
     ): PropertySpec {
-        val codeString = "${JsonApiConstants.Keys.DATA}.map { it.${JsonApiConstants.Members.ORIGINAL}(included!!) }"
+        val codeString = "${JsonApiConstants.Keys.DATA}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) }"
         val builder = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
             List::class.asClassName().parameterizedBy(className), KModifier.OVERRIDE

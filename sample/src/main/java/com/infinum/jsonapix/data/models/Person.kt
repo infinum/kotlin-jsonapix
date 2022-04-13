@@ -15,9 +15,9 @@ data class Person(
     val surname: String,
     val age: Int,
     @HasMany("dog")
-    val allMyDogs: List<Dog>,
+    val allMyDogs: List<Dog>?,
     @HasOne("dog")
-    val myFavoriteDog: Dog?
+    val myFavoriteDog: Dog? = null
 ) : JsonApiModel()
 
 @Serializable

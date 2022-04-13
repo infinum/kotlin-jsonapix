@@ -17,8 +17,7 @@
         "age": 28,
         "name": "Jason",
         "surname": "Apix"
-      },
-      "relationships": {}
+      }
     },
     {
       "links": {
@@ -30,9 +29,7 @@
         "age": 28,
         "name": "Jasminka",
         "surname": "Apix"
-      },
-      "relationships": {}
+      }
     }
-  ],
-  "included": []
+  ]
 }

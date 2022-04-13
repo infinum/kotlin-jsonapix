@@ -7,7 +7,7 @@ interface ResourceObject<out Model> {
     val relationships: Relationships?
     val links: Links?
 
-    fun original(included: List<ResourceObject<Any>>): Model
+    fun original(included: List<ResourceObject<Any>>?): Model
 
     fun relationshipsLinks(): Map<String, Links?>? = relationships?.links
 }

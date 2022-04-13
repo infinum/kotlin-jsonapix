@@ -18,6 +18,11 @@ interface SampleApiService {
     suspend fun fetchPersons(): List<Person>
 
     @Mock
+    @MockResponse(body = "responses/person_list_no_relationships.json")
+    @GET("/personsNoRel")
+    suspend fun fetchPersonsNoRelationships(): List<Person>
+
+    @Mock
     @MockResponse(body = "responses/error.json", code = 400, message = "ERROR")
     @GET("/error")
     suspend fun fetchError(): Person

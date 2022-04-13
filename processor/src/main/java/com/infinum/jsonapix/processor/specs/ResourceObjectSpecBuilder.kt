@@ -175,7 +175,7 @@ internal object ResourceObjectSpecBuilder {
             JsonApiConstants.Keys.INCLUDED,
             List::class.asClassName().parameterizedBy(
                 ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName())
-            )
+            ).copy(nullable = true)
         )
 
         val codeBlockBuilder = CodeBlock.builder()
@@ -201,12 +201,12 @@ internal object ResourceObjectSpecBuilder {
         val relationshipsLiteral = "relationships"
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
-            codeBlockBuilder.indent().addStatement("included.first {")
+            codeBlockBuilder.indent().addStatement("included?.first {")
             codeBlockBuilder.indent().addStatement(
                 "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
                 it.key
             )
-            codeBlockBuilder.unindent().addStatement("}.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
+            codeBlockBuilder.unindent().addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
             if (it.value.isNullable) {
                 codeBlockBuilder.unindent().addStatement("},")
             } else {
@@ -220,13 +220,13 @@ internal object ResourceObjectSpecBuilder {
 
         manyRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
-            codeBlockBuilder.indent().addStatement("included.filter {")
+            codeBlockBuilder.indent().addStatement("included?.filter {")
             codeBlockBuilder.indent().addStatement(
                 "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
                 it.key
             )
             codeBlockBuilder.unindent().addStatement(
-                "}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
+                "}?.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
                 it.value
             )
             if (it.value.isNullable) {
