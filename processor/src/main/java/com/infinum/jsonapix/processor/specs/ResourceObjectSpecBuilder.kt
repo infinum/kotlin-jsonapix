@@ -161,7 +161,7 @@ internal object ResourceObjectSpecBuilder {
             .build()
     }
 
-    @SuppressWarnings("SpreadOperator")
+    @SuppressWarnings("SpreadOperator", "LongMethod")
     private fun originalFunSpec(
         className: ClassName,
         attributes: List<PropertySpec>,
@@ -206,7 +206,8 @@ internal object ResourceObjectSpecBuilder {
                 "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
                 it.key
             )
-            codeBlockBuilder.unindent().addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
+            codeBlockBuilder.unindent()
+            codeBlockBuilder.addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
             if (it.value.isNullable) {
                 codeBlockBuilder.unindent().addStatement("},")
             } else {
