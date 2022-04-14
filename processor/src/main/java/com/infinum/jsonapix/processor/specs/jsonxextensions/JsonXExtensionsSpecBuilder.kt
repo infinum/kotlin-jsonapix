@@ -63,11 +63,11 @@ internal class JsonXExtensionsSpecBuilder {
     fun build(): FileSpec {
         val fileSpec = FileSpec.builder(
             JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.FileNames.EXTENSIONS
+            JsonApiConstants.FileNames.JSON_X_EXTENSIONS
         )
         fileSpec.addAnnotation(
             AnnotationSpec.builder(JvmName::class)
-                .addMember("%S", JsonApiConstants.FileNames.EXTENSIONS)
+                .addMember("%S", JsonApiConstants.FileNames.JSON_X_EXTENSIONS)
                 .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE).build()
         )
 

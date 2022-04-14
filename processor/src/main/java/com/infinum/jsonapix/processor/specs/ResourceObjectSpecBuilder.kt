@@ -129,6 +129,7 @@ internal object ResourceObjectSpecBuilder {
 
         return FileSpec.builder(className.packageName, generatedName)
             .addImport(JsonApiConstants.Packages.CORE_RESOURCES, JsonApiConstants.Imports.RESOURCE_IDENTIFIER)
+            .addImport(JsonApiConstants.Packages.CORE_SHARED, JsonApiConstants.Imports.REQUIRE_NOT_NULL)
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
@@ -189,10 +190,9 @@ internal object ResourceObjectSpecBuilder {
                 )
             } else {
                 codeBlockBuilder.addStatement(
-                    "%N = requireNotNull(attributes?.%N, { throw %T(%S) }),",
+                    "%N = requireNotNull(attributes?.%N, %S),",
                     it.name,
                     it.name,
-                    JsonApiXMissingArgumentException::class,
                     it.name
                 )
             }
