@@ -129,6 +129,7 @@ internal object ResourceObjectSpecBuilder {
 
         return FileSpec.builder(className.packageName, generatedName)
             .addImport(JsonApiConstants.Packages.CORE_RESOURCES, JsonApiConstants.Imports.RESOURCE_IDENTIFIER)
+            .addImport(JsonApiConstants.Packages.CORE_SHARED, JsonApiConstants.Imports.REQUIRE_NOT_NULL)
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
@@ -161,7 +162,7 @@ internal object ResourceObjectSpecBuilder {
             .build()
     }
 
-    @SuppressWarnings("SpreadOperator")
+    @SuppressWarnings("SpreadOperator", "LongMethod")
     private fun originalFunSpec(
         className: ClassName,
         attributes: List<PropertySpec>,
@@ -175,53 +176,69 @@ internal object ResourceObjectSpecBuilder {
             JsonApiConstants.Keys.INCLUDED,
             List::class.asClassName().parameterizedBy(
                 ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName())
-            )
+            ).copy(nullable = true)
         )
 
         val codeBlockBuilder = CodeBlock.builder()
         codeBlockBuilder.addStatement("return %T(", className).indent()
         attributes.forEach {
-            codeBlockBuilder.addStatement(
-                "%N = requireNotNull(attributes?.%N, { throw %T(%S) }),",
-                it.name,
-                it.name,
-                JsonApiXMissingArgumentException::class,
-                it.name
-            )
+            if (it.type.isNullable) {
+                codeBlockBuilder.addStatement(
+                    "%N = attributes?.%N,",
+                    it.name,
+                    it.name
+                )
+            } else {
+                codeBlockBuilder.addStatement(
+                    "%N = requireNotNull(attributes?.%N, %S),",
+                    it.name,
+                    it.name,
+                    it.name
+                )
+            }
         }
 
         val relationshipsLiteral = "relationships"
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
-            codeBlockBuilder.indent().addStatement("included.first {")
+            codeBlockBuilder.indent().addStatement("included?.first {")
             codeBlockBuilder.indent().addStatement(
                 "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
                 it.key
             )
-            codeBlockBuilder.unindent().addStatement("}.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
-            codeBlockBuilder.unindent().addStatement(
-                "} ?: throw %T(%S),",
-                JsonApiXMissingArgumentException::class,
-                relationshipsLiteral
-            )
+            codeBlockBuilder.unindent()
+            codeBlockBuilder.addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
+            if (it.value.isNullable) {
+                codeBlockBuilder.unindent().addStatement("},")
+            } else {
+                codeBlockBuilder.unindent().addStatement(
+                    "} ?: throw %T(%S),",
+                    JsonApiXMissingArgumentException::class,
+                    relationshipsLiteral
+                )
+            }
         }
 
         manyRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
-            codeBlockBuilder.indent().addStatement("included.filter {")
+            codeBlockBuilder.indent().addStatement("included?.filter {")
             codeBlockBuilder.indent().addStatement(
                 "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
                 it.key
             )
             codeBlockBuilder.unindent().addStatement(
-                "}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
+                "}?.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
                 it.value
             )
-            codeBlockBuilder.unindent().addStatement(
-                "} ?: throw %T(%S),",
-                JsonApiXMissingArgumentException::class,
-                relationshipsLiteral
-            )
+            if (it.value.isNullable) {
+                codeBlockBuilder.unindent().addStatement("},")
+            } else {
+                codeBlockBuilder.unindent().addStatement(
+                    "} ?: throw %T(%S),",
+                    JsonApiXMissingArgumentException::class,
+                    relationshipsLiteral
+                )
+            }
         }
         codeBlockBuilder.addStatement(")")
 

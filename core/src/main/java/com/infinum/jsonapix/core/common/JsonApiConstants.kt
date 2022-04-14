@@ -78,10 +78,11 @@ object JsonApiConstants {
         const val KOTLINX_SERIALIZATION_JSON = "kotlinx.serialization.json"
         const val TYPE_EXTRACTOR = "com.infinum.jsonapix.core.discriminators.TypeExtractor"
         const val CORE_RESOURCES = "com.infinum.jsonapix.core.resources"
+        const val CORE_SHARED = "com.infinum.jsonapix.core.shared"
     }
 
     object FileNames {
-        const val EXTENSIONS = "JsonXExtensions"
+        const val JSON_X_EXTENSIONS = "JsonXExtensions"
         const val TYPE_ADAPTER_FACTORY = "TypeAdapterFactory"
     }
 
@@ -112,6 +113,8 @@ object JsonApiConstants {
         )
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
+
+        const val REQUIRE_NOT_NULL = "requireNotNull"
     }
 
     object Statements {

@@ -107,7 +107,7 @@ internal object RelationshipsSpecBuilder {
 
         manyRelationships.forEachIndexed { index, property ->
             constructorStringBuilder.append(
-                "${property.name} = %T(originalObject.${property.name}.map { %T(%L) })"
+                "${property.name} = %T(originalObject.${property.name}!!.map { %T(%L) })"
             )
             builderArgs.add(ManyRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())

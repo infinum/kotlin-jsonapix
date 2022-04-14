@@ -1,0 +1,35 @@
+{
+  "errors": null,
+  "meta": {
+    "owner": "Stef"
+  },
+  "links": {
+    "self": "https://root.link.com"
+  },
+  "data": [
+    {
+      "links": {
+        "self": "https://resource.link.com"
+      },
+      "type": "person",
+      "id": "1",
+      "attributes": {
+        "age": 28,
+        "name": "Jason",
+        "surname": "Apix"
+      }
+    },
+    {
+      "links": {
+        "self": "https://resource.link.com"
+      },
+      "type": "person",
+      "id": "2",
+      "attributes": {
+        "age": 28,
+        "name": "Jasminka",
+        "surname": "Apix"
+      }
+    }
+  ]
+}
