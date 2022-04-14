@@ -43,9 +43,16 @@ android {
 }
 
 dependencies {
+    // Comment this out for testing local deploy
     implementation project(":core")
     kapt project(":processor")
     implementation project(":retrofit")
+
+    // Uncomment this for testing local deploy
+//    implementation packages.jsonapix.core
+//    kapt packages.jsonapix.processor
+//    implementation packages.jsonapix.retrofit
+
     implementation packages.retromock.core
     implementation packages.retrofit.core
     implementation packages.kotlin.core

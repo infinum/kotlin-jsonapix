@@ -14,7 +14,8 @@ ext.versions = [
         "activity"     : "1.4.0",
         "fragment"     : "1.4.0",
         "material"     : "1.4.0",
-        "dokka"        : "1.6.0"
+        "dokka"        : "1.6.0",
+        "jsonapix"     : "0.0.1"
 ]
 
 ext.packages = [
@@ -63,5 +64,10 @@ ext.packages = [
         "material"   : "com.google.android.material:material:${versions.material}",
         "dokka"      : [
                 "plugin": "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}"
+        ],
+        "jsonapix"   : [
+                "core": "com.infinum.jsonapix:core:${versions.jsonapix}",
+                "processor": "com.infinum.jsonapix:processor:${versions.jsonapix}",
+                "retrofit": "com.infinum.jsonapix:retrofit:${versions.jsonapix}",
         ]
 ]
