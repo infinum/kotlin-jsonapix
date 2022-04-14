@@ -77,13 +77,13 @@ All non-primitive fields of a class should be some kind of relationship.
 @Serializable
 @JsonApiX(type = "person")
 data class Person(
-    val name: String,
+    val name: String?,
     val surname: String,
     val age: Int,
     @HasMany(type = "friend")
-    val friends: List<Person>,
+    val friends: List<Person>?,
     @HasOne(type = "dog")
-    val dog: Dog
+    val dog: Dog? = null
 )
 ```
 
@@ -92,7 +92,11 @@ To access the serialization and deserialization features, you neeed to use the `
 To get the type adapter for your specific class, use the generated `TypeAdapterFactory`:
 
 ```kotlin
-val adapter = TypeAdapterFactory().getAdapter("qualified.name.of.your.class")
+val adapter = TypeAdapterFactory().getAdapter(KClass<*>)
+
+or
+
+val adapter = TypeAdapterFactory().getListAdapter(KClass<*>)
 
 adapter.convertToString(person) // Produces JSON API String from a Person instance
 
@@ -114,3 +118,10 @@ Retrofit.Builder()
      .baseUrl("https://www.example.com")
      .build()
 ```
+
+
+
+### Nullability
+
+
+Lorem ipsum
