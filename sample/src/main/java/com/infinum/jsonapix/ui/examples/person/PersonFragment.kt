@@ -42,7 +42,10 @@ class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.downloadButton.setOnClickListener {
-            viewModel.fetchPersonList()
+            viewModel.fetchPersonList(hasRelationships = true)
+        }
+        binding.downloadPersonNoRelButton.setOnClickListener {
+            viewModel.fetchPersonList(hasRelationships = false)
         }
     }
 }

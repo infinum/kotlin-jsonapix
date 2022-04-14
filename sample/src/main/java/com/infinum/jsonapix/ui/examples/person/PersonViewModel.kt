@@ -2,6 +2,7 @@ package com.infinum.jsonapix.ui.examples.person
 
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
+import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonMeta
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,13 +31,18 @@ class PersonViewModel @Inject constructor(
         }
     }
 
-    fun fetchPersonList() {
+    fun fetchPersonList(hasRelationships: Boolean) {
         launch {
             showLoading()
-//            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
-            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list_no_relationships.json") }
-//            val persons = io { sampleApiService.fetchPersons() }
-            val persons = io { sampleApiService.fetchPersonsNoRelationships() }
+            val bodyString: String
+            val persons: List<Person>
+            if (hasRelationships) {
+                bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
+                persons = io { sampleApiService.fetchPersons() }
+            } else {
+                bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list_no_relationships.json") }
+                persons = io { sampleApiService.fetchPersonsNoRelationships() }
+            }
             hideLoading()
             viewState = PersonState(
                 bodyString,

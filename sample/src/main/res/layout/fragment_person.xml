@@ -17,17 +17,40 @@
             android:padding="16dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="Person example:"/>
+            android:text="PersonsWithRel example:"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:paddingHorizontal="16dp"
-            android:text="Press the button to download the following person:\nName: Jason\nSurname: Apix\nAge: 28\nDogs: [(Bella, age of 1), (Bongo age of 2)]\nFavorite dog: Bella"/>
+            android:text="Press the button to download the following person list with relationships:\nName: Jason\nSurname: Apix\nAge: 28\nDogs: [(Bella, age of 1), (Bongo age of 2)]\nFavorite dog: Bella, \nName: Jasminka\nSurname: Apix\nAge: 28\nDogs: [(Bella, age of 1), (Bongo age of 2)]\nFavorite dog: Bongo"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/downloadButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Download"
+            android:layout_marginVertical="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="PersonsNoRel example:"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp"
+            android:text="Press the button to download the following person list with no relationships:\nName: Jason\nSurname: Apix\nAge: 28\nDogs: null \nFavorite dog: null,\nName: Jasminka\nSurname: Apix\nAge: 28\nDogs: null \nFavorite dog: null"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/downloadPersonNoRelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
