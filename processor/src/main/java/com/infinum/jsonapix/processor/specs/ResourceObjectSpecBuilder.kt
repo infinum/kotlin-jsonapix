@@ -202,10 +202,17 @@ internal object ResourceObjectSpecBuilder {
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
             codeBlockBuilder.indent().addStatement("included?.first {")
-            codeBlockBuilder.indent().addStatement(
-                "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
-                it.key
-            )
+            if (it.value.isNullable) {
+                codeBlockBuilder.indent().addStatement(
+                    "safeRelationships.%N?.data == ResourceIdentifier(it.type, it.id)",
+                    it.key
+                )
+            } else {
+                codeBlockBuilder.indent().addStatement(
+                    "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
+                    it.key
+                )
+            }
             codeBlockBuilder.unindent()
             codeBlockBuilder.addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
             if (it.value.isNullable) {
@@ -214,7 +221,7 @@ internal object ResourceObjectSpecBuilder {
                 codeBlockBuilder.unindent().addStatement(
                     "} ?: throw %T(%S),",
                     JsonApiXMissingArgumentException::class,
-                    relationshipsLiteral
+                    it.key
                 )
             }
         }
@@ -222,10 +229,17 @@ internal object ResourceObjectSpecBuilder {
         manyRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
             codeBlockBuilder.indent().addStatement("included?.filter {")
-            codeBlockBuilder.indent().addStatement(
-                "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
-                it.key
-            )
+            if (it.value.isNullable) {
+                codeBlockBuilder.indent().addStatement(
+                    "safeRelationships.%N?.data?.contains(ResourceIdentifier(it.type, it.id)) == true",
+                    it.key
+                )
+            } else {
+                codeBlockBuilder.indent().addStatement(
+                    "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
+                    it.key
+                )
+            }
             codeBlockBuilder.unindent().addStatement(
                 "}?.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
                 it.value
@@ -236,7 +250,7 @@ internal object ResourceObjectSpecBuilder {
                 codeBlockBuilder.unindent().addStatement(
                     "} ?: throw %T(%S),",
                     JsonApiXMissingArgumentException::class,
-                    relationshipsLiteral
+                    it.key
                 )
             }
         }

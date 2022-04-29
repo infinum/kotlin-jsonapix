@@ -35,19 +35,37 @@ internal object RelationshipsSpecBuilder {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 
         val properties: MutableList<PropertySpec> = oneRelationships.map {
-            PropertySpec.builder(it.name, OneRelationshipMember::class).initializer(it.name)
-                .build()
+            if (it.type.isNullable) {
+                PropertySpec.builder(it.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
+                    .initializer(it.name)
+                    .build()
+            } else {
+                PropertySpec.builder(it.name, OneRelationshipMember::class)
+                    .initializer(it.name)
+                    .build()
+            }
         }.toMutableList()
 
         properties.addAll(
             manyRelationships.map {
-                PropertySpec.builder(it.name, ManyRelationshipMember::class)
-                    .initializer(it.name).build()
+                if (it.type.isNullable) {
+                    PropertySpec.builder(it.name, ManyRelationshipMember::class.asTypeName().copy(nullable = true))
+                        .initializer(it.name).build()
+                } else {
+                    PropertySpec.builder(it.name, ManyRelationshipMember::class)
+                        .initializer(it.name).build()
+                }
             }
         )
 
         val params = properties.map {
-            ParameterSpec.builder(it.name, it.type).addAnnotation(Specs.getSerialNameSpec(it.name))
+            ParameterSpec.builder(it.name, it.type)
+                .addAnnotation(Specs.getSerialNameSpec(it.name))
+                .apply {
+                    if (it.type.isNullable) {
+                        defaultValue("%L", null)
+                    }
+                }
                 .build()
         }
 
@@ -94,7 +112,14 @@ internal object RelationshipsSpecBuilder {
         val constructorStringBuilder = StringBuilder()
         val builderArgs = mutableListOf<Any>(generatedName)
         oneRelationships.forEachIndexed { index, property ->
-            constructorStringBuilder.append("${property.name} = %T(%T(%L))")
+            if (property.type.isNullable) {
+                constructorStringBuilder.append(
+                    "${property.name} = originalObject.${property.name}?.let { %T(%T(%L)) }"
+                )
+            } else {
+                constructorStringBuilder.append("${property.name} = %T(%T(%L))")
+            }
+
             builderArgs.add(OneRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
@@ -106,9 +131,15 @@ internal object RelationshipsSpecBuilder {
         }
 
         manyRelationships.forEachIndexed { index, property ->
-            constructorStringBuilder.append(
-                "${property.name} = %T(originalObject.${property.name}!!.map { %T(%L) })"
-            )
+            if (property.type.isNullable) {
+                constructorStringBuilder.append(
+                    "${property.name} = originalObject.${property.name}?.let { %T(it.map { %T(%L) }) }"
+                )
+            } else {
+                constructorStringBuilder.append(
+                    "${property.name} = %T(originalObject.${property.name}!!.map { %T(%L) })"
+                )
+            }
             builderArgs.add(ManyRelationshipMember::class.asClassName())
             builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
@@ -131,10 +162,18 @@ internal object RelationshipsSpecBuilder {
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
-            returnStatement += "\"${it.name}\" to ${it.name}.links, "
+            returnStatement += if (it.type.isNullable) {
+                "\"${it.name}\" to ${it.name}?.links, "
+            } else {
+                "\"${it.name}\" to ${it.name}.links, "
+            }
         }
         manyRelationships.forEach {
-            returnStatement += "\"${it.name}\" to ${it.name}.links, "
+            returnStatement += if (it.type.isNullable) {
+                "\"${it.name}\" to ${it.name}?.links, "
+            } else {
+                "\"${it.name}\" to ${it.name}.links, "
+            }
         }
         returnStatement += ")"
 
