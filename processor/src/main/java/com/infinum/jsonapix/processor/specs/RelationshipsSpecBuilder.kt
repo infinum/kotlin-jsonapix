@@ -35,39 +35,26 @@ internal object RelationshipsSpecBuilder {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 
         val properties: MutableList<PropertySpec> = oneRelationships.map {
-            if (it.type.isNullable) {
+            val builder = if (it.type.isNullable) {
                 PropertySpec.builder(it.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
-                    .initializer(it.name)
-                    .build()
             } else {
                 PropertySpec.builder(it.name, OneRelationshipMember::class)
-                    .initializer(it.name)
-                    .build()
             }
+            builder.initializer(it.name).build()
         }.toMutableList()
 
         properties.addAll(
             manyRelationships.map {
-                if (it.type.isNullable) {
+                val builder = if (it.type.isNullable) {
                     PropertySpec.builder(it.name, ManyRelationshipMember::class.asTypeName().copy(nullable = true))
-                        .initializer(it.name).build()
                 } else {
                     PropertySpec.builder(it.name, ManyRelationshipMember::class)
-                        .initializer(it.name).build()
                 }
+                builder.initializer(it.name).build()
             }
         )
 
-        val params = properties.map {
-            ParameterSpec.builder(it.name, it.type)
-                .addAnnotation(Specs.getSerialNameSpec(it.name))
-                .apply {
-                    if (it.type.isNullable) {
-                        defaultValue("%L", null)
-                    }
-                }
-                .build()
-        }
+        val params = mapPropertiesToParams(properties)
 
         return TypeSpec.classBuilder(generatedName)
             .addModifiers(KModifier.DATA)
@@ -198,5 +185,18 @@ internal object RelationshipsSpecBuilder {
         }.members.first { member ->
             member.toString().trim().startsWith("type")
         }.toString().split("=")[1].trim()
+    }
+
+    private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> {
+        return properties.map {
+            ParameterSpec.builder(it.name, it.type)
+                .addAnnotation(Specs.getSerialNameSpec(it.name))
+                .apply {
+                    if (it.type.isNullable) {
+                        defaultValue("%L", null)
+                    }
+                }
+                .build()
+        }
     }
 }

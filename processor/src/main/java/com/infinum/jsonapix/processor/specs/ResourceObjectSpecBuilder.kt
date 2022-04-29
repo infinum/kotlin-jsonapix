@@ -198,7 +198,6 @@ internal object ResourceObjectSpecBuilder {
             }
         }
 
-        val relationshipsLiteral = "relationships"
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
             codeBlockBuilder.indent().addStatement("included?.first {")
