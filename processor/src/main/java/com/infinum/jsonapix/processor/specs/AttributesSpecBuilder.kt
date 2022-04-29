@@ -25,6 +25,11 @@ internal object AttributesSpecBuilder {
         val parameterSpecs = attributes.map {
             ParameterSpec.builder(it.name, it.type)
                 .addAnnotation(Specs.getSerialNameSpec(it.name))
+                .apply {
+                    if (it.type.isNullable) {
+                        defaultValue("%L", null)
+                    }
+                }
                 .build()
         }
 
