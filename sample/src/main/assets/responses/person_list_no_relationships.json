@@ -15,8 +15,15 @@
       "id": "1",
       "attributes": {
         "age": 28,
-        "name": "Jason",
         "surname": "Apix"
+      },
+      "relationships": {
+        "myFavoriteDog": {
+          "data": {
+            "id": "1",
+            "type": "dog"
+          }
+        }
       }
     },
     {
@@ -29,6 +36,16 @@
         "age": 28,
         "name": "Jasminka",
         "surname": "Apix"
+      }
+    }
+  ],
+  "included": [
+    {
+      "type":"dog",
+      "id":"1",
+      "attributes":{
+        "age":1,
+        "name":"Bella"
       }
     }
   ]
