@@ -45,11 +45,11 @@ plugins {
 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
 // Json API X
-implementation("com.infinum.jsonapix:core:1.0.0-alpha")
-kapt("com.infinum.jsonapix:processor:1.0.0-alpha")
+implementation("com.infinum.jsonapix:core:1.0.0-alpha02")
+kapt("com.infinum.jsonapix:processor:1.0.0-alpha02")
 
 // Optional: For Retrofit support
-implementation("com.infinum.jsonapix:retrofit:1.0.0-alpha")
+implementation("com.infinum.jsonapix:retrofit:1.0.0-alpha02")
 ```
 
 ## Usage
