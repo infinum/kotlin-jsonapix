@@ -287,3 +287,13 @@ limitations under the License.
 ## Credits
 
 Maintained and sponsored by [Infinum](http://www.infinum.com).
+
+<p align="center">
+  <a href='https://infinum.com'>
+    <picture>
+        <source srcset="https://assets.infinum.com/brand/logo/static/white.svg" media="(prefers-color-scheme: dark)">
+        <img src="https://assets.infinum.com/brand/logo/static/default.svg">
+    </picture>
+  </a>
+</p>
+
