@@ -64,9 +64,9 @@ afterEvaluate {
                         url.set(properties.scm.url)
                     }
                 }
-                signing {
+                /*signing {
                     sign publishing.publications.release
-                }
+                }*/
             }
         }
     }

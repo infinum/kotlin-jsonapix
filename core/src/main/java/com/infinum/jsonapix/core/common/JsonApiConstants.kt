@@ -89,7 +89,8 @@ object JsonApiConstants {
     object Imports {
         val JSON_X = arrayOf(
             "core.JsonApiX",
-            "core.resources.ResourceObject"
+            "core.resources.ResourceObject",
+            "core.JsonApiModel"
         )
 
         val KOTLINX = arrayOf(

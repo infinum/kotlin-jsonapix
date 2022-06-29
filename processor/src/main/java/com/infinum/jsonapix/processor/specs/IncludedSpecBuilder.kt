@@ -3,7 +3,6 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.PropertySpec
-import java.lang.StringBuilder
 
 internal object IncludedSpecBuilder {
 
@@ -41,7 +40,10 @@ internal object IncludedSpecBuilder {
         val statement = StringBuilder("listOf(")
         oneRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*map { it.${prop.name}!!.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                """
+                    
+               |        *map { it.${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()
+            """.trimMargin()
             )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
@@ -51,14 +53,17 @@ internal object IncludedSpecBuilder {
         }
 
         manyRelationships.forEachIndexed { index, prop ->
-            statement.append("*flatMap { it.${prop.name}!!.map {")
-            statement.append("it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
-            statement.append("} }.toTypedArray()")
+            statement.append(
+                """
+
+               |        *flatMap { it.${prop.name}?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() } ?: listOf() }.toTypedArray()
+            """.trimMargin()
+            )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
             }
         }
-        statement.append(")")
+        statement.appendLine("\n\t)")
 
         return CodeBlock.of(statement.toString())
     }

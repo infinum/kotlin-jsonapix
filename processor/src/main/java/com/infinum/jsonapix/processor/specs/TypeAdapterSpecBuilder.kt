@@ -90,6 +90,7 @@ public object TypeAdapterSpecBuilder {
             )
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("(original as? %T)?.let {", JsonApiModel::class)
+            .addStatement("it.setId(data.data?.id ?: \"0\")")
             .addStatement("it.setRootLinks(data.links)")
             .addStatement("it.setResourceLinks(data.data?.links)")
             .addStatement("data.data?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")

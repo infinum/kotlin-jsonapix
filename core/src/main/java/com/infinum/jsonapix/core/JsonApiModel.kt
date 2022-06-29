@@ -10,6 +10,7 @@ abstract class JsonApiModel {
     private var resourceLinks: Links? = null
     private var relationshipLinks: Map<String, Links?>? = null
     private var meta: Meta? = null
+    private var id: String = "0"
 
     fun setRootLinks(links: Links?) {
         rootLinks = links
@@ -27,6 +28,10 @@ abstract class JsonApiModel {
         this.meta = meta
     }
 
+    fun setId(id: String) {
+        this.id = id
+    }
+
     fun rootLinks(): DefaultLinks? = rootLinks as? DefaultLinks
 
     fun <T : Links> rootLinks(): T? = rootLinks as? T
@@ -41,4 +46,6 @@ abstract class JsonApiModel {
     fun <T : Links> relationshipsLinks(): Map<String, T?>? = relationshipLinks as? Map<String, T?>
 
     fun <T : Meta> meta() = meta as? T
+
+    fun id(): String = this.id
 }
