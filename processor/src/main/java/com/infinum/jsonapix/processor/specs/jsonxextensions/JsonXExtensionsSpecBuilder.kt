@@ -60,9 +60,9 @@ internal class JsonXExtensionsSpecBuilder {
     }
 
     @SuppressWarnings("SpreadOperator", "LongMethod")
-    fun build(): FileSpec {
+    fun build(packageName: String): FileSpec {
         val fileSpec = FileSpec.builder(
-            JsonApiConstants.Packages.JSONX,
+            packageName,
             JsonApiConstants.FileNames.JSON_X_EXTENSIONS
         )
         fileSpec.addAnnotation(
@@ -114,8 +114,8 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.includedListStatement?.toString()
                 )
             )
-            fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key))
-            fileSpec.addFunction(SerializeListFunSpecBuilder.build(it.key))
+            fileSpec.addFunction(SerializeFunSpecBuilder.build(packageName, it.key))
+            fileSpec.addFunction(SerializeListFunSpecBuilder.build(packageName, it.key))
         }
 
         fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, metas))
@@ -123,8 +123,8 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
 
-        fileSpec.addFunction(DeserializeFunSpecBuilder.build())
-        fileSpec.addFunction(DeserializeListFunSpecBuilder.build())
+        fileSpec.addFunction(DeserializeFunSpecBuilder.build(packageName))
+        fileSpec.addFunction(DeserializeListFunSpecBuilder.build(packageName))
 
         return fileSpec.build()
     }

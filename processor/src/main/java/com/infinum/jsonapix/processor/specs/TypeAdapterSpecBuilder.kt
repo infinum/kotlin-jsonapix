@@ -15,6 +15,7 @@ import com.squareup.kotlinpoet.asClassName
 public object TypeAdapterSpecBuilder {
 
     public fun build(
+        rootPackage: String,
         className: ClassName,
         rootLinks: String?,
         resourceObjectLinks: String?,
@@ -51,7 +52,7 @@ public object TypeAdapterSpecBuilder {
                     .build()
             )
             .addImport(
-                JsonApiConstants.Packages.JSONX,
+                rootPackage,
                 JsonApiConstants.Members.JSONX_SERIALIZE,
                 JsonApiConstants.Members.JSONX_DESERIALIZE
             )

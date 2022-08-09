@@ -7,16 +7,8 @@ import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
-import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
-import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
-import com.infinum.jsonapix.processor.specs.JsonApiXListSpecBuilder
+import com.infinum.jsonapix.processor.specs.*
 import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
-import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
-import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
-import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
-import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
-import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
-import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -30,6 +22,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
+
 
 @SuppressWarnings("SpreadOperator")
 public class JsonApiProcessor : AbstractProcessor() {
@@ -83,8 +76,17 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
-        if (elements?.isNullOrEmpty() == false) {
+        if (!elements.isNullOrEmpty()) {
+            var rootPackage: String? = null
             elements.forEach {
+                if (rootPackage == null) {
+                    var enclosing: Element = it
+                    while (enclosing.kind != ElementKind.PACKAGE) {
+                        enclosing = enclosing.enclosingElement
+                    }
+                    rootPackage = processingEnv.elementUtils.getPackageOf(enclosing).toString()
+                }
+
                 if (it.kind != ElementKind.CLASS) {
                     processingEnv.messager.printMessage(
                         Diagnostic.Kind.ERROR,
@@ -93,20 +95,23 @@ public class JsonApiProcessor : AbstractProcessor() {
                     return true
                 }
 
-                val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
-                processAnnotation(it, type)
+                rootPackage?.apply {
+                    val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
+                    processAnnotation(this, it, type)
+                }
             }
 
-            val kaptKotlinGeneratedDir =
-                processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
-            collector.build().writeTo(File(kaptKotlinGeneratedDir!!))
-            adapterFactoryCollector.build().writeTo(File(kaptKotlinGeneratedDir))
+            rootPackage?.apply {
+                val kaptKotlinGeneratedDir = processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
+                collector.build(this).writeTo(File(kaptKotlinGeneratedDir!!))
+                adapterFactoryCollector.build(this).writeTo(File(kaptKotlinGeneratedDir))
+            }
         }
         return true
     }
 
     @SuppressWarnings("LongMethod")
-    private fun processAnnotation(element: Element, type: String) {
+    private fun processAnnotation(rootPackage: String, element: Element, type: String) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
         val kaptKotlinGeneratedDir =
@@ -207,6 +212,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
+            rootPackage,
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
@@ -215,6 +221,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
+            rootPackage,
             inputDataClass,
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,

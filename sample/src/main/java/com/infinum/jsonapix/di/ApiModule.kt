@@ -2,8 +2,8 @@ package com.infinum.jsonapix.di
 
 import android.content.Context
 import co.infinum.retromock.Retromock
-import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.data.api.SampleApiService
+import com.infinum.jsonapix.data.models.TypeAdapterFactory
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import dagger.Module
 import dagger.Provides

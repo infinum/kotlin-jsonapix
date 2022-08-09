@@ -6,20 +6,14 @@ import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.decodeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.findTypeMember
-import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.formatMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.jsonObjectMember
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.TypeVariableName
-import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 
 internal object DeserializeFunSpecBuilder {
 
-    fun build(): FunSpec {
+    fun build(rootPackage: String): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
 
@@ -28,6 +22,7 @@ internal object DeserializeFunSpecBuilder {
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
         )
+        val formatMember = MemberName(rootPackage, JsonApiConstants.Members.FORMAT)
         return FunSpec.builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)

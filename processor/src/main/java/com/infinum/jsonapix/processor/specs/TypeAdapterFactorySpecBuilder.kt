@@ -21,8 +21,8 @@ public class TypeAdapterFactorySpecBuilder {
         classNames.add(className)
     }
 
-    public fun build(): FileSpec {
-        return FileSpec.builder(JsonApiConstants.Packages.JSONX, JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
+    public fun build(packageName: String): FileSpec {
+        return FileSpec.builder(packageName, JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
             .addType(
                 TypeSpec.classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
                     .addSuperinterface(AdapterFactory::class)
