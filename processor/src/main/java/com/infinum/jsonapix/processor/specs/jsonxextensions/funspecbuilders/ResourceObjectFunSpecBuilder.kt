@@ -15,6 +15,8 @@ internal object ResourceObjectFunSpecBuilder {
         val returnStatement = StringBuilder("return %T(")
         val builderArgs = mutableListOf<Any>(resourceObjectClass)
 
+        returnStatement.append("id = (this as? JsonApiModel)?.let { it.id() } ?: \"0\", ")
+
         if (attributesClass != null) {
             returnStatement.append(
                 "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this)"
