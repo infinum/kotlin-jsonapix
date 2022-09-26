@@ -37,6 +37,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    lintOptions {
+        checkDependencies true
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -47,7 +51,9 @@ dependencies {
     implementation project(":core")
     kapt project(":processor")
     implementation project(":retrofit")
+//    implementation project(':jsonapixlint')
 
+    lintChecks project(path: ':lint')
     // Uncomment this for testing local deploy
 //    implementation packages.jsonapix.core
 //    kapt packages.jsonapix.processor

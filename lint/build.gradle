@@ -1,0 +1,30 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'com.android.lint'
+
+lintOptions {
+    htmlReport true
+    htmlOutput file("lint-report.html")
+    textReport true
+    absolutePaths false
+    ignoreTestSources true
+}
+
+dependencies {
+    compileOnly packages.lint.api
+    compileOnly packages.lint.checks
+    compileOnly packages.kotlin.core
+
+    testImplementation "junit:junit:4.13.2"
+    testImplementation packages.lint.lint
+    testImplementation packages.lint.tests
+}
+
+jar {
+    manifest {
+        attributes('Lint-Registry-v2': 'com.infinum.jsonapix.lint.JsonApiXIssueRegistry')
+    }
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
