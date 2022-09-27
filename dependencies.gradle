@@ -16,7 +16,8 @@ ext.versions = [
         "material"     : "1.4.0",
         "dokka"        : "1.6.0",
         "jsonapix"     : "0.0.1",
-        "lint"         : "30.2.0"
+        "lint"         : "30.2.0",
+        "junit"        : "4.13.2"
 ]
 
 ext.packages = [
@@ -41,7 +42,7 @@ ext.packages = [
                 "plugin": "org.jlleitschuh.gradle:ktlint-gradle:${versions.ktlint}"
         ],
         "lint"     : [
-                "lint"  : "com.android.tools.lint:lint:${versions.lint}",
+                "core"  : "com.android.tools.lint:lint:${versions.lint}",
                 "api"   : "com.android.tools.lint:lint-api:${versions.lint}",
                 "checks": "com.android.tools.lint:lint-checks:${versions.lint}",
                 "tests"  : "com.android.tools.lint:lint-tests:${versions.lint}"
@@ -76,5 +77,8 @@ ext.packages = [
                 "core": "com.infinum.jsonapix:core:${versions.jsonapix}",
                 "processor": "com.infinum.jsonapix:processor:${versions.jsonapix}",
                 "retrofit": "com.infinum.jsonapix:retrofit:${versions.jsonapix}",
+        ],
+        "junit"      : [
+                "core": "junit:junit:${versions.junit}"
         ]
 ]

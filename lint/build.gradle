@@ -1,6 +1,29 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
+apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/ktlint.gradle"
+apply from: "$rootDir/dokka.gradle"
+apply from: "$rootDir/maven-publish.gradle"
+
+ext.mavenPublishProperties = [
+        group      : releaseConfig.group,
+        version    : releaseConfig.version,
+        artifactId   : "core",
+        repository : [
+                url     : sonatype.url,
+                username: sonatype.username,
+                password: sonatype.password
+        ],
+        name       : "JsonApiX Core",
+        description: "JsonApiX Core module",
+        url        : "https://github.com/infinum/android-jsonapix",
+        scm        : [
+                connection: "https://github.com/infinum/android-jsonapix.git",
+                url       : "https://github.com/infinum/android-jsonapix"
+        ]
+]
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
@@ -18,8 +41,8 @@ dependencies {
     compileOnly packages.lint.checks
     compileOnly packages.kotlin.core
 
-    testImplementation "junit:junit:4.13.2"
-    testImplementation packages.lint.lint
+    testImplementation packages.junit.core
+    testImplementation packages.lint.core
     testImplementation packages.lint.tests
 }
 
