@@ -9,14 +9,14 @@ apply from: "$rootDir/maven-publish.gradle"
 ext.mavenPublishProperties = [
         group      : releaseConfig.group,
         version    : releaseConfig.version,
-        artifactId   : "core",
+        artifactId   : "lint",
         repository : [
                 url     : sonatype.url,
                 username: sonatype.username,
                 password: sonatype.password
         ],
-        name       : "JsonApiX Core",
-        description: "JsonApiX Core module",
+        name       : "JsonApiX Lint",
+        description: "JsonApiX Lint module",
         url        : "https://github.com/infinum/android-jsonapix",
         scm        : [
                 connection: "https://github.com/infinum/android-jsonapix.git",

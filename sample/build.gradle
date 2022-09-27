@@ -58,6 +58,7 @@ dependencies {
 //    implementation packages.jsonapix.core
 //    kapt packages.jsonapix.processor
 //    implementation packages.jsonapix.retrofit
+//    implementation packages.jsonapix.lint
 
     implementation packages.retromock.core
     implementation packages.retrofit.core
