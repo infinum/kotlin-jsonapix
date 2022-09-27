@@ -44,6 +44,7 @@ dependencies {
     testImplementation packages.junit.core
     testImplementation packages.lint.core
     testImplementation packages.lint.tests
+    testImplementation project(":core")
 }
 
 jar {
