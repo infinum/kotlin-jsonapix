@@ -10,8 +10,7 @@ private const val MIN_API = 8
 class JsonApiXIssueRegistry : IssueRegistry() {
     override val issues = listOf(JsonApiXCodeDetector.ANNOTATION_USAGE_ISSUE)
 
-    override val api: Int
-        get() = CURRENT_API
+    override val api: Int = CURRENT_API
 
     // works with Studio 4.1 or later; see com.android.tools.lint.detector.api.Api / ApiKt
     override val minApi: Int = MIN_API
