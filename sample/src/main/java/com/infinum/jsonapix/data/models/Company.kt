@@ -6,7 +6,7 @@ import com.infinum.jsonapix.annotations.JsonApiX
 import kotlinx.serialization.Serializable
 
 @JsonApiX(type = "company")
-//@Serializable
+@Serializable
 data class Company(
     @HasMany("person")
     val personel: List<Person>,

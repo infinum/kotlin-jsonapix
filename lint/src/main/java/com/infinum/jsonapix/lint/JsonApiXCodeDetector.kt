@@ -28,7 +28,7 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             override fun visitAnnotation(node: UAnnotation) {
                 if (node.qualifiedName == JSON_API_X || node.qualifiedName == JSON_API_X_META) {
                     node.getParentOfType<UAnnotated>()?.let { annotatedClass ->
-                        if (annotatedClass.uAnnotations.any { annotation -> annotation.qualifiedName == SERIALIZABLE}.not()) {
+                        if (annotatedClass.uAnnotations.any { it.qualifiedName == SERIALIZABLE }.not()) {
                             context.report(
                                 ANNOTATION_USAGE_ISSUE,
                                 node,
@@ -49,7 +49,8 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             id = "IllegalJsonApiXAnnotation",
             briefDescription = "Illegal use of JsonApiX annotation",
             explanation = """
-                    @JsonApiX annotation takes a String type parameter and it must be combined with @Serializable from KotlinX Serialization
+                    @JsonApiX annotation takes a String type parameter and it must be combined with @Serializable 
+                    from KotlinX Serialization
                     """, // no need to .trimIndent(), lint does that automatically
             category = Category.CUSTOM_LINT_CHECKS,
             priority = 8,
