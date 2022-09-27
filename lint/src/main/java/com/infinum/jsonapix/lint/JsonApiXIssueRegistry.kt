@@ -20,7 +20,7 @@ class JsonApiXIssueRegistry : IssueRegistry() {
     // Requires lint API 30.0+; if you're still building for something
     // older, just remove this property.
     override val vendor: Vendor = Vendor(
-        vendorName = "JsonApiX - Infinum",
+        vendorName = "Infinum Inc.",
         feedbackUrl = "https://github.com/infinum/kotlin-jsonapix/issues",
         contact = "https://github.com/infinum/kotlin-jsonapix"
     )
