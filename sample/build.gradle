@@ -51,14 +51,13 @@ dependencies {
     implementation project(":core")
     kapt project(":processor")
     implementation project(":retrofit")
-//    implementation project(':jsonapixlint')
-
     lintChecks project(path: ':lint')
+
     // Uncomment this for testing local deploy
 //    implementation packages.jsonapix.core
 //    kapt packages.jsonapix.processor
 //    implementation packages.jsonapix.retrofit
-//    implementation packages.jsonapix.lint
+//    lintChecks packages.jsonapix.lint
 
     implementation packages.retromock.core
     implementation packages.retrofit.core
