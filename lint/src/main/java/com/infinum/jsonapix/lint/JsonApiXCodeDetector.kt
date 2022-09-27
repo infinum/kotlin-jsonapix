@@ -12,6 +12,7 @@ import org.jetbrains.uast.UAnnotated
 import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.getParentOfType
+import java.util.EnumSet
 
 private const val JSON_API_X = "com.infinum.jsonapix.annotations.JsonApiX"
 private const val JSON_API_X_META = "com.infinum.jsonapix.annotations.JsonApiXMeta"
@@ -57,7 +58,7 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             severity = Severity.ERROR,
             implementation = Implementation(
                 JsonApiXCodeDetector::class.java,
-                Scope.JAVA_FILE_SCOPE
+                EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
     }
