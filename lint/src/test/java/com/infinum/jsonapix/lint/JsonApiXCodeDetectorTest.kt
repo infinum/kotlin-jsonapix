@@ -6,7 +6,7 @@ import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
 
-@Suppress("UnstableApiUsage")
+@Suppress("UnstableApiUsage", "MaxLineLength")
 class JsonApiXCodeDetectorTest : LintDetectorTest() {
 
     object Stubs {
