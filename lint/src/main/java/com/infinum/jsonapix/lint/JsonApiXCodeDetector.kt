@@ -61,9 +61,8 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
                 id = "Illegal${annotationName}Annotation",
                 briefDescription = "Illegal use of $annotationName annotation",
                 explanation = """
-                    $annotationName annotation takes a String type parameter and it must be combined with @Serializable 
-                    from KotlinX Serialization
-                    """, // no need to .trimIndent(), lint does that automatically
+                    $annotationName must be combined with @Serializable from KotlinX Serialization as it's 
+                    mandatory for correct class generation/serialization.""", // no need to .trimIndent(), lint does that automatically
                 category = Category.CUSTOM_LINT_CHECKS,
                 priority = 8,
                 severity = Severity.ERROR,
