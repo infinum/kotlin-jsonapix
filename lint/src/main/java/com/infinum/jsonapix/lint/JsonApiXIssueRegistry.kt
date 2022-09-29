@@ -8,7 +8,7 @@ private const val MIN_API = 8
 
 @Suppress("UnstableApiUsage")
 class JsonApiXIssueRegistry : IssueRegistry() {
-    override val issues = listOf(JsonApiXCodeDetector.ANNOTATION_USAGE_ISSUE)
+    override val issues = JsonApiXCodeDetector.annotationIssues
 
     override val api: Int = CURRENT_API
 
