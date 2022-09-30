@@ -41,7 +41,9 @@ dependencies {
     compileOnly packages.lint.checks
     compileOnly packages.kotlin.core
 
-    testImplementation packages.junit.core
+    testImplementation packages.junit.engine
+    testImplementation packages.junit.api
+    testImplementation packages.junit.params
     testImplementation packages.lint.core
     testImplementation packages.lint.tests
     testImplementation project(":core")
