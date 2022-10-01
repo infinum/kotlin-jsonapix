@@ -15,12 +15,13 @@ ext.versions = [
         "fragment"     : "1.4.0",
         "material"     : "1.4.0",
         "dokka"        : "1.6.0",
-        "jsonapix"     : "0.0.1"
+        "jsonapix"     : "0.0.1",
+        "junit"        : "5.8.2"
 ]
 
 ext.packages = [
-        "gradle"     : "com.android.tools.build:gradle:${versions.gradle}",
-        "kotlin"     : [
+        "gradle"   : "com.android.tools.build:gradle:${versions.gradle}",
+        "kotlin"   : [
                 "plugin"              : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                 "core"                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
                 "poet"                : "com.squareup:kotlinpoet:${versions.poet}",
@@ -28,46 +29,51 @@ ext.packages = [
                 "serialization_plugin": "org.jetbrains.kotlin:kotlin-serialization:${versions.kotlin}",
                 "serialization_core"  : "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}",
         ],
-        "androidx"   : [
-                "core"        : "androidx.core:core-ktx:${versions.core}",
-                "appcompat"   : "androidx.appcompat:appcompat:${versions.appcompat}"
+        "androidx" : [
+                "core"     : "androidx.core:core-ktx:${versions.core}",
+                "appcompat": "androidx.appcompat:appcompat:${versions.appcompat}"
         ],
-        "detekt"     : [
+        "detekt"   : [
                 "plugin"    : "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${versions.detekt}",
                 "formatting": "io.gitlab.arturbosch.detekt:detekt-formatting:${versions.detekt}"
         ],
-        "ktlint"     : [
+        "ktlint"   : [
                 "plugin": "org.jlleitschuh.gradle:ktlint-gradle:${versions.ktlint}"
         ],
-        "retrofit"   : [
+        "retrofit" : [
                 "core": "com.squareup.retrofit2:retrofit:${versions.retrofit}"
         ],
-        "retromock"  : [
+        "retromock": [
                 "core": "co.infinum:retromock:${versions.retromock}"
         ],
-        "hilt"       : [
-                "core": "com.google.dagger:hilt-android:${versions.hilt}",
+        "hilt"     : [
+                "core"    : "com.google.dagger:hilt-android:${versions.hilt}",
                 "compiler": "com.google.dagger:hilt-compiler:${versions.hilt}",
-                "plugin": "com.google.dagger:hilt-android-gradle-plugin:${versions.hilt}"
+                "plugin"  : "com.google.dagger:hilt-android-gradle-plugin:${versions.hilt}"
         ],
-        "lifecycle"  : [
-                "runtime": "androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycle}",
-                "common": "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}",
+        "lifecycle": [
+                "runtime"  : "androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycle}",
+                "common"   : "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}",
                 "viewmodel": "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"
         ],
-        "activity"   : [
+        "activity" : [
                 "core": "androidx.activity:activity-ktx:${versions.activity}"
         ],
-        "fragment"   : [
+        "fragment" : [
                 "core": "androidx.fragment:fragment-ktx:${versions.fragment}"
         ],
-        "material"   : "com.google.android.material:material:${versions.material}",
-        "dokka"      : [
+        "material" : "com.google.android.material:material:${versions.material}",
+        "dokka"    : [
                 "plugin": "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}"
         ],
-        "jsonapix"   : [
-                "core": "com.infinum.jsonapix:core:${versions.jsonapix}",
+        "jsonapix" : [
+                "core"     : "com.infinum.jsonapix:core:${versions.jsonapix}",
                 "processor": "com.infinum.jsonapix:processor:${versions.jsonapix}",
-                "retrofit": "com.infinum.jsonapix:retrofit:${versions.jsonapix}",
+                "retrofit" : "com.infinum.jsonapix:retrofit:${versions.jsonapix}",
+        ],
+        "junit"    : [
+                "engine": "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
+                "api"   : "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
+                "params": "org.junit.jupiter:junit-jupiter-params:${versions.junit}"
         ]
 ]
