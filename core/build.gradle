@@ -31,11 +31,6 @@ dependencies {
     implementation packages.kotlin.core
     api project(":annotations")
     compileOnly packages.kotlin.serialization_core
-
-    testImplementation packages.junit.api
-    testRuntimeOnly packages.junit.engine
-    testImplementation packages.junit.params
-    testImplementation packages.mockk.core
 }
 
 compileKotlin {

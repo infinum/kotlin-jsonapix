@@ -200,7 +200,7 @@ internal object ResourceObjectSpecBuilder {
 
         oneRelationships.forEach {
             codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
-            codeBlockBuilder.indent().addStatement("included?.first {")
+            codeBlockBuilder.indent().addStatement("included?.firstOrNull {")
             if (it.value.isNullable) {
                 codeBlockBuilder.indent().addStatement(
                     "safeRelationships.%N?.data == ResourceIdentifier(it.type, it.id)",
