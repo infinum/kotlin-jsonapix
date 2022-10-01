@@ -16,7 +16,8 @@ ext.versions = [
         "material"     : "1.4.0",
         "dokka"        : "1.6.0",
         "jsonapix"     : "0.0.1",
-        "junit"        : "5.8.2"
+        "junit"        : "5.8.2",
+        "mockk"        : "1.12.2",
 ]
 
 ext.packages = [
@@ -75,5 +76,8 @@ ext.packages = [
                 "engine": "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
                 "api"   : "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
                 "params": "org.junit.jupiter:junit-jupiter-params:${versions.junit}"
+        ],
+        "mockk"    : [
+                "core": "io.mockk:mockk:${versions.mockk}",
         ]
 ]
