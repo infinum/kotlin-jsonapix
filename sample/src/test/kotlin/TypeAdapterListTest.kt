@@ -260,6 +260,32 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
+    fun `given that person list second person has null myFavoriteDog and empty allMyDogs type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog and empty allMyDogs rels`() {
+        val personList = listOf(Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+            myFavoriteDog = Dog(name = "Bella", age = 1)
+        ), Person(
+            name = "Jasminka",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = emptyList(),
+            myFavoriteDog = null
+        ))
+
+        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
     fun `given that person list second person has null myFavoriteDog and empty allMyDogs type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog and allMyDogs rels`() {
         val personList = listOf(Person(
             name = "Jason",
@@ -276,6 +302,32 @@ internal class TypeAdapterListTest {
         ))
 
         val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that person list both persons has null myFavoriteDog and allMyDogs type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog and allMyDogs rels`() {
+        val personList = listOf(Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = null
+        ), Person(
+            name = "Jasminka",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = null
+        ))
+
+        val response = getFileAsString("person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
 
         val result = typeListAdapter?.convertToString(personList)
 
