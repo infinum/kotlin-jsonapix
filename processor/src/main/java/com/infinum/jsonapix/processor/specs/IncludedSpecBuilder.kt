@@ -23,7 +23,7 @@ internal object IncludedSpecBuilder {
 
         manyRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*${prop.name}?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }!!.toTypedArray()"
+                "*${prop.name}.mapSafe { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
             )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")

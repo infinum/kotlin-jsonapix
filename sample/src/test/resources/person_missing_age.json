@@ -13,6 +13,7 @@
     "type":"person",
     "id":"1",
     "attributes":{
+      "age":null,
       "name":"Jason",
       "surname":"Apix"
     },

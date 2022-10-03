@@ -96,15 +96,6 @@ internal class TypeAdapterTest {
         )
     }
 
-//    @org.junit.jupiter.api.Test
-//    fun `type adapter Person convertFromString should throw a JsonApiXMissingArgumentException when Person age is missing`() {
-//        val response = getFileAsString("person_missing_age.json")
-//
-//        val result = typeAdapter?.convertFromString(response)
-//
-//        Assertions.assertInstanceOf(kotlinx.serialization.MissingFieldException::class.java, result)
-//    }
-
     @org.junit.jupiter.api.Test
     fun `type adapter Person convertToString should generate a json with many allMyDogs relationships and no one myFavouriteDog relationship`() {
         val person = Person(
@@ -131,10 +122,11 @@ internal class TypeAdapterTest {
             name = "Jason",
             surname = "Apix",
             age = 28,
+            myFavoriteDog = null,
             allMyDogs = emptyList(),
         )
 
-        val response = getFileAsString("person_no_one_rel_empty_many_rel.json")
+        val response = getFileAsString("person_one_rel_null_many_rel_empty.json")
 
         val result = typeAdapter?.convertToString(person)
 
@@ -144,24 +136,24 @@ internal class TypeAdapterTest {
         )
     }
 
-//    @org.junit.jupiter.api.Test
-//    fun `type adapter Person convertToString should generate a json with both one and many rel as null`() {
-//        val person = Person(
-//            name = "Jason",
-//            surname = "Apix",
-//            age = 28,
-//            allMyDogs = null,
-//        )
-//
-//        val response = getFileAsString("person_no_one_rel_empty_many_rel.json")
-//
-//        val result = typeAdapter?.convertToString(person)
-//
-//        Assertions.assertEquals(
-//            response,
-//            result
-//        )
-//    }
+    @org.junit.jupiter.api.Test
+    fun `type adapter Person convertToString should generate a json with both one and many rel as null`() {
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+        )
+
+        val response = getFileAsString("person_one_and_many_rel_as_null.json")
+
+        val result = typeAdapter?.convertToString(person)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
 
     private fun getFileAsString(filename: String): String {
         val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
