@@ -13,3 +13,7 @@ fun <T : Any> requireNotNull(value: T?, missingArgument: String): T {
 inline fun <T, R> Iterable<T>?.mapSafe(transform: (T) -> R): List<R> {
     return this?.map(transform) ?: emptyList()
 }
+
+inline fun <T, R> Iterable<T>?.flatMapSafe(transform: (T) -> Iterable<R>): List<R> {
+    return this?.flatMap(transform) ?: emptyList()
+}

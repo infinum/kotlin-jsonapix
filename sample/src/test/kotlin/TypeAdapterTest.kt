@@ -5,6 +5,7 @@ import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import java.io.InputStreamReader
 
 internal class TypeAdapterTest {
@@ -46,7 +47,7 @@ internal class TypeAdapterTest {
             myFavoriteDog = null
         )
 
-        val response = getFileAsString("person_no_rel.json")
+        val response = getFileAsString("person_no_included_block.json")
 
         val result = typeAdapter?.convertFromString(response)
 
@@ -97,6 +98,13 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
+    fun `given that there is an included block but links set as null in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
+        val response = getFileAsString("person_list_with_both_person_links_set_as_null.json")
+
+        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
+    }
+
+    @org.junit.jupiter.api.Test
     fun `type adapter Person convertToString should generate a json with many allMyDogs relationships and no one myFavouriteDog relationship`() {
         val person = Person(
             name = "Jason",
@@ -143,6 +151,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = null,
+            myFavoriteDog = null
         )
 
         val response = getFileAsString("person_one_and_many_rel_as_null.json")

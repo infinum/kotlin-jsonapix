@@ -117,6 +117,7 @@ object JsonApiConstants {
 
         const val REQUIRE_NOT_NULL = "requireNotNull"
         const val MAP_SAFE = "mapSafe"
+        const val FLAT_MAP_SAFE = "flatMapSafe"
     }
 
     object Statements {

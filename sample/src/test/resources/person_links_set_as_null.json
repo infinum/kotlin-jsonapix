@@ -7,9 +7,7 @@
     "self": "https://root.link.com"
   },
   "data":{
-    "links": {
-      "self": "https://resource.link.com"
-    },
+    "links":null,
     "type":"person",
     "id":"1",
     "attributes":{
@@ -37,5 +35,23 @@
         ]
       }
     }
-  }
+  },
+  "included":[
+    {
+      "type":"dog",
+      "id":"1",
+      "attributes":{
+        "age":1,
+        "name":"Bella"
+      }
+    },
+    {
+      "type":"dog",
+      "id":"2",
+      "attributes":{
+        "age":2,
+        "name":"Bongo"
+      }
+    }
+  ]
 }

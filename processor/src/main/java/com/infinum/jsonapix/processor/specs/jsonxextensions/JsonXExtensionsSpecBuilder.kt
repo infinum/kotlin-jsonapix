@@ -96,6 +96,11 @@ internal class JsonXExtensionsSpecBuilder {
             JsonApiConstants.Imports.MAP_SAFE
         )
 
+        fileSpec.addImport(
+            JsonApiConstants.Packages.CORE_SHARED,
+            JsonApiConstants.Imports.FLAT_MAP_SAFE
+        )
+
         specsMap.entries.forEach {
             fileSpec.addFunction(
                 ResourceObjectFunSpecBuilder.build(
