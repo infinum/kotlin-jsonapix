@@ -116,6 +116,7 @@ object JsonApiConstants {
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
 
         const val REQUIRE_NOT_NULL = "requireNotNull"
+        const val MAP_SAFE = "mapSafe"
     }
 
     object Statements {
