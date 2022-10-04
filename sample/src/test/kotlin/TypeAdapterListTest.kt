@@ -45,12 +45,12 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class list with first person no many rels and second person with full rels`() {
+    fun `given that the response has an included block but first person not having allMyDogs rel type adapter Person convertFromString should generate a Person class list with first person allMyDogs as null and second person with full rels`() {
         val personList = listOf(Person(
             name = "Jason",
             surname = "Apix",
             age = 28,
-            allMyDogs = emptyList(),
+            allMyDogs = null,
             myFavoriteDog = Dog(name = "Bella", age = 1)
         ), Person(
             name = "Jasminka",
@@ -71,7 +71,7 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class list class with first person full rels and second person with no many rels`() {
+    fun `given that the response has included block but second person has no allMyDogs rel type adapter Person convertFromString should generate a Person class list class with first person full rels and second person with allMyDogs as null`() {
         val personList = listOf(Person(
             name = "Jason",
             surname = "Apix",
@@ -82,7 +82,7 @@ internal class TypeAdapterListTest {
             name = "Jasminka",
             surname = "Apix",
             age = 28,
-            allMyDogs = emptyList(),
+            allMyDogs = null,
             myFavoriteDog = Dog(name = "Bongo", age = 2)
         ))
 
@@ -97,12 +97,12 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class list with first person no many rels and null one rel and second person with full rels`() {
+    fun `given that response has an included block but first person no allMyDogs rel and myFavoriteDog set as null type adapter Person convertFromString should generate a Person class list with first person allMyDogs and myFavoriteDog set as null`() {
         val personList = listOf(Person(
             name = "Jason",
             surname = "Apix",
             age = 28,
-            allMyDogs = emptyList(),
+            allMyDogs = null,
             myFavoriteDog = null
         ), Person(
             name = "Jasminka",
@@ -175,18 +175,18 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is an included block but both persons have both rel set as null in response type adapter Person list convertFromString should generate a Person class list with allMyDogs emptyList and myFavoriteDog null for both Persons`() {
+    fun `given that there is an included block but both persons have both rel set as null in response type adapter Person list convertFromString should generate a Person class list with allMyDogs null and myFavoriteDog null for both Persons`() {
         val personList = listOf(Person(
             name = "Jason",
             surname = "Apix",
             age = 28,
-            allMyDogs = emptyList(),
+            allMyDogs = null,
             myFavoriteDog = null
         ), Person(
             name = "Jasminka",
             surname = "Apix",
             age = 28,
-            allMyDogs = emptyList(),
+            allMyDogs = null,
             myFavoriteDog = null
         ))
 
