@@ -118,10 +118,23 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is an included block but links set as null in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
-        val response = getFileAsString("person_links_set_as_null.json")
+    fun `given that there is an included block but all level links set as null in response type adapter Person convertFromString should generate a valid person class with no illegal argument exception`() {
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+            myFavoriteDog = null
+        )
 
-        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
+        val response = getFileAsString("person_all_types_of_links_null.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person,
+            result
+        )
     }
 
     @org.junit.jupiter.api.Test
