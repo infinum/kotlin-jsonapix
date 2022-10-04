@@ -17,9 +17,7 @@
     },
     "relationships":{
       "myFavoriteDog":{
-        "links": {
-          "self": "https://relationship.link.com"
-        },
+        "links":null,
         "data":{
           "type":"dog",
           "id":"1"

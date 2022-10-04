@@ -6,8 +6,12 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonNull
 import kotlinx.serialization.json.jsonObject
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * This Discriminator is made specifically to handle JSON API objects. It leverages the functionality
@@ -41,11 +45,12 @@ class JsonApiDiscriminator(
             val metaObject = getMetaObject(jsonElement)
 
             // Injected objects
-            val newRootLinksObject = rootLinksObject?.let {
-                val linksDiscriminator = CommonDiscriminator(rootLinks)
-                linksDiscriminator.inject(it)
+            val newRootLinksObject = rootLinksObject?.takeIf { it !is JsonNull }?.let {
+                val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
+                resourceLinksDiscriminator.inject(it)
             }
-            val newResourceLinksObject = resourceLinksObject?.let {
+
+            val newResourceLinksObject = resourceLinksObject?.takeIf { it !is JsonNull }?.let {
                 val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
                 resourceLinksDiscriminator.inject(it)
             }
