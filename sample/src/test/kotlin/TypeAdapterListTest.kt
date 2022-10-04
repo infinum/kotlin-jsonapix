@@ -208,7 +208,7 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person list convertToString should generate a json with 2 persons having allMyDogs and myFavouriteDog relationships set with no links`() {
+    fun `given that person list has allMyDogs and myFavoriteDog set type adapter Person list convertToString should generate a json with 2 persons having allMyDogs and myFavouriteDog relationships set with no links`() {
         val personList = listOf(Person(
             name = "Jason",
             surname = "Apix",
