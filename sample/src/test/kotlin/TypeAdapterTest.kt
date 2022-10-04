@@ -58,16 +58,36 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class with one myFavoriteDog relationship and no many relationships`() {
+    fun `given that response has no allMyDogs many rel set type adapter Person convertFromString should generate a Person class with one myFavoriteDog relationship and allMyDogs as null`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
             age = 28,
-            allMyDogs = emptyList(),
+            allMyDogs = null,
             myFavoriteDog = Dog(name = "Bella", age = 1)
         )
 
         val response = getFileAsString("person_one_rel.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that response has allMyDogs many rel set as null type adapter Person convertFromString should generate a Person class with one myFavoriteDog relationship and allMyDogs as null`() {
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = Dog(name = "Bella", age = 1)
+        )
+
+        val response = getFileAsString("person_many_rel_null_with_included.json")
 
         val result = typeAdapter?.convertFromString(response)
 
@@ -155,6 +175,26 @@ internal class TypeAdapterTest {
         )
 
         val response = getFileAsString("person_one_and_many_rel_as_null.json")
+
+        val result = typeAdapter?.convertToString(person)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given a Person with allMyDogs with id set type adapter Person convertToString should generate a json with allMyDogs many rel and correct id set for each dog in both included and relationship blocks`() {
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = null
+        )
+
+        val response = getFileAsString("person_all_my_dogs_with_id_set_for_each_dog.json")
 
         val result = typeAdapter?.convertToString(person)
 

@@ -240,7 +240,7 @@ internal object ResourceObjectSpecBuilder {
                 )
             }
             codeBlockBuilder.unindent().addStatement(
-                "}?.map { it.${JsonApiConstants.Members.ORIGINAL}(included) } as %T",
+                "}?.map { it.${JsonApiConstants.Members.ORIGINAL}(included) }.takeIf { it?.isNotEmpty() == true } as %T",
                 it.value
             )
             if (it.value.isNullable) {
