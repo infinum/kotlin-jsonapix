@@ -138,6 +138,20 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
+    fun `given that there is a null data of person in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
+        val response = getFileAsString("person_invalid_data.json")
+
+        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that there is a null relationship data in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
+        val response = getFileAsString("person_invalid_relationship_data.json")
+
+        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
+    }
+
+    @org.junit.jupiter.api.Test
     fun `given that person has both allMyDogs and myFavoriteDog set type adapter Person convertToString should generate a json with many allMyDogs relationships and myFavouriteDog relationship but links as null`() {
         val person = Person(
             name = "Jason",
