@@ -201,8 +201,41 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is an included block but both persons have both links set as null in response type adapter Person list convertFromString should throw an IllegalArgumentException`() {
-        val response = getFileAsString("person_list_with_both_person_links_set_as_null.json")
+    fun `given that there is an included block but all link types in response are set as null type adapter Person list convertFromString should generate a valid Person list with no illegal argument exception`() {
+        val personList = listOf(Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+            myFavoriteDog = Dog(name = "Bella", age = 1)
+        ), Person(
+            name = "Jasminka",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+            myFavoriteDog = Dog(name = "Bongo", age = 2)
+        ))
+
+        val response = getFileAsString("person_list_all_links_null.json")
+
+        val result = typeListAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            personList,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that there is a null data of person array in response type adapter Person list convertFromString should throw an IllegalArgumentException`() {
+        val response = getFileAsString("person_list_invalid_data.json")
+
+        assertThrows<IllegalArgumentException> { typeListAdapter?.convertFromString(response) }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that there is a null relationship data in response type adapter Person list convertFromString should throw an IllegalArgumentException`() {
+        val response = getFileAsString("person_list_invalid_relationship_data.json")
 
         assertThrows<IllegalArgumentException> { typeListAdapter?.convertFromString(response) }
     }

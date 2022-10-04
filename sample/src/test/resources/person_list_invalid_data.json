@@ -1,0 +1,28 @@
+{
+  "errors": null,
+  "meta": {
+    "owner": "Stef"
+  },
+  "links": {
+    "self": "https://root.link.com"
+  },
+  "data":null,
+  "included": [
+    {
+      "type": "dog",
+      "id": "1",
+      "attributes": {
+        "age": 1,
+        "name": "Bella"
+      }
+    },
+    {
+      "type": "dog",
+      "id": "2",
+      "attributes": {
+        "age": 2,
+        "name": "Bongo"
+      }
+    }
+  ]
+}

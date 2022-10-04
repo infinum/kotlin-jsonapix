@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.jsonArray
@@ -26,7 +27,7 @@ class JsonApiListDiscriminator(
             val rootLinksObject = getLinksObject(jsonElement)
             val metaObject = getMetaObject(jsonElement)
 
-            val newRootLinksObject = rootLinksObject?.let {
+            val newRootLinksObject = rootLinksObject?.takeIf { it !is JsonNull }?.let {
                 val linksDiscriminator = CommonDiscriminator(rootLinks)
                 linksDiscriminator.inject(it)
             }
@@ -49,7 +50,7 @@ class JsonApiListDiscriminator(
                     attributesDiscriminator.inject(it)
                 }
 
-                val newResourceLinksObject = resourceLinksObject?.let {
+                val newResourceLinksObject = resourceLinksObject?.takeIf { it !is JsonNull }?.let {
                     val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
                     resourceLinksDiscriminator.inject(it)
                 }

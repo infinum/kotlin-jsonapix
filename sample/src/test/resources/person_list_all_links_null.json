@@ -3,9 +3,7 @@
   "meta": {
     "owner": "Stef"
   },
-  "links": {
-    "self": "https://root.link.com"
-  },
+  "links":null,
   "data": [
     {
       "links":null,
@@ -18,18 +16,14 @@
       },
       "relationships": {
         "myFavoriteDog": {
-          "links": {
-            "self": "https://relationship.link.com"
-          },
+          "links":null,
           "data": {
             "type": "dog",
             "id": "1"
           }
         },
         "allMyDogs": {
-          "links": {
-            "self": "https://relationship.link.com"
-          },
+          "links":null,
           "data": [
             {
               "type": "dog",
@@ -44,9 +38,7 @@
       }
     },
     {
-      "links": {
-        "self": "https://resource.link.com"
-      },
+      "links":null,
       "type": "person",
       "id": "2",
       "attributes": {
@@ -56,18 +48,14 @@
       },
       "relationships": {
         "myFavoriteDog": {
-          "links": {
-            "self": "https://relationship.link.com"
-          },
+          "links":null,
           "data": {
             "type": "dog",
             "id": "2"
           }
         },
         "allMyDogs": {
-          "links": {
-            "self": "https://relationship.link.com"
-          },
+          "links":null,
           "data": [
             {
               "type": "dog",
