@@ -19,7 +19,7 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person list convertFromString should generate a Person class list with full rels on both list item Person`() {
+    fun `given that response for both persons has all rels set type adapter Person list convertFromString should generate a Person class list with full rels on both list item Person`() {
         val personList = listOf(Person(
             name = "Jason",
             surname = "Apix",

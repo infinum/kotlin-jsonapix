@@ -18,7 +18,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class with allMyDogs many relationships and one myFavouriteDog relationship`() {
+    fun `given that response has both myFavoriteDog one and allMyDogs many rel set type adapter Person convertFromString should generate a Person class with allMyDogs and myFavouriteDog set`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
@@ -38,7 +38,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class with no relationships`() {
+    fun `given that response had no included block but both relationships set type adapter Person convertFromString should generate a Person class with allMyDogs and myFavoriteDog as null`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
@@ -98,7 +98,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertFromString should generate a Person class with many allMyDogs relationships and no one myFavouriteDog relationship`() {
+    fun `given that response has allMyDogs many rel set but no myFavoriteDog one rel set type adapter Person convertFromString should generate a Person class with valid allMyDogs list and myFavouriteDog as null`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
@@ -125,7 +125,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertToString should generate a json with many allMyDogs relationships and no one myFavouriteDog relationship`() {
+    fun `given that person has both allMyDogs and myFavoriteDog set type adapter Person convertToString should generate a json with many allMyDogs relationships and myFavouriteDog relationship but links as null`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
@@ -145,7 +145,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertToString should generate a json with one relationship null and many as empty`() {
+    fun `given that person has myFavoriteDog set as null but allMyDogs as an empty list type adapter Person convertToString should generate a json with one relationship null and many as empty`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
@@ -165,7 +165,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `type adapter Person convertToString should generate a json with both one and many rel as null`() {
+    fun `given that Person has both allMyDogs and myFavoriteDog set as null type adapter Person convertToString should generate a json with both one and many rel as null`() {
         val person = Person(
             name = "Jason",
             surname = "Apix",
