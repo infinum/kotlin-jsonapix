@@ -101,14 +101,14 @@ internal object RelationshipsSpecBuilder {
         oneRelationships.forEachIndexed { index, property ->
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}?.let { %T(%T(%L)) }"
+                    "${property.name} = originalObject.${property.name}?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
                 )
             } else {
-                constructorStringBuilder.append("${property.name} = %T(%T(%L))")
+                constructorStringBuilder.append(
+                    "${property.name} = originalObject.${property.name}.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                )
             }
 
-            builderArgs.add(OneRelationshipMember::class.asClassName())
-            builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
@@ -120,15 +120,13 @@ internal object RelationshipsSpecBuilder {
         manyRelationships.forEachIndexed { index, property ->
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}?.let { %T(it.map { %T(%L) }) }"
+                    "${property.name} = originalObject.${property.name}?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
                 )
             } else {
                 constructorStringBuilder.append(
-                    "${property.name} = %T(originalObject.${property.name}!!.map { %T(%L) })"
+                    "${property.name} = originalObject.${property.name}.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
                 )
             }
-            builderArgs.add(ManyRelationshipMember::class.asClassName())
-            builderArgs.add(ResourceIdentifier::class.asClassName())
             builderArgs.add(getTypeOfRelationship(property))
             if (index != manyRelationships.lastIndex) {
                 constructorStringBuilder.append(", ")

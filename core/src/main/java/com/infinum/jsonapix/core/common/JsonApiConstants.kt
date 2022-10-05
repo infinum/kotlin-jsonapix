@@ -114,6 +114,11 @@ object JsonApiConstants {
             "TypeExtractor"
         )
 
+        val RELATIONSHIP_EXTENSIONS = arrayOf(
+            "toOneRelationshipModel",
+            "toManyRelationshipModel"
+        )
+
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
         const val JSON_API_MODEL = "JsonApiModel"
 
