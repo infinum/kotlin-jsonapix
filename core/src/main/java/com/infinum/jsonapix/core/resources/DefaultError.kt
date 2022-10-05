@@ -9,4 +9,4 @@ class DefaultError(
     @SerialName("title") val title: String,
     @SerialName("detail") val detail: String,
     @SerialName("status") val status: String
-)
+) : Error
