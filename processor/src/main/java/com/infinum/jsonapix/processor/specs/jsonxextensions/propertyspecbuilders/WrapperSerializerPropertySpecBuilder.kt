@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Attributes
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
@@ -120,7 +121,23 @@ internal object WrapperSerializerPropertySpecBuilder {
             )
         }
 
-        customErrors.values.forEach { error ->
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder.addStatement(
+            "%M(%T::class) {",
+            polymorpicMember,
+            Error::class.asClassName()
+        )
+
+        codeBlockBuilder.indent()
+
+        codeBlockBuilder.addStatement(
+            "%M(%T::class)",
+            subclassMember,
+            DefaultError::class.asClassName()
+        )
+
+        customErrors.forEach { error ->
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,
