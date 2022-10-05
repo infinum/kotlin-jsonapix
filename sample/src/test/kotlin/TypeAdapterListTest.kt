@@ -370,6 +370,32 @@ internal class TypeAdapterListTest {
         )
     }
 
+    @org.junit.jupiter.api.Test
+    fun `given a Person list with allMyDogs with id set type adapter list Person convertToString should generate a json with person array and allMyDogs many rel and correct id set for each dog in both included and relationship blocks`() {
+        val personList = listOf(Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = null
+        ), Person(
+            name = "Jasminka",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = null
+        ))
+
+        val response = getFileAsString("person_list_all_my_dogs_with_id_set_for_each_dog.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
     private fun getFileAsString(filename: String): String {
         val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
         val fileReader: InputStreamReader? = fileStream?.reader()
