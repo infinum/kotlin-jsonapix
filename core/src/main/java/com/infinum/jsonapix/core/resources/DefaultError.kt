@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Error(
+class DefaultError(
     @SerialName("code") val code: String,
     @SerialName("title") val title: String,
     @SerialName("detail") val detail: String,
