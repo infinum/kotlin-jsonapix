@@ -106,6 +106,7 @@ public object TypeAdapterListSpecBuilder {
             .addStatement("safeModel.setId(resource.id)")
             .addStatement("safeModel.setRootLinks(data.links)")
             .addStatement("safeModel.setResourceLinks(resource.links)")
+            .addStatement("safeModel.setErrors(data.errors)")
             .addStatement("safeModel.setMeta(data.meta)")
             .addStatement("resource.relationshipsLinks()?.let {")
             .addStatement("relationshipLinks -> safeModel.setRelationshipsLinks(relationshipLinks)")

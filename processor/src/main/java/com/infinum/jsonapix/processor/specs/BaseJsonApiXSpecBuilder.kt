@@ -2,6 +2,7 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.DefaultError
+import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.ResourceObject
@@ -41,7 +42,7 @@ internal abstract class BaseJsonApiXSpecBuilder {
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.ERRORS,
-                List::class.parameterizedBy(DefaultError::class)
+                List::class.parameterizedBy(Error::class)
                     .copy(nullable = true)
             ).defaultValue("%L", "null")
                 .build()
@@ -86,7 +87,7 @@ internal abstract class BaseJsonApiXSpecBuilder {
 
     private fun errorsProperty(): PropertySpec = PropertySpec.builder(
         JsonApiConstants.Keys.ERRORS,
-        List::class.parameterizedBy(DefaultError::class).copy(nullable = true),
+        List::class.parameterizedBy(Error::class).copy(nullable = true),
         KModifier.OVERRIDE
     )
         .addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ERRORS))

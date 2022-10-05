@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.ui.examples.error
 
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
 import com.infinum.jsonapix.retrofit.asJsonXHttpException
@@ -22,7 +23,13 @@ class ErrorViewModel @Inject constructor(
             try {
                 val person = io { sampleApiService.fetchError() }
             } catch (e: HttpException) {
-                showError(e.asJsonXHttpException().errors?.first()?.detail ?: "")
+                e.asJsonXHttpException().errors?.first()?.let {
+                    if (it is DefaultError) {
+                        showError(it.detail)
+                    } else {
+                        showError("Not a default error")
+                    }
+                } ?: showError("Unable to parse to JsonXHttpException")
             }
 
             hideLoading()

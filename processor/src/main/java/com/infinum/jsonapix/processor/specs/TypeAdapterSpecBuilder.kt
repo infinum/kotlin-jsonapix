@@ -93,6 +93,7 @@ public object TypeAdapterSpecBuilder {
             .addStatement("it.setId(data.data?.id)")
             .addStatement("it.setRootLinks(data.links)")
             .addStatement("it.setResourceLinks(data.data?.links)")
+            .addStatement("it.setErrors(data.errors)")
             .addStatement("data.data?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")
             .addStatement("it.setMeta(data.meta)")
             .addStatement("}")
@@ -105,6 +106,14 @@ public object TypeAdapterSpecBuilder {
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
             .addStatement("return %S", links)
+            .build()
+    }
+
+    private fun errorsFunSpec(errors: String): FunSpec {
+        return FunSpec.builder(JsonApiConstants.Keys.ERRORS)
+            .addModifiers(KModifier.OVERRIDE)
+            .returns(String::class)
+            .addStatement("return %S", errors)
             .build()
     }
 

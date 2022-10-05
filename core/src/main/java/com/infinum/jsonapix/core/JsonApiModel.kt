@@ -1,5 +1,7 @@
 package com.infinum.jsonapix.core
 
+import com.infinum.jsonapix.core.resources.Error
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
@@ -10,6 +12,7 @@ abstract class JsonApiModel {
     private var rootLinks: Links? = null
     private var resourceLinks: Links? = null
     private var relationshipLinks: Map<String, Links?>? = null
+    private var errors: List<Error>? = null
     private var meta: Meta? = null
 
     fun setId(id: String?) {
@@ -18,6 +21,10 @@ abstract class JsonApiModel {
 
     fun setRootLinks(links: Links?) {
         rootLinks = links
+    }
+
+    fun setErrors(errors: List<Error>?) {
+        this.errors = errors
     }
 
     fun setResourceLinks(links: Links?) {
@@ -35,6 +42,8 @@ abstract class JsonApiModel {
     fun id(): String? = id
 
     fun rootLinks(): DefaultLinks? = rootLinks as? DefaultLinks
+
+    fun errors(): List<Error>? = errors as? List<DefaultError>
 
     fun <T : Links> rootLinks(): T? = rootLinks as? T
 
