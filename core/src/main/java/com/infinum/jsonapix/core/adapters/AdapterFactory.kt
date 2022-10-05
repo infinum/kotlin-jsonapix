@@ -10,4 +10,5 @@ interface AdapterFactory {
 
 inline fun <reified T> AdapterFactory.getAdapter(): TypeAdapter<T>? = getAdapter(T::class) as? TypeAdapter<T>
 
-inline fun <reified T> AdapterFactory.getListAdapter(): TypeAdapter<List<T>>? = getListAdapter(T::class) as? TypeAdapter<List<T>>
+inline fun <reified T> AdapterFactory.getListAdapter(): TypeAdapter<List<T>>? =
+    getListAdapter(T::class) as? TypeAdapter<List<T>>
