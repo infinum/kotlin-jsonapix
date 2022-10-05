@@ -23,6 +23,7 @@ internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
     private val customLinks = mutableListOf<ClassName>()
+    private val customErrors = mutableMapOf<String, ClassName>()
     private val metas = mutableMapOf<String, ClassName>()
 
     @SuppressWarnings("LongParameterList")
@@ -52,6 +53,11 @@ internal class JsonXExtensionsSpecBuilder {
     fun addCustomLinks(links: List<ClassName>) {
         customLinks.clear()
         customLinks.addAll(links)
+    }
+
+    fun addCustomErrors(map: Map<String, ClassName>) {
+        customErrors.clear()
+        customErrors.putAll(map)
     }
 
     fun addCustomMetas(map: Map<String, ClassName>) {
@@ -118,7 +124,7 @@ internal class JsonXExtensionsSpecBuilder {
             fileSpec.addFunction(SerializeListFunSpecBuilder.build(it.key))
         }
 
-        fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, metas))
+        fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, customErrors, metas))
         fileSpec.addProperty(FormatPropertySpecBuilder.build())
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())

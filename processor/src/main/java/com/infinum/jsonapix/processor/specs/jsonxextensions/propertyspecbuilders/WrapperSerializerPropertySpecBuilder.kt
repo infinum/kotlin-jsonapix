@@ -26,6 +26,7 @@ internal object WrapperSerializerPropertySpecBuilder {
     fun build(
         specsMap: HashMap<ClassName, ClassInfo>,
         customLinks: List<ClassName>,
+        customErrors: Map<String, ClassName>,
         metas: Map<String, ClassName>
     ): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
@@ -116,6 +117,14 @@ internal object WrapperSerializerPropertySpecBuilder {
                 "%M(%T::class)",
                 subclassMember,
                 link
+            )
+        }
+
+        customErrors.values.forEach { error ->
+            codeBlockBuilder.addStatement(
+                "%M(%T::class)",
+                subclassMember,
+                error
             )
         }
 
