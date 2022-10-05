@@ -1,2 +1,2 @@
-include ":processor", ":annotations", ":core", ":sample", ":retrofit"
+include ":processor", ":annotations", ":core", ":sample", ":retrofit", ':lint'
 rootProject.name = "android-jsonapix"

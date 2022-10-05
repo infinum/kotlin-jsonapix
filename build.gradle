@@ -38,7 +38,8 @@ task detektAll(dependsOn: [
         ':core:detekt',
         ':processor:detekt',
         ':sample:detekt',
-        ':retrofit:detekt'
+        ':retrofit:detekt',
+        ':lint:detekt'
 ]) {
     group = "Verification"
     description = "Run detekt on all modules"
@@ -49,7 +50,8 @@ task ktlintAll(dependsOn: [
         ':core:ktlintCheck',
         ':processor:ktlintCheck',
         ':sample:ktlintCheck',
-        ':retrofit:ktlintCheck'
+        ':retrofit:ktlintCheck',
+        ':lint:ktlintCheck'
 ]) {
     group = "Verification"
     description = "Run ktlint on all modules"
