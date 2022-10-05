@@ -130,6 +130,7 @@ internal object ResourceObjectSpecBuilder {
         return FileSpec.builder(className.packageName, generatedName)
             .addImport(JsonApiConstants.Packages.CORE_RESOURCES, JsonApiConstants.Imports.RESOURCE_IDENTIFIER)
             .addImport(JsonApiConstants.Packages.CORE_SHARED, JsonApiConstants.Imports.REQUIRE_NOT_NULL)
+            .addImport(JsonApiConstants.Packages.CORE, JsonApiConstants.Imports.JSON_API_MODEL)
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
@@ -169,6 +170,8 @@ internal object ResourceObjectSpecBuilder {
         oneRelationships: Map<String, TypeName>,
         manyRelationships: Map<String, TypeName>
     ): FunSpec {
+        val tempVariableName = "tempOriginal"
+
         val builder = FunSpec.builder(JsonApiConstants.Members.ORIGINAL)
         builder.addModifiers(KModifier.OVERRIDE)
         builder.returns(className)
@@ -180,7 +183,7 @@ internal object ResourceObjectSpecBuilder {
         )
 
         val codeBlockBuilder = CodeBlock.builder()
-        codeBlockBuilder.addStatement("return %T(", className).indent()
+        codeBlockBuilder.addStatement("val $tempVariableName = %T(", className).indent()
         attributes.forEach {
             if (it.type.isNullable) {
                 codeBlockBuilder.addStatement(
@@ -254,6 +257,13 @@ internal object ResourceObjectSpecBuilder {
             }
         }
         codeBlockBuilder.addStatement(")")
+
+        codeBlockBuilder.beginControlFlow("($tempVariableName as? JsonApiModel)?.let")
+        codeBlockBuilder.addStatement("$tempVariableName.setType(type)")
+        codeBlockBuilder.addStatement("$tempVariableName.setId(id)")
+        codeBlockBuilder.endControlFlow()
+
+        codeBlockBuilder.addStatement("return $tempVariableName")
 
         return builder.addCode(codeBlockBuilder.build().toString()).build()
     }
