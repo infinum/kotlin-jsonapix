@@ -43,7 +43,7 @@ class JsonApiDiscriminator(
 
             // Injected objects
             val newRootLinksObject = rootLinksObject?.takeIf { it !is JsonNull }?.let {
-                val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
+                val resourceLinksDiscriminator = CommonDiscriminator(rootLinks)
                 resourceLinksDiscriminator.inject(it)
             }
 
