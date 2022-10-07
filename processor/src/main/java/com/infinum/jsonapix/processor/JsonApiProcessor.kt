@@ -215,7 +215,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
             linksInfo?.relationshipsLinks,
-            customMetas[type]?.canonicalName
+            customMetas[type]?.canonicalName,
+            customErrors[type]?.canonicalName
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
@@ -223,7 +224,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
             linksInfo?.relationshipsLinks,
-            customMetas[type]?.canonicalName
+            customMetas[type]?.canonicalName,
+            customErrors[type]?.canonicalName
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))

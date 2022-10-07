@@ -14,8 +14,9 @@ class JsonApiListDiscriminator(
     private val rootLinks: String,
     private val resourceObjectLinks: String,
     relationshipsLinks: String,
-    meta: String
-) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta) {
+    meta: String,
+    error: String
+) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta, error) {
 
     // TODO Handle those in a future PR
     @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught", "LongMethod")
@@ -32,14 +33,8 @@ class JsonApiListDiscriminator(
                 linksDiscriminator.inject(it)
             }
 
-            val errorsArray = errorsObject?.jsonArray?.let {
-                buildJsonArray {
-                    it.forEach { jsonElement ->
-                        val errorDiscriminator =
-                            CommonDiscriminator(JsonApiConstants.Prefix.ERROR.withName(TypeExtractor.findType(jsonElement)))
-                        add(errorDiscriminator.inject(jsonElement))
-                    }
-                }
+            val newErrorsArray = errorsObject?.let {
+                getNewErrorsArray(it)
             }
 
             dataArray?.jsonArray?.forEach { dataObject ->
@@ -94,7 +89,7 @@ class JsonApiListDiscriminator(
                 dataArray = newDataArray,
                 includedArray = newIncludedArray,
                 linksObject = newRootLinksObject,
-                errorsArray = errorsArray,
+                errorsArray = newErrorsArray,
                 metaObject = newMetaObject
             )
             return rootDiscriminator.inject(newJsonElement)

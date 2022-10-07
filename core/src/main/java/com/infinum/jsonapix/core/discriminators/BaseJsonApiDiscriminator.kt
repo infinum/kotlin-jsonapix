@@ -13,7 +13,8 @@ import kotlinx.serialization.json.jsonObject
 abstract class BaseJsonApiDiscriminator(
     rootType: String,
     private val relationshipsLinks: String,
-    private val meta: String
+    private val meta: String,
+    private val error: String
 ) : Discriminator {
 
     val rootDiscriminator = CommonDiscriminator(rootType)
@@ -105,6 +106,19 @@ abstract class BaseJsonApiDiscriminator(
             resultMap[relationshipEntry.key] = JsonObject(tempMap)
         }
         return JsonObject(resultMap)
+    }
+
+    fun getNewErrorsArray(
+        original: JsonElement
+    ): JsonArray {
+        val resultMap = mutableMapOf<String, JsonElement>()
+        val errorDiscriminator = CommonDiscriminator(error)
+
+        return buildJsonArray {
+            original.jsonArray.forEach { errorEntry ->
+                add(errorDiscriminator.inject(errorEntry))
+            }
+        }
     }
 
     fun buildRootDiscriminatedIncludedArray(jsonElement: JsonElement) =

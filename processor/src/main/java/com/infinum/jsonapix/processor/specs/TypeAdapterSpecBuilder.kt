@@ -19,7 +19,8 @@ public object TypeAdapterSpecBuilder {
         rootLinks: String?,
         resourceObjectLinks: String?,
         relationshipsLinks: String?,
-        meta: String?
+        meta: String?,
+        errors: String?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER.withName(className.simpleName)
         val typeAdapterClassName = ClassName(
@@ -47,6 +48,9 @@ public object TypeAdapterSpecBuilder {
                         if (meta != null) {
                             addFunction(metaFunSpec(meta))
                         }
+                        if(errors != null) {
+                            addFunction(errorsFunSpec(errors))
+                        }
                     }
                     .build()
             )
@@ -64,12 +68,13 @@ public object TypeAdapterSpecBuilder {
             .addParameter("input", className)
             .returns(String::class)
             .addStatement(
-                "return input.%N(%N(), %N(), %N(), %N())",
+                "return input.%N(%N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_SERIALIZE,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META
+                JsonApiConstants.Keys.META,
+                JsonApiConstants.Keys.ERRORS
             )
             .build()
     }
@@ -80,13 +85,14 @@ public object TypeAdapterSpecBuilder {
             .addParameter("input", String::class)
             .returns(className)
             .addStatement(
-                "val data = input.%N<%T>(%N(), %N(), %N(), %N())",
+                "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_DESERIALIZE,
                 className,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META
+                JsonApiConstants.Keys.META,
+                JsonApiConstants.Keys.ERRORS
             )
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("(original as? %T)?.let {", JsonApiModel::class)

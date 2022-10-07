@@ -142,7 +142,7 @@ internal object WrapperSerializerPropertySpecBuilder {
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,
-                error
+                error.value
             )
         }
 

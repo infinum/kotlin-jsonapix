@@ -34,6 +34,7 @@ internal object DeserializeFunSpecBuilder {
             .addTypeVariable(typeVariableName.copy(reified = true))
             .addParameters(linksParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
+            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(JsonApiX::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
                 "val type = %T.%M(%T.%L(this).%M[%S]!!)",
@@ -45,13 +46,14 @@ internal object DeserializeFunSpecBuilder {
                 JsonApiConstants.Keys.DATA
             )
             .addStatement(
-                "val discriminator = %T(%L, %L, %L, %L, %L)",
+                "val discriminator = %T(%L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class,
                 JsonApiConstants.Keys.TYPE,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META
+                JsonApiConstants.Keys.META,
+                JsonApiConstants.Keys.ERRORS
             )
             .addStatement(
                 "val jsonElement = %T.%L(this)",

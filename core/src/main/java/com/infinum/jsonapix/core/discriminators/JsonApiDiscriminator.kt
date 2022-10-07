@@ -26,8 +26,9 @@ class JsonApiDiscriminator(
     private val rootLinks: String,
     private val resourceObjectLinks: String,
     relationshipsLinks: String,
-    meta: String
-) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta) {
+    meta: String,
+    error: String
+) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, meta, error) {
 
     @SuppressWarnings("SwallowedException", "LongMethod")
     override fun inject(jsonElement: JsonElement): JsonElement {
@@ -53,17 +54,8 @@ class JsonApiDiscriminator(
                 resourceLinksDiscriminator.inject(it)
             }
 
-            val errorsArray = errorsObject?.jsonArray?.let {
-                buildJsonArray {
-                    it.forEach { jsonElement ->
-                        val errorDiscriminator = CommonDiscriminator(
-                            JsonApiConstants.Prefix.ERROR.withName(
-                                TypeExtractor.findType(it)
-                            )
-                        )
-                        add(errorDiscriminator.inject(jsonElement))
-                    }
-                }
+            val newErrorsArray = errorsObject?.let {
+                getNewErrorsArray(it)
             }
 
             val newRelationshipsObject = relationshipsObject?.let {
@@ -100,7 +92,7 @@ class JsonApiDiscriminator(
                 dataObject = newDataObject,
                 includedArray = newIncludedArray,
                 linksObject = newRootLinksObject,
-                errorsArray = errorsArray,
+                errorsArray = newErrorsArray,
                 metaObject = newMetaObject
             )
             return rootDiscriminator.inject(newJsonElement)
