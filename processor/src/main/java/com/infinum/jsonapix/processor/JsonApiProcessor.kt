@@ -83,7 +83,7 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         collector.addCustomMetas(customMetas)
 
-        processCustomErrorAnnotation(roundEnv)
+        processErrorAnnotation(roundEnv)
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
@@ -233,7 +233,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         typeAdapterListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 
-    private fun processCustomErrorAnnotation(roundEnv: RoundEnvironment?) {
+    private fun processErrorAnnotation(roundEnv: RoundEnvironment?) {
         roundEnv?.getElementsAnnotatedWith(JsonApiXError::class.java).orEmpty().forEach {
             val type = it.getAnnotationParameterValue<JsonApiXError, String> { type }
             val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())

@@ -31,6 +31,7 @@ object JsonApiConstants {
         const val RELATIONSHIPS = "Relationships_"
         const val TYPE_ADAPTER = "TypeAdapter_"
         const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
+        const val ERROR = "Error_"
 
         fun String.withName(name: String): String = "$this$name"
     }
@@ -68,6 +69,7 @@ object JsonApiConstants {
         const val ROOT_LINKS = "rootLinks"
         const val RESOURCE_OBJECT_LINKS = "resourceObjectLinks"
         const val RELATIONSHIPS_LINKS = "relationshipsLinks"
+        const val ERRORS = "errors"
     }
 
     object Packages {

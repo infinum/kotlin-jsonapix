@@ -7,6 +7,8 @@ import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 /**
@@ -35,6 +37,7 @@ class JsonApiDiscriminator(
             val relationshipsObject = getRelationshipsObject(jsonElement)
             val attributesObject = getAttributesObject(jsonElement)
             val rootLinksObject = getLinksObject(jsonElement)
+            val errorsObject = getErrorsObject(jsonElement)
             val resourceLinksObject = dataObject?.let {
                 getLinksObject(it)
             }
@@ -48,6 +51,19 @@ class JsonApiDiscriminator(
             val newResourceLinksObject = resourceLinksObject?.let {
                 val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
                 resourceLinksDiscriminator.inject(it)
+            }
+
+            val errorsArray = errorsObject?.jsonArray?.let {
+                buildJsonArray {
+                    it.forEach { jsonElement ->
+                        val errorDiscriminator = CommonDiscriminator(
+                            JsonApiConstants.Prefix.ERROR.withName(
+                                TypeExtractor.findType(it)
+                            )
+                        )
+                        add(errorDiscriminator.inject(jsonElement))
+                    }
+                }
             }
 
             val newRelationshipsObject = relationshipsObject?.let {
@@ -84,6 +100,7 @@ class JsonApiDiscriminator(
                 dataObject = newDataObject,
                 includedArray = newIncludedArray,
                 linksObject = newRootLinksObject,
+                errorsArray = errorsArray,
                 metaObject = newMetaObject
             )
             return rootDiscriminator.inject(newJsonElement)
@@ -103,11 +120,13 @@ class JsonApiDiscriminator(
                 rootDiscriminator.extract(it)
             }
             val includedArray = buildRootDiscriminatedIncludedArray(jsonElement)
+            val errorsArray = buildRootDiscriminatedErrorsArray(jsonElement)
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 original = jsonElement,
                 includedArray = includedArray,
                 dataObject = dataObject,
                 linksObject = null,
+                errorsArray = errorsArray,
                 metaObject = null
             )
             return rootDiscriminator.extract(newJsonElement)
@@ -131,9 +150,10 @@ class JsonApiDiscriminator(
         dataObject: JsonElement?,
         includedArray: JsonArray?,
         linksObject: JsonElement?,
+        errorsArray: JsonArray?,
         metaObject: JsonElement?
     ): JsonObject {
-        return getDiscriminatedBaseEntries(original, includedArray, linksObject, metaObject).let { entries ->
+        return getDiscriminatedBaseEntries(original, includedArray, linksObject, errorsArray, metaObject).let { entries ->
             dataObject?.let { data ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.DATA }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.DATA, data))

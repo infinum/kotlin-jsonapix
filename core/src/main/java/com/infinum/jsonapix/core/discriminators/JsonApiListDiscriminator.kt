@@ -24,11 +24,22 @@ class JsonApiListDiscriminator(
             val dataArray = getDataObject(jsonElement)
             val newDataEntries = mutableListOf<JsonElement>()
             val rootLinksObject = getLinksObject(jsonElement)
+            val errorsObject = getErrorsObject(jsonElement)
             val metaObject = getMetaObject(jsonElement)
 
             val newRootLinksObject = rootLinksObject?.let {
                 val linksDiscriminator = CommonDiscriminator(rootLinks)
                 linksDiscriminator.inject(it)
+            }
+
+            val errorsArray = errorsObject?.jsonArray?.let {
+                buildJsonArray {
+                    it.forEach { jsonElement ->
+                        val errorDiscriminator =
+                            CommonDiscriminator(JsonApiConstants.Prefix.ERROR.withName(TypeExtractor.findType(jsonElement)))
+                        add(errorDiscriminator.inject(jsonElement))
+                    }
+                }
             }
 
             dataArray?.jsonArray?.forEach { dataObject ->
@@ -83,6 +94,7 @@ class JsonApiListDiscriminator(
                 dataArray = newDataArray,
                 includedArray = newIncludedArray,
                 linksObject = newRootLinksObject,
+                errorsArray = errorsArray,
                 metaObject = newMetaObject
             )
             return rootDiscriminator.inject(newJsonElement)
@@ -103,11 +115,13 @@ class JsonApiListDiscriminator(
                 rootDiscriminator.extract(it)
             }
             val includedArray = buildRootDiscriminatedIncludedArray(jsonElement)
+            val errorsArray = buildRootDiscriminatedErrorsArray(jsonElement)
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 original = jsonElement,
                 includedArray = includedArray,
                 dataArray = dataArray?.jsonArray,
                 linksObject = null,
+                errorsArray = errorsArray,
                 metaObject = null
             )
             return rootDiscriminator.extract(newJsonElement)
@@ -131,9 +145,10 @@ class JsonApiListDiscriminator(
         dataArray: JsonArray?,
         includedArray: JsonArray?,
         linksObject: JsonElement?,
+        errorsArray: JsonArray?,
         metaObject: JsonElement?
     ): JsonObject {
-        return getDiscriminatedBaseEntries(original, includedArray, linksObject, metaObject).let { entries ->
+        return getDiscriminatedBaseEntries(original, includedArray, linksObject, errorsArray, metaObject).let { entries ->
             dataArray?.let { data ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.DATA }
                 entries.add(getJsonArrayEntry(JsonApiConstants.Keys.DATA, data))

@@ -50,6 +50,9 @@ abstract class BaseJsonApiDiscriminator(
     fun getMetaObject(jsonElement: JsonElement) =
         jsonElement.jsonObject[JsonApiConstants.Keys.META]
 
+    fun getErrorsObject(jsonElement: JsonElement) =
+        jsonElement.jsonObject[JsonApiConstants.Keys.ERRORS]
+
     fun getJsonObjectEntry(key: String, data: JsonElement): Map.Entry<String, JsonElement> {
         return object : Map.Entry<String, JsonElement> {
             override val key: String = key
@@ -113,6 +116,15 @@ abstract class BaseJsonApiDiscriminator(
             }
         }
 
+    fun buildRootDiscriminatedErrorsArray(jsonElement: JsonElement) =
+        getErrorsObject(jsonElement)?.let { errors ->
+            buildJsonArray {
+                errors.jsonArray.forEach {
+                    add(rootDiscriminator.extract(it))
+                }
+            }
+        }
+
     fun buildTypeDiscriminatedIncludedArray(jsonElement: JsonElement) =
         getIncludedArray(jsonElement)?.let { included ->
             buildJsonArray {
@@ -132,6 +144,7 @@ abstract class BaseJsonApiDiscriminator(
         original: JsonElement,
         includedArray: JsonArray?,
         linksObject: JsonElement?,
+        errorsArray: JsonArray?,
         metaObject: JsonElement?
     ): MutableSet<Map.Entry<String, JsonElement>> {
         original.jsonObject.entries.toMutableSet().let { entries ->
@@ -143,6 +156,11 @@ abstract class BaseJsonApiDiscriminator(
             linksObject?.let { links ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
+            errorsArray?.let { errors ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.ERRORS }
+                entries.add(getJsonArrayEntry(JsonApiConstants.Keys.ERRORS, errors))
             }
 
             metaObject?.let { meta ->

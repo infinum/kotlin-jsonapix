@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.ui.shared
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -25,6 +26,7 @@ abstract class BaseViewModel<State, Event> : ViewModel() {
     val errorFlow: SharedFlow<ErrorEvent> = mutableErrorFlow
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
+        Log.e("NIKOLA", "error = $t")
         hideLoading()
     }
 
