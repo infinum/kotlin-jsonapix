@@ -128,7 +128,7 @@ A single error is modeled to wrap the most common arguments of an error. Develop
 this model.
 
 ```kotlin
-class DefaultError(
+class Error(
     val code: String,
     val title: String,
     val detail: String,
