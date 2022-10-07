@@ -100,6 +100,9 @@ listAdapter.convertToString(person) // Produces JSON API String from a Person li
 listAdapter.convertFromString(inputJsonString) // Produces Person list from JSON API String
 ```
 
+In some cases, a need for custom modification of certain aspects of model classes is preferred. With this in mind, we've enabled the option for clients to customize 
+JsonApiModel if such a need occurs. Clients are able to set optional params on a model class such as links or meta(explained in its own chapter), but also to customize the default `id` of a model. Clients can simply set/get `id` on a JsonApiModel depending on the case at hand.
+
 ### Nullability
 
 JsonApiX relies on the `included` JSON array from the JSON API specification when deserializing relationships. If the input JSON API string
@@ -145,24 +148,6 @@ try {
     // Handle errors
 }
 ```
-
-## Custom error
-
-Developers can define their own custom error models to adapt to the specific requirements.
-
-Let's take this custom person error model as an example. 
-Every custom error model must should extend the `Error` interface and have a `JsonApiXError` annotation. 
-
-```kotlin
-@Serializable
-@JsonApiXError(type = "person")
-data class PersonError(
-    val code: String,
-    val title: String
-) : Error
-```
-
-In this example, the annotation processor will automatically make the error type of a `Person` class to be a `PersonError` and use it as a type when deserializing errors array. Developer needs to make sure that the `type` parameter value in `JsonApiXError` matches the one in the `JsonApiX` above the original model.
 
 ## JsonApiModel - Handling `links` and `meta` JSON API fields
 
