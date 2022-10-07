@@ -117,7 +117,7 @@ abstract class BaseJsonApiDiscriminator(
         }
 
     fun buildTypeDiscriminatedIncludedArray(jsonElement: JsonElement) =
-        getIncludedArray(jsonElement)?.let { included ->
+        getIncludedArray(jsonElement)?.takeIf { it !is JsonNull }?.let { included ->
             buildJsonArray {
                 included.jsonArray.forEach {
                     val includedDiscriminator =
