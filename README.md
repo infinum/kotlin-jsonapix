@@ -1,6 +1,6 @@
 # **JsonApiX**
 
-- JSON API X is a Kotlin multiplatform, annotation processor library
+- JSON API X is an Android, annotation processor library with the intention of extending it to a KMM library in due time
 - Implements a parser between Kotlin classes and JSON API specification strings in both directions
 - Includes Retrofit module for easy API implementations
 
@@ -125,7 +125,7 @@ A single error is modeled to wrap the most common arguments of an error. Develop
 this model.
 
 ```kotlin
-class Error(
+class DefaultError(
     val code: String,
     val title: String,
     val detail: String,
@@ -145,6 +145,24 @@ try {
     // Handle errors
 }
 ```
+
+## Custom error
+
+Developers can define their own custom error models to adapt to the specific requirements.
+
+Let's take this custom person error model as an example. 
+Every custom error model must should extend the `Error` interface and have a `JsonApiXError` annotation. 
+
+```kotlin
+@Serializable
+@JsonApiXError(type = "person")
+data class PersonError(
+    val code: String,
+    val title: String
+) : Error
+```
+
+In this example, the annotation processor will automatically make the error type of a `Person` class to be a `PersonError` and use it as a type when deserializing errors array. Developer needs to make sure that the `type` parameter value in `JsonApiXError` matches the one in the `JsonApiX` above the original model.
 
 ## JsonApiModel - Handling `links` and `meta` JSON API fields
 
