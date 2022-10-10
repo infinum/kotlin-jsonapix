@@ -1,6 +1,6 @@
 package com.infinum.jsonapix.ui.examples.error
 
-import com.infinum.jsonapix.asJsonXApiException
+import com.infinum.jsonapix.asJsonXHttpException
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
 import com.infinum.jsonapix.data.models.PersonalError
@@ -23,7 +23,7 @@ class ErrorViewModel @Inject constructor(
             try {
                 val person = io { sampleApiService.fetchError() }
             } catch (e: HttpException) {
-                val exc = e.asJsonXApiException<PersonalError>()
+                val exc = e.asJsonXHttpException<PersonalError>()
                 exc.errors?.first()?.let {
                     if (it is PersonalError) {
                         showError(it.desc)
