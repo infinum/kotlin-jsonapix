@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.jsonArray
@@ -26,7 +27,7 @@ class JsonApiListDiscriminator(
             val rootLinksObject = getLinksObject(jsonElement)
             val metaObject = getMetaObject(jsonElement)
 
-            val newRootLinksObject = rootLinksObject?.let {
+            val newRootLinksObject = rootLinksObject?.takeIf { it !is JsonNull }?.let {
                 val linksDiscriminator = CommonDiscriminator(rootLinks)
                 linksDiscriminator.inject(it)
             }
@@ -36,36 +37,36 @@ class JsonApiListDiscriminator(
                 val attributesObject = getAttributesObject(dataObject)
                 val resourceLinksObject = getLinksObject(dataObject)
 
-                val newRelationshipsObject = relationshipsObject?.let {
+                val newRelationshipsObject = relationshipsObject?.takeIf { it !is JsonNull }?.let {
                     val relationshipsDiscriminator = CommonDiscriminator(
                         JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
                     )
                     getNewRelationshipsObject(relationshipsDiscriminator.inject(it))
                 }
 
-                val newAttributesObject = attributesObject?.let {
+                val newAttributesObject = attributesObject?.takeIf { it !is JsonNull }?.let {
                     val attributesDiscriminator =
                         CommonDiscriminator(JsonApiConstants.Prefix.ATTRIBUTES.withName(rootType))
                     attributesDiscriminator.inject(it)
                 }
 
-                val newResourceLinksObject = resourceLinksObject?.let {
+                val newResourceLinksObject = resourceLinksObject?.takeIf { it !is JsonNull }?.let {
                     val resourceLinksDiscriminator = CommonDiscriminator(resourceObjectLinks)
                     resourceLinksDiscriminator.inject(it)
                 }
 
-                val newDataObject = dataObject.let {
+                dataObject.takeIf { it !is JsonNull }?.let {
                     val dataDiscriminator = CommonDiscriminator(
                         JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType)
                     )
-                    getNewDataObject(
+                    val newDataObject = getNewDataObject(
                         dataDiscriminator.inject(it),
                         newAttributesObject,
                         newRelationshipsObject,
                         newResourceLinksObject
                     )
+                    newDataEntries.add(newDataObject)
                 }
-                newDataEntries.add(newDataObject)
             }
 
             val newIncludedArray = buildTypeDiscriminatedIncludedArray(jsonElement)
@@ -76,7 +77,7 @@ class JsonApiListDiscriminator(
                 }
             }
 
-            val newMetaObject = metaObject?.let { getNewMetaObject(it) }
+            val newMetaObject = metaObject?.takeIf { it !is JsonNull }?.let { getNewMetaObject(it) }
 
             val newJsonElement = getJsonObjectWithDataDiscriminator(
                 original = jsonElement,

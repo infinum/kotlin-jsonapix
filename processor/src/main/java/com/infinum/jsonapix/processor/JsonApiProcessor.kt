@@ -164,6 +164,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             val relationshipsFileSpec =
                 FileSpec.builder(generatedPackage, relationshipsTypeSpec.name!!)
                     .addType(relationshipsTypeSpec)
+                    .addImport(JsonApiConstants.Packages.CORE, JsonApiConstants.Imports.JSON_API_MODEL)
+                    .addImport(JsonApiConstants.Packages.JSONX, *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS)
                     .build()
             relationshipsFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
