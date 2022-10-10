@@ -28,7 +28,7 @@ ext.mavenPublishProperties = [
 
 dependencies {
     implementation packages.kotlin.core
-    implementation packages.retrofit.core
+    api packages.retrofit.core
     compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core
 }

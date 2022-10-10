@@ -57,6 +57,7 @@ object JsonApiConstants {
         const val FIND_TYPE = "findType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
         const val JSONX_SERIALIZER_MODULE = "jsonApiXSerializerModule"
+        const val AS_JSON_X_HTTP_EXCEPTION = "asJsonXApiException"
 
         const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
         const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
@@ -114,6 +115,8 @@ object JsonApiConstants {
             "JsonApiDiscriminator",
             "TypeExtractor"
         )
+
+        const val ERRORS = "Errors"
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
 

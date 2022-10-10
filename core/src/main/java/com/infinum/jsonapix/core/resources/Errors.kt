@@ -7,3 +7,8 @@ import kotlinx.serialization.Serializable
 data class Errors(
     @SerialName("errors") val errors: List<Error>
 )
+
+@Serializable
+data class DefaultErrors(
+    @SerialName("errors") val errors: List<DefaultError>
+)
