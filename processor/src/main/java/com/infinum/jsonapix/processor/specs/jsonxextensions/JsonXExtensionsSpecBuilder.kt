@@ -22,6 +22,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.asTypeName
 import retrofit2.HttpException
 
 @SuppressWarnings("SpreadOperator")
@@ -74,15 +75,16 @@ internal class JsonXExtensionsSpecBuilder {
     private fun asJsonXHttpExceptionFunSpec(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
+        typeVariableName.bounds
 
         return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
             .receiver(HttpException::class)
             .returns(JsonXHttpException::class)
             .addModifiers(KModifier.INLINE)
-            .addTypeVariable(typeVariableName.copy(reified = true))
+            .addTypeVariable(typeVariableName.copy(reified = true, bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())))
             .addStatement(
                 "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
-                    "format.decodeFromString<Errors>(it) }?.errors)",
+                    "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
                 JsonXHttpException::class.asClassName()
             )
             .build()

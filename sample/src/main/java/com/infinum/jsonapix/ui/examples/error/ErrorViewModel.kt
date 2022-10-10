@@ -1,9 +1,9 @@
 package com.infinum.jsonapix.ui.examples.error
 
-import com.infinum.jsonapix.core.resources.DefaultError
+import com.infinum.jsonapix.asJsonXApiException
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
-import com.infinum.jsonapix.retrofit.asJsonXHttpException
+import com.infinum.jsonapix.data.models.PersonalError
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -23,9 +23,10 @@ class ErrorViewModel @Inject constructor(
             try {
                 val person = io { sampleApiService.fetchError() }
             } catch (e: HttpException) {
-                e.asJsonXHttpException().errors?.first()?.let {
-                    if (it is DefaultError) {
-                        showError(it.detail)
+                val exc = e.asJsonXApiException<PersonalError>()
+                exc.errors?.first()?.let {
+                    if (it is PersonalError) {
+                        showError(it.desc)
                     } else {
                         showError("Not a default error")
                     }

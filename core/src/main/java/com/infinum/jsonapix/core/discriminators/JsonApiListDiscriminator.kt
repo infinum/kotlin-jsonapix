@@ -135,6 +135,7 @@ class JsonApiListDiscriminator(
     override fun getAttributesObject(jsonElement: JsonElement): JsonElement? =
         jsonElement.jsonObject[JsonApiConstants.Keys.ATTRIBUTES]
 
+    @Suppress("LongParameterList")
     private fun getJsonObjectWithDataDiscriminator(
         original: JsonElement,
         dataArray: JsonArray?,
@@ -143,7 +144,13 @@ class JsonApiListDiscriminator(
         errorsArray: JsonArray?,
         metaObject: JsonElement?
     ): JsonObject {
-        return getDiscriminatedBaseEntries(original, includedArray, linksObject, errorsArray, metaObject).let { entries ->
+        return getDiscriminatedBaseEntries(
+            original,
+            includedArray,
+            linksObject,
+            errorsArray,
+            metaObject
+        ).let { entries ->
             dataArray?.let { data ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.DATA }
                 entries.add(getJsonArrayEntry(JsonApiConstants.Keys.DATA, data))
