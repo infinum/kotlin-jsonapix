@@ -4,7 +4,9 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Attributes
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.DefaultLinks
+import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.Meta
@@ -26,6 +28,7 @@ internal object WrapperSerializerPropertySpecBuilder {
     fun build(
         specsMap: HashMap<ClassName, ClassInfo>,
         customLinks: List<ClassName>,
+        customErrors: Map<String, ClassName>,
         metas: Map<String, ClassName>
     ): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
@@ -116,6 +119,30 @@ internal object WrapperSerializerPropertySpecBuilder {
                 "%M(%T::class)",
                 subclassMember,
                 link
+            )
+        }
+
+        codeBlockBuilder.unindent().addStatement("}")
+
+        codeBlockBuilder.addStatement(
+            "%M(%T::class) {",
+            polymorpicMember,
+            Error::class.asClassName()
+        )
+
+        codeBlockBuilder.indent()
+
+        codeBlockBuilder.addStatement(
+            "%M(%T::class)",
+            subclassMember,
+            DefaultError::class.asClassName()
+        )
+
+        customErrors.forEach { error ->
+            codeBlockBuilder.addStatement(
+                "%M(%T::class)",
+                subclassMember,
+                error.value
             )
         }
 

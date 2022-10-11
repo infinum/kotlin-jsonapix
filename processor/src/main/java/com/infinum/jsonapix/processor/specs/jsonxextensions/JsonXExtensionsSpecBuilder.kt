@@ -13,16 +13,24 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Wrap
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.WrapperListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.FormatPropertySpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.WrapperSerializerPropertySpecBuilder
+import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.asTypeName
+import retrofit2.HttpException
 
 @SuppressWarnings("SpreadOperator")
 internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
     private val customLinks = mutableListOf<ClassName>()
+    private val customErrors = mutableMapOf<String, ClassName>()
     private val metas = mutableMapOf<String, ClassName>()
 
     @SuppressWarnings("LongParameterList")
@@ -54,9 +62,41 @@ internal class JsonXExtensionsSpecBuilder {
         customLinks.addAll(links)
     }
 
+    fun addCustomErrors(map: Map<String, ClassName>) {
+        customErrors.clear()
+        customErrors.putAll(map)
+    }
+
     fun addCustomMetas(map: Map<String, ClassName>) {
         metas.clear()
         metas.putAll(map)
+    }
+
+    private fun asJsonXHttpExceptionFunSpec(): FunSpec {
+        val typeVariableName =
+            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
+        typeVariableName.bounds
+
+        return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
+            .receiver(HttpException::class)
+            .returns(JsonXHttpException::class)
+            .addModifiers(KModifier.INLINE)
+            .addTypeVariable(typeVariableName.copy(reified = true, bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())))
+            .addStatement(
+                "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
+                    "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
+                JsonXHttpException::class.asClassName()
+            )
+            .build()
+    }
+
+    private fun hasRetrofitModule(): Boolean {
+        return try {
+            Class.forName("com.infinum.jsonapix.retrofit.JsonXHttpException")
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     @SuppressWarnings("SpreadOperator", "LongMethod")
@@ -128,10 +168,18 @@ internal class JsonXExtensionsSpecBuilder {
             fileSpec.addFunction(SerializeListFunSpecBuilder.build(it.key))
         }
 
-        fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, metas))
+        fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, customErrors, metas))
         fileSpec.addProperty(FormatPropertySpecBuilder.build())
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
+
+        if (hasRetrofitModule()) {
+            fileSpec.addImport(
+                JsonApiConstants.Packages.CORE_RESOURCES,
+                JsonApiConstants.Imports.ERRORS
+            )
+            fileSpec.addFunction(asJsonXHttpExceptionFunSpec())
+        }
 
         fileSpec.addFunction(DeserializeFunSpecBuilder.build())
         fileSpec.addFunction(DeserializeListFunSpecBuilder.build())
