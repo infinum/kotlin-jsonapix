@@ -1,0 +1,25 @@
+{
+  "errors":null,
+  "meta": {
+    "owner": "Stef"
+  },
+  "links": {
+    "self": "https://root.link.com"
+  },
+  "data":{
+    "links": {
+      "self": "https://resource.link.com"
+    },
+    "type":"person",
+    "id":"1",
+    "attributes":{
+      "age":28,
+      "name":"Jason",
+      "surname":"Apix"
+    },
+    "relationships":{
+      "myFavoriteDog":null,
+      "allMyDogs":null
+    }
+  }
+}

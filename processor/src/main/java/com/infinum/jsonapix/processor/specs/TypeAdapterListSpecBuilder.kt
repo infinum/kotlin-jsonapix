@@ -109,7 +109,6 @@ public object TypeAdapterListSpecBuilder {
             .addStatement("data.data?.let { resourceData ->")
             .addStatement("original.zip(resourceData) { model, resource ->")
             .addStatement("(model as? %T)?.let { safeModel ->", JsonApiModel::class)
-            .addStatement("safeModel.setId(resource.id)")
             .addStatement("safeModel.setRootLinks(data.links)")
             .addStatement("safeModel.setResourceLinks(resource.links)")
             .addStatement("safeModel.setErrors(data.errors)")

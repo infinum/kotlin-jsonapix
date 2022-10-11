@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ResourceIdentifier(
     val type: String,
-    val id: String = "0"
+    val id: String = ""
 )
