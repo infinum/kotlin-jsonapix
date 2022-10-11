@@ -162,7 +162,7 @@ try {
 Developers can define their own custom error models to adapt to the specific requirements.
 
 Let's take this custom person error model as an example. 
-Every custom error model must should extend the `Error` interface and have a `JsonApiXError` annotation. 
+Every custom error model should extend the `Error` interface and have a `JsonApiXError` annotation set. 
 
 ```kotlin
 @Serializable
