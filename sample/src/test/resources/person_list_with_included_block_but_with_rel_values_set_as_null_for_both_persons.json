@@ -1,0 +1,61 @@
+{
+  "errors": null,
+  "meta": {
+    "owner": "Stef"
+  },
+  "links": {
+    "self": "https://root.link.com"
+  },
+  "data": [
+    {
+      "links": {
+        "self": "https://resource.link.com"
+      },
+      "type": "person",
+      "id": "1",
+      "attributes": {
+        "age": 28,
+        "name": "Jason",
+        "surname": "Apix"
+      },
+      "relationships": {
+        "myFavoriteDog":null,
+        "allMyDogs":null
+      }
+    },
+    {
+      "links": {
+        "self": "https://resource.link.com"
+      },
+      "type": "person",
+      "id": "2",
+      "attributes": {
+        "age": 28,
+        "name": "Jasminka",
+        "surname": "Apix"
+      },
+      "relationships": {
+        "myFavoriteDog":null,
+        "allMyDogs":null
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "dog",
+      "id": "1",
+      "attributes": {
+        "age": 1,
+        "name": "Bella"
+      }
+    },
+    {
+      "type": "dog",
+      "id": "2",
+      "attributes": {
+        "age": 2,
+        "name": "Bongo"
+      }
+    }
+  ]
+}

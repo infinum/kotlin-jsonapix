@@ -31,7 +31,6 @@ object JsonApiConstants {
         const val RELATIONSHIPS = "Relationships_"
         const val TYPE_ADAPTER = "TypeAdapter_"
         const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
-        const val ERROR = "Error_"
 
         fun String.withName(name: String): String = "$this$name"
     }
@@ -82,6 +81,7 @@ object JsonApiConstants {
         const val TYPE_EXTRACTOR = "com.infinum.jsonapix.core.discriminators.TypeExtractor"
         const val CORE_RESOURCES = "com.infinum.jsonapix.core.resources"
         const val CORE_SHARED = "com.infinum.jsonapix.core.shared"
+        const val CORE = "com.infinum.jsonapix.core"
     }
 
     object FileNames {
@@ -118,9 +118,17 @@ object JsonApiConstants {
 
         const val ERRORS = "Errors"
 
+        val RELATIONSHIP_EXTENSIONS = arrayOf(
+            "toOneRelationshipModel",
+            "toManyRelationshipModel"
+        )
+
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
+        const val JSON_API_MODEL = "JsonApiModel"
 
         const val REQUIRE_NOT_NULL = "requireNotNull"
+        const val MAP_SAFE = "mapSafe"
+        const val FLAT_MAP_SAFE = "flatMapSafe"
     }
 
     object Statements {

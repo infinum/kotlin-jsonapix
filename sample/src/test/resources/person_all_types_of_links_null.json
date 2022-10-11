@@ -1,0 +1,44 @@
+{
+  "errors":null,
+  "meta": {
+    "owner": "Stef"
+  },
+  "links":null,
+  "data":{
+    "links":null,
+    "type":"person",
+    "id":"1",
+    "attributes":{
+      "age":28,
+      "name":"Jason",
+      "surname":"Apix"
+    },
+    "relationships":{
+      "allMyDogs":{
+        "links":null,
+        "data":[
+          { "type":"dog", "id":"1" },
+          { "type":"dog", "id":"2" }
+        ]
+      }
+    }
+  },
+  "included":[
+    {
+      "type":"dog",
+      "id":"1",
+      "attributes":{
+        "age":1,
+        "name":"Bella"
+      }
+    },
+    {
+      "type":"dog",
+      "id":"2",
+      "attributes":{
+        "age":2,
+        "name":"Bongo"
+      }
+    }
+  ]
+}

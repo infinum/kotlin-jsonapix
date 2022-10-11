@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.jsonArray
@@ -96,10 +97,12 @@ abstract class BaseJsonApiDiscriminator(
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
         original.jsonObject.entries.filter { it.value is JsonObject }.forEach { relationshipEntry ->
             val set = relationshipEntry.value.jsonObject.entries.toMutableSet()
-            getLinksObject(relationshipEntry.value)?.let { linksSafe ->
-                val newLinks = relationshipsLinksDiscriminator.inject(linksSafe)
-                set.removeAll { it.key == JsonApiConstants.Keys.LINKS }
-                set.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, newLinks))
+            getLinksObject(relationshipEntry.value)?.let { linksObject ->
+                if (linksObject !is JsonNull) {
+                    val newLinks = relationshipsLinksDiscriminator.inject(linksObject)
+                    set.removeAll { it.key == JsonApiConstants.Keys.LINKS }
+                    set.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, newLinks))
+                }
             }
             val tempMap = mutableMapOf<String, JsonElement>()
             tempMap.putAll(set.map { Pair(it.key, it.value) })
@@ -111,7 +114,6 @@ abstract class BaseJsonApiDiscriminator(
     fun getNewErrorsArray(
         original: JsonElement
     ): JsonArray {
-        val resultMap = mutableMapOf<String, JsonElement>()
         val errorDiscriminator = CommonDiscriminator(error)
 
         return buildJsonArray {
@@ -122,7 +124,7 @@ abstract class BaseJsonApiDiscriminator(
     }
 
     fun buildRootDiscriminatedIncludedArray(jsonElement: JsonElement) =
-        getIncludedArray(jsonElement)?.let { included ->
+        getIncludedArray(jsonElement)?.takeIf { it !is JsonNull }?.let { included ->
             buildJsonArray {
                 included.jsonArray.forEach {
                     add(rootDiscriminator.extract(it))
@@ -131,7 +133,7 @@ abstract class BaseJsonApiDiscriminator(
         }
 
     fun buildRootDiscriminatedErrorsArray(jsonElement: JsonElement) =
-        getErrorsObject(jsonElement)?.let { errors ->
+        getErrorsObject(jsonElement)?.takeIf { it !is JsonNull }?.let { errors ->
             buildJsonArray {
                 errors.jsonArray.forEach {
                     add(rootDiscriminator.extract(it))
@@ -140,7 +142,7 @@ abstract class BaseJsonApiDiscriminator(
         }
 
     fun buildTypeDiscriminatedIncludedArray(jsonElement: JsonElement) =
-        getIncludedArray(jsonElement)?.let { included ->
+        getIncludedArray(jsonElement)?.takeIf { it !is JsonNull }?.let { included ->
             buildJsonArray {
                 included.jsonArray.forEach {
                     val includedDiscriminator =

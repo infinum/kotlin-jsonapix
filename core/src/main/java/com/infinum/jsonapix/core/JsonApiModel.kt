@@ -8,12 +8,17 @@ import com.infinum.jsonapix.core.resources.Meta
 
 @Suppress("UNCHECKED_CAST", "TooManyFunctions", "UnnecessaryAbstractClass")
 abstract class JsonApiModel {
+    private var type: String? = null
     private var id: String? = "0"
     private var rootLinks: Links? = null
     private var resourceLinks: Links? = null
     private var relationshipLinks: Map<String, Links?>? = null
     private var errors: List<Error>? = null
     private var meta: Meta? = null
+
+    fun setType(type: String?) {
+        this.type = type
+    }
 
     fun setId(id: String?) {
         this.id = id
@@ -38,6 +43,8 @@ abstract class JsonApiModel {
     fun setMeta(meta: Meta?) {
         this.meta = meta
     }
+
+    fun type(): String? = type
 
     fun id(): String? = id
 

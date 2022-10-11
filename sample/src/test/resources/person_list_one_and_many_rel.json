@@ -1,0 +1,105 @@
+{
+  "errors": null,
+  "meta": {
+    "owner": "Stef"
+  },
+  "links": {
+    "self": "https://root.link.com"
+  },
+  "data": [
+    {
+      "links": {
+        "self": "https://resource.link.com"
+      },
+      "type": "person",
+      "id": "1",
+      "attributes": {
+        "age": 28,
+        "name": "Jason",
+        "surname": "Apix"
+      },
+      "relationships": {
+        "myFavoriteDog": {
+          "links": {
+            "self": "https://relationship.link.com"
+          },
+          "data": {
+            "type": "dog",
+            "id": "1"
+          }
+        },
+        "allMyDogs": {
+          "links": {
+            "self": "https://relationship.link.com"
+          },
+          "data": [
+            {
+              "type": "dog",
+              "id": "1"
+            },
+            {
+              "type": "dog",
+              "id": "2"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "links": {
+        "self": "https://resource.link.com"
+      },
+      "type": "person",
+      "id": "2",
+      "attributes": {
+        "age": 28,
+        "name": "Jasminka",
+        "surname": "Apix"
+      },
+      "relationships": {
+        "myFavoriteDog": {
+          "links": {
+            "self": "https://relationship.link.com"
+          },
+          "data": {
+            "type": "dog",
+            "id": "2"
+          }
+        },
+        "allMyDogs": {
+          "links": {
+            "self": "https://relationship.link.com"
+          },
+          "data": [
+            {
+              "type": "dog",
+              "id": "1"
+            },
+            {
+              "type": "dog",
+              "id": "2"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "dog",
+      "id": "1",
+      "attributes": {
+        "age": 1,
+        "name": "Bella"
+      }
+    },
+    {
+      "type": "dog",
+      "id": "2",
+      "attributes": {
+        "age": 2,
+        "name": "Bongo"
+      }
+    }
+  ]
+}

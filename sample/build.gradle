@@ -40,6 +40,15 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+            testLogging {
+                events("PASSED", "FAILED", "SKIPPED")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -69,4 +78,8 @@ dependencies {
     implementation packages.fragment.core
     kapt packages.hilt.compiler
     implementation packages.material
+
+    testImplementation packages.junit.api
+    testRuntimeOnly packages.junit.engine
+    testImplementation packages.junit.params
 }
