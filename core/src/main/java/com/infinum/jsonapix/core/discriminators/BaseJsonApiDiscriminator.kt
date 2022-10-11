@@ -13,7 +13,8 @@ import kotlinx.serialization.json.jsonObject
 abstract class BaseJsonApiDiscriminator(
     rootType: String,
     private val relationshipsLinks: String,
-    private val meta: String
+    private val meta: String,
+    private val error: String
 ) : Discriminator {
 
     val rootDiscriminator = CommonDiscriminator(rootType)
@@ -49,6 +50,9 @@ abstract class BaseJsonApiDiscriminator(
 
     fun getMetaObject(jsonElement: JsonElement) =
         jsonElement.jsonObject[JsonApiConstants.Keys.META]
+
+    fun getErrorsObject(jsonElement: JsonElement) =
+        jsonElement.jsonObject[JsonApiConstants.Keys.ERRORS]
 
     fun getJsonObjectEntry(key: String, data: JsonElement): Map.Entry<String, JsonElement> {
         return object : Map.Entry<String, JsonElement> {
@@ -104,10 +108,32 @@ abstract class BaseJsonApiDiscriminator(
         return JsonObject(resultMap)
     }
 
+    fun getNewErrorsArray(
+        original: JsonElement
+    ): JsonArray {
+        val resultMap = mutableMapOf<String, JsonElement>()
+        val errorDiscriminator = CommonDiscriminator(error)
+
+        return buildJsonArray {
+            original.jsonArray.forEach { errorEntry ->
+                add(errorDiscriminator.inject(errorEntry))
+            }
+        }
+    }
+
     fun buildRootDiscriminatedIncludedArray(jsonElement: JsonElement) =
         getIncludedArray(jsonElement)?.let { included ->
             buildJsonArray {
                 included.jsonArray.forEach {
+                    add(rootDiscriminator.extract(it))
+                }
+            }
+        }
+
+    fun buildRootDiscriminatedErrorsArray(jsonElement: JsonElement) =
+        getErrorsObject(jsonElement)?.let { errors ->
+            buildJsonArray {
+                errors.jsonArray.forEach {
                     add(rootDiscriminator.extract(it))
                 }
             }
@@ -132,6 +158,7 @@ abstract class BaseJsonApiDiscriminator(
         original: JsonElement,
         includedArray: JsonArray?,
         linksObject: JsonElement?,
+        errorsArray: JsonArray?,
         metaObject: JsonElement?
     ): MutableSet<Map.Entry<String, JsonElement>> {
         original.jsonObject.entries.toMutableSet().let { entries ->
@@ -143,6 +170,11 @@ abstract class BaseJsonApiDiscriminator(
             linksObject?.let { links ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.LINKS }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
+            }
+
+            errorsArray?.let { errors ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.ERRORS }
+                entries.add(getJsonArrayEntry(JsonApiConstants.Keys.ERRORS, errors))
             }
 
             metaObject?.let { meta ->

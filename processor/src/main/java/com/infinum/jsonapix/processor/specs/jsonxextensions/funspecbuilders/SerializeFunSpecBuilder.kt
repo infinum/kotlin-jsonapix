@@ -27,15 +27,17 @@ internal object SerializeFunSpecBuilder {
             .receiver(originalClass)
             .addParameters(linksParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
+            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(String::class)
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
             .addStatement(
-                "val discriminator = %T(jsonX.data.type, %L, %L, %L, %L)",
+                "val discriminator = %T(jsonX.data.type, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class.asClassName(),
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META
+                JsonApiConstants.Keys.META,
+                JsonApiConstants.Keys.ERRORS
             )
             .addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",

@@ -31,6 +31,7 @@ object JsonApiConstants {
         const val RELATIONSHIPS = "Relationships_"
         const val TYPE_ADAPTER = "TypeAdapter_"
         const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
+        const val ERROR = "Error_"
 
         fun String.withName(name: String): String = "$this$name"
     }
@@ -56,6 +57,7 @@ object JsonApiConstants {
         const val FIND_TYPE = "findType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
         const val JSONX_SERIALIZER_MODULE = "jsonApiXSerializerModule"
+        const val AS_JSON_X_HTTP_EXCEPTION = "asJsonXHttpException"
 
         const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
         const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
@@ -68,6 +70,7 @@ object JsonApiConstants {
         const val ROOT_LINKS = "rootLinks"
         const val RESOURCE_OBJECT_LINKS = "resourceObjectLinks"
         const val RELATIONSHIPS_LINKS = "relationshipsLinks"
+        const val ERRORS = "errors"
     }
 
     object Packages {
@@ -112,6 +115,8 @@ object JsonApiConstants {
             "JsonApiDiscriminator",
             "TypeExtractor"
         )
+
+        const val ERRORS = "Errors"
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
 

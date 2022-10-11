@@ -3,6 +3,7 @@ package com.infinum.jsonapix.data.models
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
+import com.infinum.jsonapix.annotations.JsonApiXError
 import com.infinum.jsonapix.annotations.JsonApiXMeta
 import com.infinum.jsonapix.core.JsonApiModel
 import com.infinum.jsonapix.core.resources.Meta
@@ -23,3 +24,7 @@ data class Person(
 @Serializable
 @JsonApiXMeta("person")
 data class PersonMeta(val owner: String) : Meta
+
+@Serializable
+@JsonApiXError("person")
+data class PersonalError(val desc: String) : com.infinum.jsonapix.core.resources.Error

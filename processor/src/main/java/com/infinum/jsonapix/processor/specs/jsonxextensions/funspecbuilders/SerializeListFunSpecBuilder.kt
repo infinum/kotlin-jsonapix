@@ -29,6 +29,7 @@ internal object SerializeListFunSpecBuilder {
             .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
             .addParameters(linksParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
+            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(String::class)
             .addAnnotation(
                 AnnotationSpec.builder(JvmName::class)
@@ -37,12 +38,13 @@ internal object SerializeListFunSpecBuilder {
             )
             .addStatement("val jsonX = this.%M()", jsonApiListWrapperMember)
             .addStatement(
-                "val discriminator = %T(jsonX.data.first().type, %N, %N, %N, %N)",
+                "val discriminator = %T(jsonX.data.first().type, %N, %N, %N, %N, %N)",
                 JsonApiListDiscriminator::class.asClassName(),
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META
+                JsonApiConstants.Keys.META,
+                JsonApiConstants.Keys.ERRORS
             )
             .addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",

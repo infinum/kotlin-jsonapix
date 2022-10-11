@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta

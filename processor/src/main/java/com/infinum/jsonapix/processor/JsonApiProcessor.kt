@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
+import com.infinum.jsonapix.annotations.JsonApiXError
 import com.infinum.jsonapix.annotations.JsonApiXLinks
 import com.infinum.jsonapix.annotations.JsonApiXMeta
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
@@ -38,6 +39,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
     private val customLinks = mutableListOf<LinksInfo>()
     private val customMetas = mutableMapOf<String, ClassName>()
+    private val customErrors = mutableMapOf<String, ClassName>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
         mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name, JsonApiXMeta::class.java.name)
@@ -80,6 +82,8 @@ public class JsonApiProcessor : AbstractProcessor() {
         }
 
         collector.addCustomMetas(customMetas)
+
+        processErrorAnnotation(roundEnv)
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
@@ -211,7 +215,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
             linksInfo?.relationshipsLinks,
-            customMetas[type]?.canonicalName
+            customMetas[type]?.canonicalName,
+            customErrors[type]?.canonicalName
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
@@ -219,7 +224,8 @@ public class JsonApiProcessor : AbstractProcessor() {
             linksInfo?.rootLinks,
             linksInfo?.resourceObjectLinks,
             linksInfo?.relationshipsLinks,
-            customMetas[type]?.canonicalName
+            customMetas[type]?.canonicalName,
+            customErrors[type]?.canonicalName
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
@@ -227,5 +233,14 @@ public class JsonApiProcessor : AbstractProcessor() {
         wrapperListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+    }
+
+    private fun processErrorAnnotation(roundEnv: RoundEnvironment?) {
+        roundEnv?.getElementsAnnotatedWith(JsonApiXError::class.java).orEmpty().forEach {
+            val type = it.getAnnotationParameterValue<JsonApiXError, String> { type }
+            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            customErrors[type] = className
+        }
+        collector.addCustomErrors(customErrors)
     }
 }
