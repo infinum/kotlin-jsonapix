@@ -42,14 +42,14 @@ plugins {
 
 ```groovy
 // Serialization API. Check the docs link above for newer versions
-implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
 // Json API X
-implementation("com.infinum.jsonapix:core:1.0.0-alpha02")
-kapt("com.infinum.jsonapix:processor:1.0.0-alpha02")
+implementation("com.infinum.jsonapix:core:1.0.0-beta01")
+kapt("com.infinum.jsonapix:processor:1.0.0-beta01")
 
 // Optional: For Retrofit support
-implementation("com.infinum.jsonapix:retrofit:1.0.0-alpha02")
+implementation("com.infinum.jsonapix:retrofit:1.0.0-beta01")
 ```
 
 ## Usage
@@ -100,9 +100,6 @@ listAdapter.convertToString(person) // Produces JSON API String from a Person li
 listAdapter.convertFromString(inputJsonString) // Produces Person list from JSON API String
 ```
 
-In some cases, a need for custom modification of certain aspects of model classes is preferred. With this in mind, we've enabled the option for clients to customize 
-JsonApiModel if such a need occurs. Clients are able to set optional params on a model class such as links or meta(explained in its own chapter), but also to customize the default `id` of a model. Clients can simply set/get `id` on a JsonApiModel depending on the case at hand.
-
 ### Nullability
 
 JsonApiX relies on the `included` JSON array from the JSON API specification when deserializing relationships. If the input JSON API string
@@ -139,21 +136,17 @@ class DefaultError(
 ```
 
 When using Retrofit, in the event of a network error a `HttpException` will be thrown. To extract the `DefaultError` model from a response, you can
-use the `HttpException.asJsonXHttpException<DefaultError>()` extension. The extension takes in a generic `DefaultError` which will return a `JsonXHttpException`, containing the original `response` as well as `errors` list.
+use the `HttpException.asJsonXHttpException()` extension. The extension will return a `JsonXHttpException`, containing the original `response` as well as `errors` list.
 
 ```kotlin
+// Using DefaultError
 try {
     val person = io { sampleApiService.fetchPerson() }
 } catch (exception: HttpException) {
-    val errors = exception.asJsonXHttpException<DefaultError>().errors
-    errors?.first()?.let {
-        if (it is DefaultError) {
-            showError(it.code)
-        } else {
-            showError("Not a default error.")
-        } 
-    } ?: showError("Unable to parse to JsonXHttpException")
-    // Handle errors
+    val jsonXHttpException = exception.asJsonXHttpException()
+    val errors = jsonXHttpException.errors // List<DefaultError>
+    // handle errors
+    ...
 }
 ```
 
@@ -177,17 +170,14 @@ In this example, the annotation processor will automatically make the error type
 To extract a custom error model (ex. `PersonalError`), clients should use a generic `asJsonXHttpException` in a similar way as explained in the previous chapter for `DefaultError`.
 
 ```kotlin
+// Using custom error
 try {
     val person = io { sampleApiService.fetchPerson() }
 } catch (exception: HttpException) {
-    val errors = exception.asJsonXHttpException<PersonalError>().errors
-    errors?.first()?.let {
-        when (it) {
-            is DefaultError -> showError(it.code)
-            is PersonalError -> showError(it.desc)
-        }
-    } ?: showError("Unable to parse to JsonXHttpException")
-    // Handle errors
+    val jsonXHttpException = exception.asJsonXHttpException<PersonError>()
+    val errors = jsonXHttpException.errors // List<PersonError>
+    // handle errors
+    ...
 }
 ```
 
@@ -212,6 +202,9 @@ data class Person(
 ```
 
 `JsonApiModel` is an abstract class which will provide you with getters and setters for links and meta objects.
+
+In some cases, a need for custom modification of certain aspects of model classes is preferred. With this in mind, we've enabled the option for clients to customize 
+JsonApiModel if such a need occurs. Clients are able to set optional params on a model class such as links or meta(explained in its own chapter), but also to customize the default `id` of a model. Clients can simply set/get `id` on a JsonApiModel depending on the case at hand.
 
 ### Links
 
