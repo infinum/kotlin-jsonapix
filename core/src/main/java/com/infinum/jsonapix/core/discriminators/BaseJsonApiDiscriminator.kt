@@ -114,7 +114,6 @@ abstract class BaseJsonApiDiscriminator(
     fun getNewErrorsArray(
         original: JsonElement
     ): JsonArray {
-        val resultMap = mutableMapOf<String, JsonElement>()
         val errorDiscriminator = CommonDiscriminator(error)
 
         return buildJsonArray {
@@ -125,7 +124,7 @@ abstract class BaseJsonApiDiscriminator(
     }
 
     fun buildRootDiscriminatedIncludedArray(jsonElement: JsonElement) =
-        getIncludedArray(jsonElement)?.let { included ->
+        getIncludedArray(jsonElement)?.takeIf { it !is JsonNull }?.let { included ->
             buildJsonArray {
                 included.jsonArray.forEach {
                     add(rootDiscriminator.extract(it))
@@ -134,7 +133,7 @@ abstract class BaseJsonApiDiscriminator(
         }
 
     fun buildRootDiscriminatedErrorsArray(jsonElement: JsonElement) =
-        getErrorsObject(jsonElement)?.let { errors ->
+        getErrorsObject(jsonElement)?.takeIf { it !is JsonNull }?.let { errors ->
             buildJsonArray {
                 errors.jsonArray.forEach {
                     add(rootDiscriminator.extract(it))

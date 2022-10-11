@@ -34,7 +34,7 @@ class JsonApiListDiscriminator(
                 linksDiscriminator.inject(it)
             }
 
-            val newErrorsArray = errorsObject?.let {
+            val newErrorsArray = errorsObject?.takeIf { it !is JsonNull }?.let {
                 getNewErrorsArray(it)
             }
 
