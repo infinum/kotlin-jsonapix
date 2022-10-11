@@ -128,6 +128,8 @@ A single error is modeled to wrap the most common arguments of an error. Develop
 this model.
 
 ```kotlin
+@Serializable
+@SerialName("error")
 class DefaultError(
     val code: String,
     val title: String,
@@ -136,15 +138,21 @@ class DefaultError(
 )
 ```
 
-When using Retrofit, in the event of a network error a `HttpException` will be thrown. To extract the `Error` model from a response, you can
-use the `HttpException.asJsonXHttpException()` extension, which will return a `JsonXHttpException`, containing the original `response` as
-well as `errors` list.
+When using Retrofit, in the event of a network error a `HttpException` will be thrown. To extract the `DefaultError` model from a response, you can
+use the `HttpException.asJsonXHttpException<DefaultError>()` extension. The extension takes in a generic `DefaultError` which will return a `JsonXHttpException`, containing the original `response` as well as `errors` list.
 
 ```kotlin
 try {
     val person = io { sampleApiService.fetchPerson() }
 } catch (exception: HttpException) {
-    val errors = exception.asJsonXHttpException().errors
+    val errors = exception.asJsonXHttpException<DefaultError>().errors
+    errors?.first()?.let {
+        if (it is DefaultError) {
+            showError(it.code)
+        } else {
+            showError("Not a default error.")
+        } 
+    } ?: showError("Unable to parse to JsonXHttpException")
     // Handle errors
 }
 ```
@@ -159,13 +167,29 @@ Every custom error model must should extend the `Error` interface and have a `Js
 ```kotlin
 @Serializable
 @JsonApiXError(type = "person")
-data class PersonError(
-    val code: String,
-    val title: String
+data class PersonalError(
+    val desc: String
 ) : Error
 ```
 
 In this example, the annotation processor will automatically make the error type of a `Person` class to be a `PersonError` and use it as a type when deserializing errors array. Developer needs to make sure that the `type` parameter value in `JsonApiXError` matches the one in the `JsonApiX` above the original model.
+
+To extract a custom error model (ex. `PersonalError`), clients should use a generic `asJsonXHttpException` in a similar way as explained in the previous chapter for `DefaultError`.
+
+```kotlin
+try {
+    val person = io { sampleApiService.fetchPerson() }
+} catch (exception: HttpException) {
+    val errors = exception.asJsonXHttpException<PersonalError>().errors
+    errors?.first()?.let {
+        when (it) {
+            is DefaultError -> showError(it.code)
+            is PersonalError -> showError(it.desc)
+        }
+    } ?: showError("Unable to parse to JsonXHttpException")
+    // Handle errors
+}
+```
 
 ## JsonApiModel - Handling `links` and `meta` JSON API fields
 
