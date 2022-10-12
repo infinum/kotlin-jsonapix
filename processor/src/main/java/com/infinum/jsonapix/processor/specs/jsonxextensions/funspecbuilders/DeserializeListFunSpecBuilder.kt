@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.decodeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.findTypeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.formatMember
@@ -37,13 +38,18 @@ internal object DeserializeListFunSpecBuilder {
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(JsonApiXList::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
-                "val type = %T.%M(%T.%L(this).%M[%S]!!)",
-                TypeExtractor::class.asTypeName(),
-                findTypeMember,
+                "val de = %T.%L(this).%M[%S]!!",
                 Json::class.asTypeName(),
                 JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
                 jsonObjectMember,
                 JsonApiConstants.Keys.DATA
+            )
+            .addStatement(
+                "val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) %T.%M(Model::class) else %T.%M(de)",
+                TypeExtractor::class.asTypeName(),
+                DeserializeFunSpecMemberProvider.guessTypeMember,
+                TypeExtractor::class.asTypeName(),
+                findTypeMember
             )
             .addStatement(
                 "val discriminator = %T(%L, %L, %L, %L, %L, %L)",

@@ -29,6 +29,7 @@ ext.mavenPublishProperties = [
 
 dependencies {
     implementation packages.kotlin.core
+    implementation packages.kotlin.reflect
     api project(":annotations")
     compileOnly packages.kotlin.serialization_core
 }
