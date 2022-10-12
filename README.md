@@ -50,6 +50,9 @@ kapt("com.infinum.jsonapix:processor:1.0.0-beta01")
 
 // Optional: For Retrofit support
 implementation("com.infinum.jsonapix:retrofit:1.0.0-beta01")
+
+// Optional: Custom lint tool checker
+implementation("com.infinum.jsonapix:lint:1.0.0-beta01")
 ```
 
 ## Usage
