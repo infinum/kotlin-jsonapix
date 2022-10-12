@@ -54,6 +54,7 @@ object JsonApiConstants {
         const val FORMAT = "format"
         const val GENERIC_TYPE_VARIABLE = "Model"
         const val FIND_TYPE = "findType"
+        const val GUESS_TYPE = "guessType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
         const val JSONX_SERIALIZER_MODULE = "jsonApiXSerializerModule"
         const val AS_JSON_X_HTTP_EXCEPTION = "asJsonXHttpException"
