@@ -1,9 +1,9 @@
 ext {
     buildConfig = [
             "minSdk"    : 23,
-            "compileSdk": 31,
-            "targetSdk" : 31,
-            "buildTools": "30.0.3"
+            "compileSdk": 33,
+            "targetSdk" : 33,
+            "buildTools": "33.0.1"
     ]
     releaseConfig = [
             "group"      : "com.infinum.jsonapix",

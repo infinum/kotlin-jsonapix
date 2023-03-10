@@ -38,7 +38,7 @@ internal object Specs {
     }.build()
 
     fun getNullParamSpec(name: String, typeName: TypeName): ParameterSpec =
-        ParameterSpec.builder(name, typeName, KModifier.OVERRIDE)
+        ParameterSpec.builder(name, typeName)
             .defaultValue("%L", null)
             .build()
 
