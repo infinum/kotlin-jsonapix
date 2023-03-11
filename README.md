@@ -45,14 +45,14 @@ plugins {
 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
 // Json API X
-implementation("com.infinum.jsonapix:core:1.0.0-beta01")
-kapt("com.infinum.jsonapix:processor:1.0.0-beta01")
+implementation("com.infinum.jsonapix:core:1.0.0-beta02")
+kapt("com.infinum.jsonapix:processor:1.0.0-beta02")
 
 // Optional: For Retrofit support
-implementation("com.infinum.jsonapix:retrofit:1.0.0-beta01")
+implementation("com.infinum.jsonapix:retrofit:1.0.0-beta02")
 
 // Optional: Custom lint tool checker
-implementation("com.infinum.jsonapix:lint:1.0.0-beta01")
+implementation("com.infinum.jsonapix:lint:1.0.0-beta02")
 ```
 
 ## Usage
