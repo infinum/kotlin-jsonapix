@@ -49,6 +49,7 @@ android {
             }
         }
     }
+    namespace 'com.infinum.jsonapix'
 }
 
 dependencies {
