@@ -15,16 +15,20 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.properties.Delegates
 
 internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private val serializableClassName = Serializable::class.asClassName()
 
+    private var isNullable by Delegates.notNull<Boolean>()
     override fun build(
         className: ClassName,
+        isNullable: Boolean,
         type: String,
         metaClassName: ClassName?
     ): FileSpec {
+        this.isNullable = isNullable
         val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
             className.packageName,
@@ -37,7 +41,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.DATA,
-                resourceObjectClassName
+                resourceObjectClassName.copy(nullable = isNullable)
             ).build()
         )
 
@@ -73,7 +77,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
         JsonApiConstants.Keys.DATA,
-        resourceObject
+        resourceObject.copy(nullable = isNullable)
     ).addAnnotation(
         Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA)
     )
@@ -83,11 +87,18 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
     private fun originalProperty(
         className: ClassName
     ): PropertySpec {
-        val codeString = "${JsonApiConstants.Keys.DATA}.${JsonApiConstants.Members.ORIGINAL}(included)"
+        val codeString =
+            if (isNullable) "${JsonApiConstants.Keys.DATA}?.${JsonApiConstants.Members.ORIGINAL}(included) ?: ${className.simpleName}()"
+            else "${JsonApiConstants.Keys.DATA}.${JsonApiConstants.Members.ORIGINAL}(included)"
+
+
         val builder = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
             className, KModifier.OVERRIDE
-        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
+        ).addAnnotation(
+            AnnotationSpec.builder(Transient::class.asClassName())
+                .build()
+        )
 
         return builder.initializer(codeString).build()
     }
