@@ -4,6 +4,7 @@ import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -21,7 +22,12 @@ object TypeExtractor {
     }
 
     @SuppressWarnings("SwallowedException")
-    fun findType(jsonElement: JsonElement): String {
+    fun findType(jsonElement: JsonElement?): String? {
+        if(jsonElement == null || jsonElement is JsonNull){
+            return null
+        }
+
+
         return try {
             when (jsonElement) {
                 is JsonObject -> {
