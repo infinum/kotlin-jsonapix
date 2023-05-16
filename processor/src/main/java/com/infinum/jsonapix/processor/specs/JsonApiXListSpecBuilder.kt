@@ -22,6 +22,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     override fun build(
         className: ClassName,
+        isNullable: Boolean,
         type: String,
         metaClassName: ClassName?
     ): FileSpec {
