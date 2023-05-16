@@ -6,4 +6,4 @@ package com.infinum.jsonapix.annotations
 @MustBeDocumented
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiX(val type: String)
+annotation class JsonApiX(val type: String,val isNullable: Boolean = false)
