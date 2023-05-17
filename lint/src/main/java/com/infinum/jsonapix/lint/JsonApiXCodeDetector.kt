@@ -76,7 +76,7 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             context.log(
                 exception = null,
                 format = "$annotationName -> ${isPrimaryDataNullable(node)} -> ${
-                    isAllFieldsHasDefaultValues(node)
+                isAllFieldsHasDefaultValues(node)
                 }"
             )
         }
@@ -93,7 +93,6 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             )
         }
     }
-
 
     private fun isInvalidAnnotationUsage(node: UAnnotation): Boolean =
         node.getParentOfType<UAnnotated>()?.uAnnotations?.any { it.qualifiedName == SERIALIZABLE }

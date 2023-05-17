@@ -91,7 +91,6 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             if (isNullable) "${JsonApiConstants.Keys.DATA}?.${JsonApiConstants.Members.ORIGINAL}(included) ?: ${className.simpleName}()"
             else "${JsonApiConstants.Keys.DATA}.${JsonApiConstants.Members.ORIGINAL}(included)"
 
-
         val builder = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
             className, KModifier.OVERRIDE

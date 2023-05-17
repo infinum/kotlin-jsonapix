@@ -66,21 +66,25 @@ public class JsonApiProcessor : AbstractProcessor() {
                 customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
                     when (placementStrategy) {
                         LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                        LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks =
-                            className.canonicalName
+                        LinksPlacementStrategy.DATA ->
+                            linksInfo.resourceObjectLinks =
+                                className.canonicalName
 
-                        LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks =
-                            className.canonicalName
+                        LinksPlacementStrategy.RELATIONSHIPS ->
+                            linksInfo.relationshipsLinks =
+                                className.canonicalName
                     }
                 } ?: kotlin.run {
                     val linksInfo = LinksInfo(type)
                     when (placementStrategy) {
                         LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                        LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks =
-                            className.canonicalName
+                        LinksPlacementStrategy.DATA ->
+                            linksInfo.resourceObjectLinks =
+                                className.canonicalName
 
-                        LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks =
-                            className.canonicalName
+                        LinksPlacementStrategy.RELATIONSHIPS ->
+                            linksInfo.relationshipsLinks =
+                                className.canonicalName
                     }
                     customLinks.add(linksInfo)
                 }
@@ -233,9 +237,9 @@ public class JsonApiProcessor : AbstractProcessor() {
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass,isNullable,type, customMetas[type])
+            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, customMetas[type])
         val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass,isNullable, type, customMetas[type])
+            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, customMetas[type])
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(

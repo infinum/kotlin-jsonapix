@@ -26,7 +26,6 @@ internal object SerializeFunSpecBuilder {
                 .build()
         )
 
-
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
             .receiver(originalClass)
             .addParameters(linksParams)
@@ -36,7 +35,9 @@ internal object SerializeFunSpecBuilder {
             )
             .returns(String::class)
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
-            .addStatement(if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type")
+            .addStatement(
+                if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type"
+            )
             .addStatement(
                 "val discriminator = %T(type, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class.asClassName(),

@@ -91,7 +91,7 @@ internal class JsonXExtensionsSpecBuilder {
             )
             .addStatement(
                 "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
-                        "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
+                    "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
                 JsonXHttpException::class.asClassName()
             )
             .build()
@@ -172,7 +172,7 @@ internal class JsonXExtensionsSpecBuilder {
                 )
             )
 
-            fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key,it.value.isNullable))
+            fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key, it.value.isNullable))
             fileSpec.addFunction(SerializeListFunSpecBuilder.build(it.key))
         }
 

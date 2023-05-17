@@ -23,10 +23,9 @@ object TypeExtractor {
 
     @SuppressWarnings("SwallowedException")
     fun findType(jsonElement: JsonElement?): String? {
-        if(jsonElement == null || jsonElement is JsonNull){
+        if (jsonElement == null || jsonElement is JsonNull) {
             return null
         }
-
 
         return try {
             when (jsonElement) {
