@@ -26,7 +26,7 @@ class PersonViewModel @Inject constructor(
                 person.rootLinks()?.self,
                 person.resourceLinks()?.self,
                 person.relationshipsLinks()?.values?.firstOrNull()?.self,
-                person.meta<PersonMeta>()?.owner
+                person.rootMeta<PersonMeta>()?.owner
             )
         }
     }
@@ -50,7 +50,7 @@ class PersonViewModel @Inject constructor(
                 persons.last().rootLinks()?.self,
                 persons.last().resourceLinks()?.self,
                 persons.first().relationshipsLinks()?.values?.firstOrNull()?.self,
-                persons.first().meta<PersonMeta>()?.owner
+                persons.first().rootMeta<PersonMeta>()?.owner
             )
         }
     }
