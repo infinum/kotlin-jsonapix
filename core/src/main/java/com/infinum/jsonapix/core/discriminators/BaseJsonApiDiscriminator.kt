@@ -41,19 +41,19 @@ abstract class BaseJsonApiDiscriminator(
     }
 
     fun getDataObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.DATA]
+        jsonElement.jsonObject[JsonApiConstants.Keys.DATA].takeUnless { it is JsonNull }
 
     fun getIncludedArray(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.INCLUDED]
+        jsonElement.jsonObject[JsonApiConstants.Keys.INCLUDED].takeUnless { it is JsonNull }
 
     fun getLinksObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.LINKS]
+        jsonElement.jsonObject[JsonApiConstants.Keys.LINKS].takeUnless { it is JsonNull }
 
     fun getMetaObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.META]
+        jsonElement.jsonObject[JsonApiConstants.Keys.META].takeUnless { it is JsonNull }
 
     fun getErrorsObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.ERRORS]
+        jsonElement.jsonObject[JsonApiConstants.Keys.ERRORS].takeUnless { it is JsonNull }
 
     fun getJsonObjectEntry(key: String, data: JsonElement): Map.Entry<String, JsonElement> {
         return object : Map.Entry<String, JsonElement> {
@@ -148,7 +148,7 @@ abstract class BaseJsonApiDiscriminator(
                     val includedDiscriminator =
                         CommonDiscriminator(
                             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
-                                TypeExtractor.findType(it)
+                                requireNotNull(TypeExtractor.findType(it))
                             )
                         )
                     add(includedDiscriminator.inject(it))

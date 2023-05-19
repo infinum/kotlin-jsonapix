@@ -11,13 +11,13 @@ import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXListSpecBuilder
-import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -42,7 +42,11 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val customErrors = mutableMapOf<String, ClassName>()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        mutableSetOf(JsonApiX::class.java.name, JsonApiXLinks::class.java.name, JsonApiXMeta::class.java.name)
+        mutableSetOf(
+            JsonApiX::class.java.name,
+            JsonApiXLinks::class.java.name,
+            JsonApiXMeta::class.java.name
+        )
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -50,34 +54,51 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val linksElements = roundEnv?.getElementsAnnotatedWith(JsonApiXLinks::class.java).orEmpty().map {
-            val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
-            val placementStrategy =
-                it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
-            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
-            customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
-                when (placementStrategy) {
-                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className.canonicalName
-                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className.canonicalName
+        val linksElements =
+            roundEnv?.getElementsAnnotatedWith(JsonApiXLinks::class.java).orEmpty().map {
+                val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
+                val placementStrategy =
+                    it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
+                val className = ClassName(
+                    processingEnv.elementUtils.getPackageOf(it).toString(),
+                    it.simpleName.toString()
+                )
+                customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
+                    when (placementStrategy) {
+                        LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
+                        LinksPlacementStrategy.DATA ->
+                            linksInfo.resourceObjectLinks =
+                                className.canonicalName
+
+                        LinksPlacementStrategy.RELATIONSHIPS ->
+                            linksInfo.relationshipsLinks =
+                                className.canonicalName
+                    }
+                } ?: kotlin.run {
+                    val linksInfo = LinksInfo(type)
+                    when (placementStrategy) {
+                        LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
+                        LinksPlacementStrategy.DATA ->
+                            linksInfo.resourceObjectLinks =
+                                className.canonicalName
+
+                        LinksPlacementStrategy.RELATIONSHIPS ->
+                            linksInfo.relationshipsLinks =
+                                className.canonicalName
+                    }
+                    customLinks.add(linksInfo)
                 }
-            } ?: kotlin.run {
-                val linksInfo = LinksInfo(type)
-                when (placementStrategy) {
-                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className.canonicalName
-                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className.canonicalName
-                }
-                customLinks.add(linksInfo)
+                className
             }
-            className
-        }
 
         collector.addCustomLinks(linksElements)
 
         roundEnv?.getElementsAnnotatedWith(JsonApiXMeta::class.java).orEmpty().forEach {
             val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
-            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            val className = ClassName(
+                processingEnv.elementUtils.getPackageOf(it).toString(),
+                it.simpleName.toString()
+            )
             customMetas[type] = className
         }
 
@@ -98,7 +119,8 @@ public class JsonApiProcessor : AbstractProcessor() {
                 }
 
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
-                processAnnotation(it, type)
+                val isNullable = it.getAnnotationParameterValue<JsonApiX, Boolean> { isNullable }
+                processAnnotation(it, type, isNullable)
             }
 
             val kaptKotlinGeneratedDir =
@@ -110,7 +132,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     }
 
     @SuppressWarnings("LongMethod")
-    private fun processAnnotation(element: Element, type: String) {
+    private fun processAnnotation(element: Element, type: String, isNullable: Boolean) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
         val kaptKotlinGeneratedDir =
@@ -123,7 +145,8 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val inputDataClass = ClassName(generatedPackage, className)
         val generatedJsonWrapperName = JsonApiConstants.Prefix.JSON_API_X.withName(className)
-        val generatedJsonWrapperListName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className)
+        val generatedJsonWrapperListName =
+            JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className)
         val generatedResourceObjectName =
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className)
 
@@ -168,8 +191,14 @@ public class JsonApiProcessor : AbstractProcessor() {
             val relationshipsFileSpec =
                 FileSpec.builder(generatedPackage, relationshipsTypeSpec.name!!)
                     .addType(relationshipsTypeSpec)
-                    .addImport(JsonApiConstants.Packages.CORE, JsonApiConstants.Imports.JSON_API_MODEL)
-                    .addImport(JsonApiConstants.Packages.JSONX, *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS)
+                    .addImport(
+                        JsonApiConstants.Packages.CORE,
+                        JsonApiConstants.Imports.JSON_API_MODEL
+                    )
+                    .addImport(
+                        JsonApiConstants.Packages.JSONX,
+                        *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS
+                    )
                     .build()
             relationshipsFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
@@ -179,18 +208,19 @@ public class JsonApiProcessor : AbstractProcessor() {
         }
 
         collector.add(
-            type,
-            inputDataClass,
-            jsonWrapperClassName,
-            jsonWrapperListClassName,
-            resourceObjectClassName,
-            attributesClassName,
-            relationshipsClassName,
-            IncludedSpecBuilder.build(
+            type = type,
+            isNullable = isNullable,
+            data = inputDataClass,
+            wrapper = jsonWrapperClassName,
+            wrapperList = jsonWrapperListClassName,
+            resourceObject = resourceObjectClassName,
+            attributesObject = attributesClassName,
+            relationshipsObject = relationshipsClassName,
+            includedStatement = IncludedSpecBuilder.build(
                 oneRelationships,
                 manyRelationships
             ),
-            IncludedSpecBuilder.buildForList(
+            includedListStatement = IncludedSpecBuilder.buildForList(
                 oneRelationships,
                 manyRelationships
             )
@@ -207,9 +237,9 @@ public class JsonApiProcessor : AbstractProcessor() {
                 mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, type, customMetas[type])
+            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, customMetas[type])
         val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, type, customMetas[type])
+            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, customMetas[type])
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
@@ -240,7 +270,10 @@ public class JsonApiProcessor : AbstractProcessor() {
     private fun processErrorAnnotation(roundEnv: RoundEnvironment?) {
         roundEnv?.getElementsAnnotatedWith(JsonApiXError::class.java).orEmpty().forEach {
             val type = it.getAnnotationParameterValue<JsonApiXError, String> { type }
-            val className = ClassName(processingEnv.elementUtils.getPackageOf(it).toString(), it.simpleName.toString())
+            val className = ClassName(
+                processingEnv.elementUtils.getPackageOf(it).toString(),
+                it.simpleName.toString()
+            )
             customErrors[type] = className
         }
         collector.addCustomErrors(customErrors)

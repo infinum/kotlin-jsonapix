@@ -48,7 +48,7 @@ public object TypeAdapterSpecBuilder {
                         if (meta != null) {
                             addFunction(metaFunSpec(meta))
                         }
-                        if(errors != null) {
+                        if (errors != null) {
                             addFunction(errorsFunSpec(errors))
                         }
                     }

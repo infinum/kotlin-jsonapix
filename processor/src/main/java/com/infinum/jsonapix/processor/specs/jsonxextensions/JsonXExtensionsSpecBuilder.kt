@@ -36,6 +36,7 @@ internal class JsonXExtensionsSpecBuilder {
     @SuppressWarnings("LongParameterList")
     fun add(
         type: String,
+        isNullable: Boolean,
         data: ClassName,
         wrapper: ClassName,
         wrapperList: ClassName,
@@ -43,17 +44,18 @@ internal class JsonXExtensionsSpecBuilder {
         attributesObject: ClassName?,
         relationshipsObject: ClassName?,
         includedStatement: CodeBlock?,
-        includedListStatement: CodeBlock?
+        includedListStatement: CodeBlock?,
     ) {
         specsMap[data] = ClassInfo(
-            type,
-            wrapper,
-            wrapperList,
-            resourceObject,
-            attributesObject,
-            relationshipsObject,
-            includedStatement,
-            includedListStatement
+            type = type,
+            isNullable = isNullable,
+            jsonWrapperClassName = wrapper,
+            jsonWrapperListClassName = wrapperList,
+            resourceObjectClassName = resourceObject,
+            attributesWrapperClassName = attributesObject,
+            relationshipsObjectClassName = relationshipsObject,
+            includedStatement = includedStatement,
+            includedListStatement = includedListStatement
         )
     }
 
@@ -81,7 +83,12 @@ internal class JsonXExtensionsSpecBuilder {
             .receiver(HttpException::class)
             .returns(JsonXHttpException::class)
             .addModifiers(KModifier.INLINE)
-            .addTypeVariable(typeVariableName.copy(reified = true, bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())))
+            .addTypeVariable(
+                typeVariableName.copy(
+                    reified = true,
+                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
+                )
+            )
             .addStatement(
                 "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
                     "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
@@ -164,11 +171,19 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.includedListStatement?.toString()
                 )
             )
-            fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key))
+
+            fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key, it.value.isNullable))
             fileSpec.addFunction(SerializeListFunSpecBuilder.build(it.key))
         }
 
-        fileSpec.addProperty(WrapperSerializerPropertySpecBuilder.build(specsMap, customLinks, customErrors, metas))
+        fileSpec.addProperty(
+            WrapperSerializerPropertySpecBuilder.build(
+                specsMap,
+                customLinks,
+                customErrors,
+                metas
+            )
+        )
         fileSpec.addProperty(FormatPropertySpecBuilder.build())
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())

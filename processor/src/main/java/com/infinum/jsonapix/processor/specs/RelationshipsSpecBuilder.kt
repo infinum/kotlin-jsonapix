@@ -8,7 +8,6 @@ import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
-import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
