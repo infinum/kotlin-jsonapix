@@ -14,14 +14,16 @@ import kotlinx.serialization.PolymorphicSerializer
 
 internal object SerializeFunSpecBuilder {
 
-    fun build(originalClass: ClassName): FunSpec {
+    fun build(originalClass: ClassName, isNullable: Boolean): FunSpec {
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
 
         val linksParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
+            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class)
+                .build(),
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class)
+                .build()
         )
 
         val metaParams = listOf(
@@ -38,7 +40,10 @@ internal object SerializeFunSpecBuilder {
             .returns(String::class)
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
             .addStatement(
-                "val discriminator = %T(jsonX.data.type, %L, %L, %L, %L, %L, %L, %L)",
+                if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type"
+            )
+            .addStatement(
+                "val discriminator = %T(type, %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class.asClassName(),
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,

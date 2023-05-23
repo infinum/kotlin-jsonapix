@@ -12,13 +12,13 @@ import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXListSpecBuilder
-import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXSpecBuilder
 import com.infinum.jsonapix.processor.specs.RelationshipsSpecBuilder
 import com.infinum.jsonapix.processor.specs.ResourceObjectSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -55,7 +55,8 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val linksElements = roundEnv?.getLinksElements().orEmpty()
+        val linksElements =
+            roundEnv?.getLinksElements().orEmpty()
         val metaElements = roundEnv?.getMetaElements().orEmpty()
 
         collector.addCustomLinks(linksElements)
@@ -76,7 +77,8 @@ public class JsonApiProcessor : AbstractProcessor() {
                 }
 
                 val type = it.getAnnotationParameterValue<JsonApiX, String> { type }
-                processAnnotation(it, type)
+                val isNullable = it.getAnnotationParameterValue<JsonApiX, Boolean> { isNullable }
+                processAnnotation(it, type, isNullable)
             }
 
             val kaptKotlinGeneratedDir =
@@ -88,7 +90,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     }
 
     @SuppressWarnings("LongMethod")
-    private fun processAnnotation(element: Element, type: String) {
+    private fun processAnnotation(element: Element, type: String, isNullable: Boolean) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
         val kaptKotlinGeneratedDir =
@@ -164,18 +166,19 @@ public class JsonApiProcessor : AbstractProcessor() {
         }
 
         collector.add(
-            type,
-            inputDataClass,
-            jsonWrapperClassName,
-            jsonWrapperListClassName,
-            resourceObjectClassName,
-            attributesClassName,
-            relationshipsClassName,
-            IncludedSpecBuilder.build(
+            type = type,
+            isNullable = isNullable,
+            data = inputDataClass,
+            wrapper = jsonWrapperClassName,
+            wrapperList = jsonWrapperListClassName,
+            resourceObject = resourceObjectClassName,
+            attributesObject = attributesClassName,
+            relationshipsObject = relationshipsClassName,
+            includedStatement = IncludedSpecBuilder.build(
                 oneRelationships,
                 manyRelationships
             ),
-            IncludedSpecBuilder.buildForList(
+            includedListStatement = IncludedSpecBuilder.buildForList(
                 oneRelationships,
                 manyRelationships
             )
@@ -194,10 +197,9 @@ public class JsonApiProcessor : AbstractProcessor() {
                 manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
         val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, type, metaInfo?.rootClassName)
+            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
         val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, type, metaInfo?.rootClassName)
-
+            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(

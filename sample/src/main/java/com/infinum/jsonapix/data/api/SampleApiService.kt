@@ -2,6 +2,7 @@ package com.infinum.jsonapix.data.api
 
 import co.infinum.retromock.meta.Mock
 import co.infinum.retromock.meta.MockResponse
+import com.infinum.jsonapix.data.models.EmptyData
 import com.infinum.jsonapix.data.models.Person
 import retrofit2.http.GET
 
@@ -26,4 +27,9 @@ interface SampleApiService {
     @MockResponse(body = "responses/error.json", code = 400, message = "ERROR")
     @GET("/error")
     suspend fun fetchError(): Person
+
+    @Mock
+    @MockResponse(body = "responses/empty_resoruce_object.json")
+    @GET("/empty")
+    suspend fun fetchEmptyResponse(): EmptyData
 }

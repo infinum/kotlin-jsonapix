@@ -21,6 +21,7 @@ internal abstract class BaseJsonApiXSpecBuilder {
 
     abstract fun build(
         className: ClassName,
+        isNullable: Boolean,
         type: String,
         metaClassName: ClassName?
     ): FileSpec
@@ -47,12 +48,19 @@ internal abstract class BaseJsonApiXSpecBuilder {
                 .build()
         )
 
-        params.add(Specs.getNamedParamSpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true))
+        params.add(
+            Specs.getNamedParamSpec(
+                Links::class.asClassName(),
+                JsonApiConstants.Keys.LINKS,
+                true
+            )
+        )
 
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.META,
-                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName()
+                    .copy(nullable = true)
             ).defaultValue("%L", "null").build()
         )
         return params
@@ -72,7 +80,11 @@ internal abstract class BaseJsonApiXSpecBuilder {
         properties.add(errorsProperty())
 
         properties.add(
-            Specs.getNamedPropertySpec(Links::class.asClassName(), JsonApiConstants.Keys.LINKS, true)
+            Specs.getNamedPropertySpec(
+                Links::class.asClassName(),
+                JsonApiConstants.Keys.LINKS,
+                true
+            )
         )
         properties.add(metaProperty(metaClassName))
 

@@ -44,7 +44,7 @@ internal object DeserializeFunSpecBuilder {
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(JsonApiX::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
-                "val type = %T.%M(%T.%L(this).%M[%S]!!)",
+                "val type = %T.%M(%T.%L(this).%M[%S])",
                 TypeExtractor::class.asTypeName(),
                 findTypeMember,
                 Json::class.asTypeName(),
@@ -53,7 +53,7 @@ internal object DeserializeFunSpecBuilder {
                 JsonApiConstants.Keys.DATA
             )
             .addStatement(
-                "val discriminator = %T(%L, %L, %L, %L, %L, %L, %L, %L)",
+                "val discriminator = %T(%L ?: TypeExtractor.guessType(Model::class), %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class,
                 JsonApiConstants.Keys.TYPE,
                 JsonApiConstants.Members.ROOT_LINKS,
