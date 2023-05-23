@@ -10,6 +10,9 @@
     "links": {
       "self": "https://resource.link.com"
     },
+    "meta": {
+      "writer": "Ali"
+    },
     "type":"person",
     "id":"1",
     "attributes":{
@@ -25,6 +28,9 @@
         "data":{
           "type":"dog",
           "id":"1"
+        },
+        "meta": {
+          "user": "Ali"
         }
       },
       "allMyDogs":{
@@ -34,7 +40,10 @@
         "data":[
           { "type":"dog", "id":"1" },
           { "type":"dog", "id":"2" }
-        ]
+        ],
+        "meta": {
+          "user": "Ali"
+        }
       }
     }
   },

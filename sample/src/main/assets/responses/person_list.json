@@ -11,37 +11,40 @@
       "links": {
         "self": "https://resource.link.com"
       },
-      "type": "person",
-      "id": "1",
-      "attributes": {
-        "age": 28,
-        "name": "Jason",
-        "surname": "Apix"
+      "meta": {
+        "writer": "Ali"
       },
-      "relationships": {
-        "myFavoriteDog": {
+      "type":"person",
+      "id":"1",
+      "attributes":{
+        "age":28,
+        "name":"Jason",
+        "surname":"Apix"
+      },
+      "relationships":{
+        "myFavoriteDog":{
           "links": {
             "self": "https://relationship.link.com"
           },
-          "data": {
-            "type": "dog",
-            "id": "1"
+          "data":{
+            "type":"dog",
+            "id":"1"
+          },
+          "meta": {
+            "user": "Ali"
           }
         },
-        "allMyDogs": {
+        "allMyDogs":{
           "links": {
             "self": "https://relationship.link.com"
           },
-          "data": [
-            {
-              "type": "dog",
-              "id": "1"
-            },
-            {
-              "type": "dog",
-              "id": "2"
-            }
-          ]
+          "data":[
+            { "type":"dog", "id":"1" },
+            { "type":"dog", "id":"2" }
+          ],
+          "meta": {
+            "user": "Ali"
+          }
         }
       }
     },
@@ -49,37 +52,40 @@
       "links": {
         "self": "https://resource.link.com"
       },
-      "type": "person",
-      "id": "2",
-      "attributes": {
-        "age": 28,
-        "name": "Jasminka",
-        "surname": "Apix"
+      "meta": {
+        "writer": "Ali"
       },
-      "relationships": {
-        "myFavoriteDog": {
+      "type":"person",
+      "id":"1",
+      "attributes":{
+        "age":28,
+        "name":"Jason",
+        "surname":"Apix"
+      },
+      "relationships":{
+        "myFavoriteDog":{
           "links": {
             "self": "https://relationship.link.com"
           },
-          "data": {
-            "type": "dog",
-            "id": "2"
+          "data":{
+            "type":"dog",
+            "id":"1"
+          },
+          "meta": {
+            "user": "Ali"
           }
         },
-        "allMyDogs": {
+        "allMyDogs":{
           "links": {
             "self": "https://relationship.link.com"
           },
-          "data": [
-            {
-              "type": "dog",
-              "id": "1"
-            },
-            {
-              "type": "dog",
-              "id": "2"
-            }
-          ]
+          "data":[
+            { "type":"dog", "id":"1" },
+            { "type":"dog", "id":"2" }
+          ],
+          "meta": {
+            "user": "Ali"
+          }
         }
       }
     }

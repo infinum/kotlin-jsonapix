@@ -1,9 +1,10 @@
 package com.infinum.jsonapix.ui.examples.person
 
+import android.util.Log
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
 import com.infinum.jsonapix.data.models.Person
-import com.infinum.jsonapix.data.models.PersonMeta
+import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,42 +17,52 @@ class PersonViewModel @Inject constructor(
 
     fun fetchPerson() {
         launch {
-            showLoading()
-            val bodyString = io { jsonAssetReader.readJsonAsset("responses/person.json") }
-            val person = io { sampleApiService.fetchPerson() }
-            hideLoading()
-            viewState = PersonState(
-                bodyString,
-                person,
-                person.rootLinks()?.self,
-                person.resourceLinks()?.self,
-                person.relationshipsLinks()?.values?.firstOrNull()?.self,
-                person.rootMeta<PersonMeta>()?.owner
-            )
+            try {
+
+                showLoading()
+                val bodyString = io { jsonAssetReader.readJsonAsset("responses/person.json") }
+                val person = io { sampleApiService.fetchPerson() }
+                hideLoading()
+                viewState = PersonState(
+                    bodyString,
+                    person,
+                    person.rootLinks()?.self,
+                    person.resourceLinks()?.self,
+                    person.relationshipsLinks()?.values?.firstOrNull()?.self,
+                    person.rootMeta<PersonRootMeta>()?.owner
+                )
+            }catch (t: Throwable){
+                hideLoading()
+                Log.e("Error","Test",t)
+            }
         }
     }
 
     fun fetchPersonList(hasRelationships: Boolean) {
         launch {
-            showLoading()
-            val bodyString: String
-            val persons: List<Person>
-            if (hasRelationships) {
-                bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
-                persons = io { sampleApiService.fetchPersons() }
-            } else {
-                bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list_no_relationships.json") }
-                persons = io { sampleApiService.fetchPersonsNoRelationships() }
+            try {
+                showLoading()
+                val bodyString: String
+                val persons: List<Person>
+                if (hasRelationships) {
+                    bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
+                    persons = io { sampleApiService.fetchPersons() }
+                } else {
+                    bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list_no_relationships.json") }
+                    persons = io { sampleApiService.fetchPersonsNoRelationships() }
+                }
+                hideLoading()
+                viewState = PersonState(
+                    bodyString,
+                    persons.first(),
+                    persons.last().rootLinks()?.self,
+                    persons.last().resourceLinks()?.self,
+                    persons.first().relationshipsLinks()?.values?.firstOrNull()?.self,
+                    persons.first().rootMeta<PersonRootMeta>()?.owner
+                )
+            }catch (t: Throwable){
+                Log.e("Error","Test",t)
             }
-            hideLoading()
-            viewState = PersonState(
-                bodyString,
-                persons.first(),
-                persons.last().rootLinks()?.self,
-                persons.last().resourceLinks()?.self,
-                persons.first().relationshipsLinks()?.values?.firstOrNull()?.self,
-                persons.first().rootMeta<PersonMeta>()?.owner
-            )
         }
     }
 }
