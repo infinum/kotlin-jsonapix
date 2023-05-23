@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class ManyRelationshipMember(
     @SerialName("data") val data: List<ResourceIdentifier>,
-    @SerialName("links") val links: Links? = null
+    @SerialName("links") val links: Links? = null,
+    @SerialName("meta") val meta: Meta? = null,
 )
