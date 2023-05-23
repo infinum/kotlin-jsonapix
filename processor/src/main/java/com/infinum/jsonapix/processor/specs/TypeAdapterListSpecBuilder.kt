@@ -142,7 +142,7 @@ public object TypeAdapterListSpecBuilder {
             .addStatement("safeModel.setRootMeta(data.meta)")
             .addStatement("safeModel.setResourceMeta(resource.meta)")
             .addStatement("resource.relationshipsMeta()?.let {")
-            .addStatement("relationshipMeta -> safeModel.setRelationshipsMeta(relationshipMeta)")
+            .addStatement("relationshipMeta -> safeModel.setRelationshipsMeta(relationshipMeta.filterValues { it != null })")
             .addStatement("}")
             .addStatement("safeModel.setErrors(data.errors)")
             .addStatement("}")
