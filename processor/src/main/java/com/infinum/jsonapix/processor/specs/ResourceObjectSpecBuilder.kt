@@ -5,6 +5,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.common.JsonApiXMissingArgumentException
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.squareup.kotlinpoet.ClassName
@@ -27,6 +28,7 @@ internal object ResourceObjectSpecBuilder {
     @SuppressWarnings("LongMethod")
     fun build(
         className: ClassName,
+        metaClassName: ClassName?,
         type: String,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
@@ -124,6 +126,19 @@ internal object ResourceObjectSpecBuilder {
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.LINKS,
                 Links::class.asClassName().copy(nullable = true)
+            )
+        )
+
+        paramsList.add(
+            Specs.getNullParamSpec(
+                JsonApiConstants.Keys.META,
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
+            )
+        )
+        propsList.add(
+            Specs.getNullPropertySpec(
+                JsonApiConstants.Keys.META,
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
             )
         )
 
