@@ -14,7 +14,7 @@ import kotlinx.serialization.json.jsonObject
 abstract class BaseJsonApiDiscriminator(
     rootType: String,
     private val relationshipsLinks: String,
-    private val meta: String,
+    private val relationshipsMeta: String,
     private val error: String
 ) : Discriminator {
 
@@ -33,11 +33,6 @@ abstract class BaseJsonApiDiscriminator(
             override val key: String = key
             override val value: JsonArray = data
         }
-    }
-
-    fun getNewMetaObject(original: JsonElement): JsonElement {
-        val metaDiscriminator = CommonDiscriminator(meta)
-        return metaDiscriminator.inject(original)
     }
 
     fun getDataObject(jsonElement: JsonElement) =
@@ -66,7 +61,8 @@ abstract class BaseJsonApiDiscriminator(
         original: JsonElement,
         attributesObject: JsonElement?,
         relationshipsObject: JsonElement?,
-        linksObject: JsonElement?
+        linksObject: JsonElement?,
+        metaObject: JsonElement?,
     ): JsonObject {
         return original.jsonObject.entries.toMutableSet().let { entries ->
             attributesObject?.let { attributes ->
@@ -84,6 +80,11 @@ abstract class BaseJsonApiDiscriminator(
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, links))
             }
 
+            metaObject?.let { meta ->
+                entries.removeAll { it.key == JsonApiConstants.Keys.META }
+                entries.add(getJsonObjectEntry(JsonApiConstants.Keys.META, meta))
+            }
+
             val resultMap = mutableMapOf<String, JsonElement>()
             resultMap.putAll(entries.map { Pair(it.key, it.value) })
             JsonObject(resultMap)
@@ -95,6 +96,7 @@ abstract class BaseJsonApiDiscriminator(
     ): JsonObject {
         val resultMap = mutableMapOf<String, JsonElement>()
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
+        val relationshipsMetaDiscriminator = CommonDiscriminator(relationshipsMeta)
         original.jsonObject.entries.filter { it.value is JsonObject }.forEach { relationshipEntry ->
             val set = relationshipEntry.value.jsonObject.entries.toMutableSet()
             getLinksObject(relationshipEntry.value)?.let { linksObject ->
@@ -102,6 +104,14 @@ abstract class BaseJsonApiDiscriminator(
                     val newLinks = relationshipsLinksDiscriminator.inject(linksObject)
                     set.removeAll { it.key == JsonApiConstants.Keys.LINKS }
                     set.add(getJsonObjectEntry(JsonApiConstants.Keys.LINKS, newLinks))
+                }
+            }
+
+            getMetaObject(relationshipEntry.value)?.let { metaObject ->
+                if (metaObject !is JsonNull) {
+                    val newLinks = relationshipsMetaDiscriminator.inject(metaObject)
+                    set.removeAll { it.key == JsonApiConstants.Keys.META }
+                    set.add(getJsonObjectEntry(JsonApiConstants.Keys.META, newLinks))
                 }
             }
             val tempMap = mutableMapOf<String, JsonElement>()
