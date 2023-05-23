@@ -29,7 +29,7 @@ internal object WrapperSerializerPropertySpecBuilder {
         specsMap: HashMap<ClassName, ClassInfo>,
         customLinks: List<ClassName>,
         customErrors: Map<String, ClassName>,
-        metas: Map<String, ClassName>
+        metas: List<ClassName>
     ): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
         val polymorpicMember = MemberName(
@@ -156,7 +156,7 @@ internal object WrapperSerializerPropertySpecBuilder {
 
         codeBlockBuilder.indent()
 
-        metas.values.forEach { meta ->
+        metas.forEach { meta ->
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,

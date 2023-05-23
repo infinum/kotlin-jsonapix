@@ -16,7 +16,7 @@ abstract class JsonApiModel {
     private var errors: List<Error>? = null
     private var rootMeta: Meta? = null
     private var resourceMeta: Meta? = null
-    private var relationshipMeta: Map<String, Meta>? = null
+    private var relationshipMeta: Map<String, Meta?>? = null
 
     fun setType(type: String?) {
         this.type = type
@@ -50,7 +50,7 @@ abstract class JsonApiModel {
         this.resourceMeta = meta
     }
 
-    fun setRelationshipMeta(metaMap: Map<String, Meta>?) {
+    fun setRelationshipsMeta(metaMap: Map<String, Meta?>) {
         this.relationshipMeta = metaMap
     }
 

@@ -29,12 +29,19 @@ internal object DeserializeListFunSpecBuilder {
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
         )
+
+        val metaParams = listOf(
+            ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
+            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build()
+        )
+
         return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .addParameters(linksParams)
-            .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.META, String::class).build())
+            .addParameters(metaParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(JsonApiXList::class.asClassName().parameterizedBy(typeVariableName))
             .addStatement(
@@ -52,13 +59,15 @@ internal object DeserializeListFunSpecBuilder {
                 findTypeMember
             )
             .addStatement(
-                "val discriminator = %T(%L, %L, %L, %L, %L, %L)",
+                "val discriminator = %T(%L, %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiListDiscriminator::class,
                 JsonApiConstants.Keys.TYPE,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META,
+                JsonApiConstants.Members.ROOT_META,
+                JsonApiConstants.Members.RESOURCE_OBJECT_META,
+                JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
             .addStatement(
