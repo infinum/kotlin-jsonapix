@@ -50,7 +50,7 @@ class JsonApiListDiscriminator(
                     val relationshipsDiscriminator = CommonDiscriminator(
                         JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
                     )
-                    getNewRelationshipsObject(relationshipsDiscriminator.inject(it))
+                    relationshipsDiscriminator.inject(getNewRelationshipsObject(it))
                 }
 
                 val newAttributesObject = attributesObject?.takeIf { it !is JsonNull }?.let {

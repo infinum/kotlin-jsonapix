@@ -72,7 +72,7 @@ public object TypeAdapterListSpecBuilder {
                         if (relationshipsMeta != null) {
                             addFunction(
                                 metaFunSpec(
-                                    JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                                    JsonApiConstants.Members.RELATIONSHIPS_META,
                                     relationshipsMeta
                                 )
                             )
