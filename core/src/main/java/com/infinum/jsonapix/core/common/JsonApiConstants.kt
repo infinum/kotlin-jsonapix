@@ -70,6 +70,11 @@ object JsonApiConstants {
         const val ROOT_LINKS = "rootLinks"
         const val RESOURCE_OBJECT_LINKS = "resourceObjectLinks"
         const val RELATIONSHIPS_LINKS = "relationshipsLinks"
+
+        const val ROOT_META = "rootMeta"
+        const val RESOURCE_OBJECT_META = "resourceObjectMeta"
+        const val RELATIONSHIPS_META = "relationshipsMeta"
+
         const val ERRORS = "errors"
     }
 
