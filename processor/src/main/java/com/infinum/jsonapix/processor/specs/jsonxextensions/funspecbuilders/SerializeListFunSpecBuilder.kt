@@ -31,7 +31,7 @@ internal object SerializeListFunSpecBuilder {
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build()
         )
-        
+
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
             .receiver(Iterable::class.asClassName().parameterizedBy(originalClass))
             .addParameters(linksParams)

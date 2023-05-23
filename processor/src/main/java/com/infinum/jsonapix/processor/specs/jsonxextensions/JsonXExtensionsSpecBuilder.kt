@@ -68,7 +68,7 @@ internal class JsonXExtensionsSpecBuilder {
     }
 
     fun addCustomMetas(meta: List<ClassName>) {
-       customMeta.clear()
+        customMeta.clear()
         customMeta.addAll(meta)
     }
 

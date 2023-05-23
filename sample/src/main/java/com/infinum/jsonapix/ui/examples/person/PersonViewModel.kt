@@ -31,9 +31,9 @@ class PersonViewModel @Inject constructor(
                     person.relationshipsLinks()?.values?.firstOrNull()?.self,
                     person.rootMeta<PersonRootMeta>()?.owner
                 )
-            }catch (t: Throwable){
+            } catch (t: Throwable) {
                 hideLoading()
-                Log.e("Error","Test",t)
+                Log.e("Error", "Test", t)
             }
         }
     }
@@ -60,8 +60,8 @@ class PersonViewModel @Inject constructor(
                     persons.first().relationshipsLinks()?.values?.firstOrNull()?.self,
                     persons.first().rootMeta<PersonRootMeta>()?.owner
                 )
-            }catch (t: Throwable){
-                Log.e("Error","Test",t)
+            } catch (t: Throwable) {
+                Log.e("Error", "Test", t)
             }
         }
     }

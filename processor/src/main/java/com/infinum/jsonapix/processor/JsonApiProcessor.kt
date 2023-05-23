@@ -87,7 +87,6 @@ public class JsonApiProcessor : AbstractProcessor() {
         return true
     }
 
-
     @SuppressWarnings("LongMethod")
     private fun processAnnotation(element: Element, type: String) {
         val className = element.simpleName.toString()
@@ -183,7 +182,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         )
 
         adapterFactoryCollector.add(inputDataClass)
-        val metaInfo = customMetas.firstOrNull{it.type == type}
+        val metaInfo = customMetas.firstOrNull { it.type == type }
 
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
@@ -242,8 +241,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         collector.addCustomErrors(customErrors)
     }
 
-    private fun RoundEnvironment.getLinksElements(
-    ): List<ClassName> {
+    private fun RoundEnvironment.getLinksElements(): List<ClassName> {
         return getElementsAnnotatedWith(JsonApiXLinks::class.java).map {
             val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
             val placementStrategy =
@@ -255,21 +253,25 @@ public class JsonApiProcessor : AbstractProcessor() {
             customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
                 when (placementStrategy) {
                     LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks =
-                        className.canonicalName
+                    LinksPlacementStrategy.DATA ->
+                        linksInfo.resourceObjectLinks =
+                            className.canonicalName
 
-                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks =
-                        className.canonicalName
+                    LinksPlacementStrategy.RELATIONSHIPS ->
+                        linksInfo.relationshipsLinks =
+                            className.canonicalName
                 }
             } ?: kotlin.run {
                 val linksInfo = LinksInfo(type)
                 when (placementStrategy) {
                     LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks =
-                        className.canonicalName
+                    LinksPlacementStrategy.DATA ->
+                        linksInfo.resourceObjectLinks =
+                            className.canonicalName
 
-                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks =
-                        className.canonicalName
+                    LinksPlacementStrategy.RELATIONSHIPS ->
+                        linksInfo.relationshipsLinks =
+                            className.canonicalName
                 }
                 customLinks.add(linksInfo)
             }
@@ -277,8 +279,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         }
     }
 
-    private fun RoundEnvironment.getMetaElements(
-    ): List<ClassName> {
+    private fun RoundEnvironment.getMetaElements(): List<ClassName> {
         return getElementsAnnotatedWith(JsonApiXMeta::class.java).map {
             val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
             val placementStrategy =
@@ -290,26 +291,28 @@ public class JsonApiProcessor : AbstractProcessor() {
             customMetas.firstOrNull { metaInfo -> metaInfo.type == type }?.let { metaInfo ->
                 when (placementStrategy) {
                     MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
-                    MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName =
-                        className
+                    MetaPlacementStrategy.DATA ->
+                        metaInfo.resourceObjectClassName =
+                            className
 
-                    MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme =
-                        className
+                    MetaPlacementStrategy.RELATIONSHIPS ->
+                        metaInfo.relationshipsClassNAme =
+                            className
                 }
             } ?: kotlin.run {
                 val metaInfo = MetaInfo(type)
                 when (placementStrategy) {
                     MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
-                    MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName =
-                        className
-                    MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme =
-                        className
+                    MetaPlacementStrategy.DATA ->
+                        metaInfo.resourceObjectClassName =
+                            className
+                    MetaPlacementStrategy.RELATIONSHIPS ->
+                        metaInfo.relationshipsClassNAme =
+                            className
                 }
                 customMetas.add(metaInfo)
             }
             className
         }
     }
-
-
 }

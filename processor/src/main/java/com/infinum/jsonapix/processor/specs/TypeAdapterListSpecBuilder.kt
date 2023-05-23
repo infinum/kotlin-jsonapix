@@ -78,7 +78,6 @@ public object TypeAdapterListSpecBuilder {
                             )
                         }
 
-
                         if (errors != null) {
                             addFunction(errorsFunSpec(errors))
                         }

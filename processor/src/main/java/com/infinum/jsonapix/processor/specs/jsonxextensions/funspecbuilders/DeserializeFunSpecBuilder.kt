@@ -34,7 +34,7 @@ internal object DeserializeFunSpecBuilder {
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build()
         )
-        
+
         return FunSpec.builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)

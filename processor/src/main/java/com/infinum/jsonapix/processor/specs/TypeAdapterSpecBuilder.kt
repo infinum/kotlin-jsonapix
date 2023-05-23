@@ -60,7 +60,7 @@ public object TypeAdapterSpecBuilder {
                             addFunction(metaFunSpec(JsonApiConstants.Members.RELATIONSHIPS_META, relationshipsMeta))
                         }
 
-                        if(errors != null) {
+                        if (errors != null) {
                             addFunction(errorsFunSpec(errors))
                         }
                     }
