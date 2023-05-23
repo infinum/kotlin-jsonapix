@@ -19,7 +19,9 @@ public object TypeAdapterSpecBuilder {
         rootLinks: String?,
         resourceObjectLinks: String?,
         relationshipsLinks: String?,
-        meta: String?,
+        rootMeta: String?,
+        resourceObjectMeta: String?,
+        relationshipsMeta: String?,
         errors: String?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER.withName(className.simpleName)
@@ -45,9 +47,19 @@ public object TypeAdapterSpecBuilder {
                         if (relationshipsLinks != null) {
                             addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
                         }
-                        if (meta != null) {
-                            addFunction(metaFunSpec(meta))
+
+                        if (rootMeta != null) {
+                            addFunction(metaFunSpec(JsonApiConstants.Members.ROOT_META, rootMeta))
                         }
+                        if (resourceObjectMeta != null) {
+                            addFunction(
+                                metaFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_META, resourceObjectMeta)
+                            )
+                        }
+                        if (relationshipsMeta != null) {
+                            addFunction(metaFunSpec(JsonApiConstants.Members.RELATIONSHIPS_META, relationshipsMeta))
+                        }
+
                         if(errors != null) {
                             addFunction(errorsFunSpec(errors))
                         }
@@ -68,12 +80,14 @@ public object TypeAdapterSpecBuilder {
             .addParameter("input", className)
             .returns(String::class)
             .addStatement(
-                "return input.%N(%N(), %N(), %N(), %N(), %N())",
+                "return input.%N(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_SERIALIZE,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META,
+                JsonApiConstants.Members.ROOT_META,
+                JsonApiConstants.Members.RESOURCE_OBJECT_META,
+                JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
             .build()
@@ -85,22 +99,25 @@ public object TypeAdapterSpecBuilder {
             .addParameter("input", String::class)
             .returns(className)
             .addStatement(
-                "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N())",
+                "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_DESERIALIZE,
                 className,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Keys.META,
+                JsonApiConstants.Members.ROOT_META,
+                JsonApiConstants.Members.RESOURCE_OBJECT_META,
+                JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
             .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
             .addStatement("(original as? %T)?.let {", JsonApiModel::class)
             .addStatement("it.setRootLinks(data.links)")
             .addStatement("it.setResourceLinks(data.data?.links)")
-            .addStatement("it.setErrors(data.errors)")
             .addStatement("data.data?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")
-            .addStatement("it.setMeta(data.meta)")
+            .addStatement("it.setRootMeta(data.meta)")
+            .addStatement("it.setResourceMeta(data.data?.meta)")
+            .addStatement("data.data?.relationshipsMeta()?.let { meta -> it.setRelationshipsMeta(meta) }")            .addStatement("it.setErrors(data.errors)")
             .addStatement("}")
             .addStatement("return original")
             .build()
@@ -122,8 +139,8 @@ public object TypeAdapterSpecBuilder {
             .build()
     }
 
-    private fun metaFunSpec(meta: String): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Keys.META)
+    private fun metaFunSpec(methodName: String, meta: String): FunSpec {
+        return FunSpec.builder(methodName)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
             .addStatement("return %S", meta)

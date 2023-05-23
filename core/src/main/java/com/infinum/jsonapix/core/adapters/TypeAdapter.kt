@@ -5,7 +5,9 @@ interface TypeAdapter<Model> {
     fun resourceObjectLinks(): String = "links"
     fun relationshipsLinks(): String = "links"
     fun errors(): String = "error"
-    fun meta(): String = ""
+    fun rootMeta(): String = "meta"
+    fun resourceObjectMeta(): String = "meta"
+    fun relationshipsMeta(): String = "meta"
     fun convertFromString(input: String): Model
     fun convertToString(input: Model): String
 }
