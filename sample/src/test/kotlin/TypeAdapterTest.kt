@@ -3,6 +3,7 @@ import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonRootMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
@@ -228,6 +229,30 @@ internal class TypeAdapterTest {
         Assertions.assertEquals(
             response,
             result
+        )
+    }
+
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has a root meta, should generate a Person with PersonRootMeta` () {
+        val rootMeta = PersonRootMeta("Ali")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = null,
+        ).apply {
+            setRootMeta(rootMeta)
+        }
+
+        val response = getFileAsString("person_with_root_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.rootMeta(),
+            result?.rootMeta()
         )
     }
 
