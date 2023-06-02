@@ -3,6 +3,7 @@ import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -235,12 +236,12 @@ internal class TypeAdapterTest {
 
     @org.junit.jupiter.api.Test
     fun `given that a response that has a root meta, should generate a Person with PersonRootMeta` () {
-        val rootMeta = PersonRootMeta("Ali")
+        val rootMeta = PersonRootMeta("hh")
         val person = Person(
             name = "Jason",
             surname = "Apix",
             age = 28,
-            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            allMyDogs = null,
             myFavoriteDog = null,
         ).apply {
             setRootMeta(rootMeta)
@@ -253,6 +254,29 @@ internal class TypeAdapterTest {
         Assertions.assertEquals(
             person.rootMeta(),
             result?.rootMeta()
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has a resource object meta, should generate a Person with PersonResourceMeta` () {
+        val resourceMeta = PersonResourceMeta("Ali")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply {
+            setResourceMeta(resourceMeta)
+        }
+
+        val response = getFileAsString("person_with_resource_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.resourceMeta(),
+            result?.resourceMeta()
         )
     }
 
