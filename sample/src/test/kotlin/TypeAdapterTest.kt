@@ -3,6 +3,7 @@ import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import org.junit.jupiter.api.Assertions
@@ -235,7 +236,7 @@ internal class TypeAdapterTest {
 
 
     @org.junit.jupiter.api.Test
-    fun `given that a response that has a root meta, should generate a Person with PersonRootMeta` () {
+    fun `given that a response that has a root meta, should generate a Person with PersonRootMeta`() {
         val rootMeta = PersonRootMeta("hh")
         val person = Person(
             name = "Jason",
@@ -258,7 +259,7 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that a response that has a resource object meta, should generate a Person with PersonResourceMeta` () {
+    fun `given that a response that has a resource object meta, should generate a Person with PersonResourceMeta`() {
         val resourceMeta = PersonResourceMeta("Ali")
         val person = Person(
             name = "Jason",
@@ -277,6 +278,29 @@ internal class TypeAdapterTest {
         Assertions.assertEquals(
             person.resourceMeta(),
             result?.resourceMeta()
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has a one relationship meta, should generate a Person with PersonRelationshipsMeta`() {
+        val relationshipMeta = PersonRelationshipMeta("Ali")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply {
+            setRelationshipsMeta(mapOf("myFavoriteDog" to relationshipMeta))
+        }
+
+        val response = getFileAsString("person_with_one_rel_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.relationshipMeta<PersonRelationshipMeta>(),
+            result?.relationshipMeta<PersonRelationshipMeta>()
         )
     }
 
