@@ -304,6 +304,35 @@ internal class TypeAdapterTest {
         )
     }
 
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has multiple relationship meta, should generate a Person with multiple PersonRelationshipsMeta`() {
+        val firstMeta = PersonRelationshipMeta("First")
+        val secondMeta = PersonRelationshipMeta("Second")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply {
+            setRelationshipsMeta(
+                mapOf(
+                    "myFavoriteDog" to firstMeta,
+                    "allMyDogs" to secondMeta,
+                )
+            )
+        }
+
+        val response = getFileAsString("person_with_many_rel_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.relationshipMeta<PersonRelationshipMeta>(),
+            result?.relationshipMeta<PersonRelationshipMeta>()
+        )
+    }
+
     private fun getFileAsString(filename: String): String {
         val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
         val fileReader: InputStreamReader? = fileStream?.reader()
