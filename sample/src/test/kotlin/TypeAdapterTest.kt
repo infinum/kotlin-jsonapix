@@ -237,7 +237,7 @@ internal class TypeAdapterTest {
 
     @org.junit.jupiter.api.Test
     fun `given that a response that has a root meta, should generate a Person with PersonRootMeta`() {
-        val rootMeta = PersonRootMeta("hh")
+        val rootMeta = PersonRootMeta("Ali")
         val person = Person(
             name = "Jason",
             surname = "Apix",
