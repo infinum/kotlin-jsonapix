@@ -3,7 +3,6 @@ package com.infinum.jsonapix.data.models
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
-import com.infinum.jsonapix.core.JsonApiModel
 import kotlinx.serialization.Serializable
 
 @JsonApiX(type = "company")
@@ -15,4 +14,4 @@ data class Company(
     val manager: Person,
     @HasOne("address")
     val address: Address
-): JsonApiModel()
+)
