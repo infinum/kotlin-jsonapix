@@ -9,7 +9,7 @@ internal object WrapperFunSpecBuilder {
     fun build(
         originalClass: ClassName,
         wrapperClass: ClassName,
-        includedListStatement: String?,
+        includedListStatement: String?
     ): FunSpec {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
@@ -17,14 +17,10 @@ internal object WrapperFunSpecBuilder {
             "return %T(data = this.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()"
         )
 
-        returnStatement.append(", ")
-        returnStatement.append("meta = this.${JsonApiConstants.Members.ROOT_META}()")
-
         if (includedListStatement != null) {
             returnStatement.append(", ")
             returnStatement.append("included = $includedListStatement")
         }
-
         returnStatement.append(")")
         return FunSpec.builder(JsonApiConstants.Members.JSONX_WRAPPER_GETTER)
             .receiver(originalClass)
