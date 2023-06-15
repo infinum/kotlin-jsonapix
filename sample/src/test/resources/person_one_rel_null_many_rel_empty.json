@@ -1,1 +1,1 @@
-{"errors":null,"links":null,"meta":null,"included":[],"data":{"type":"person","id":"0","attributes":{"age":28,"name":"Jason","surname":"Apix"},"relationships":{"myFavoriteDog":null,"allMyDogs":{"data":[],"links":null}},"links":null}}
+{"errors":null,"links":null,"meta":null,"included":[],"data":{"type":"person","id":"0","attributes":{"age":28,"name":"Jason","surname":"Apix"},"relationships":{"myFavoriteDog":null,"allMyDogs":{"data":[],"links":null,"meta":null}},"links":null,"meta":null}}
