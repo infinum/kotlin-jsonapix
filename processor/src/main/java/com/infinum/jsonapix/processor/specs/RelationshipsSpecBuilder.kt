@@ -6,6 +6,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
+import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -85,6 +86,7 @@ internal object RelationshipsSpecBuilder {
             )
             .addProperties(properties)
             .addProperty(linksPropertySpec(oneRelationships, manyRelationships))
+            .addProperty(metaPropertySpec(oneRelationships, manyRelationships))
             .build()
     }
 
@@ -168,6 +170,41 @@ internal object RelationshipsSpecBuilder {
                 .parameterizedBy(
                     String::class.asTypeName(),
                     Links::class.asTypeName().copy(nullable = true)
+                ),
+            KModifier.OVERRIDE
+        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
+
+        return builder.initializer(returnStatement).build()
+    }
+
+    private fun metaPropertySpec(
+        oneRelationships: List<PropertySpec>,
+        manyRelationships: List<PropertySpec>
+    ): PropertySpec {
+        var returnStatement = "mapOf("
+        oneRelationships.forEach {
+            returnStatement += if (it.type.isNullable) {
+                "\"${it.name}\" to ${it.name}?.meta, "
+            } else {
+                "\"${it.name}\" to ${it.name}.meta, "
+            }
+        }
+        manyRelationships.forEach {
+            returnStatement += if (it.type.isNullable) {
+                "\"${it.name}\" to ${it.name}?.meta, "
+            } else {
+                "\"${it.name}\" to ${it.name}.meta, "
+            }
+        }
+        returnStatement += ")"
+
+        val builder = PropertySpec.builder(
+            JsonApiConstants.Keys.META,
+            Map::class
+                .asClassName()
+                .parameterizedBy(
+                    String::class.asTypeName(),
+                    Meta::class.asTypeName().copy(nullable = true)
                 ),
             KModifier.OVERRIDE
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())

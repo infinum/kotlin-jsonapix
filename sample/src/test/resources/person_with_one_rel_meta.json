@@ -1,17 +1,11 @@
 {
   "errors":null,
-  "meta": {
-    "owner": "Stef"
-  },
   "links": {
     "self": "https://root.link.com"
   },
   "data":{
     "links": {
       "self": "https://resource.link.com"
-    },
-    "meta": {
-      "writer": "Ali"
     },
     "type":"person",
     "id":"1",
@@ -25,24 +19,12 @@
         "links": {
           "self": "https://relationship.link.com"
         },
+        "meta": {
+          "user": "Ali"
+        },
         "data":{
           "type":"dog",
           "id":"1"
-        },
-        "meta": {
-          "user": "Ali"
-        }
-      },
-      "allMyDogs":{
-        "links": {
-          "self": "https://relationship.link.com"
-        },
-        "data":[
-          { "type":"dog", "id":"1" },
-          { "type":"dog", "id":"2" }
-        ],
-        "meta": {
-          "user": "Ali"
         }
       }
     }
@@ -54,14 +36,6 @@
       "attributes":{
         "age":1,
         "name":"Bella"
-      }
-    },
-    {
-      "type":"dog",
-      "id":"2",
-      "attributes":{
-        "age":2,
-        "name":"Bongo"
       }
     }
   ]

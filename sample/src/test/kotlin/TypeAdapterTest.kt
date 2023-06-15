@@ -3,6 +3,9 @@ import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonRelationshipMeta
+import com.infinum.jsonapix.data.models.PersonResourceMeta
+import com.infinum.jsonapix.data.models.PersonRootMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
@@ -228,6 +231,105 @@ internal class TypeAdapterTest {
         Assertions.assertEquals(
             response,
             result
+        )
+    }
+
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has a root meta, should generate a Person with PersonRootMeta`() {
+        val rootMeta = PersonRootMeta("Ali")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply {
+            setRootMeta(rootMeta)
+        }
+
+        val response = getFileAsString("person_with_root_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.rootMeta(),
+            result?.rootMeta()
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has a resource object meta, should generate a Person with PersonResourceMeta`() {
+        val resourceMeta = PersonResourceMeta("Ali")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply {
+            setResourceMeta(resourceMeta)
+        }
+
+        val response = getFileAsString("person_with_resource_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.resourceMeta(),
+            result?.resourceMeta()
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has a one relationship meta, should generate a Person with PersonRelationshipsMeta`() {
+        val relationshipMeta = PersonRelationshipMeta("Ali")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = null,
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply {
+            setRelationshipsMeta(mapOf("myFavoriteDog" to relationshipMeta))
+        }
+
+        val response = getFileAsString("person_with_one_rel_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.relationshipMeta<PersonRelationshipMeta>(),
+            result?.relationshipMeta<PersonRelationshipMeta>()
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has multiple relationship meta, should generate a Person with multiple PersonRelationshipsMeta`() {
+        val firstMeta = PersonRelationshipMeta("First")
+        val secondMeta = PersonRelationshipMeta("Second")
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply {
+            setRelationshipsMeta(
+                mapOf(
+                    "myFavoriteDog" to firstMeta,
+                    "allMyDogs" to secondMeta,
+                )
+            )
+        }
+
+        val response = getFileAsString("person_with_many_rel_meta.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            person.relationshipMeta<PersonRelationshipMeta>(),
+            result?.relationshipMeta<PersonRelationshipMeta>()
         )
     }
 

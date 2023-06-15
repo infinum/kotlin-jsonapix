@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class OneRelationshipMember(
     @SerialName("data") val data: ResourceIdentifier,
-    @SerialName("links") val links: Links? = null
+    @SerialName("links") val links: Links? = null,
+    @SerialName("meta") val meta: Meta? = null,
 )

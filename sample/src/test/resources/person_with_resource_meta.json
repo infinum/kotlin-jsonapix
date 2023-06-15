@@ -1,0 +1,21 @@
+{
+  "errors":null,
+  "links": {
+    "self": "https://root.link.com"
+  },
+  "data":{
+    "links": {
+      "self": "https://resource.link.com"
+    },
+    "meta": {
+      "writer": "Ali"
+    },
+    "type":"person",
+    "id":"1",
+    "attributes":{
+      "age":28,
+      "name":"Jason",
+      "surname":"Apix"
+    }
+  }
+}
