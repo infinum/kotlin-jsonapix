@@ -10,12 +10,12 @@ interface JsonApiXModel<out Model>{
     val type: String?
     val id: String?
     val rootLinks: Links?
-    val resourceLinks: Links?
-    val relationshipLinks: Map<String, Links?>?
+    val resourceObjectLinks: Links?
+    val relationshipsLinks: Map<String, Links?>?
     val errors: List<Error>?
     val rootMeta: Meta?
-    val resourceMeta: Meta?
-    val relationshipMeta: Map<String, Meta?>?
+    val resourceObjectMeta: Meta?
+    val relationshipsMeta: Map<String, Meta?>?
 }
 
 @Suppress("UNCHECKED_CAST", "TooManyFunctions", "UnnecessaryAbstractClass")

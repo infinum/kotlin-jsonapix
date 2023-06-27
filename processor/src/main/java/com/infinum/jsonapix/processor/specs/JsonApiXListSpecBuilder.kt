@@ -2,7 +2,7 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec

@@ -3,7 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.Meta
