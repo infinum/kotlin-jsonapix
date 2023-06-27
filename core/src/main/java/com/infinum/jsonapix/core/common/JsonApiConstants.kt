@@ -31,8 +31,11 @@ object JsonApiConstants {
         const val RELATIONSHIPS = "Relationships_"
         const val TYPE_ADAPTER = "TypeAdapter_"
         const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
+    }
 
-        fun String.withName(name: String): String = "$this$name"
+    object Suffix{
+        const val JSON_API_MODEL = "Model"
+        const val JSON_API_LIST = "List"
     }
 
     object Members {
@@ -144,4 +147,7 @@ object JsonApiConstants {
         const val SERIALIZERS_MODULE_FORMAT = "serializersModule = %L"
         const val RETURN_NULL = "return null"
     }
+
+    fun String.withName(name: String): String = "$this$name"
+
 }

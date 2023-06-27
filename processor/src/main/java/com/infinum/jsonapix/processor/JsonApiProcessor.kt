@@ -7,7 +7,7 @@ import com.infinum.jsonapix.annotations.JsonApiXMeta
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.annotations.MetaPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
@@ -19,6 +19,8 @@ import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.model.JsonApiListSpecBuilder
+import com.infinum.jsonapix.processor.specs.model.JsonApiModelSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -202,6 +204,9 @@ public class JsonApiProcessor : AbstractProcessor() {
             JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
+        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass,isNullable,metaInfo,linksInfo)
+        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass,isNullable,metaInfo,linksInfo)
+
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
             className = inputDataClass,
             rootLinks = linksInfo?.rootLinks,
@@ -229,6 +234,8 @@ public class JsonApiProcessor : AbstractProcessor() {
         wrapperListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        modelFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        listFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 
     private fun processErrorAnnotation(roundEnv: RoundEnvironment?) {
