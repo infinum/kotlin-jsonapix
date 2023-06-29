@@ -1,9 +1,13 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiModel
+import com.infinum.jsonapix.core.JsonApiX
+import com.infinum.jsonapix.core.JsonApiXModel
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.discriminators.TypeExtractor
+import com.infinum.jsonapix.core.resources.Meta
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -19,9 +23,9 @@ public object TypeAdapterSpecBuilder {
         rootLinks: String?,
         resourceObjectLinks: String?,
         relationshipsLinks: String?,
-        rootMeta: String?,
-        resourceObjectMeta: String?,
-        relationshipsMeta: String?,
+        rootMeta: ClassName?,
+        resourceObjectMeta: ClassName?,
+        relationshipsMeta: ClassName?,
         errors: String?
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.TYPE_ADAPTER.withName(className.simpleName)
@@ -29,12 +33,13 @@ public object TypeAdapterSpecBuilder {
             className.packageName,
             generatedName
         )
+        val modelType = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
         return FileSpec.builder(className.packageName, generatedName)
             .addType(
                 TypeSpec.classBuilder(typeAdapterClassName)
-                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(className))
-                    .addFunction(convertToStringFunSpec(className))
-                    .addFunction(convertFromStringFunSpec(className))
+                    .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(modelType))
+                    .addFunction(convertToStringFunSpec(className,modelType))
+                    .addFunction(convertFromStringFunSpec(className,modelType,rootMeta,resourceObjectMeta,relationshipsMeta))
                     .apply {
                         if (rootLinks != null) {
                             addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
@@ -49,15 +54,15 @@ public object TypeAdapterSpecBuilder {
                         }
 
                         if (rootMeta != null) {
-                            addFunction(metaFunSpec(JsonApiConstants.Members.ROOT_META, rootMeta))
+                            addFunction(metaFunSpec(JsonApiConstants.Members.ROOT_META, rootMeta.canonicalName))
                         }
                         if (resourceObjectMeta != null) {
                             addFunction(
-                                metaFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_META, resourceObjectMeta)
+                                metaFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_META, resourceObjectMeta.canonicalName)
                             )
                         }
                         if (relationshipsMeta != null) {
-                            addFunction(metaFunSpec(JsonApiConstants.Members.RELATIONSHIPS_META, relationshipsMeta))
+                            addFunction(metaFunSpec(JsonApiConstants.Members.RELATIONSHIPS_META, relationshipsMeta.canonicalName))
                         }
 
                         if (errors != null) {
@@ -74,30 +79,38 @@ public object TypeAdapterSpecBuilder {
             .build()
     }
 
-    private fun convertToStringFunSpec(className: ClassName): FunSpec {
+    private fun convertToStringFunSpec(className: ClassName,modelType: ClassName): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_TO_STRING)
             .addModifiers(KModifier.OVERRIDE)
-            .addParameter("input", className)
+            .addParameter("input", modelType)
             .returns(String::class)
             .addStatement(
-                "return input.%N(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
-                JsonApiConstants.Members.JSONX_SERIALIZE,
-                JsonApiConstants.Members.ROOT_LINKS,
-                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
-                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Members.ROOT_META,
-                JsonApiConstants.Members.RESOURCE_OBJECT_META,
-                JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
+                """return ""  """
+//                "return input.%N(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
+//                JsonApiConstants.Members.JSONX_SERIALIZE,
+//                JsonApiConstants.Members.ROOT_LINKS,
+//                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+//                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+//                JsonApiConstants.Members.ROOT_META,
+//                JsonApiConstants.Members.RESOURCE_OBJECT_META,
+//                JsonApiConstants.Members.RELATIONSHIPS_META,
+//                JsonApiConstants.Keys.ERRORS
             )
             .build()
     }
 
-    private fun convertFromStringFunSpec(className: ClassName): FunSpec {
+    private fun convertFromStringFunSpec(
+        className: ClassName,
+        modelType: ClassName,
+        rootMeta: ClassName?,
+        resourceObjectMeta: ClassName?,
+        relationshipsMeta: ClassName?,
+        ): FunSpec {
+
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
-            .returns(className)
+            .returns(modelType)
             .addStatement(
                 "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_DESERIALIZE,
@@ -110,17 +123,24 @@ public object TypeAdapterSpecBuilder {
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
-            .addStatement("val original = data.${JsonApiConstants.Members.ORIGINAL}")
-            .addStatement("(original as? %T)?.let {", JsonApiModel::class)
-            .addStatement("it.setRootLinks(data.links)")
-            .addStatement("it.setResourceLinks(data.data?.links)")
-            .addStatement("data.data?.relationshipsLinks()?.let { links -> it.setRelationshipsLinks(links) }")
-            .addStatement("it.setRootMeta(data.meta)")
-            .addStatement("it.setResourceMeta(data.data?.meta)")
-            .addStatement("data.data?.relationshipsMeta()?.let { meta -> it.setRelationshipsMeta(meta.filterValues { it != null }) }")
-            .addStatement("it.setErrors(data.errors)")
-            .addStatement("}")
-            .addStatement("return original")
+            .addStatement(
+                "return %N%N(%L, %L, %L, %L, %L, %L, %L, %L as %T, %L as %T, %L as %T})",
+                className.simpleName,
+                JsonApiConstants.Suffix.JSON_API_MODEL,
+                "data.original",
+                "data.data?.type",
+                "data.data?.id",
+                "data.links",
+                "data.data?.links",
+                "data.data?.relationshipsLinks()",
+                "data.errors",
+                "data.meta",
+                rootMeta ?: Meta::class.asClassName(),
+                "data.data?.meta",
+                resourceObjectMeta ?: Meta::class.asClassName(),
+                "data.data?.relationshipsMeta()?.mapValues { it.value",
+                relationshipsMeta ?:  Meta::class.asClassName()
+            )
             .build()
     }
 
