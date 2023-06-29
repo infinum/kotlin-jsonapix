@@ -1,6 +1,5 @@
 package com.infinum.jsonapix.processor.specs.model
 
-import com.infinum.jsonapix.core.JsonApiXModel
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Error
@@ -44,16 +43,13 @@ internal abstract class BaseJsonApiModelSpecBuilder {
                             .addParameters(params)
                             .build()
                     )
-                    .addSuperinterface(
-                        JsonApiXModel::class.asClassName().parameterizedBy(getRootClassName(className).copy(nullable = isRootNullable))
-                    )
                     .addProperties(props)
                     .build()
             )
             .build()
     }
 
-    private fun getParams(
+    fun getParams(
         className: ClassName,
         isRootNullable: Boolean,
         metaInfo: MetaInfo?,
@@ -101,7 +97,7 @@ internal abstract class BaseJsonApiModelSpecBuilder {
             name,
             type,
         )
-            .initializer(name).addModifiers(KModifier.OVERRIDE)
+            .initializer(name)
             .build()
     }
 

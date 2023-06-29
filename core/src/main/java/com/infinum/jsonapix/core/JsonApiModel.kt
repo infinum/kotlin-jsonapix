@@ -5,19 +5,6 @@ import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
-interface JsonApiXModel<out Model>{
-    val data: Model
-    val type: String?
-    val id: String?
-    val rootLinks: Links?
-    val resourceObjectLinks: Links?
-    val relationshipsLinks: Map<String, Links?>?
-    val errors: List<Error>?
-    val rootMeta: Meta?
-    val resourceObjectMeta: Meta?
-    val relationshipsMeta: Map<String, Meta?>?
-}
-
 @Suppress("UNCHECKED_CAST", "TooManyFunctions", "UnnecessaryAbstractClass")
 abstract class JsonApiModel {
     private var type: String? = null
