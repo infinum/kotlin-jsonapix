@@ -63,6 +63,17 @@ internal abstract class BasicJsonApiModelSpecBuilder {
             JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
             JsonApiConstants.Keys.TYPE.asParam(String::class.asClassName(), true),
             JsonApiConstants.Keys.ID.asParam(String::class.asClassName(), true),
+
+            JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true),
+            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true),
+            JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
+                Map::class.asClassName().parameterizedBy(
+                    String::class.asClassName(),
+                    Links::class.asClassName().copy(nullable = true),
+                ),
+                true,
+            ),
+
             JsonApiConstants.Keys.ERRORS.asParam(List::class.asClassName().parameterizedBy(Error::class.asClassName()), true),
 
             JsonApiConstants.Members.ROOT_META.asParam(metaInfo?.rootClassName ?: Meta::class.asClassName(), true),
@@ -70,19 +81,9 @@ internal abstract class BasicJsonApiModelSpecBuilder {
             JsonApiConstants.Members.RELATIONSHIPS_META.asParam(
                 Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
-                    metaInfo?.relationshipsClassNAme ?: Meta::class.asClassName()
+                    metaInfo?.relationshipsClassNAme?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
                 ),
                 true
-            ),
-
-            JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true),
-            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true),
-            JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
-                Map::class.asClassName().parameterizedBy(
-                    String::class.asClassName(),
-                    Links::class.asClassName(),
-                ),
-                true,
             ),
         )
     }

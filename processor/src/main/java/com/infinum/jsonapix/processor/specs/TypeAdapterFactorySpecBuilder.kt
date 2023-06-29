@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.adapters.AdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -52,7 +53,7 @@ public class TypeAdapterFactorySpecBuilder {
             .beginControlFlow("return when(type.qualifiedName)")
             .apply {
                 classNames.forEach {
-                    addStatement("%S -> TypeAdapter_${it.simpleName}()", it.canonicalName)
+                    addStatement("%S -> TypeAdapter_${it.simpleName}()", it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
                 }
             }
             .addStatement("else -> null")
