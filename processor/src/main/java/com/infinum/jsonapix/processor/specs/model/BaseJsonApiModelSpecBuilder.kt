@@ -19,7 +19,7 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 
-internal abstract class BasicJsonApiModelSpecBuilder {
+internal abstract class BaseJsonApiModelSpecBuilder {
 
     abstract fun getClassSuffixName(): String
     abstract fun getRootClassName(rootType: ClassName): TypeName

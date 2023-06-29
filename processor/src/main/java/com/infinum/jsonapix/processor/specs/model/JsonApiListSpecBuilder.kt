@@ -6,7 +6,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 
-internal object JsonApiListSpecBuilder : BasicJsonApiModelSpecBuilder() {
+internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getClassSuffixName(): String = JsonApiConstants.Suffix.JSON_API_LIST
     override fun getRootClassName(rootType: ClassName): TypeName = List::class.asClassName().parameterizedBy(rootType)
 }
