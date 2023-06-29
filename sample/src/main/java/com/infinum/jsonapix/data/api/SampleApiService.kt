@@ -4,6 +4,7 @@ import co.infinum.retromock.meta.Mock
 import co.infinum.retromock.meta.MockResponse
 import com.infinum.jsonapix.data.models.EmptyData
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonModel
 import retrofit2.http.GET
 
 interface SampleApiService {
@@ -11,7 +12,7 @@ interface SampleApiService {
     @Mock
     @MockResponse(body = "responses/person.json")
     @GET("/person")
-    suspend fun fetchPerson(): Person
+    suspend fun fetchPerson(): PersonModel
 
     @Mock
     @MockResponse(body = "responses/person_list.json")

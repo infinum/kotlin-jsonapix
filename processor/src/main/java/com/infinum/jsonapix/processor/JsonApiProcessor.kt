@@ -223,9 +223,9 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootLinks = linksInfo?.rootLinks,
             resourceObjectLinks = linksInfo?.resourceObjectLinks,
             relationshipsLinks = linksInfo?.relationshipsLinks,
-            rootMeta = metaInfo?.rootClassName?.canonicalName,
-            resourceObjectMeta = metaInfo?.resourceObjectClassName?.canonicalName,
-            relationshipsMeta = metaInfo?.relationshipsClassNAme?.canonicalName,
+            rootMeta = metaInfo?.rootClassName,
+            resourceObjectMeta = metaInfo?.resourceObjectClassName,
+            relationshipsMeta = metaInfo?.relationshipsClassNAme,
             errors = customErrors[type]?.canonicalName
         )
 

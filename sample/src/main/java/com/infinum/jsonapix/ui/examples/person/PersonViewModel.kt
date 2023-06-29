@@ -15,13 +15,17 @@ class PersonViewModel @Inject constructor(
     private val jsonAssetReader: JsonAssetReader
 ) : BaseViewModel<PersonState, PersonEvent>() {
 
+    init {
+        fetchPerson()
+    }
     fun fetchPerson() {
         launch {
             try {
 
                 showLoading()
                 val bodyString = io { jsonAssetReader.readJsonAsset("responses/person.json") }
-                val person = io { sampleApiService.fetchPerson() }
+                val personModel = io { sampleApiService.fetchPerson() }
+                val person = personModel.data
                 hideLoading()
                 viewState = PersonState(
                     bodyString,
