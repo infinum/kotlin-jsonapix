@@ -18,10 +18,10 @@ class PersonViewModel @Inject constructor(
     init {
         fetchPerson()
     }
+
     fun fetchPerson() {
         launch {
             try {
-
                 showLoading()
                 val bodyString = io { jsonAssetReader.readJsonAsset("responses/person.json") }
                 val personModel = io { sampleApiService.fetchPerson() }
@@ -50,10 +50,12 @@ class PersonViewModel @Inject constructor(
                 val persons: List<Person>
                 if (hasRelationships) {
                     bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list.json") }
-                    persons = io { sampleApiService.fetchPersons() }
+                    val personsData = io { sampleApiService.fetchPersons() }
+                    persons = personsData.data
                 } else {
                     bodyString = io { jsonAssetReader.readJsonAsset("responses/person_list_no_relationships.json") }
-                    persons = io { sampleApiService.fetchPersonsNoRelationships() }
+                    val personsData = io { sampleApiService.fetchPersonsNoRelationships() }
+                    persons = personsData.data
                 }
                 hideLoading()
                 viewState = PersonState(
