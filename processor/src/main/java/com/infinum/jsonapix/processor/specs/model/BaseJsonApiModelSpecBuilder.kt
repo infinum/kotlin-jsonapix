@@ -22,6 +22,8 @@ internal abstract class BaseJsonApiModelSpecBuilder {
 
     abstract fun getClassSuffixName(): String
     abstract fun getRootClassName(rootType: ClassName): TypeName
+
+    abstract fun getAdditionalParams(): List<ParameterSpec>
     fun build(
         className: ClassName,
         isRootNullable: Boolean,
@@ -56,10 +58,8 @@ internal abstract class BaseJsonApiModelSpecBuilder {
         linksInfo: LinksInfo?
     ): List<ParameterSpec> {
         return listOf(
+            *getAdditionalParams().toTypedArray(),
             JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
-            JsonApiConstants.Keys.TYPE.asParam(String::class.asClassName(), true),
-            JsonApiConstants.Keys.ID.asParam(String::class.asClassName(), true),
-
             JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true),
             JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
@@ -84,7 +84,7 @@ internal abstract class BaseJsonApiModelSpecBuilder {
         )
     }
 
-    private fun String.asParam(className: TypeName, isNullable: Boolean): ParameterSpec {
+    protected fun String.asParam(className: TypeName, isNullable: Boolean): ParameterSpec {
         return ParameterSpec.builder(
             this,
             className.copy(isNullable)
