@@ -15,35 +15,18 @@ import com.squareup.kotlinpoet.asClassName
 
 internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getClassSuffixName(): String = JsonApiConstants.Suffix.JSON_API_LIST
+    
     override fun getRootClassName(rootType: ClassName): TypeName {
         val itemType = ClassName.bestGuess(rootType.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM))
         return List::class.asClassName().parameterizedBy(itemType)
     }
-    
+
     override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
         return listOf(
             JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
             JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true),
-            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true),
-            JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
-                Map::class.asClassName().parameterizedBy(
-                    String::class.asClassName(),
-                    Links::class.asClassName().copy(nullable = true),
-                ),
-                true,
-            ),
-
             JsonApiConstants.Keys.ERRORS.asParam(List::class.asClassName().parameterizedBy(Error::class.asClassName()), true),
-
             JsonApiConstants.Members.ROOT_META.asParam(metaInfo?.rootClassName ?: Meta::class.asClassName(), true),
-            JsonApiConstants.Members.RESOURCE_OBJECT_META.asParam(metaInfo?.resourceObjectClassName ?: Meta::class.asClassName(), true),
-            JsonApiConstants.Members.RELATIONSHIPS_META.asParam(
-                Map::class.asClassName().parameterizedBy(
-                    String::class.asClassName(),
-                    metaInfo?.relationshipsClassNAme?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
-                ),
-                true
-            ),
         )
     }
 }
