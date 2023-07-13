@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs.model
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
@@ -14,7 +15,11 @@ import com.squareup.kotlinpoet.asClassName
 
 internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getClassSuffixName(): String = JsonApiConstants.Suffix.JSON_API_LIST
-    override fun getRootClassName(rootType: ClassName): TypeName = List::class.asClassName().parameterizedBy(rootType)
+    override fun getRootClassName(rootType: ClassName): TypeName {
+        val itemType = ClassName.bestGuess(rootType.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM))
+        return List::class.asClassName().parameterizedBy(itemType)
+    }
+    
     override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
         return listOf(
             JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
