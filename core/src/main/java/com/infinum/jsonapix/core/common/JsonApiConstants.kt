@@ -35,6 +35,7 @@ object JsonApiConstants {
 
     object Suffix{
         const val JSON_API_MODEL = "Model"
+        const val JSON_API_LIST_ITEM = "Item"
         const val JSON_API_LIST = "List"
     }
 

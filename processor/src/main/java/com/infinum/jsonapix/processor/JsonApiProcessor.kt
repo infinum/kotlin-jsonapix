@@ -19,6 +19,7 @@ import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.model.JsonApiListItemSpecBuilder
 import com.infinum.jsonapix.processor.specs.model.JsonApiListSpecBuilder
 import com.infinum.jsonapix.processor.specs.model.JsonApiModelSpecBuilder
 import com.squareup.kotlinpoet.ClassName
@@ -204,8 +205,9 @@ public class JsonApiProcessor : AbstractProcessor() {
             JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
-        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass,isNullable,metaInfo,linksInfo)
-        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass,isNullable,metaInfo,linksInfo)
+        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
+        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
+        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
             className = inputDataClass,
@@ -235,6 +237,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         typeAdapterFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         modelFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        listItemFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         listFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 
@@ -315,6 +318,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                     MetaPlacementStrategy.DATA ->
                         metaInfo.resourceObjectClassName =
                             className
+
                     MetaPlacementStrategy.RELATIONSHIPS ->
                         metaInfo.relationshipsClassNAme =
                             className
