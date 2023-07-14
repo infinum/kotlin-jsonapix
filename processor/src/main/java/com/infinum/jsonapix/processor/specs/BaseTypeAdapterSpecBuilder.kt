@@ -3,7 +3,6 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
-import com.infinum.jsonapix.core.resources.Meta
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -19,6 +18,16 @@ public abstract class BaseTypeAdapterSpecBuilder {
     public abstract fun getClassSuffixName(): String
 
     public abstract fun getRootModel(className: ClassName): TypeName
+
+    public abstract fun convertFromStringFunSpec(
+        className: ClassName,
+        modelType: TypeName,
+        rootMeta: ClassName?,
+        resourceObjectMeta: ClassName?,
+        relationshipsMeta: ClassName?,
+    ): FunSpec
+
+    public abstract fun getAdditionalImports(): List<String>
 
     public fun build(
         className: ClassName,
@@ -40,8 +49,8 @@ public abstract class BaseTypeAdapterSpecBuilder {
             .addType(
                 TypeSpec.classBuilder(typeAdapterClassName)
                     .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(modelType))
-                    .addFunction(convertToStringFunSpec(className,modelType))
-                    .addFunction(convertFromStringFunSpec(className,modelType,rootMeta,resourceObjectMeta,relationshipsMeta))
+                    .addFunction(convertToStringFunSpec(className, modelType))
+                    .addFunction(convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta))
                     .apply {
                         if (rootLinks != null) {
                             addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
@@ -75,13 +84,12 @@ public abstract class BaseTypeAdapterSpecBuilder {
             )
             .addImport(
                 JsonApiConstants.Packages.JSONX,
-                JsonApiConstants.Members.JSONX_SERIALIZE,
-                JsonApiConstants.Members.JSONX_DESERIALIZE
+                getAdditionalImports(),
             )
             .build()
     }
 
-    private fun convertToStringFunSpec(className: ClassName,modelType: TypeName): FunSpec {
+    private fun convertToStringFunSpec(className: ClassName, modelType: TypeName): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_TO_STRING)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", modelType)
@@ -97,51 +105,6 @@ public abstract class BaseTypeAdapterSpecBuilder {
 //                JsonApiConstants.Members.RESOURCE_OBJECT_META,
 //                JsonApiConstants.Members.RELATIONSHIPS_META,
 //                JsonApiConstants.Keys.ERRORS
-            )
-            .build()
-    }
-
-    private fun convertFromStringFunSpec(
-        className: ClassName,
-        modelType: TypeName,
-        rootMeta: ClassName?,
-        resourceObjectMeta: ClassName?,
-        relationshipsMeta: ClassName?,
-        ): FunSpec {
-
-        return FunSpec.builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
-            .addModifiers(KModifier.OVERRIDE)
-            .addParameter("input", String::class)
-            .returns(modelType)
-            .addStatement(
-                "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
-                JsonApiConstants.Members.JSONX_DESERIALIZE,
-                getRootModel(className),
-                JsonApiConstants.Members.ROOT_LINKS,
-                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
-                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-                JsonApiConstants.Members.ROOT_META,
-                JsonApiConstants.Members.RESOURCE_OBJECT_META,
-                JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
-            )
-            .addStatement(
-                "return %N%N(%L, %L, %L, %L, %L, %L, %L, %L as %T, %L as %T, %L as %T})",
-                className.simpleName,
-                getClassSuffixName(),
-                "data.original",
-                "data.data?.type",
-                "data.data?.id",
-                "data.links",
-                "data.data?.links",
-                "data.data?.relationshipsLinks()",
-                "data.errors",
-                "data.meta",
-                rootMeta ?: Meta::class.asClassName(),
-                "data.data?.meta",
-                resourceObjectMeta ?: Meta::class.asClassName(),
-                "data.data?.relationshipsMeta()?.mapValues { it.value",
-                relationshipsMeta ?:  Meta::class.asClassName()
             )
             .build()
     }
