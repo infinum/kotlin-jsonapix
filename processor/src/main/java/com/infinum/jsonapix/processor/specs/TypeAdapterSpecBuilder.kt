@@ -33,9 +33,10 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
             .addParameter("input", String::class)
             .returns(modelType)
             .addStatement(
-                "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
+                "val data = input.%N<%T,%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_DESERIALIZE,
                 getRootModel(className),
+                modelType,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
@@ -44,24 +45,7 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
-            .addStatement(
-                "return %N%N(%L, %L, %L, %L, %L, %L, %L, %L as %T, %L as %T, %L as %T})",
-                className.simpleName,
-                getClassSuffixName(),
-                "data.original",
-                "data.data?.type",
-                "data.data?.id",
-                "data.links",
-                "data.data?.links",
-                "data.data?.relationshipsLinks()",
-                "data.errors",
-                "data.meta",
-                rootMeta ?: Meta::class.asClassName(),
-                "data.data?.meta",
-                resourceObjectMeta ?: Meta::class.asClassName(),
-                "data.data?.relationshipsMeta()?.mapValues { it.value",
-                relationshipsMeta ?: Meta::class.asClassName()
-            )
+            .addStatement("return data.%L",JsonApiConstants.Members.ORIGINAL)
             .build()
     }
 }

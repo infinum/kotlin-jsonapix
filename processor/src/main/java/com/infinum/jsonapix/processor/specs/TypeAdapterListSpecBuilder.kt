@@ -34,9 +34,10 @@ public object TypeAdapterListSpecBuilder : BaseTypeAdapterSpecBuilder() {
             .addParameter("input", String::class)
             .returns(modelType)
             .addStatement(
-                "val data = input.%N<%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
+                "val data = input.%N<%T,%T>(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
                 JsonApiConstants.Members.JSONX_LIST_DESERIALIZE,
-                ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM)),
+                className,
+                modelType,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,
@@ -45,16 +46,7 @@ public object TypeAdapterListSpecBuilder : BaseTypeAdapterSpecBuilder() {
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
-            .addStatement(
-                "return %N%N(%L, %L, %L, %L as %T)",
-                className.simpleName,
-                getClassSuffixName(),
-                "data.original",
-                "data.links",
-                "data.errors",
-                "data.meta",
-                rootMeta ?: Meta::class.asClassName(),
-            )
+            .addStatement("return data.%L",JsonApiConstants.Members.ORIGINAL)
             .build()
     }
 }
