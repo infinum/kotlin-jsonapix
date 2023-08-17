@@ -74,6 +74,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
                         originalProperty(
                             modelClassName,
                             metaInfo,
+                            isNullable,
                         )
                     )
                     .build()
@@ -93,23 +94,24 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
     private fun originalProperty(
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
+        isNullable: Boolean,
     ): PropertySpec {
 
         val getterFunSpec = FunSpec.builder("get()")
-            .addStatement("val original = data.original(included)")
+            .addStatement(if (isNullable) "val original = data?.original(included)" else "val original = data.original(included)")
             .addStatement(
                 "val model = %T(%L,%L,%L,%L,%L,%L,%L,%L,%L,%L?.mapValues{ it.value as? %T } )",
                 modelClassName,
                 "original",
-                "data.type",
-                "data.id",
+                if (isNullable) "data?.type" else "data.type",
+                if (isNullable) "data?.id" else "data.id",
                 "links",
-                "data.links",
-                "data.relationshipsLinks()",
+                if (isNullable) "data?.links" else "data.links",
+                if (isNullable) "data?.relationshipsLinks()" else "data.relationshipsLinks()",
                 "errors",
                 "meta",
-                "data.meta",
-                "data.relationshipsMeta()",
+                if (isNullable) "data?.meta" else "data.meta",
+                if (isNullable) "data?.relationshipsMeta()" else "data.relationshipsMeta()",
                 metaInfo?.relationshipsClassNAme ?: Meta::class
             )
             .addStatement("return model")
