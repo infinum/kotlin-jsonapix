@@ -23,6 +23,8 @@ internal object DeserializeListFunSpecBuilder {
     fun build(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
+        val dataVariableName =
+            TypeVariableName.invoke(JsonApiConstants.Members.DATA_TYPE_VARIABLE)
 
         val linksParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
@@ -39,11 +41,12 @@ internal object DeserializeListFunSpecBuilder {
         return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
+            .addTypeVariable(dataVariableName.copy(reified = true))
             .addTypeVariable(typeVariableName.copy(reified = true))
             .addParameters(linksParams)
             .addParameters(metaParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
-            .returns(JsonApiXList::class.asClassName().parameterizedBy(typeVariableName))
+            .returns(JsonApiXList::class.asClassName().parameterizedBy(dataVariableName,typeVariableName))
             .addStatement(
                 "val de = %T.%L(this).%M[%S]",
                 Json::class.asTypeName(),
@@ -79,11 +82,12 @@ internal object DeserializeListFunSpecBuilder {
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
             )
             .addStatement(
-                "return %M.%M<%T<%T>>(jsonStringWithDiscriminator)",
+                "return %M.%M<%T<%T,%T>>(jsonStringWithDiscriminator)",
                 formatMember,
                 decodeMember,
                 JsonApiXList::class,
-                typeVariableName
+                dataVariableName,
+                typeVariableName,
             )
             .build()
     }

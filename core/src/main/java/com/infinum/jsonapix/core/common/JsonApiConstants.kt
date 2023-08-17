@@ -57,6 +57,7 @@ object JsonApiConstants {
         const val ENCODE_TO_STRING = "encodeToString"
         const val FORMAT = "format"
         const val GENERIC_TYPE_VARIABLE = "Model"
+        const val DATA_TYPE_VARIABLE = "Data"
         const val FIND_TYPE = "findType"
         const val GUESS_TYPE = "guessType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
