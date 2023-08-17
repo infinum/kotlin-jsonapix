@@ -3,6 +3,9 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.resources.Meta
+import com.infinum.jsonapix.processor.LinksInfo
+import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -26,8 +29,10 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         className: ClassName,
         isNullable: Boolean,
         type: String,
-        metaClassName: ClassName?
+        metaInfo: MetaInfo?,
     ): FileSpec {
+        val modelClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
+
         this.isNullable = isNullable
         val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
@@ -35,8 +40,8 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         )
 
-        val properties = getBasePropertySpecs(metaClassName).toMutableList()
-        val params = getBaseParamSpecs(metaClassName).toMutableList()
+        val properties = getBasePropertySpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
+        val params = getBaseParamSpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
 
         params.add(
             ParameterSpec.builder(
@@ -55,7 +60,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiX::class.asClassName().parameterizedBy(className)
+                        JsonApiX::class.asClassName().parameterizedBy(className, modelClassName)
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
@@ -67,7 +72,8 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
                     .addProperties(properties)
                     .addProperty(
                         originalProperty(
-                            className
+                            modelClassName,
+                            metaInfo,
                         )
                     )
                     .build()
@@ -85,20 +91,41 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         .build()
 
     private fun originalProperty(
-        className: ClassName
+        modelClassName: ClassName,
+        metaInfo: MetaInfo?,
     ): PropertySpec {
-        val codeString =
-            if (isNullable) "${JsonApiConstants.Keys.DATA}?.${JsonApiConstants.Members.ORIGINAL}(included) ?: ${className.simpleName}()"
-            else "${JsonApiConstants.Keys.DATA}.${JsonApiConstants.Members.ORIGINAL}(included)"
 
-        val builder = PropertySpec.builder(
+        val getterFunSpec = FunSpec.builder("get()")
+            .addStatement("val original = data.original(included)")
+            .addStatement(
+                "val model = %T(%L,%L,%L,%L,%L,%L,%L,%L,%L,%L?.mapValues{ it.value as? %T } )",
+                modelClassName,
+                "original",
+                "data.type",
+                "data.id",
+                "links",
+                "data.links",
+                "data.relationshipsLinks()",
+                "errors",
+                "meta",
+                "data.meta",
+                "data.relationshipsMeta()",
+                metaInfo?.relationshipsClassNAme ?: Meta::class
+            )
+            .addStatement("return model")
+            .build()
+
+
+        val propertySpec = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
-            className, KModifier.OVERRIDE
-        ).addAnnotation(
-            AnnotationSpec.builder(Transient::class.asClassName())
-                .build()
+            modelClassName, KModifier.OVERRIDE
         )
+            .getter(getterFunSpec)
+            .addAnnotation(
+                AnnotationSpec.builder(Transient::class.asClassName())
+                    .build()
+            )
 
-        return builder.initializer(codeString).build()
+        return propertySpec.build()
     }
 }

@@ -3,6 +3,9 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.resources.Meta
+import com.infinum.jsonapix.processor.LinksInfo
+import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -24,7 +27,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         className: ClassName,
         isNullable: Boolean,
         type: String,
-        metaClassName: ClassName?
+        metaInfo: MetaInfo?,
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
@@ -32,8 +35,8 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         )
 
-        val properties = getBasePropertySpecs(metaClassName).toMutableList()
-        val params = getBaseParamSpecs(metaClassName).toMutableList()
+        val properties = getBasePropertySpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
+        val params = getBaseParamSpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
 
         params.add(
             ParameterSpec.builder(

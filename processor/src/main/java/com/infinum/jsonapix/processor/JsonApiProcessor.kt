@@ -199,12 +199,13 @@ public class JsonApiProcessor : AbstractProcessor() {
                 oneRelationships = mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
                 manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
-        val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
-        val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
+
         val linksInfo = customLinks.firstOrNull { it.type == type }
 
+        val wrapperFileSpec =
+            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo)
+        val wrapperListFileSpec =
+            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo)
         val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
         val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
         val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
