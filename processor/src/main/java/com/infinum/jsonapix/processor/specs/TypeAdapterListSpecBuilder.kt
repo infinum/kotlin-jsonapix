@@ -18,6 +18,7 @@ public object TypeAdapterListSpecBuilder : BaseTypeAdapterSpecBuilder() {
 
     override fun getAdditionalImports(): List<String> {
         return listOf(
+            JsonApiConstants.Members.JSONX_SERIALIZE,
             JsonApiConstants.Members.JSONX_LIST_DESERIALIZE,
         )
     }
@@ -49,4 +50,5 @@ public object TypeAdapterListSpecBuilder : BaseTypeAdapterSpecBuilder() {
             .addStatement("return data.%L",JsonApiConstants.Members.ORIGINAL)
             .build()
     }
+
 }

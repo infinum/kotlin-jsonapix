@@ -12,8 +12,10 @@ internal object IncludedSpecBuilder {
         manyRelationships: List<PropertySpec>
     ): CodeBlock {
         val statement = StringBuilder("listOfNotNull(")
+
         oneRelationships.forEachIndexed { index, prop ->
-            statement.append("${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
+
+            statement.append("data.${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
@@ -23,7 +25,7 @@ internal object IncludedSpecBuilder {
 
         manyRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*${prop.name}.mapSafe { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                "*data.${prop.name}.mapSafe { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
             )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
@@ -41,7 +43,7 @@ internal object IncludedSpecBuilder {
         val statement = StringBuilder("listOfNotNull(")
         oneRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*mapSafe { it.${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                "*data.mapSafe { it.data.${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
             )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
@@ -51,7 +53,7 @@ internal object IncludedSpecBuilder {
         }
 
         manyRelationships.forEachIndexed { index, prop ->
-            statement.append("*flatMapSafe { it.${prop.name}.mapSafe { ")
+            statement.append("*data.flatMapSafe { it.data.${prop.name}.mapSafe { ")
             statement.append("it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
             statement.append("} }.toTypedArray()")
             if (index != manyRelationships.lastIndex) {

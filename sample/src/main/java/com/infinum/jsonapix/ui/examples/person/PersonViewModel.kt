@@ -33,10 +33,10 @@ class PersonViewModel @Inject constructor(
                 viewState = PersonState(
                     bodyString,
                     person,
-                    person.rootLinks()?.self,
-                    person.resourceLinks()?.self,
-                    person.relationshipsLinks()?.values?.firstOrNull()?.self,
-                    person.rootMeta<PersonRootMeta>()?.owner
+                    (personModel.rootLinks as? DefaultLinks)?.self,
+                    (personModel.resourceObjectLinks as? DefaultLinks)?.self,
+                    personModel.relationshipsLinks?.mapValues { it.value as? DefaultLinks }?.values?.firstOrNull()?.self,
+                    personModel.rootMeta?.owner
                 )
             } catch (t: Throwable) {
                 hideLoading()

@@ -95,16 +95,15 @@ public abstract class BaseTypeAdapterSpecBuilder {
             .addParameter("input", modelType)
             .returns(String::class)
             .addStatement(
-                """return ""  """
-//                "return input.%N(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
-//                JsonApiConstants.Members.JSONX_SERIALIZE,
-//                JsonApiConstants.Members.ROOT_LINKS,
-//                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
-//                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
-//                JsonApiConstants.Members.ROOT_META,
-//                JsonApiConstants.Members.RESOURCE_OBJECT_META,
-//                JsonApiConstants.Members.RELATIONSHIPS_META,
-//                JsonApiConstants.Keys.ERRORS
+                "return input.%N(%N(), %N(), %N(), %N(), %N(), %N(), %N())",
+                JsonApiConstants.Members.JSONX_SERIALIZE,
+                JsonApiConstants.Members.ROOT_LINKS,
+                JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                JsonApiConstants.Members.ROOT_META,
+                JsonApiConstants.Members.RESOURCE_OBJECT_META,
+                JsonApiConstants.Members.RELATIONSHIPS_META,
+                JsonApiConstants.Keys.ERRORS
             )
             .build()
     }
