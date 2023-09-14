@@ -33,10 +33,13 @@ internal abstract class BaseResourceObjectFunSpecBuilder() {
                 returnStatement.append(", ")
             }
             returnStatement.append(
-                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this)"
+                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data)"
             )
             builderArgs.add(relationshipsClass)
         }
+
+        returnStatement.append(", meta = resourceObjectMeta")
+        returnStatement.append(", links = resourceObjectLinks")
 
         returnStatement.append(")")
 
