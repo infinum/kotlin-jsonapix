@@ -18,15 +18,18 @@ internal object WrapperFunSpecBuilder {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
 
-        val dataStatement = if(isNullable) "this.data?" else "this.data"
         val returnStatement = StringBuilder(
-            "return %T(data = $dataStatement.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()",
+            "return %T(data = ${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()",
         )
 
         if (includedListStatement != null) {
             returnStatement.append(", ")
             returnStatement.append("included = $includedListStatement")
         }
+
+        returnStatement.append(", meta = rootMeta")
+        returnStatement.append(", links = rootLinks")
+
         returnStatement.append(")")
         return FunSpec.builder(JsonApiConstants.Members.JSONX_WRAPPER_GETTER)
             .receiver(modelClass)
