@@ -2,10 +2,13 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.processor.ClassInfo
+import com.infinum.jsonapix.processor.MetaInfo
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ListItemResourceObjectFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OriginalDataResourceObjectFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ResourceObjectFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.SerializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.SerializeListFunSpecBuilder
@@ -36,6 +39,7 @@ internal class JsonXExtensionsSpecBuilder {
     @SuppressWarnings("LongParameterList")
     fun add(
         type: String,
+        metaInfo: MetaInfo?,
         isNullable: Boolean,
         data: ClassName,
         wrapper: ClassName,
@@ -48,6 +52,7 @@ internal class JsonXExtensionsSpecBuilder {
     ) {
         specsMap[data] = ClassInfo(
             type = type,
+            metaInfo = metaInfo,
             isNullable = isNullable,
             jsonWrapperClassName = wrapper,
             jsonWrapperListClassName = wrapperList,
@@ -150,7 +155,24 @@ internal class JsonXExtensionsSpecBuilder {
 
         specsMap.entries.forEach {
             fileSpec.addFunction(
+                OriginalDataResourceObjectFunSpecBuilder.build(
+                    it.key,
+                    it.value.resourceObjectClassName,
+                    it.value.attributesWrapperClassName,
+                    it.value.relationshipsObjectClassName,
+                    it.value.metaInfo?.resourceObjectClassName
+                )
+            )
+            fileSpec.addFunction(
                 ResourceObjectFunSpecBuilder.build(
+                    it.key,
+                    it.value.resourceObjectClassName,
+                    it.value.attributesWrapperClassName,
+                    it.value.relationshipsObjectClassName
+                )
+            )
+            fileSpec.addFunction(
+                ListItemResourceObjectFunSpecBuilder.build(
                     it.key,
                     it.value.resourceObjectClassName,
                     it.value.attributesWrapperClassName,

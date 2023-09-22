@@ -22,11 +22,11 @@ internal object WrapperListFunSpecBuilder {
 
         val returnStatement =if(isNullable) {
             StringBuilder(
-                "return %T(data =data?.map { it.data?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
+                "return %T(data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
             )
         }else{
             StringBuilder(
-                "return %T(data =data.map { it.data.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }"
+                "return %T(data =data.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }"
             )
         }
 

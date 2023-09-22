@@ -13,4 +13,5 @@ internal data class ClassInfo(
     val relationshipsObjectClassName: ClassName?,
     val includedStatement: CodeBlock?,
     val includedListStatement: CodeBlock?,
+    val metaInfo: MetaInfo?,
 )

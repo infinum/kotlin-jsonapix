@@ -168,8 +168,11 @@ public class JsonApiProcessor : AbstractProcessor() {
             relationshipsClassName = ClassName(generatedPackage, generatedRelationshipsObjectName)
         }
 
+        val metaInfo = customMetas.firstOrNull { it.type == type }
+
         collector.add(
             type = type,
+            metaInfo = metaInfo,
             isNullable = isNullable,
             data = inputDataClass,
             wrapper = jsonWrapperClassName,
@@ -188,7 +191,6 @@ public class JsonApiProcessor : AbstractProcessor() {
         )
 
         adapterFactoryCollector.add(inputDataClass)
-        val metaInfo = customMetas.firstOrNull { it.type == type }
 
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
