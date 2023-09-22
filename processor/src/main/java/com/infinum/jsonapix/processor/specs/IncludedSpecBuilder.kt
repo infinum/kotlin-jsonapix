@@ -15,7 +15,6 @@ internal object IncludedSpecBuilder {
 
         oneRelationships.forEachIndexed { index, prop ->
 
-            val metaStatement =
             statement.append("""data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                     relationshipsMeta?.get(it.type().orEmpty()),
                     relationshipsLinks?.get(it.type().orEmpty())
@@ -29,7 +28,10 @@ internal object IncludedSpecBuilder {
 
         manyRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*data.${prop.name}.mapSafe { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                """*data.${prop.name}.mapSafe { it.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                        relationshipsMeta?.get(it.type().orEmpty()),
+                        relationshipsLinks?.get(it.type().orEmpty())
+                    )}}.toTypedArray()""".trimMargin()
             )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
