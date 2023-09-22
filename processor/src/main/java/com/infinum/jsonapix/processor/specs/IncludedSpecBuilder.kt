@@ -15,7 +15,11 @@ internal object IncludedSpecBuilder {
 
         oneRelationships.forEachIndexed { index, prop ->
 
-            statement.append("data.${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
+            val metaStatement =
+            statement.append("""data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                    relationshipsMeta?.get(it.type().orEmpty()),
+                    relationshipsLinks?.get(it.type().orEmpty())
+                )}""".trimMargin())
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {

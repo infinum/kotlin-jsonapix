@@ -39,7 +39,9 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
             builderArgs.add(relationshipsClass)
         }
 
-        returnStatement.append(", meta = meta")
+        returnStatement.append(", meta = meta as %T")
+        builderArgs.add(resourceMeta?: Meta::class
+        )
         returnStatement.append(", links = links")
 
         returnStatement.append(")")
@@ -49,7 +51,7 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
             .returns(resourceObjectClass)
             .addParameter(
                 "meta",
-                (resourceMeta?: Meta::class.asClassName()).copy(nullable = true),
+                Meta::class.asClassName().copy(nullable = true),
             )
             .addParameter(
                 "links",
