@@ -24,25 +24,23 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
 
         if (attributesClass != null) {
             returnStatement.append(
-                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this)"
+                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this), "
             )
             builderArgs.add(attributesClass)
         }
 
         if (relationshipsClass != null) {
-            if (attributesClass != null) {
-                returnStatement.append(", ")
-            }
             returnStatement.append(
-                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this)"
+                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this), "
             )
             builderArgs.add(relationshipsClass)
         }
 
-        returnStatement.append(", meta = meta as %T")
-        builderArgs.add(resourceMeta?: Meta::class
+        returnStatement.append("meta = meta as? %T, ")
+        builderArgs.add(
+            resourceMeta ?: Meta::class
         )
-        returnStatement.append(", links = links")
+        returnStatement.append("links = links")
 
         returnStatement.append(")")
 

@@ -23,23 +23,20 @@ internal abstract class BaseResourceObjectFunSpecBuilder() {
 
         if (attributesClass != null) {
             returnStatement.append(
-                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data)"
+                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data), "
             )
             builderArgs.add(attributesClass)
         }
 
         if (relationshipsClass != null) {
-            if (attributesClass != null) {
-                returnStatement.append(", ")
-            }
             returnStatement.append(
-                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data)"
+                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data), "
             )
             builderArgs.add(relationshipsClass)
         }
 
-        returnStatement.append(", meta = resourceObjectMeta")
-        returnStatement.append(", links = resourceObjectLinks")
+        returnStatement.append("meta = resourceObjectMeta, ")
+        returnStatement.append("links = resourceObjectLinks")
 
         returnStatement.append(")")
 
