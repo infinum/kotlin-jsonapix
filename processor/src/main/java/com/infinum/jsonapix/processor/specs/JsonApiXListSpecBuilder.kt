@@ -99,7 +99,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
             .addStatement("val items = data.map {")
             .addStatement("val original = it.original(included)")
             .addStatement(
-                "%T(%L,%L,%L,%L,%L?.mapValues{ it.value as? %T } )",
+                "%T(%L,%L,%L?.filterValues{ it != null },%L,%L?.filterValues{ it != null }?.mapValues{ it.value as? %T } )",
                 itemClassName,
                 "original",
                 "it.links",
