@@ -3,6 +3,7 @@ import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
@@ -13,7 +14,7 @@ import java.io.InputStreamReader
 
 internal class TypeAdapterTest {
 
-    private var typeAdapter: TypeAdapter<Person>? = null
+    private var typeAdapter: TypeAdapter<PersonModel>? = null
 
     @BeforeEach
     fun setup() {
@@ -30,12 +31,16 @@ internal class TypeAdapterTest {
             myFavoriteDog = Dog(name = "Bella", age = 1)
         )
 
+        val personModel = PersonModel(
+            person, "person", "1", null, null, null, null, null,null,null,
+        )
+
         val response = getFileAsString("person_one_and_many_rel.json")
 
         val result = typeAdapter?.convertFromString(response)
 
-        Assertions.assertEquals(
-            person,
+         Assertions.assertEquals(
+            personModel,
             result
         )
     }
@@ -164,9 +169,21 @@ internal class TypeAdapterTest {
             myFavoriteDog = Dog(name = "Bella", age = 1)
         )
 
+        val model = PersonModel(
+            data = person,
+            type = "person",
+            id = "0",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+        )
         val response = getFileAsString("person_no_links_all_rel.json")
 
-        val result = typeAdapter?.convertToString(person)
+        val result = typeAdapter?.convertToString(model)
 
         Assertions.assertEquals(
             response,
@@ -184,9 +201,22 @@ internal class TypeAdapterTest {
             allMyDogs = emptyList(),
         )
 
+        val model = PersonModel(
+            data = person,
+            type = "person",
+            id = "0",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+        )
+
         val response = getFileAsString("person_one_rel_null_many_rel_empty.json")
 
-        val result = typeAdapter?.convertToString(person)
+        val result = typeAdapter?.convertToString(model)
 
         Assertions.assertEquals(
             response,
@@ -204,9 +234,22 @@ internal class TypeAdapterTest {
             myFavoriteDog = null
         )
 
+        val model = PersonModel(
+            data = person,
+            type = "person",
+            id = "0",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+        )
+
         val response = getFileAsString("person_one_and_many_rel_as_null.json")
 
-        val result = typeAdapter?.convertToString(person)
+        val result = typeAdapter?.convertToString(model)
 
         Assertions.assertEquals(
             response,
@@ -224,9 +267,22 @@ internal class TypeAdapterTest {
             myFavoriteDog = null
         )
 
+        val model = PersonModel(
+            data = person,
+            type = "person",
+            id = "0",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+        )
+
         val response = getFileAsString("person_all_my_dogs_with_id_set_for_each_dog.json")
 
-        val result = typeAdapter?.convertToString(person)
+        val result = typeAdapter?.convertToString(model)
 
         Assertions.assertEquals(
             response,
@@ -254,7 +310,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             person.rootMeta(),
-            result?.rootMeta()
+            result?.rootMeta
         )
     }
 
@@ -277,7 +333,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             person.resourceMeta(),
-            result?.resourceMeta()
+            result?.resourceObjectMeta
         )
     }
 
@@ -300,7 +356,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             person.relationshipMeta<PersonRelationshipMeta>(),
-            result?.relationshipMeta<PersonRelationshipMeta>()
+            result?.relationshipsMeta
         )
     }
 
@@ -329,7 +385,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             person.relationshipMeta<PersonRelationshipMeta>(),
-            result?.relationshipMeta<PersonRelationshipMeta>()
+            result?.relationshipsMeta
         )
     }
 
