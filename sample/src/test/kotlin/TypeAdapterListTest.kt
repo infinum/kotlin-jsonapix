@@ -26,8 +26,7 @@ internal class TypeAdapterListTest {
 
         val items = listOf(
             PersonItem(
-                id = "0",
-                type = "person",
+
                 data = Person(
                     name = "Jason",
                     surname = "Apix",
@@ -42,8 +41,7 @@ internal class TypeAdapterListTest {
             ),
 
             PersonItem(
-                id = "1",
-                type = "person",
+
                 data = Person(
                     name = "Jasminka",
                     surname = "Apix",
