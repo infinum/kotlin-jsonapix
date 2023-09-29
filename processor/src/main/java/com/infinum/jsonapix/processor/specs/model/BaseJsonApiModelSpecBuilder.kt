@@ -50,12 +50,15 @@ internal abstract class BaseJsonApiModelSpecBuilder {
     }
 
 
-    protected fun String.asParam(className: TypeName, isNullable: Boolean): ParameterSpec {
+    protected fun String.asParam(className: TypeName, isNullable: Boolean, defaultValue: String? = null): ParameterSpec {
         return ParameterSpec.builder(
             this,
-            className.copy(isNullable)
-        )
-            .build()
+            className.copy(isNullable),
+        ).apply {
+            if (defaultValue != null) {
+                defaultValue(defaultValue)
+            }
+        }.build()
     }
 
     private fun ParameterSpec.toPropSpec(): PropertySpec {

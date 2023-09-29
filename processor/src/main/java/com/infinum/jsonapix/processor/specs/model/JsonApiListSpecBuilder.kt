@@ -15,7 +15,7 @@ import com.squareup.kotlinpoet.asClassName
 
 internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getClassSuffixName(): String = JsonApiConstants.Suffix.JSON_API_LIST
-    
+
     override fun getRootClassName(rootType: ClassName): TypeName {
         val itemType = ClassName.bestGuess(rootType.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM))
         return List::class.asClassName().parameterizedBy(itemType)
@@ -23,10 +23,21 @@ internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
 
     override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
         return listOf(
-            JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
-            JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true),
-            JsonApiConstants.Keys.ERRORS.asParam(List::class.asClassName().parameterizedBy(Error::class.asClassName()), true),
-            JsonApiConstants.Members.ROOT_META.asParam(metaInfo?.rootClassName ?: Meta::class.asClassName(), true),
+            JsonApiConstants.Keys.DATA.asParam(
+                getRootClassName(className),
+                isRootNullable,
+                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }),
+            JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
+            JsonApiConstants.Keys.ERRORS.asParam(
+                List::class.asClassName().parameterizedBy(Error::class.asClassName()),
+                true,
+                JsonApiConstants.Defaults.NULL
+            ),
+            JsonApiConstants.Members.ROOT_META.asParam(
+                metaInfo?.rootClassName ?: Meta::class.asClassName(),
+                true,
+                JsonApiConstants.Defaults.NULL
+            ),
         )
     }
 }

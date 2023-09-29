@@ -16,22 +16,31 @@ internal object JsonApiListItemSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getRootClassName(rootType: ClassName): ClassName = rootType
     override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
         return listOf(
-            JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
-            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true),
+            JsonApiConstants.Keys.DATA.asParam(
+                getRootClassName(className),
+                isRootNullable,
+                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }),
+            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
                 Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
                     Links::class.asClassName().copy(nullable = true),
                 ),
                 true,
+                JsonApiConstants.Defaults.EMPTY_MAP
             ),
-            JsonApiConstants.Members.RESOURCE_OBJECT_META.asParam(metaInfo?.resourceObjectClassName ?: Meta::class.asClassName(), true),
+            JsonApiConstants.Members.RESOURCE_OBJECT_META.asParam(
+                metaInfo?.resourceObjectClassName ?: Meta::class.asClassName(),
+                true,
+                JsonApiConstants.Defaults.NULL
+            ),
             JsonApiConstants.Members.RELATIONSHIPS_META.asParam(
                 Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
                     metaInfo?.relationshipsClassNAme?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
                 ),
-                true
+                true,
+                JsonApiConstants.Defaults.EMPTY_MAP
             ),
         )
     }
