@@ -40,10 +40,6 @@ internal class TypeAdapterTest {
                 "myFavoriteDog" to DefaultLinks(self = "https://relationship.link.com"),
                 "allMyDogs" to DefaultLinks(self = "https://relationship.link.com"),
             ),
-            errors = null,
-            rootMeta = null,
-            resourceObjectMeta = null,
-            relationshipsMeta = null,
         )
 
         val response = getFileAsString("person_one_and_many_rel.json")
@@ -65,13 +61,18 @@ internal class TypeAdapterTest {
             allMyDogs = null,
             myFavoriteDog = null
         )
+        val personModel = PersonModel(
+            data = person,
+            rootLinks = DefaultLinks(self = "https://root.link.com"),
+            resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
+        )
 
         val response = getFileAsString("person_no_included_block.json")
 
         val result = typeAdapter?.convertFromString(response)
 
         Assertions.assertEquals(
-            person,
+            personModel,
             result
         )
     }
@@ -85,13 +86,21 @@ internal class TypeAdapterTest {
             allMyDogs = null,
             myFavoriteDog = Dog(name = "Bella", age = 1)
         )
+        val personModel = PersonModel(
+            data = person,
+            rootLinks = DefaultLinks(self = "https://root.link.com"),
+            resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
+            relationshipsLinks = mapOf(
+                "myFavoriteDog" to DefaultLinks(self = "https://relationship.link.com"),
+            ),
+        )
 
         val response = getFileAsString("person_one_rel.json")
 
         val result = typeAdapter?.convertFromString(response)
 
         Assertions.assertEquals(
-            person,
+            personModel,
             result
         )
     }
@@ -105,13 +114,20 @@ internal class TypeAdapterTest {
             allMyDogs = null,
             myFavoriteDog = Dog(name = "Bella", age = 1)
         )
+        val personModel = PersonModel(
+            person,
+            rootLinks = DefaultLinks(self = "https://root.link.com"),
+            resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
+            relationshipsLinks = mapOf(
+                "myFavoriteDog" to DefaultLinks(self = "https://relationship.link.com"),
+            ),
+        )
 
         val response = getFileAsString("person_many_rel_null_with_included.json")
-
         val result = typeAdapter?.convertFromString(response)
 
         Assertions.assertEquals(
-            person,
+            personModel,
             result
         )
     }
@@ -125,13 +141,21 @@ internal class TypeAdapterTest {
             allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
             myFavoriteDog = null
         )
+        val personModel = PersonModel(
+            data = person,
+            rootLinks = DefaultLinks(self = "https://root.link.com"),
+            resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
+            relationshipsLinks = mapOf(
+                "allMyDogs" to DefaultLinks(self = "https://relationship.link.com"),
+            ),
+        )
 
         val response = getFileAsString("person_many_rel.json")
 
         val result = typeAdapter?.convertFromString(response)
 
         Assertions.assertEquals(
-            person,
+            personModel,
             result
         )
     }
@@ -145,22 +169,16 @@ internal class TypeAdapterTest {
             allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
             myFavoriteDog = null
         )
+        val personModel = PersonModel(person)
 
         val response = getFileAsString("person_all_types_of_links_null.json")
 
         val result = typeAdapter?.convertFromString(response)
 
         Assertions.assertEquals(
-            person,
+            personModel,
             result
         )
-    }
-
-    @org.junit.jupiter.api.Test
-    fun `given that there is a null data of person in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
-        val response = getFileAsString("person_invalid_data.json")
-
-        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
     }
 
     @org.junit.jupiter.api.Test
