@@ -27,4 +27,10 @@ class DefaultLinks(
         if (next != other.next) return false
         return prev == other.prev
     }
+
+    override fun toString(): String {
+        return "DefaultLinks(self=$self, related=$related, first=$first, last=$last, next=$next, prev=$prev)"
+    }
+
+
 }
