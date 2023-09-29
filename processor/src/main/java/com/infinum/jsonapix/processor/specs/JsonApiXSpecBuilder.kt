@@ -100,12 +100,12 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         val getterFunSpec = FunSpec.builder("get()")
             .addStatement(if (isNullable) "val original = data?.original(included)" else "val original = data.original(included)")
             .addStatement(
-                "val model = %T(%L,%L,%L,%L,%L,%L,%L,%L?.mapValues{ it.value as? %T } )",
+                "val model = %T(%L,%L,%L,%L,%L,%L,%L,%L?.filterValues{ it != null }?.mapValues{ it.value as? %T } )",
                 modelClassName,
                 "original",
                 "links",
                 if (isNullable) "data?.links" else "data.links",
-                if (isNullable) "data?.relationshipsLinks()" else "data.relationshipsLinks()",
+                (if (isNullable) "data?.relationshipsLinks()" else "data.relationshipsLinks()") + "\n?.filterValues{ it != null }",
                 "errors",
                 "meta",
                 if (isNullable) "data?.meta" else "data.meta",
