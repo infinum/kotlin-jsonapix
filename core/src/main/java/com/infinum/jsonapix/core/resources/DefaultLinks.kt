@@ -13,3 +13,18 @@ class DefaultLinks(
     @SerialName("next") val next: String? = null,
     @SerialName("prev") val prev: String? = null
 ) : Links
+{
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DefaultLinks
+
+        if (self != other.self) return false
+        if (related != other.related) return false
+        if (first != other.first) return false
+        if (last != other.last) return false
+        if (next != other.next) return false
+        return prev == other.prev
+    }
+}
