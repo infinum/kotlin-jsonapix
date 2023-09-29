@@ -19,7 +19,7 @@ internal abstract class BaseResourceObjectFunSpecBuilder() {
         val returnStatement = StringBuilder("return %T(")
         val builderArgs = mutableListOf<Any>(resourceObjectClass)
 
-        returnStatement.append("id = id ?: \"0\", ")
+        returnStatement.append("id = data?.id() ?: \"0\", ")
 
         if (attributesClass != null) {
             returnStatement.append(
