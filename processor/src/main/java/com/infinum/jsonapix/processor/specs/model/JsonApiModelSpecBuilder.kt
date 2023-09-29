@@ -17,8 +17,6 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
         return listOf(
             JsonApiConstants.Keys.DATA.asParam(getRootClassName(className), isRootNullable),
-            JsonApiConstants.Keys.TYPE.asParam(String::class.asClassName(), true),
-            JsonApiConstants.Keys.ID.asParam(String::class.asClassName(), true),
             JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true),
             JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
