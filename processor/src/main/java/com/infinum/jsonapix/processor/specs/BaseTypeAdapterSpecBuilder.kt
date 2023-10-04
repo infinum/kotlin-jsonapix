@@ -51,7 +51,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
             .addType(
                 TypeSpec.classBuilder(typeAdapterClassName)
                     .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(modelType))
-                    .addFunction(convertToStringFunSpec(className, modelType))
+                    .addFunction(convertToStringFunSpec(modelType))
                     .addFunction(convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta))
                     .apply {
                         if (rootLinks != null) {
@@ -91,7 +91,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
             .build()
     }
 
-    private fun convertToStringFunSpec(className: ClassName, modelType: TypeName): FunSpec {
+    private fun convertToStringFunSpec(modelType: TypeName): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_TO_STRING)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", modelType)
