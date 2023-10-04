@@ -27,6 +27,16 @@ class DefaultLinks(
         return prev == other.prev
     }
 
+    override fun hashCode(): Int {
+        var result = self?.hashCode() ?: 0
+        result = 31 * result + (related?.hashCode() ?: 0)
+        result = 31 * result + (first?.hashCode() ?: 0)
+        result = 31 * result + (last?.hashCode() ?: 0)
+        result = 31 * result + (next?.hashCode() ?: 0)
+        result = 31 * result + (prev?.hashCode() ?: 0)
+        return result
+    }
+
     override fun toString(): String {
         return "DefaultLinks(self=$self, related=$related, first=$first, last=$last, next=$next, prev=$prev)"
     }
