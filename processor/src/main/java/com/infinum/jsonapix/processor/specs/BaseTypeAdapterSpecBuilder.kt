@@ -12,6 +12,8 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 
+private const val DEFAULT_RETURN_STRING = "return %S"
+
 public abstract class BaseTypeAdapterSpecBuilder {
 
     public abstract fun getAdapterPrefixName(): String
@@ -115,7 +117,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
         return FunSpec.builder(methodName)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
-            .addStatement("return %S", links)
+            .addStatement(DEFAULT_RETURN_STRING, links)
             .build()
     }
 
@@ -123,7 +125,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
         return FunSpec.builder(JsonApiConstants.Keys.ERRORS)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
-            .addStatement("return %S", errors)
+            .addStatement(DEFAULT_RETURN_STRING, errors)
             .build()
     }
 
@@ -131,7 +133,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
         return FunSpec.builder(methodName)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
-            .addStatement("return %S", meta)
+            .addStatement(DEFAULT_RETURN_STRING, meta)
             .build()
     }
 }
