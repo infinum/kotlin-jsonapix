@@ -102,11 +102,13 @@ internal object RelationshipsSpecBuilder {
         oneRelationships.forEachIndexed { index, property ->
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                    "${property.name} = originalObject.${property.name}" +
+                        "?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
                 )
             } else {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                    "${property.name} = originalObject.${property.name}." +
+                        "toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
                 )
             }
 
@@ -121,11 +123,13 @@ internal object RelationshipsSpecBuilder {
         manyRelationships.forEachIndexed { index, property ->
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
+                    "${property.name} = originalObject.${property.name}" +
+                        "?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
                 )
             } else {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
+                    "${property.name} = originalObject.${property.name}" +
+                        ".toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
                 )
             }
             builderArgs.add(getTypeOfRelationship(property))

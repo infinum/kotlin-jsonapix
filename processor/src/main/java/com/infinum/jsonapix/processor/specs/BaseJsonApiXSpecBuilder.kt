@@ -5,7 +5,6 @@ import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.ResourceObject
-import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec

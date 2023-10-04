@@ -3,7 +3,6 @@ package com.infinum.jsonapix.processor
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
-import com.infinum.jsonapix.core.JsonApiModel
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
@@ -60,8 +59,8 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
         }
 
     private fun PropertySpec.isNullable(): Boolean {
-       val jsonApiX = annotations.find { it.typeName == JsonApiX::class.asTypeName() }
-           ?: return false
+        val jsonApiX = annotations.find { it.typeName == JsonApiX::class.asTypeName() }
+            ?: return false
         println(jsonApiX)
         println(jsonApiX.members)
 

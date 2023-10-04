@@ -22,8 +22,6 @@ data class Person(
     val myFavoriteDog: Dog? = null
 ) : JsonApiModel()
 
-
-
 @Serializable
 @JsonApiXMeta("person")
 data class PersonRootMeta(val owner: String) : Meta

@@ -33,7 +33,7 @@ object JsonApiConstants {
         const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
     }
 
-    object Suffix{
+    object Suffix {
         const val JSON_API_MODEL = "Model"
         const val JSON_API_LIST_ITEM = "Item"
         const val JSON_API_LIST = "List"
@@ -150,11 +150,10 @@ object JsonApiConstants {
         const val RETURN_NULL = "return null"
     }
 
-    object Defaults{
-       const val NULL: String = "null"
-       const val EMPTY_MAP: String = "emptyMap()"
+    object Defaults {
+        const val NULL: String = "null"
+        const val EMPTY_MAP: String = "emptyMap()"
     }
 
     fun String.withName(name: String): String = "$this$name"
-
 }

@@ -4,7 +4,6 @@ import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Meta
-import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -58,7 +57,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiXList::class.asClassName().parameterizedBy(className,modelClassName)
+                        JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName)
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
@@ -118,7 +117,6 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                 "meta",
             )
             .build()
-
 
         val propertySpec = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,

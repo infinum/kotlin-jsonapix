@@ -1,7 +1,6 @@
 package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 import com.squareup.kotlinpoet.ClassName
@@ -61,5 +60,4 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
             )
             .build()
     }
-
 }

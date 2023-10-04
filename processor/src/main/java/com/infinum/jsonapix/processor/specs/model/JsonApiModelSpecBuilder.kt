@@ -19,7 +19,8 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
             JsonApiConstants.Keys.DATA.asParam(
                 getRootClassName(className),
                 isRootNullable,
-                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }),
+                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
+            ),
             JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
             JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
@@ -58,4 +59,3 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
         )
     }
 }
-

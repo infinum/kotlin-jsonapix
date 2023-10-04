@@ -5,7 +5,6 @@ abstract class JsonApiModel {
     private var type: String? = null
     private var id: String? = "0"
 
-
     fun setType(type: String?) {
         this.type = type
     }

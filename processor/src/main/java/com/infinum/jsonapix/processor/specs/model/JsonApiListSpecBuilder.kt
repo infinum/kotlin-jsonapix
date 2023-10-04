@@ -26,7 +26,8 @@ internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
             JsonApiConstants.Keys.DATA.asParam(
                 getRootClassName(className),
                 isRootNullable,
-                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }),
+                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
+            ),
             JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
             JsonApiConstants.Keys.ERRORS.asParam(
                 List::class.asClassName().parameterizedBy(Error::class.asClassName()),

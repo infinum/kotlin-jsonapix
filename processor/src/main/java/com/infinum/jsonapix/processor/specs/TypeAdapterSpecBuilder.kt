@@ -1,12 +1,10 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.resources.Meta
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.asClassName
 
 public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
     override fun getAdapterPrefixName(): String = JsonApiConstants.Prefix.TYPE_ADAPTER
@@ -45,7 +43,7 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS
             )
-            .addStatement("return data.%L",JsonApiConstants.Members.ORIGINAL)
+            .addStatement("return data.%L", JsonApiConstants.Members.ORIGINAL)
             .build()
     }
 }

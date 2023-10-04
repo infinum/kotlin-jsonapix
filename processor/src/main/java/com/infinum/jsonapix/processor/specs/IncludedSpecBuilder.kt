@@ -15,10 +15,12 @@ internal object IncludedSpecBuilder {
 
         oneRelationships.forEachIndexed { index, prop ->
 
-            statement.append("""data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+            statement.append(
+                """data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                     relationshipsMeta?.get("${prop.name}"),
                     relationshipsLinks?.get("${prop.name}")
-                )}""".trimMargin())
+                )}""".trimMargin()
+            )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
@@ -65,10 +67,12 @@ internal object IncludedSpecBuilder {
 
         manyRelationships.forEachIndexed { index, prop ->
             statement.append("*data.flatMapSafe {item-> item.data.${prop.name}.mapSafe {\n")
-            statement.append("""it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+            statement.append(
+                """it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                      item.relationshipsMeta?.get("${prop.name}"),
                      item.relationshipsLinks?.get("${prop.name}")
-                )""".trimMargin())
+                )""".trimMargin()
+            )
             statement.append("} }.toTypedArray()")
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")

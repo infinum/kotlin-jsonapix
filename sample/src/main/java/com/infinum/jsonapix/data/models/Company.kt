@@ -15,4 +15,4 @@ data class Company(
     val manager: Person,
     @HasOne("address")
     val address: Address
-): JsonApiModel()
+) : JsonApiModel()

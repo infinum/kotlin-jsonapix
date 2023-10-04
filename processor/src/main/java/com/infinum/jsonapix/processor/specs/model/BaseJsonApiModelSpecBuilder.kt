@@ -49,7 +49,6 @@ internal abstract class BaseJsonApiModelSpecBuilder {
             .build()
     }
 
-
     protected fun String.asParam(className: TypeName, isNullable: Boolean, defaultValue: String? = null): ParameterSpec {
         return ParameterSpec.builder(
             this,
@@ -69,5 +68,4 @@ internal abstract class BaseJsonApiModelSpecBuilder {
             .initializer(name)
             .build()
     }
-
 }

@@ -4,7 +4,6 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Meta
-import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -114,7 +113,6 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             )
             .addStatement("return model")
             .build()
-
 
         val propertySpec = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,

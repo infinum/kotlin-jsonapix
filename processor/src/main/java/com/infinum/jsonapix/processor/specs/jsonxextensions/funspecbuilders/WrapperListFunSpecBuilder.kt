@@ -4,8 +4,6 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.asClassName
 
 internal object WrapperListFunSpecBuilder {
 
@@ -20,11 +18,11 @@ internal object WrapperListFunSpecBuilder {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
 
-        val returnStatement =if(isNullable) {
+        val returnStatement = if (isNullable) {
             StringBuilder(
                 "return %T(data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
             )
-        }else{
+        } else {
             StringBuilder(
                 "return %T(data =data.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }"
             )

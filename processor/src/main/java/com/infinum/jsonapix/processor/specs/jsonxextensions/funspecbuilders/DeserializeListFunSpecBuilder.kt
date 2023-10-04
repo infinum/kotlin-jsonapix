@@ -46,7 +46,7 @@ internal object DeserializeListFunSpecBuilder {
             .addParameters(linksParams)
             .addParameters(metaParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
-            .returns(JsonApiXList::class.asClassName().parameterizedBy(dataVariableName,typeVariableName))
+            .returns(JsonApiXList::class.asClassName().parameterizedBy(dataVariableName, typeVariableName))
             .addStatement(
                 "val de = %T.%L(this).%M[%S]",
                 Json::class.asTypeName(),

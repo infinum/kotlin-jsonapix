@@ -4,10 +4,8 @@ import android.util.Log
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
-import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
-import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -61,12 +59,12 @@ class PersonViewModel @Inject constructor(
                     personsData = io { sampleApiService.fetchPersonsNoRelationships() }
                     persons = personsData.data
                 }
-                Log.d("Person",personsData.toString())
+                Log.d("Person", personsData.toString())
                 hideLoading()
                 viewState = PersonState(
                     bodyString,
                     persons.first().data,
-                    (personsData.rootLinks as DefaultLinks) .self,
+                    (personsData.rootLinks as DefaultLinks).self,
                     (persons.firstOrNull()?.resourceObjectLinks as? DefaultLinks)?.self,
                     (persons.firstOrNull()?.relationshipsLinks as? Map<String, DefaultLinks>)?.values?.firstOrNull()?.self,
                     personsData.rootMeta?.owner

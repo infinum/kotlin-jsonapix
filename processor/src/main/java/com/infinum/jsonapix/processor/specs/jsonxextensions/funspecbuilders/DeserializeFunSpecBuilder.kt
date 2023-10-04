@@ -45,7 +45,7 @@ internal object DeserializeFunSpecBuilder {
             .addParameters(linksParams)
             .addParameters(metaParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
-            .returns(JsonApiX::class.asClassName().parameterizedBy(dataVariableName,typeVariableName))
+            .returns(JsonApiX::class.asClassName().parameterizedBy(dataVariableName, typeVariableName))
             .addStatement(
                 "val type = %T.%M(%T.%L(this).%M[%S])",
                 TypeExtractor::class.asTypeName(),

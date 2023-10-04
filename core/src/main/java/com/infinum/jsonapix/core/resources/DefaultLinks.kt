@@ -12,8 +12,7 @@ class DefaultLinks(
     @SerialName("last") val last: String? = null,
     @SerialName("next") val next: String? = null,
     @SerialName("prev") val prev: String? = null
-) : Links
-{
+) : Links {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -31,6 +30,4 @@ class DefaultLinks(
     override fun toString(): String {
         return "DefaultLinks(self=$self, related=$related, first=$first, last=$last, next=$next, prev=$prev)"
     }
-
-
 }
