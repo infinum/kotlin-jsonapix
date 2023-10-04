@@ -33,7 +33,7 @@ class PersonViewModel @Inject constructor(
                     person,
                     (personModel.rootLinks as? DefaultLinks)?.self,
                     (personModel.resourceObjectLinks as? DefaultLinks)?.self,
-                    personModel.relationshipsLinks?.mapValues { it.value as? DefaultLinks }?.values?.firstOrNull()?.self,
+                    (personModel.relationshipsLinks?.values?.firstOrNull() as? DefaultLinks)?.self,
                     personModel.rootMeta?.owner
                 )
             } catch (t: Throwable) {
