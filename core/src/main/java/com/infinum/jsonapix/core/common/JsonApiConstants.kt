@@ -1,7 +1,7 @@
 package com.infinum.jsonapix.core.common
 
 /**
- * Contains all the constants used in JSON:API specification
+ * Contains all the constants used in JSON:API specification https://jsonapi.org/format/
  * as well as prefixes for the generated classes
  */
 object JsonApiConstants {
