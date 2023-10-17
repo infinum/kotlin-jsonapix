@@ -11,22 +11,16 @@ internal object WrapperListFunSpecBuilder {
         originalClass: ClassName,
         wrapperClass: ClassName,
         includedListStatement: String?,
-        isNullable: Boolean,
     ): FunSpec {
         val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST))
 
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
 
-        val returnStatement = if (isNullable) {
-            StringBuilder(
-                "return %T(data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
-            )
-        } else {
-            StringBuilder(
-                "return %T(data =data.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }"
-            )
-        }
+        val returnStatement = StringBuilder(
+            "return %T(data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
+        )
+
 
         if (includedListStatement != null) {
             returnStatement.append(", ")

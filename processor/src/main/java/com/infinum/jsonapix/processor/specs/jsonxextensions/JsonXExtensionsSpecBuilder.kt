@@ -184,7 +184,6 @@ internal class JsonXExtensionsSpecBuilder {
                     it.key,
                     it.value.jsonWrapperClassName,
                     it.value.includedStatement?.toString(),
-                    it.value.isNullable
                 )
             )
             fileSpec.addFunction(
@@ -192,7 +191,6 @@ internal class JsonXExtensionsSpecBuilder {
                     it.key,
                     it.value.jsonWrapperListClassName,
                     it.value.includedListStatement?.toString(),
-                    it.value.isNullable,
                 )
             )
 

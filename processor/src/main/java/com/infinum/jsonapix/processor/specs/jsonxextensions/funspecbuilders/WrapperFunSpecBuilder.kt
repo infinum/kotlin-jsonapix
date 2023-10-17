@@ -11,7 +11,6 @@ internal object WrapperFunSpecBuilder {
         originalClass: ClassName,
         wrapperClass: ClassName,
         includedListStatement: String?,
-        isNullable: Boolean,
     ): FunSpec {
         val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
 
