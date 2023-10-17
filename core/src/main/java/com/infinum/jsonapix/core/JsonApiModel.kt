@@ -3,7 +3,7 @@ package com.infinum.jsonapix.core
 @Suppress("UnnecessaryAbstractClass")
 abstract class JsonApiModel {
     private var type: String? = null
-    private var id: String? = "0"
+    private var id: String? = null
 
     fun setType(type: String?) {
         this.type = type

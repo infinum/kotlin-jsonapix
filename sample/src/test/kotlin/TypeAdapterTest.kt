@@ -194,9 +194,11 @@ internal class TypeAdapterTest {
             name = "Jason",
             surname = "Apix",
             age = 28,
-            allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-            myFavoriteDog = Dog(name = "Bella", age = 1)
-        )
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
+        ).apply {
+            setId("0")
+        }
 
         val model = PersonModel(
             data = person,
