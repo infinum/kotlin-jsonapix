@@ -5,6 +5,7 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.extensions.appendIf
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -73,7 +74,6 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
                         originalProperty(
                             modelClassName,
                             metaInfo,
-                            isNullable,
                         )
                     )
                     .build()
@@ -93,22 +93,21 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
     private fun originalProperty(
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
-        isNullable: Boolean,
     ): PropertySpec {
 
         val getterFunSpec = FunSpec.builder("get()")
-            .addStatement(if (isNullable) "val original = data?.original(included)" else "val original = data.original(included)")
+            .addStatement("val original = data?.original(included)".appendIf("!!") { isNullable.not() })
             .addStatement(
                 "val model = %T(%L,%L,%L,%L,%L,%L,%L,%L?.filterValues{ it != null }?.mapValues{ it.value as? %T } )",
                 modelClassName,
                 "original",
                 "links",
-                if (isNullable) "data?.links" else "data.links",
-                (if (isNullable) "data?.relationshipsLinks()" else "data.relationshipsLinks()") + "\n?.filterValues{ it != null }",
+                "data?.links",
+                "data?.relationshipsLinks()\n?.filterValues{ it != null }",
                 "errors",
                 "meta",
-                if (isNullable) "data?.meta" else "data.meta",
-                if (isNullable) "data?.relationshipsMeta()" else "data.relationshipsMeta()",
+                "data?.meta",
+                "data?.relationshipsMeta()",
                 metaInfo?.relationshipsClassNAme ?: Meta::class
             )
             .addStatement("return model")
