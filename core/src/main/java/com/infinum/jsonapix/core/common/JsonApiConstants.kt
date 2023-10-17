@@ -70,7 +70,6 @@ object JsonApiConstants {
         const val CONVERT_TO_STRING = "convertToString"
         const val CONVERT_FROM_STRING = "convertFromString"
         const val GET_ADAPTER = "getAdapter"
-        const val GET_LIST_ADAPTER = "getListAdapter"
 
         const val ROOT_LINKS = "rootLinks"
         const val RESOURCE_OBJECT_LINKS = "resourceObjectLinks"
@@ -147,7 +146,6 @@ object JsonApiConstants {
         const val IGNORE_UNKNOWN_KEYS = "ignoreUnknownKeys = true"
         const val CLASS_DISCRIMINATOR_FORMAT = "classDiscriminator = %S"
         const val SERIALIZERS_MODULE_FORMAT = "serializersModule = %L"
-        const val RETURN_NULL = "return null"
     }
 
     object Defaults {
