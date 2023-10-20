@@ -407,7 +407,7 @@ internal class TypeAdapterTest {
             age = 28,
             allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
             myFavoriteDog = Dog(name = "Bella", age = 1),
-        )
+        ).apply { setId("1") }
 
         val model = PersonModel(
             data = person,
@@ -424,8 +424,43 @@ internal class TypeAdapterTest {
         val result = typeAdapter?.convertFromString(response)
 
         Assertions.assertEquals(
-            model.relationshipsMeta,
-            result?.relationshipsMeta
+            model,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has multiple  all types of links, should generate a Person with all types of links`() {
+        val rootLinks = DefaultLinks("https://root.link.com")
+        val resourceLinks = DefaultLinks("https://resource.link.com")
+        val relationship1Links = DefaultLinks("https://relationship1.link.com")
+        val relationship2Links = DefaultLinks("https://relationship2.link.com")
+
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        )
+
+        val model = PersonModel(
+            data = person,
+            rootLinks = rootLinks,
+            resourceObjectLinks = resourceLinks,
+            relationshipsLinks = mapOf(
+                "myFavoriteDog" to relationship1Links,
+                "allMyDogs" to relationship2Links,
+            )
+        )
+
+        val response = getFileAsString("person_with_all_links.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            model,
+            result
         )
     }
 

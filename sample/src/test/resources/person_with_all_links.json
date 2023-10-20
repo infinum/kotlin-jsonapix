@@ -1,11 +1,11 @@
 {
   "errors":null,
-  "meta": {
-    "owner": "root"
+  "links": {
+    "self": "https://root.link.com"
   },
   "data":{
-    "meta": {
-      "writer": "resource"
+    "links": {
+      "self": "https://resource.link.com"
     },
     "type":"person",
     "id":"1",
@@ -16,8 +16,8 @@
     },
     "relationships":{
       "myFavoriteDog":{
-        "meta": {
-          "user": "relation1"
+        "links": {
+          "self": "https://relationship1.link.com"
         },
         "data":{
           "type":"dog",
@@ -25,8 +25,8 @@
         }
       },
       "allMyDogs":{
-        "meta": {
-          "user": "relation2"
+        "links": {
+          "self": "https://relationship2.link.com"
         },
         "data":[
           { "type":"dog", "id":"1" },
