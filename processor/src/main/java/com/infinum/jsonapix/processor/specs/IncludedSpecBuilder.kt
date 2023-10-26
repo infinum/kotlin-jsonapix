@@ -12,8 +12,15 @@ internal object IncludedSpecBuilder {
         manyRelationships: List<PropertySpec>
     ): CodeBlock {
         val statement = StringBuilder("listOfNotNull(")
+
         oneRelationships.forEachIndexed { index, prop ->
-            statement.append("${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
+
+            statement.append(
+                """data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                    relationshipsMeta?.get("${prop.name}"),
+                    relationshipsLinks?.get("${prop.name}")
+                )}""".trimMargin()
+            )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
@@ -23,7 +30,10 @@ internal object IncludedSpecBuilder {
 
         manyRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*${prop.name}.mapSafe { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                """*data.${prop.name}.mapSafe { it.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                        relationshipsMeta?.get("${prop.name}"),
+                        relationshipsLinks?.get("${prop.name}")
+                    )}}.toTypedArray()""".trimMargin()
             )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
@@ -41,18 +51,28 @@ internal object IncludedSpecBuilder {
         val statement = StringBuilder("listOfNotNull(")
         oneRelationships.forEachIndexed { index, prop ->
             statement.append(
-                "*mapSafe { it.${prop.name}?.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }.toTypedArray()"
+                """*data.mapSafe {item -> 
+                    item.data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                        item.relationshipsMeta?.get("${prop.name}"),
+                        item.relationshipsLinks?.get("${prop.name}")
+                    )} }.toTypedArray()
+                    """.trimMargin()
             )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
-                statement.append(", ")
+                statement.append(",")
             }
         }
 
         manyRelationships.forEachIndexed { index, prop ->
-            statement.append("*flatMapSafe { it.${prop.name}.mapSafe { ")
-            statement.append("it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()")
+            statement.append("*data.flatMapSafe {item-> item.data.${prop.name}.mapSafe {\n")
+            statement.append(
+                """it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                     item.relationshipsMeta?.get("${prop.name}"),
+                     item.relationshipsLinks?.get("${prop.name}")
+                )""".trimMargin()
+            )
             statement.append("} }.toTypedArray()")
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")

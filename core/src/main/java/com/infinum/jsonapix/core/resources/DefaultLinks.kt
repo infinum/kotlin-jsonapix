@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("links")
-class DefaultLinks(
+data class DefaultLinks(
     @SerialName("self") val self: String? = null,
     @SerialName("related") val related: String? = null,
     @SerialName("first") val first: String? = null,

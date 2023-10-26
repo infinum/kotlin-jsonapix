@@ -1,15 +1,12 @@
 {
   "errors": null,
-  "meta": {
-    "owner": "Stef"
-  },
   "links": {
     "self": "https://root.link.com"
   },
   "data": [
     {
       "links": {
-        "self": "https://resource.link.com"
+        "self": "https://resource1.link.com"
       },
       "type": "person",
       "id": "1",
@@ -21,7 +18,7 @@
       "relationships": {
         "myFavoriteDog": {
           "links": {
-            "self": "https://relationship.link.com"
+            "self": "https://relationship1.link.com"
           },
           "data": {
             "type": "dog",
@@ -32,7 +29,7 @@
     },
     {
       "links": {
-        "self": "https://resource.link.com"
+        "self": "https://resource2.link.com"
       },
       "type": "person",
       "id": "2",
@@ -44,7 +41,7 @@
       "relationships": {
         "myFavoriteDog": {
           "links": {
-            "self": "https://relationship.link.com"
+            "self": "https://relationship2.link.com"
           },
           "data": {
             "type": "dog",
@@ -53,7 +50,7 @@
         },
         "allMyDogs": {
           "links": {
-            "self": "https://relationship.link.com"
+            "self": "https://relationship2.link.com"
           },
           "data": [
             {

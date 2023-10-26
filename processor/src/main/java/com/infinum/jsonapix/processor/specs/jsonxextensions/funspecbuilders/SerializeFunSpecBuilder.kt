@@ -2,6 +2,7 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.encodeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.formatMember
@@ -15,6 +16,8 @@ import kotlinx.serialization.PolymorphicSerializer
 internal object SerializeFunSpecBuilder {
 
     fun build(originalClass: ClassName, isNullable: Boolean): FunSpec {
+        val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
+
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
 
@@ -33,7 +36,7 @@ internal object SerializeFunSpecBuilder {
         )
 
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
-            .receiver(originalClass)
+            .receiver(modelClass)
             .addParameters(linksParams)
             .addParameters(metaParams)
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())

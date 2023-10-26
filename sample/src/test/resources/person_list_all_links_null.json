@@ -1,12 +1,9 @@
 {
   "errors": null,
-  "meta": {
-    "owner": "Stef"
-  },
-  "links":null,
+  "links": null,
   "data": [
     {
-      "links":null,
+      "links": null,
       "type": "person",
       "id": "1",
       "attributes": {
@@ -16,14 +13,14 @@
       },
       "relationships": {
         "myFavoriteDog": {
-          "links":null,
+          "links": null,
           "data": {
             "type": "dog",
             "id": "1"
           }
         },
         "allMyDogs": {
-          "links":null,
+          "links": null,
           "data": [
             {
               "type": "dog",
@@ -38,7 +35,7 @@
       }
     },
     {
-      "links":null,
+      "links": null,
       "type": "person",
       "id": "2",
       "attributes": {
@@ -48,14 +45,14 @@
       },
       "relationships": {
         "myFavoriteDog": {
-          "links":null,
+          "links": null,
           "data": {
             "type": "dog",
             "id": "2"
           }
         },
         "allMyDogs": {
-          "links":null,
+          "links": null,
           "data": [
             {
               "type": "dog",

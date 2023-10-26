@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.adapters.AdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -27,7 +28,6 @@ public class TypeAdapterFactorySpecBuilder {
                 TypeSpec.classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
                     .addSuperinterface(AdapterFactory::class)
                     .addFunction(getAdapterFunSpec())
-                    .addFunction(getListAdapterFunSpec())
                     .build()
             )
             .apply {
@@ -52,28 +52,14 @@ public class TypeAdapterFactorySpecBuilder {
             .beginControlFlow("return when(type.qualifiedName)")
             .apply {
                 classNames.forEach {
-                    addStatement("%S -> TypeAdapter_${it.simpleName}()", it.canonicalName)
+                    addStatement("%S -> TypeAdapter_${it.simpleName}()", it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
                 }
-            }
-            .addStatement("else -> null")
-            .endControlFlow()
-            .build()
-    }
 
-    private fun getListAdapterFunSpec(): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Members.GET_LIST_ADAPTER)
-            .addModifiers(KModifier.OVERRIDE)
-            .addParameter("type", KClass::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(Any::class)))
-            .returns(
-                TypeAdapter::class
-                    .asClassName()
-                    .parameterizedBy(WildcardTypeName.producerOf(Any::class))
-                    .copy(nullable = true)
-            )
-            .beginControlFlow("return when(type.qualifiedName)")
-            .apply {
                 classNames.forEach {
-                    addStatement("%S -> TypeAdapterList_${it.simpleName}()", it.canonicalName)
+                    addStatement(
+                        "%S -> TypeAdapterList_${it.simpleName}()",
+                        it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST)
+                    )
                 }
             }
             .addStatement("else -> null")

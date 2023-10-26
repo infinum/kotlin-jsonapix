@@ -1,15 +1,12 @@
 {
   "errors": null,
-  "meta": {
-    "owner": "Stef"
-  },
   "links": {
     "self": "https://root.link.com"
   },
   "data": [
     {
       "links": {
-        "self": "https://resource.link.com"
+        "self": "https://resource1.link.com"
       },
       "type": "person",
       "id": "1",
@@ -25,7 +22,7 @@
     },
     {
       "links": {
-        "self": "https://resource.link.com"
+        "self": "https://resource2.link.com"
       },
       "type": "person",
       "id": "2",

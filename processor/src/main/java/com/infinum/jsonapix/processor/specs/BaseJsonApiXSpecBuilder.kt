@@ -5,6 +5,7 @@ import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.ResourceObject
+import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -23,7 +24,7 @@ internal abstract class BaseJsonApiXSpecBuilder {
         className: ClassName,
         isNullable: Boolean,
         type: String,
-        metaClassName: ClassName?
+        metaInfo: MetaInfo?,
     ): FileSpec
 
     fun getBaseParamSpecs(metaClassName: ClassName?): List<ParameterSpec> {

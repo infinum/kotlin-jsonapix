@@ -1,7 +1,7 @@
 package com.infinum.jsonapix.core.common
 
 /**
- * Contains all the constants used in JSON:API specification
+ * Contains all the constants used in JSON:API specification https://jsonapi.org/format/
  * as well as prefixes for the generated classes
  */
 object JsonApiConstants {
@@ -31,8 +31,12 @@ object JsonApiConstants {
         const val RELATIONSHIPS = "Relationships_"
         const val TYPE_ADAPTER = "TypeAdapter_"
         const val TYPE_ADAPTER_LIST = "TypeAdapterList_"
+    }
 
-        fun String.withName(name: String): String = "$this$name"
+    object Suffix {
+        const val JSON_API_MODEL = "Model"
+        const val JSON_API_LIST_ITEM = "Item"
+        const val JSON_API_LIST = "List"
     }
 
     object Members {
@@ -53,6 +57,7 @@ object JsonApiConstants {
         const val ENCODE_TO_STRING = "encodeToString"
         const val FORMAT = "format"
         const val GENERIC_TYPE_VARIABLE = "Model"
+        const val DATA_TYPE_VARIABLE = "Data"
         const val FIND_TYPE = "findType"
         const val GUESS_TYPE = "guessType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
@@ -65,7 +70,6 @@ object JsonApiConstants {
         const val CONVERT_TO_STRING = "convertToString"
         const val CONVERT_FROM_STRING = "convertFromString"
         const val GET_ADAPTER = "getAdapter"
-        const val GET_LIST_ADAPTER = "getListAdapter"
 
         const val ROOT_LINKS = "rootLinks"
         const val RESOURCE_OBJECT_LINKS = "resourceObjectLinks"
@@ -142,6 +146,12 @@ object JsonApiConstants {
         const val IGNORE_UNKNOWN_KEYS = "ignoreUnknownKeys = true"
         const val CLASS_DISCRIMINATOR_FORMAT = "classDiscriminator = %S"
         const val SERIALIZERS_MODULE_FORMAT = "serializersModule = %L"
-        const val RETURN_NULL = "return null"
     }
+
+    object Defaults {
+        const val NULL: String = "null"
+        const val EMPTY_MAP: String = "emptyMap()"
+    }
+
+    fun String.withName(name: String): String = "$this$name"
 }

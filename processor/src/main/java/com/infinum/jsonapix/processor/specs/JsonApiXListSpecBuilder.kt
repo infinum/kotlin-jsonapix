@@ -2,7 +2,9 @@ package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.resources.Meta
+import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -24,16 +26,19 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         className: ClassName,
         isNullable: Boolean,
         type: String,
-        metaClassName: ClassName?
+        metaInfo: MetaInfo?,
     ): FileSpec {
+        val modelClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST))
+        val itemClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM))
+
         val generatedName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
             className.packageName,
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         )
 
-        val properties = getBasePropertySpecs(metaClassName).toMutableList()
-        val params = getBaseParamSpecs(metaClassName).toMutableList()
+        val properties = getBasePropertySpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
+        val params = getBaseParamSpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
 
         params.add(
             ParameterSpec.builder(
@@ -52,7 +57,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiXList::class.asClassName().parameterizedBy(className)
+                        JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName)
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
@@ -64,7 +69,9 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                     .addProperties(properties)
                     .addProperty(
                         originalProperty(
-                            className
+                            itemClassName,
+                            modelClassName,
+                            metaInfo,
                         )
                     )
                     .build()
@@ -82,14 +89,45 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         .build()
 
     private fun originalProperty(
-        className: ClassName
+        itemClassName: ClassName,
+        modelClassName: ClassName,
+        metaInfo: MetaInfo?,
     ): PropertySpec {
-        val codeString = "${JsonApiConstants.Keys.DATA}.map { it.${JsonApiConstants.Members.ORIGINAL}(included) }"
-        val builder = PropertySpec.builder(
-            JsonApiConstants.Members.ORIGINAL,
-            List::class.asClassName().parameterizedBy(className), KModifier.OVERRIDE
-        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
-        return builder.initializer(codeString).build()
+        val getterFunSpec = FunSpec.builder("get()")
+            .addStatement("val items = data.map {")
+            .addStatement("val original = it.original(included)")
+            .addStatement(
+                "%T(%L,%L,%L?.filterValues{ it != null },%L,%L?.filterValues{ it != null }?.mapValues{ it.value as? %T } )",
+                itemClassName,
+                "original",
+                "it.links",
+                "it.relationshipsLinks()",
+                "it.meta",
+                "it.relationshipsMeta()",
+                metaInfo?.relationshipsClassNAme ?: Meta::class
+            )
+            .addStatement("}")
+            .addStatement(
+                "return %T(%L, %L, %L, %L)",
+                modelClassName,
+                "items",
+                "links",
+                "errors",
+                "meta",
+            )
+            .build()
+
+        val propertySpec = PropertySpec.builder(
+            JsonApiConstants.Members.ORIGINAL,
+            modelClassName, KModifier.OVERRIDE
+        )
+            .getter(getterFunSpec)
+            .addAnnotation(
+                AnnotationSpec.builder(Transient::class.asClassName())
+                    .build()
+            )
+
+        return propertySpec.build()
     }
 }

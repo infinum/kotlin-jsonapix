@@ -28,6 +28,7 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
     }
 
     fun getOneRelationships(): List<PropertySpec> {
+
         return compositeFields.filter { it.isOneRelationship() }
     }
 

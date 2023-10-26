@@ -7,7 +7,7 @@ import com.infinum.jsonapix.annotations.JsonApiXMeta
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.annotations.MetaPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
@@ -19,6 +19,9 @@ import com.infinum.jsonapix.processor.specs.TypeAdapterFactorySpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterListSpecBuilder
 import com.infinum.jsonapix.processor.specs.TypeAdapterSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.model.JsonApiListItemSpecBuilder
+import com.infinum.jsonapix.processor.specs.model.JsonApiListSpecBuilder
+import com.infinum.jsonapix.processor.specs.model.JsonApiModelSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -165,8 +168,11 @@ public class JsonApiProcessor : AbstractProcessor() {
             relationshipsClassName = ClassName(generatedPackage, generatedRelationshipsObjectName)
         }
 
+        val metaInfo = customMetas.firstOrNull { it.type == type }
+
         collector.add(
             type = type,
+            metaInfo = metaInfo,
             isNullable = isNullable,
             data = inputDataClass,
             wrapper = jsonWrapperClassName,
@@ -185,7 +191,6 @@ public class JsonApiProcessor : AbstractProcessor() {
         )
 
         adapterFactoryCollector.add(inputDataClass)
-        val metaInfo = customMetas.firstOrNull { it.type == type }
 
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
@@ -196,20 +201,25 @@ public class JsonApiProcessor : AbstractProcessor() {
                 oneRelationships = mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
                 manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
-        val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
-        val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo?.rootClassName)
+
         val linksInfo = customLinks.firstOrNull { it.type == type }
+
+        val wrapperFileSpec =
+            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo)
+        val wrapperListFileSpec =
+            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo)
+        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
+        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
+        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
             className = inputDataClass,
             rootLinks = linksInfo?.rootLinks,
             resourceObjectLinks = linksInfo?.resourceObjectLinks,
             relationshipsLinks = linksInfo?.relationshipsLinks,
-            rootMeta = metaInfo?.rootClassName?.canonicalName,
-            resourceObjectMeta = metaInfo?.resourceObjectClassName?.canonicalName,
-            relationshipsMeta = metaInfo?.relationshipsClassNAme?.canonicalName,
+            rootMeta = metaInfo?.rootClassName,
+            resourceObjectMeta = metaInfo?.resourceObjectClassName,
+            relationshipsMeta = metaInfo?.relationshipsClassNAme,
             errors = customErrors[type]?.canonicalName
         )
 
@@ -218,9 +228,9 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootLinks = linksInfo?.rootLinks,
             resourceObjectLinks = linksInfo?.resourceObjectLinks,
             relationshipsLinks = linksInfo?.relationshipsLinks,
-            rootMeta = metaInfo?.rootClassName?.canonicalName,
-            resourceObjectMeta = metaInfo?.resourceObjectClassName?.canonicalName,
-            relationshipsMeta = metaInfo?.relationshipsClassNAme?.canonicalName,
+            rootMeta = metaInfo?.rootClassName,
+            resourceObjectMeta = metaInfo?.resourceObjectClassName,
+            relationshipsMeta = metaInfo?.relationshipsClassNAme,
             errors = customErrors[type]?.canonicalName
         )
 
@@ -229,6 +239,9 @@ public class JsonApiProcessor : AbstractProcessor() {
         wrapperListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterFileSpec.writeTo(File(kaptKotlinGeneratedDir))
         typeAdapterListFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        modelFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        listItemFileSpec.writeTo(File(kaptKotlinGeneratedDir))
+        listFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 
     private fun processErrorAnnotation(roundEnv: RoundEnvironment?) {
@@ -308,6 +321,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                     MetaPlacementStrategy.DATA ->
                         metaInfo.resourceObjectClassName =
                             className
+
                     MetaPlacementStrategy.RELATIONSHIPS ->
                         metaInfo.relationshipsClassNAme =
                             className

@@ -3,7 +3,7 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.Meta
@@ -102,11 +102,13 @@ internal object RelationshipsSpecBuilder {
         oneRelationships.forEachIndexed { index, property ->
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                    "${property.name} = originalObject.${property.name}" +
+                        "?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
                 )
             } else {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                    "${property.name} = originalObject.${property.name}." +
+                        "toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
                 )
             }
 
@@ -121,11 +123,13 @@ internal object RelationshipsSpecBuilder {
         manyRelationships.forEachIndexed { index, property ->
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
+                    "${property.name} = originalObject.${property.name}" +
+                        "?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
                 )
             } else {
                 constructorStringBuilder.append(
-                    "${property.name} = originalObject.${property.name}.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
+                    "${property.name} = originalObject.${property.name}" +
+                        ".toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
                 )
             }
             builderArgs.add(getTypeOfRelationship(property))

@@ -1,7 +1,7 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.common.JsonApiConstants.Prefix.withName
+import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.common.JsonApiXMissingArgumentException
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.Links
