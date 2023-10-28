@@ -3,6 +3,7 @@ package com.infinum.jsonapix.core.discriminators
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
@@ -85,8 +86,11 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 entries.withIndex().firstOrNull { it.value.key == JsonApiConstants.Keys.META }?.let {
                     // Remove nested discriminator inside meta element
 
-                    val meta = removeDiscriminatorEntry(it.value.value.jsonObject)
-                    entries.set(it.index, mapOf(JsonApiConstants.Keys.META to meta).entries.first())
+                    val metaJsonObject = it.value.value.takeUnless { json-> json is JsonNull }?.jsonObject
+                    if (metaJsonObject != null) {
+                        val meta = removeDiscriminatorEntry(metaJsonObject)
+                        entries[it.index] = mapOf(JsonApiConstants.Keys.META to meta).entries.first()
+                    }
                 }
 
                 val resultMap = mutableMapOf<String, JsonElement>()
