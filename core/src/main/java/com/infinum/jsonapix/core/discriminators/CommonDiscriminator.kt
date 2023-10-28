@@ -25,6 +25,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
             is JsonObject -> {
                 addDiscriminatorEntry(jsonElement)
             }
+
             is JsonArray -> {
                 val jsonArray = jsonElement.jsonArray
                 val newJsonArray = mutableListOf<JsonObject>()
@@ -34,6 +35,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 }
                 JsonArray(newJsonArray)
             }
+
             else -> {
                 throw IllegalArgumentException("Input must be either JSON object or array")
             }
@@ -45,6 +47,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
             is JsonObject -> {
                 removeDiscriminatorEntry(jsonElement)
             }
+
             is JsonArray -> {
                 val jsonArray = jsonElement.jsonArray
                 val newJsonArray = mutableListOf<JsonObject>()
@@ -54,6 +57,7 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 }
                 JsonArray(newJsonArray)
             }
+
             else -> {
                 throw IllegalArgumentException("Input must be either JSON object or array")
             }
@@ -73,12 +77,23 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
     private fun removeDiscriminatorEntry(jsonObject: JsonObject): JsonObject {
         return jsonObject.entries
-            .toMutableSet()
+            .toMutableList()
             .let { entries ->
+
                 entries.removeAll { it.key == JsonApiConstants.CLASS_DISCRIMINATOR_KEY }
+
+                entries.withIndex().firstOrNull { it.value.key == JsonApiConstants.Keys.META }?.let {
+                    // Remove nested discriminator inside meta element
+
+                    val meta = removeDiscriminatorEntry(it.value.value.jsonObject)
+                    entries.set(it.index, mapOf(JsonApiConstants.Keys.META to meta).entries.first())
+                }
+
                 val resultMap = mutableMapOf<String, JsonElement>()
                 resultMap.putAll(entries.map { Pair(it.key, it.value) })
                 JsonObject(resultMap)
             }
     }
+
+
 }
