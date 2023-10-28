@@ -376,7 +376,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 )
             ), PersonItem(
@@ -384,7 +386,9 @@ internal class TypeAdapterListTest {
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bongo", age = 2).apply { setId("0") }
                 )
             )
@@ -411,7 +415,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 )
             ),
@@ -420,7 +426,9 @@ internal class TypeAdapterListTest {
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = null
                 )
             )
@@ -448,7 +456,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 )
             ),
@@ -480,7 +490,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 ).apply { setId("0") }
             ), PersonItem(
@@ -564,6 +576,18 @@ internal class TypeAdapterListTest {
         Assertions.assertEquals(
             response,
             result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given an empty Person list convertFromString should generate no error`() {
+        val response = getFileAsString("person_list_blank_data.json")
+
+        val result = typeListAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            result?.data?.isEmpty(),
+            true
         )
     }
 
