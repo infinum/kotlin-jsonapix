@@ -83,20 +83,25 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
                 entries.removeAll { it.key == JsonApiConstants.CLASS_DISCRIMINATOR_KEY }
 
-                entries.withIndex().firstOrNull { it.value.key == JsonApiConstants.Keys.META }?.let {
-                    // Remove nested discriminator inside meta element
-
-                    val metaJsonObject = it.value.value.takeUnless { json-> json is JsonNull }?.jsonObject
-                    if (metaJsonObject != null) {
-                        val meta = removeDiscriminatorEntry(metaJsonObject)
-                        entries[it.index] = mapOf(JsonApiConstants.Keys.META to meta).entries.first()
-                    }
-                }
+                // Remove nested discriminator inside meta and links elements
+                entries.removeNestedDiscriminator(JsonApiConstants.Keys.META)
+                entries.removeNestedDiscriminator(JsonApiConstants.Keys.LINKS)
 
                 val resultMap = mutableMapOf<String, JsonElement>()
                 resultMap.putAll(entries.map { Pair(it.key, it.value) })
                 JsonObject(resultMap)
             }
+    }
+
+    private fun MutableList<Map.Entry<String, JsonElement>>.removeNestedDiscriminator(key: String) {
+        withIndex().firstOrNull { it.value.key == key }?.let {
+
+            val metaJsonObject = it.value.value.takeUnless { json -> json is JsonNull }?.jsonObject
+            if (metaJsonObject != null) {
+                val meta = removeDiscriminatorEntry(metaJsonObject)
+                this[it.index] = mapOf(key to meta).entries.first()
+            }
+        }
     }
 
 
