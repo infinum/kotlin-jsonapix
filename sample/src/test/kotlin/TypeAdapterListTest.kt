@@ -591,6 +591,19 @@ internal class TypeAdapterListTest {
         )
     }
 
+    @org.junit.jupiter.api.Test
+    fun `given an empty Person list convertToString should generate no error`() {
+        val personList = PersonList(data = emptyList())
+        val response = getFileAsString("person_list_blank_data_encode.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
     private fun getFileAsString(filename: String): String {
         val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
         val fileReader: InputStreamReader? = fileStream?.reader()
