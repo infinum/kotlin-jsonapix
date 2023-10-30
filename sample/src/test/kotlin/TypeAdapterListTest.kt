@@ -21,43 +21,6 @@ internal class TypeAdapterListTest {
         typeListAdapter = TypeAdapterFactory().getAdapter(PersonList::class) as? TypeAdapterList_Person
     }
 
-    @Test
-    fun `play around with convertToString`() {
-
-        val items = listOf(
-            PersonItem(
-
-                data = Person(
-                    name = "Jason",
-                    surname = "Apix",
-                    age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bella", age = 1)
-                ), resourceObjectLinks = null, relationshipsLinks = null, resourceObjectMeta = null, relationshipsMeta = null
-            ),
-
-            PersonItem(
-
-                data = Person(
-                    name = "Jasminka",
-                    surname = "Apix",
-                    age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2)
-                ), resourceObjectLinks = null, relationshipsLinks = null, resourceObjectMeta = null, relationshipsMeta = null
-            ),
-        )
-        val personList = PersonList(
-            data = items,
-            rootLinks = null,
-            rootMeta = null,
-            errors = null,
-        )
-
-        val json = typeListAdapter?.convertToString(personList)
-        println(json)
-    }
-
     @org.junit.jupiter.api.Test
     fun `given that response for both persons has all rels set type adapter Person list convertFromString should generate a Person class list with full rels on both list item Person`() {
         val items = listOf(
