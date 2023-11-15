@@ -1,0 +1,56 @@
+{
+  "errors":null,
+  "meta": {
+    "owner": "root"
+  },
+  "data":{
+    "meta": {
+      "writer": "resource"
+    },
+    "type":"person",
+    "id":"1",
+    "attributes":{
+      "age":28,
+      "name":"Jason",
+      "surname":"Apix"
+    },
+    "relationships":{
+      "myFavoriteDog":{
+        "meta": {
+          "user": "relation1"
+        },
+        "data":{
+          "type":"dog",
+          "id":"1"
+        }
+      },
+      "allMyDogs":{
+        "meta": {
+          "user": "relation2"
+        },
+        "data":[
+          { "type":"dog", "id":"1" },
+          { "type":"dog", "id":"2" }
+        ]
+      }
+    }
+  },
+  "included":[
+    {
+      "type":"dog",
+      "id":"1",
+      "attributes":{
+        "age":1,
+        "name":"Bella"
+      }
+    },
+    {
+      "type":"dog",
+      "id":"2",
+      "attributes":{
+        "age":2,
+        "name":"Bongo"
+      }
+    }
+  ]
+}

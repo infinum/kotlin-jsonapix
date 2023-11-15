@@ -21,43 +21,6 @@ internal class TypeAdapterListTest {
         typeListAdapter = TypeAdapterFactory().getAdapter(PersonList::class) as? TypeAdapterList_Person
     }
 
-    @Test
-    fun `play around with convertToString`() {
-
-        val items = listOf(
-            PersonItem(
-
-                data = Person(
-                    name = "Jason",
-                    surname = "Apix",
-                    age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bella", age = 1)
-                ), resourceObjectLinks = null, relationshipsLinks = null, resourceObjectMeta = null, relationshipsMeta = null
-            ),
-
-            PersonItem(
-
-                data = Person(
-                    name = "Jasminka",
-                    surname = "Apix",
-                    age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2)
-                ), resourceObjectLinks = null, relationshipsLinks = null, resourceObjectMeta = null, relationshipsMeta = null
-            ),
-        )
-        val personList = PersonList(
-            data = items,
-            rootLinks = null,
-            rootMeta = null,
-            errors = null,
-        )
-
-        val json = typeListAdapter?.convertToString(personList)
-        println(json)
-    }
-
     @org.junit.jupiter.api.Test
     fun `given that response for both persons has all rels set type adapter Person list convertFromString should generate a Person class list with full rels on both list item Person`() {
         val items = listOf(
@@ -376,7 +339,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 )
             ), PersonItem(
@@ -384,7 +349,9 @@ internal class TypeAdapterListTest {
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bongo", age = 2).apply { setId("0") }
                 )
             )
@@ -411,7 +378,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 )
             ),
@@ -420,7 +389,9 @@ internal class TypeAdapterListTest {
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = null
                 )
             )
@@ -448,7 +419,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 )
             ),
@@ -480,7 +453,9 @@ internal class TypeAdapterListTest {
                     name = "Jason",
                     surname = "Apix",
                     age = 28,
-                    allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
+                    allMyDogs = listOf(
+                        Dog(name = "Bella", age = 1).apply { setId("0") },
+                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
                     myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
                 ).apply { setId("0") }
             ), PersonItem(
@@ -558,6 +533,31 @@ internal class TypeAdapterListTest {
         val personList = PersonList(items)
 
         val response = getFileAsString("person_list_all_my_dogs_with_id_set_for_each_dog.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given an empty Person list convertFromString should generate no error`() {
+        val response = getFileAsString("person_list_blank_data.json")
+
+        val result = typeListAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            result?.data?.isEmpty(),
+            true
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given an empty Person list convertToString should generate no error`() {
+        val personList = PersonList(data = emptyList())
+        val response = getFileAsString("person_list_blank_data_encode.json")
 
         val result = typeListAdapter?.convertToString(personList)
 

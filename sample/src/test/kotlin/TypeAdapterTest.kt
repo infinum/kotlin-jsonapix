@@ -394,6 +394,145 @@ internal class TypeAdapterTest {
         )
     }
 
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has multiple  all types of meta, should generate a Person with all types of meta`() {
+        val rootMeta = PersonRootMeta("root")
+        val resourceMeta = PersonResourceMeta("resource")
+        val relationship1Meta = PersonRelationshipMeta("relation1")
+        val relationship2Meta = PersonRelationshipMeta("relation2")
+
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply { setId("1") }
+
+        val model = PersonModel(
+            data = person,
+            rootMeta = rootMeta,
+            resourceObjectMeta = resourceMeta,
+            relationshipsMeta = mapOf(
+                "myFavoriteDog" to relationship1Meta,
+                "allMyDogs" to relationship2Meta,
+            )
+        )
+
+        val response = getFileAsString("person_with_all_metas.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            model,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that a response that has multiple  all types of links, should generate a Person with all types of links`() {
+        val rootLinks = DefaultLinks("https://root.link.com")
+        val resourceLinks = DefaultLinks("https://resource.link.com")
+        val relationship1Links = DefaultLinks("https://relationship1.link.com")
+        val relationship2Links = DefaultLinks("https://relationship2.link.com")
+
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        )
+
+        val model = PersonModel(
+            data = person,
+            rootLinks = rootLinks,
+            resourceObjectLinks = resourceLinks,
+            relationshipsLinks = mapOf(
+                "myFavoriteDog" to relationship1Links,
+                "allMyDogs" to relationship2Links,
+            )
+        )
+
+        val response = getFileAsString("person_with_all_links.json")
+
+        val result = typeAdapter?.convertFromString(response)
+
+        Assertions.assertEquals(
+            model,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that Person with all types of meta, should generate a a response that has all types of meta`() {
+        val rootMeta = PersonRootMeta("root")
+        val resourceMeta = PersonResourceMeta("resource")
+        val relationship1Meta = PersonRelationshipMeta("relation1")
+        val relationship2Meta = PersonRelationshipMeta("relation2")
+
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply { setId("1") }
+
+        val model = PersonModel(
+            data = person,
+            rootMeta = rootMeta,
+            resourceObjectMeta = resourceMeta,
+            relationshipsMeta = mapOf(
+                "myFavoriteDog" to relationship1Meta,
+                "allMyDogs" to relationship2Meta,
+            )
+        )
+
+        val response = getFileAsString("person_with_all_meta_types_encode.json")
+
+        val result = typeAdapter?.convertToString(model)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @org.junit.jupiter.api.Test
+    fun `given that Person with all types of links, should generate a a response that has all types of meta`() {
+        val rootLinks = DefaultLinks("root")
+        val resourceLinks = DefaultLinks("resource")
+        val relationship1Links = DefaultLinks("relation1")
+        val relationship2Links = DefaultLinks("relation2")
+
+        val person = Person(
+            name = "Jason",
+            surname = "Apix",
+            age = 28,
+            allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
+            myFavoriteDog = Dog(name = "Bella", age = 1),
+        ).apply { setId("1") }
+
+        val model = PersonModel(
+            data = person,
+            rootLinks = rootLinks,
+            resourceObjectLinks = resourceLinks,
+            relationshipsLinks = mapOf(
+                "myFavoriteDog" to relationship1Links,
+                "allMyDogs" to relationship2Links,
+            )
+        )
+
+        val response = getFileAsString("person_with_all_links_types_encode.json")
+
+        val result = typeAdapter?.convertToString(model)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
     private fun getFileAsString(filename: String): String {
         val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
         val fileReader: InputStreamReader? = fileStream?.reader()

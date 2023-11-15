@@ -55,7 +55,7 @@ internal object DeserializeListFunSpecBuilder {
                 JsonApiConstants.Keys.DATA
             )
             .addStatement(
-                "val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) %T.%M(Model::class) else %T.%M(de)",
+                "val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) %T.%M(Data::class) else %T.%M(de)",
                 TypeExtractor::class.asTypeName(),
                 DeserializeFunSpecMemberProvider.guessTypeMember,
                 TypeExtractor::class.asTypeName(),
