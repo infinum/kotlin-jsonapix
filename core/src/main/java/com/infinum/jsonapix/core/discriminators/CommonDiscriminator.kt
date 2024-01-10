@@ -103,6 +103,4 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
             }
         }
     }
-
-
 }

@@ -21,7 +21,6 @@ internal object WrapperListFunSpecBuilder {
             "return %T(data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
         )
 
-
         if (includedListStatement != null) {
             returnStatement.append(", ")
             returnStatement.append("included = $includedListStatement")
