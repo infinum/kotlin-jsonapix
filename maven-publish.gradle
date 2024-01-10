@@ -58,7 +58,7 @@ afterEvaluate {
                             email = 'nikola.gobovic@infinum.com'
                         }
                         developer {
-                            id = 'thisaay'
+                            id = 'thisAAY'
                             name = 'Ahmed Ali'
                             email = 'ahmedali.abdelghany.yousef@infinum.com'
                         }
