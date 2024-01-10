@@ -31,7 +31,9 @@ dependencies {
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
     implementation packages.kotlin.poet_metadata
-    compileOnly project(":annotations")
+    // Using compileOnly cause an error with new version from hilt
+    // TODO: https://app.productive.io/1-infinum/tasks/6780558
+    implementation project(":annotations")
     compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core
     compileOnly packages.retrofit.core
