@@ -10,7 +10,6 @@ import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.processor.extensions.findAnnotationWithTypeName
-import com.infinum.jsonapix.processor.extensions.missingTypeName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
@@ -46,7 +45,7 @@ internal object RelationshipsSpecBuilder {
             }
 
             builder
-                .addSerialNameAnnotationIfItExits(it)
+                .addSerialNameAnnotation(it)
                 .initializer(it.name)
                 .build()
         }.toMutableList()
@@ -60,7 +59,7 @@ internal object RelationshipsSpecBuilder {
                 }
 
                 builder
-                    .addSerialNameAnnotationIfItExits(it)
+                    .addSerialNameAnnotation(it)
                     .initializer(it.name)
                     .build()
             }
@@ -102,19 +101,17 @@ internal object RelationshipsSpecBuilder {
             .build()
     }
 
-    private fun PropertySpec.Builder.addSerialNameAnnotationIfItExits(originalProperty: PropertySpec): PropertySpec.Builder = this.apply {
-        originalProperty.annotations.findAnnotationWithTypeName(serialNameTypeName)?.let { annotationSpec ->
-            addAnnotation(annotationSpec)
-        }
+    private fun PropertySpec.Builder.addSerialNameAnnotation(originalProperty: PropertySpec): PropertySpec.Builder = this.apply {
+        val serialNameAnnotation = originalProperty.annotations.findAnnotationWithTypeName(serialNameTypeName)
+            ?: Specs.getSerialNameSpec(originalProperty.name)
+
+        addAnnotation(serialNameAnnotation)
     }
 
     private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> {
         return properties.map {
             ParameterSpec.builder(it.name, it.type)
                 .apply {
-                    if (it.annotations.missingTypeName(serialNameTypeName)) {
-                        addAnnotation(Specs.getSerialNameSpec(it.name))
-                    }
                     if (it.type.isNullable) {
                         defaultValue("%L", null)
                     }
