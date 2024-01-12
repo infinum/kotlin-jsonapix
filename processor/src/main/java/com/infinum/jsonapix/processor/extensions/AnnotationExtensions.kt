@@ -1,5 +1,7 @@
 package com.infinum.jsonapix.processor.extensions
 
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.TypeName
 import javax.lang.model.element.Element
 import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeMirror
@@ -18,3 +20,11 @@ public inline fun <reified T : Annotation> Element.getAnnotationClassValue(
 } catch (e: MirroredTypeException) {
     e.typeMirror
 }
+
+public fun List<AnnotationSpec>.missingTypeName(typeName: TypeName): Boolean =
+    indexOfFirst { it.typeName == typeName } < 0
+
+public fun List<AnnotationSpec>.findAnnotationWithTypeName(typeName: TypeName): AnnotationSpec? =
+    this.firstOrNull { annotationSpec ->
+        annotationSpec.typeName == typeName
+    }
