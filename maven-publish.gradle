@@ -57,6 +57,11 @@ afterEvaluate {
                             name = 'Nikola Gobovic'
                             email = 'nikola.gobovic@infinum.com'
                         }
+                        developer {
+                            id = 'thisAAY'
+                            name = 'Ahmed Ali'
+                            email = 'ahmedali.abdelghany.yousef@infinum.com'
+                        }
                     }
                     scm {
                         connection.set(properties.scm.connection)

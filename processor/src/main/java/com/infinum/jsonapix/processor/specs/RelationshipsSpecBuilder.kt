@@ -173,6 +173,7 @@ internal object RelationshipsSpecBuilder {
                 ParameterSpec.builder("originalObject", originalClass).build()
             )
             .addStatement("return %L($constructorStringBuilder)", *builderArgs.toTypedArray())
+            .returns(ClassName.bestGuess(generatedName))
             .build()
     }
 

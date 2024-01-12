@@ -73,6 +73,7 @@ internal object AttributesSpecBuilder {
                 ParameterSpec.builder("originalObject", originalClass).build()
             )
             .addStatement("return %L($constructorString)", generatedName)
+            .returns(ClassName.bestGuess(generatedName))
             .build()
     }
 }
