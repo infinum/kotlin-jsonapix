@@ -9,6 +9,7 @@ import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
+import com.infinum.jsonapix.processor.extensions.findAnnotationWithTypeName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
@@ -19,12 +20,14 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 internal object RelationshipsSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
+    private val serialNameTypeName = SerialName::class.asTypeName()
 
     fun build(
         className: ClassName,
@@ -40,7 +43,11 @@ internal object RelationshipsSpecBuilder {
             } else {
                 PropertySpec.builder(it.name, OneRelationshipMember::class)
             }
-            builder.initializer(it.name).build()
+
+            builder
+                .addSerialNameAnnotation(it)
+                .initializer(it.name)
+                .build()
         }.toMutableList()
 
         properties.addAll(
@@ -50,7 +57,11 @@ internal object RelationshipsSpecBuilder {
                 } else {
                     PropertySpec.builder(it.name, ManyRelationshipMember::class)
                 }
-                builder.initializer(it.name).build()
+
+                builder
+                    .addSerialNameAnnotation(it)
+                    .initializer(it.name)
+                    .build()
             }
         )
 
@@ -88,6 +99,25 @@ internal object RelationshipsSpecBuilder {
             .addProperty(linksPropertySpec(oneRelationships, manyRelationships))
             .addProperty(metaPropertySpec(oneRelationships, manyRelationships))
             .build()
+    }
+
+    private fun PropertySpec.Builder.addSerialNameAnnotation(originalProperty: PropertySpec): PropertySpec.Builder = this.apply {
+        val serialNameAnnotation = originalProperty.annotations.findAnnotationWithTypeName(serialNameTypeName)
+            ?: Specs.getSerialNameSpec(originalProperty.name)
+
+        addAnnotation(serialNameAnnotation)
+    }
+
+    private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> {
+        return properties.map {
+            ParameterSpec.builder(it.name, it.type)
+                .apply {
+                    if (it.type.isNullable) {
+                        defaultValue("%L", null)
+                    }
+                }
+                .build()
+        }
     }
 
     @SuppressWarnings("SpreadOperator")
@@ -224,18 +254,5 @@ internal object RelationshipsSpecBuilder {
         }.members.first { member ->
             member.toString().trim().startsWith("type")
         }.toString().split("=")[1].trim()
-    }
-
-    private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> {
-        return properties.map {
-            ParameterSpec.builder(it.name, it.type)
-                .addAnnotation(Specs.getSerialNameSpec(it.name))
-                .apply {
-                    if (it.type.isNullable) {
-                        defaultValue("%L", null)
-                    }
-                }
-                .build()
-        }
     }
 }
