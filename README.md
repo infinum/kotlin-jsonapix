@@ -1,6 +1,7 @@
-# **JsonApiX**
+### <img align="left" src="logo.svg" width="48">
+# JsonApiX
 
-- JSON API X is an Android, annotation processor library with the intention of extending it to a KMM library in due time
+- JSON API X is an Android, annotation processor library with the intention of extending it to a KMP library in due time
 - Implements a parser between Kotlin classes and JSON API specification strings in both directions
 - Includes Retrofit module for easy API implementations
 
@@ -45,14 +46,14 @@ plugins {
 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
 // Json API X
-implementation("com.infinum.jsonapix:core:1.0.0-beta02")
-kapt("com.infinum.jsonapix:processor:1.0.0-beta02")
+implementation("com.infinum.jsonapix:core:1.0.0")
+kapt("com.infinum.jsonapix:processor:1.0.0")
 
 // Optional: For Retrofit support
-implementation("com.infinum.jsonapix:retrofit:1.0.0-beta02")
+implementation("com.infinum.jsonapix:retrofit:1.0.0")
 
 // Optional: Custom lint tool checker
-implementation("com.infinum.jsonapix:lint:1.0.0-beta02")
+implementation("com.infinum.jsonapix:lint:1.0.0")
 ```
 
 ## Usage
@@ -84,23 +85,44 @@ the `Dog` class.
 
 All non-primitive fields of a class should be some kind of relationship.
 
-Hit build and wrappers will be generated. You are now ready to serialize and deserialize your class in the form of JSON API string.
+Once you hit build, `PersonModel`, `PersonItem`, and `PersonList` are automatically generated. These wrappers facilitate the serialization and deserialization of your classes into and from JSON API strings.
+
+For example, for a single `Person` instance, `PersonModel` is generated as follows:
+```kotlin
+public data class PersonModel(
+  public val `data`: Person, // The Person object
+  // ... Root values
+  // ... Resource object values
+)
+```
+```kotlin
+public data class PersonItem(
+  public val `data`: Person, // Individual Person object within the list
+  // ... Resource object values
+)
+```
+```kotlin
+public data class PersonList(
+  public val `data`: List<PersonItem>, // List of PersonItem objects
+  // ... Root values
+)
+```
 
 To access the serialization and deserialization features, you need to use the `TypeAdapter` interface. To get the type adapter for your
 specific class, use the generated `TypeAdapterFactory`:
 
 ```kotlin
 // Gets adapter for a single instance of Person
-val adapter = TypeAdapterFactory().getAdapter(Person::class)
+val adapter = TypeAdapterFactory().getAdapter(PersonModel::class)
 
 // Gets adapter for a list of Person instances
-val listAdapter = TypeAdapterFactory().getListAdapter(Person::class)
+val listAdapter = TypeAdapterFactory().getAdapter(PersonList::class)
 
-adapter.convertToString(person) // Produces JSON API String from a Person instance
-adapter.convertFromString(inputJsonString) // Produces Person instance from JSON API String
+adapter.convertToString(personModel) // Produces JSON API String from a PersonModel instance
+adapter.convertFromString(inputJsonString) // Produces PersonModel instance from JSON API String
 
-listAdapter.convertToString(person) // Produces JSON API String from a Person list
-listAdapter.convertFromString(inputJsonString) // Produces Person list from JSON API String
+listAdapter.convertToString(personList) // Produces JSON API String from a PersonList
+listAdapter.convertFromString(inputJsonString) // Produces PersonList from JSON API String
 ```
 
 ### Nullability
@@ -204,10 +226,9 @@ data class Person(
 ) : JsonApiModel()
 ```
 
-`JsonApiModel` is an abstract class which will provide you with getters and setters for links and meta objects.
+`JsonApiModel` is an abstract class that provides getters and setters for id and type.
 
-In some cases, a need for custom modification of certain aspects of model classes is preferred. With this in mind, we've enabled the option for clients to customize 
-JsonApiModel if such a need occurs. Clients are able to set optional params on a model class such as links or meta(explained in its own chapter), but also to customize the default `id` of a model. Clients can simply set/get `id` on a JsonApiModel depending on the case at hand.
+The generated `PersonModel` and `PersonList` classes come with default meta and links, but we've provided options for customization. This allows you to tailor these elements to fit your specific project needs, enhancing flexibility and control.
 
 ### Links
 
@@ -229,13 +250,13 @@ And the can be retrieved in the following way:
 
 ```kotlin
 // Get root level links
-person.rootLinks()
+personModel.rootLinks
 
 // Get relationships links
-person.relationshipsLinks()
+personModel.relationshipsLinks
 
 // Get resource object links
-person.resourceLinks()
+personModel.resourceObjectLinks
 ```
 
 ##### Custom links
@@ -252,15 +273,6 @@ data class PersonLinks(
     val bioLink: String,
     val socialLink: String
 ) : Links
-```
-
-In this example, the annotation processor will automatically make the root-links type of a `Person` class to be `PersonLinks`. 
-Developer needs to make sure that the `type` parameter value in `JsonApiXLinks` matches the one in the `JsonApiX` above the original model.
-To retrieve them, a generic variant of the `rootLinks()` method is used.
-
-```kotlin
-// Gets root level links as a `PersonLinks` instance
-person.rootLinks<PersonLinks>()
 ```
 
 `LinksPlacementStartegy` enum is used to determine which links from the whole JSON API object will be replaced by a custom model.
@@ -281,13 +293,16 @@ Every custom meta model must extend the `Meta` interface and have a `JsonApiXMet
 data class PersonMeta(val owner: String) : Meta
 ```
 
-In this example, the annotation processor will automatically make the meta type of a `Person` class to be `PersonMeta`.
+In this example, the annotation processor will automatically make the meta type of a `PersonModel` class to be `PersonMeta`.
 Developer needs to make sure that the `type` parameter value in `JsonApiXMeta` matches the one in the `JsonApiX` above the original model.
 To retrieve a meta object, a generic variant of the `meta()` method is used.
 
 ```kotlin
 // Gets meta object
-person.meta<PersonMeta>()
+person.rootMeta
+person.relationshipsMeta
+person.resourceObjectMeta
+
 ```
 
 ## Retrofit
