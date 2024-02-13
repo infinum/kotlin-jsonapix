@@ -2,6 +2,7 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.processor.ClassInfo
+import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
@@ -40,6 +41,7 @@ internal class JsonXExtensionsSpecBuilder {
     fun add(
         type: String,
         metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
         isNullable: Boolean,
         data: ClassName,
         wrapper: ClassName,
@@ -53,6 +55,7 @@ internal class JsonXExtensionsSpecBuilder {
         specsMap[data] = ClassInfo(
             type = type,
             metaInfo = metaInfo,
+            linksInfo = linksInfo,
             isNullable = isNullable,
             jsonWrapperClassName = wrapper,
             jsonWrapperListClassName = wrapperList,
@@ -160,7 +163,8 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.resourceObjectClassName,
                     it.value.attributesWrapperClassName,
                     it.value.relationshipsObjectClassName,
-                    it.value.metaInfo?.resourceObjectClassName
+                    it.value.metaInfo?.resourceObjectClassName,
+                    it.value.linksInfo?.resourceObjectLinks
                 )
             )
             fileSpec.addFunction(

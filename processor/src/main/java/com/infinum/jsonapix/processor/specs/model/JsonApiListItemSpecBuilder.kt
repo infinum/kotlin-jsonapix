@@ -1,7 +1,7 @@
 package com.infinum.jsonapix.processor.specs.model
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
@@ -20,11 +20,13 @@ internal object JsonApiListItemSpecBuilder : BaseJsonApiModelSpecBuilder() {
                 isRootNullable,
                 JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
             ),
-            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
+            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(
+                linksInfo?.resourceObjectLinks ?: DefaultLinks::class.asClassName(), true, JsonApiConstants.Defaults.NULL
+            ),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
                 Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
-                    Links::class.asClassName().copy(nullable = true),
+                    linksInfo?.relationshipsLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
                 ),
                 true,
                 JsonApiConstants.Defaults.EMPTY_MAP
