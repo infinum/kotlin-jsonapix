@@ -1,13 +1,14 @@
 package com.infinum.jsonapix.ui.examples.error
 
 import com.infinum.jsonapix.asJsonXHttpException
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
 import com.infinum.jsonapix.data.models.PersonalError
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import retrofit2.HttpException
+import javax.inject.Inject
 
 @HiltViewModel
 class ErrorViewModel @Inject constructor(
@@ -23,13 +24,9 @@ class ErrorViewModel @Inject constructor(
             try {
                 val person = io { sampleApiService.fetchError() }
             } catch (e: HttpException) {
-                val exc = e.asJsonXHttpException<PersonalError>()
+                val exc = e.asJsonXHttpException<DefaultError>()
                 exc.errors?.first()?.let {
-                    if (it is PersonalError) {
-                        showError(it.desc)
-                    } else {
-                        showError("Not a default error")
-                    }
+                    showError(it.code)
                 } ?: showError("Unable to parse to JsonXHttpException")
             }
 
