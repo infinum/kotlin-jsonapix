@@ -24,6 +24,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
@@ -89,7 +90,7 @@ internal class JsonXExtensionsSpecBuilder {
 
         return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
             .receiver(HttpException::class)
-            .returns(JsonXHttpException::class)
+            .returns(JsonXHttpException::class.asClassName().parameterizedBy(typeVariableName))
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(
                 typeVariableName.copy(
