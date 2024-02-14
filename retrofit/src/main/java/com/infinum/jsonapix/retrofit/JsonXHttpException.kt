@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import retrofit2.Response
 
-data class JsonXHttpException(val response: Response<*>?, val errors: List<Error>?)
+data class  JsonXHttpException <T: Error> (val response: Response<*>?, val errors: List<T>?)
 
 fun HttpException.asJsonXHttpException(): JsonXHttpException {
     return JsonXHttpException(
