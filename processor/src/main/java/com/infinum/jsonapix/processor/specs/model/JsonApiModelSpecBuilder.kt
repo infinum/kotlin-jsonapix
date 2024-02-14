@@ -1,8 +1,8 @@
 package com.infinum.jsonapix.processor.specs.model
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Error
-import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
@@ -21,23 +21,31 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
                 isRootNullable,
                 JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
             ),
-            JsonApiConstants.Members.ROOT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
-            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(Links::class.asClassName(), true, JsonApiConstants.Defaults.NULL),
+            JsonApiConstants.Members.ROOT_LINKS.asParam(
+                linksInfo?.rootLinks ?: DefaultLinks::class.asClassName(),
+                true,
+                JsonApiConstants.Defaults.NULL
+            )
+            ,
+            JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(
+                linksInfo?.resourceObjectLinks ?: DefaultLinks::class.asClassName(),
+                true,
+                JsonApiConstants.Defaults.NULL
+            )
+            ,
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
                 Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
-                    Links::class.asClassName().copy(nullable = true),
+                    linksInfo?.relationshipsLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
                 ),
                 true,
                 JsonApiConstants.Defaults.EMPTY_MAP,
             ),
-
             JsonApiConstants.Keys.ERRORS.asParam(
                 List::class.asClassName().parameterizedBy(Error::class.asClassName()),
                 true,
                 JsonApiConstants.Defaults.NULL,
             ),
-
             JsonApiConstants.Members.ROOT_META.asParam(
                 metaInfo?.rootClassName ?: Meta::class.asClassName(),
                 true,
@@ -55,7 +63,7 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
                 ),
                 true,
                 JsonApiConstants.Defaults.EMPTY_MAP,
-            ),
+            )
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
 import com.squareup.kotlinpoet.ClassName
@@ -14,6 +15,7 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
         attributesClass: ClassName?,
         relationshipsClass: ClassName?,
         resourceMeta: ClassName?,
+        resourceLinksClass: ClassName?
     ): FunSpec {
 
         val returnStatement = StringBuilder("return %T(")
@@ -39,8 +41,11 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
         builderArgs.add(
             resourceMeta ?: Meta::class
         )
-        returnStatement.append("links = links")
 
+        returnStatement.append("links = links as? %T")
+        builderArgs.add(
+            resourceLinksClass ?: DefaultLinks::class
+        )
         returnStatement.append(")")
 
         return FunSpec.builder(JsonApiConstants.Members.TO_RESOURCE_OBJECT)

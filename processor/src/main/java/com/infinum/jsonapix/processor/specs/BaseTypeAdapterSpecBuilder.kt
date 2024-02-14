@@ -33,9 +33,9 @@ public abstract class BaseTypeAdapterSpecBuilder {
 
     public fun build(
         className: ClassName,
-        rootLinks: String?,
-        resourceObjectLinks: String?,
-        relationshipsLinks: String?,
+        rootLinks: ClassName?,
+        resourceObjectLinks: ClassName?,
+        relationshipsLinks: ClassName?,
         rootMeta: ClassName?,
         resourceObjectMeta: ClassName?,
         relationshipsMeta: ClassName?,
@@ -55,15 +55,15 @@ public abstract class BaseTypeAdapterSpecBuilder {
                     .addFunction(convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta))
                     .apply {
                         if (rootLinks != null) {
-                            addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks))
+                            addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks.canonicalName))
                         }
                         if (resourceObjectLinks != null) {
                             addFunction(
-                                linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks)
+                                linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks.canonicalName)
                             )
                         }
                         if (relationshipsLinks != null) {
-                            addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks))
+                            addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks.canonicalName))
                         }
 
                         if (rootMeta != null) {
