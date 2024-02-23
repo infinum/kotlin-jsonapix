@@ -13,36 +13,44 @@ import com.squareup.kotlinpoet.asClassName
 internal object JsonApiListItemSpecBuilder : BaseJsonApiModelSpecBuilder() {
     override fun getClassSuffixName(): String = JsonApiConstants.Suffix.JSON_API_LIST_ITEM
     override fun getRootClassName(rootType: ClassName): ClassName = rootType
-    override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
+    override fun getParams(
+        className: ClassName,
+        isRootNullable: Boolean,
+        metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
+        customError: ClassName?
+    ): List<ParameterSpec> {
         return listOf(
             JsonApiConstants.Keys.DATA.asParam(
-                getRootClassName(className),
-                isRootNullable,
-                JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
+                className = getRootClassName(className),
+                isNullable = isRootNullable,
+                defaultValue = JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
             ),
             JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(
-                linksInfo?.resourceObjectLinks ?: DefaultLinks::class.asClassName(), true, JsonApiConstants.Defaults.NULL
+                className = linksInfo?.resourceObjectLinks ?: DefaultLinks::class.asClassName(),
+                isNullable = true,
+                defaultValue = JsonApiConstants.Defaults.NULL
             ),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
-                Map::class.asClassName().parameterizedBy(
+                className = Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
                     linksInfo?.relationshipsLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
                 ),
-                true,
-                JsonApiConstants.Defaults.EMPTY_MAP
+                isNullable = true,
+                defaultValue = JsonApiConstants.Defaults.EMPTY_MAP
             ),
             JsonApiConstants.Members.RESOURCE_OBJECT_META.asParam(
-                metaInfo?.resourceObjectClassName ?: Meta::class.asClassName(),
-                true,
-                JsonApiConstants.Defaults.NULL
+                className = metaInfo?.resourceObjectClassName ?: Meta::class.asClassName(),
+                isNullable = true,
+                defaultValue = JsonApiConstants.Defaults.NULL
             ),
             JsonApiConstants.Members.RELATIONSHIPS_META.asParam(
-                Map::class.asClassName().parameterizedBy(
+                className = Map::class.asClassName().parameterizedBy(
                     String::class.asClassName(),
                     metaInfo?.relationshipsClassNAme?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
                 ),
-                true,
-                JsonApiConstants.Defaults.EMPTY_MAP
+                isNullable = true,
+                defaultValue = JsonApiConstants.Defaults.EMPTY_MAP
             ),
         )
     }

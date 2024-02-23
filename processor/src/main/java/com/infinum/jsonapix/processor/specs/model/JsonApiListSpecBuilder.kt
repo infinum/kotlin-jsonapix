@@ -2,8 +2,8 @@ package com.infinum.jsonapix.processor.specs.model
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.DefaultLinks
-import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
@@ -21,7 +21,13 @@ internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
         return List::class.asClassName().parameterizedBy(itemType)
     }
 
-    override fun getParams(className: ClassName, isRootNullable: Boolean, metaInfo: MetaInfo?, linksInfo: LinksInfo?): List<ParameterSpec> {
+    override fun getParams(
+        className: ClassName,
+        isRootNullable: Boolean,
+        metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
+        customError: ClassName?
+    ): List<ParameterSpec> {
         return listOf(
             JsonApiConstants.Keys.DATA.asParam(
                 className = getRootClassName(className),
@@ -34,7 +40,7 @@ internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
                 defaultValue = JsonApiConstants.Defaults.NULL
             ),
             JsonApiConstants.Keys.ERRORS.asParam(
-                className = List::class.asClassName().parameterizedBy(Error::class.asClassName()),
+                className = List::class.asClassName().parameterizedBy(customError ?: DefaultError::class.asClassName()),
                 isNullable = true,
                 defaultValue = JsonApiConstants.Defaults.NULL
             ),
