@@ -170,6 +170,7 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val metaInfo = customMetas.firstOrNull { it.type == type }
         val linksInfo = customLinks.firstOrNull { it.type == type }
+        val customError = customErrors[type]
 
         collector.add(
             type = type,
@@ -194,7 +195,6 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         adapterFactoryCollector.add(inputDataClass)
 
-
         val resourceFileSpec =
             ResourceObjectSpecBuilder.build(
                 className = inputDataClass,
@@ -206,14 +206,11 @@ public class JsonApiProcessor : AbstractProcessor() {
                 manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
 
-
-        val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo)
-        val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo)
-        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
-        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
-        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
+        val wrapperFileSpec = JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo, customError)
+        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo, customError)
+        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
+        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
+        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
             className = inputDataClass,
@@ -223,7 +220,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootMeta = metaInfo?.rootClassName,
             resourceObjectMeta = metaInfo?.resourceObjectClassName,
             relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customErrors[type]?.canonicalName
+            errors = customError?.canonicalName
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
@@ -234,7 +231,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootMeta = metaInfo?.rootClassName,
             resourceObjectMeta = metaInfo?.resourceObjectClassName,
             relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customErrors[type]?.canonicalName
+            errors = customError?.canonicalName
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))

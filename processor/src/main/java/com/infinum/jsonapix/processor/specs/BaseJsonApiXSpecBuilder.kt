@@ -1,8 +1,8 @@
 package com.infinum.jsonapix.processor.specs
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.DefaultLinks
-import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.LinksInfo
@@ -26,10 +26,15 @@ internal abstract class BaseJsonApiXSpecBuilder {
         isNullable: Boolean,
         type: String,
         metaInfo: MetaInfo?,
-        linksInfo: LinksInfo?
+        linksInfo: LinksInfo?,
+        customError: ClassName?
     ): FileSpec
 
-    fun getBaseParamSpecs(metaClassName: ClassName?, rootLinksClassName: ClassName?): List<ParameterSpec> {
+    fun getBaseParamSpecs(
+        metaClassName: ClassName?,
+        rootLinksClassName: ClassName?,
+        customError: ClassName?
+    ): List<ParameterSpec> {
         val params = mutableListOf<ParameterSpec>()
 
         params.add(
@@ -45,8 +50,8 @@ internal abstract class BaseJsonApiXSpecBuilder {
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.ERRORS,
-                List::class.parameterizedBy(Error::class)
-                    .copy(nullable = true)
+                List::class.asClassName()
+                    .parameterizedBy(customError ?: DefaultError::class.asClassName()).copy(nullable = true)
             ).defaultValue("%L", "null")
                 .build()
         )
@@ -61,14 +66,17 @@ internal abstract class BaseJsonApiXSpecBuilder {
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.META,
-                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName()
-                    .copy(nullable = true)
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
             ).defaultValue("%L", "null").build()
         )
         return params
     }
 
-    fun getBasePropertySpecs(metaClassName: ClassName?, rootLinksClassName: ClassName?): List<PropertySpec> {
+    fun getBasePropertySpecs(
+        metaClassName: ClassName?,
+        rootLinksClassName: ClassName?,
+        customError: ClassName?
+    ): List<PropertySpec> {
         val properties = mutableListOf<PropertySpec>()
         properties.add(
             Specs.getNullPropertySpec(
@@ -79,7 +87,7 @@ internal abstract class BaseJsonApiXSpecBuilder {
                 ).copy(nullable = true)
             )
         )
-        properties.add(errorsProperty())
+        properties.add(errorsProperty(customError))
 
         properties.add(linksProperty(rootLinksClassName))
 
@@ -93,9 +101,9 @@ internal abstract class BaseJsonApiXSpecBuilder {
         return ANY.copy(annotations = ANY.annotations + contextual)
     }
 
-    private fun errorsProperty(): PropertySpec = PropertySpec.builder(
+    private fun errorsProperty(customError: ClassName?): PropertySpec = PropertySpec.builder(
         JsonApiConstants.Keys.ERRORS,
-        List::class.parameterizedBy(Error::class).copy(nullable = true),
+        List::class.asClassName().parameterizedBy(customError ?: DefaultError::class.asClassName()).copy(nullable = true),
         KModifier.OVERRIDE
     )
         .addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ERRORS))
