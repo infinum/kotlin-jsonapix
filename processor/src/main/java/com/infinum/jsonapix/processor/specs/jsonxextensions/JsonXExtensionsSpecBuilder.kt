@@ -85,32 +85,6 @@ internal class JsonXExtensionsSpecBuilder {
         customMeta.addAll(meta)
     }
 
-    private fun asJsonXHttpExceptionFunSpec(): FunSpec {
-        val typeVariableName =
-            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        typeVariableName.bounds
-
-        return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
-            .receiver(HttpException::class)
-            .returns(JsonXHttpException::class.asClassName().parameterizedBy(typeVariableName))
-            .addModifiers(KModifier.INLINE)
-            .addTypeVariable(
-                typeVariableName.copy(
-                    reified = true,
-                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
-                )
-            )
-            .beginControlFlow("try")
-            .addStatement(
-                "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
-                    "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
-                JsonXHttpException::class.asClassName()
-            ).nextControlFlow("catch (e: %T)", IllegalArgumentException::class.asClassName())
-            .addStatement("return %T(response(),emptyList())", JsonXHttpException::class.asClassName())
-            .endControlFlow()
-            .build()
-    }
-
     private fun decodeJsonApiErrorFunSpec(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
@@ -143,6 +117,29 @@ internal class JsonXExtensionsSpecBuilder {
             .endControlFlow()
             .build()
     }
+
+    private fun asJsonXHttpExceptionFunSpec(): FunSpec {
+        val typeVariableName =
+            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
+        typeVariableName.bounds
+
+        return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
+            .receiver(HttpException::class)
+            .returns(JsonXHttpException::class.asClassName().parameterizedBy(typeVariableName))
+            .addModifiers(KModifier.INLINE)
+            .addTypeVariable(
+                typeVariableName.copy(
+                    reified = true,
+                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
+                )
+            )
+            .addStatement("val response = response()")
+            .addStatement("val body = response?.errorBody()?.charStream()?.readText()")
+            .addStatement("val errors = if (body != null) %L<Model>(body) else emptyList()",JsonApiConstants.Members.DECODE_JSON_API_ERROR)
+            .addStatement("return JsonXHttpException(response(), errors)")
+            .build()
+    }
+
 
     private fun hasRetrofitModule(): Boolean {
         return try {
