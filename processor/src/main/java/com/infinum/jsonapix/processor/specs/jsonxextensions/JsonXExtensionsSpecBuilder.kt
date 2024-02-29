@@ -98,11 +98,14 @@ internal class JsonXExtensionsSpecBuilder {
                     bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
                 )
             )
+            .beginControlFlow("try")
             .addStatement(
                 "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
                     "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
                 JsonXHttpException::class.asClassName()
-            )
+            ).nextControlFlow("catch (e: %T)", IllegalArgumentException::class.asClassName())
+            .addStatement("return %T(response(),emptyList())", JsonXHttpException::class.asClassName())
+            .endControlFlow()
             .build()
     }
 

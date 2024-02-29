@@ -24,9 +24,10 @@ class ErrorViewModel @Inject constructor(
             try {
                 val person = io { sampleApiService.fetchError() }
             } catch (e: HttpException) {
-                val exc = e.asJsonXHttpException<DefaultError>()
-                exc.errors?.first()?.let {
-                    showError(it.code)
+                val exc = e.asJsonXHttpException<PersonalError>()
+
+                exc.errors?.firstOrNull()?.let {
+                    showError(it.desc)
                 } ?: showError("Unable to parse to JsonXHttpException")
             }
 
