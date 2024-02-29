@@ -63,6 +63,8 @@ object JsonApiConstants {
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
         const val JSONX_SERIALIZER_MODULE = "jsonApiXSerializerModule"
         const val AS_JSON_X_HTTP_EXCEPTION = "asJsonXHttpException"
+        const val DECODE_JSON_API_ERROR = "decodeJsonApiError"
+        const val ERROR_BODY = "errorBody"
 
         const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
         const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
