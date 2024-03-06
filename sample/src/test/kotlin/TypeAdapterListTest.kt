@@ -5,6 +5,9 @@ import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
+import com.infinum.jsonapix.data.models.PersonRelationshipMeta
+import com.infinum.jsonapix.data.models.PersonResourceMeta
+import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.data.models.TypeAdapterList_Person
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -533,6 +536,136 @@ internal class TypeAdapterListTest {
         val personList = PersonList(items)
 
         val response = getFileAsString("person_list_all_my_dogs_with_id_set_for_each_dog.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+
+    @Test
+    fun `given a Person List with root meta should generate json a json with root meta info`() {
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null
+                )
+            )
+        )
+        val rootMeta = PersonRootMeta(owner = "Ali")
+        val personList = PersonList(
+            data = items,
+            rootMeta = rootMeta,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_root_meta.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @Test
+    fun `given a Person List with resource object meta should generate json a json with resource meta info`() {
+        val resourceMeta = PersonResourceMeta(writer = "Ali")
+
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
+                ),
+                resourceObjectMeta = resourceMeta
+            )
+        )
+        val personList = PersonList(
+            data = items,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_resource_meta.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @Test
+    fun `given a Person List with relationship meta should generate json a json with relationship meta info`() {
+        val relationship1Meta = PersonRelationshipMeta("relation1")
+        val relationship2Meta = PersonRelationshipMeta("relation2")
+
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
+                ),
+                relationshipsMeta = mapOf(
+                    "myFavoriteDog" to relationship1Meta,
+                    "allMyDogs" to relationship2Meta,
+                )
+            )
+        )
+        val personList = PersonList(
+            data = items,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_relationships_meta.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @Test
+    fun `given a Person List with all types of meta should generate json a json with all meta info`() {
+        val relationship1Meta = PersonRelationshipMeta("relation1")
+        val relationship2Meta = PersonRelationshipMeta("relation2")
+        val resourceMeta = PersonResourceMeta(writer = "resource")
+
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
+                ),
+                resourceObjectMeta = resourceMeta,
+                relationshipsMeta = mapOf(
+                    "myFavoriteDog" to relationship1Meta,
+                    "allMyDogs" to relationship2Meta,
+                )
+            )
+        )
+
+        val rootMeta = PersonRootMeta(owner = "root")
+
+        val personList = PersonList(
+            data = items,
+            rootMeta = rootMeta,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_all_meta.json")
 
         val result = typeListAdapter?.convertToString(personList)
 
