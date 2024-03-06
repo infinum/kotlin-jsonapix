@@ -32,7 +32,8 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         isNullable: Boolean,
         type: String,
         metaInfo: MetaInfo?,
-        linksInfo: LinksInfo?
+        linksInfo: LinksInfo?,
+        customError: ClassName?
     ): FileSpec {
         val modelClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
 
@@ -45,12 +46,14 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
         val properties = getBasePropertySpecs(
             metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
-            rootLinksClassName = linksInfo?.rootLinks
+            rootLinksClassName = linksInfo?.rootLinks,
+            customError = customError
         ).toMutableList()
 
         val params = getBaseParamSpecs(
             metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
-            rootLinksClassName = linksInfo?.rootLinks
+            rootLinksClassName = linksInfo?.rootLinks,
+            customError = customError
         ).toMutableList()
 
         params.add(
