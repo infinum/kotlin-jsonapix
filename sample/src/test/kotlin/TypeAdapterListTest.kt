@@ -675,6 +675,96 @@ internal class TypeAdapterListTest {
         )
     }
 
+    @Test
+    fun `given a Person List with root links should generate json a json with root links info`() {
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null
+                )
+            )
+        )
+        val rootLinks = DefaultLinks(self = "root")
+        val personList = PersonList(
+            data = items,
+            rootLinks = rootLinks,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_root_links.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @Test
+    fun `given a Person List with resource links should generate json a json with resource links info`() {
+        val resourceLinks = DefaultLinks(self = "resource")
+
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null
+                ),
+                resourceObjectLinks = resourceLinks,
+            )
+        )
+        val personList = PersonList(
+            data = items,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_resource_links.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
+    @Test
+    fun `given a Person List with relationship links should generate json a json with links meta info`() {
+        val relationship1Links = DefaultLinks("relation1")
+        val relationship2Links = DefaultLinks("relation2")
+
+        val items = listOf(
+            PersonItem(
+                Person(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
+                ),
+                relationshipsLinks = mapOf(
+                    "myFavoriteDog" to relationship1Links,
+                    "allMyDogs" to relationship2Links,
+                )
+            )
+        )
+        val personList = PersonList(
+            data = items,
+        )
+        val response = getFileAsString("person_list_convert_to_string_with_relationships_links.json")
+
+        val result = typeListAdapter?.convertToString(personList)
+
+        Assertions.assertEquals(
+            response,
+            result
+        )
+    }
+
     @org.junit.jupiter.api.Test
     fun `given an empty Person list convertFromString should generate no error`() {
         val response = getFileAsString("person_list_blank_data.json")
