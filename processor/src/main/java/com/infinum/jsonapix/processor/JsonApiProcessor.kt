@@ -169,10 +169,13 @@ public class JsonApiProcessor : AbstractProcessor() {
         }
 
         val metaInfo = customMetas.firstOrNull { it.type == type }
+        val linksInfo = customLinks.firstOrNull { it.type == type }
+        val customError = customErrors[type]
 
         collector.add(
             type = type,
             metaInfo = metaInfo,
+            linksInfo = linksInfo,
             isNullable = isNullable,
             data = inputDataClass,
             wrapper = jsonWrapperClassName,
@@ -196,21 +199,18 @@ public class JsonApiProcessor : AbstractProcessor() {
             ResourceObjectSpecBuilder.build(
                 className = inputDataClass,
                 metaClassName = metaInfo?.resourceObjectClassName,
+                linksInfo = linksInfo,
                 type = type,
                 attributes = primitives,
                 oneRelationships = mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
                 manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
             )
 
-        val linksInfo = customLinks.firstOrNull { it.type == type }
-
-        val wrapperFileSpec =
-            JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo)
-        val wrapperListFileSpec =
-            JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo)
-        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
-        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
-        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo)
+        val wrapperFileSpec = JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo, customError)
+        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo, customError)
+        val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
+        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
+        val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
             className = inputDataClass,
@@ -220,7 +220,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootMeta = metaInfo?.rootClassName,
             resourceObjectMeta = metaInfo?.resourceObjectClassName,
             relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customErrors[type]?.canonicalName
+            errors = customError?.canonicalName
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
@@ -231,7 +231,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootMeta = metaInfo?.rootClassName,
             resourceObjectMeta = metaInfo?.resourceObjectClassName,
             relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customErrors[type]?.canonicalName
+            errors = customError?.canonicalName
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
@@ -267,26 +267,16 @@ public class JsonApiProcessor : AbstractProcessor() {
             )
             customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
                 when (placementStrategy) {
-                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                    LinksPlacementStrategy.DATA ->
-                        linksInfo.resourceObjectLinks =
-                            className.canonicalName
-
-                    LinksPlacementStrategy.RELATIONSHIPS ->
-                        linksInfo.relationshipsLinks =
-                            className.canonicalName
+                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
+                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className
+                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className
                 }
             } ?: kotlin.run {
                 val linksInfo = LinksInfo(type)
                 when (placementStrategy) {
-                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className.canonicalName
-                    LinksPlacementStrategy.DATA ->
-                        linksInfo.resourceObjectLinks =
-                            className.canonicalName
-
-                    LinksPlacementStrategy.RELATIONSHIPS ->
-                        linksInfo.relationshipsLinks =
-                            className.canonicalName
+                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
+                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className
+                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className
                 }
                 customLinks.add(linksInfo)
             }
@@ -306,25 +296,15 @@ public class JsonApiProcessor : AbstractProcessor() {
             customMetas.firstOrNull { metaInfo -> metaInfo.type == type }?.let { metaInfo ->
                 when (placementStrategy) {
                     MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
-                    MetaPlacementStrategy.DATA ->
-                        metaInfo.resourceObjectClassName =
-                            className
-
-                    MetaPlacementStrategy.RELATIONSHIPS ->
-                        metaInfo.relationshipsClassNAme =
-                            className
+                    MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName = className
+                    MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme = className
                 }
             } ?: kotlin.run {
                 val metaInfo = MetaInfo(type)
                 when (placementStrategy) {
                     MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
-                    MetaPlacementStrategy.DATA ->
-                        metaInfo.resourceObjectClassName =
-                            className
-
-                    MetaPlacementStrategy.RELATIONSHIPS ->
-                        metaInfo.relationshipsClassNAme =
-                            className
+                    MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName = className
+                    MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme = className
                 }
                 customMetas.add(metaInfo)
             }

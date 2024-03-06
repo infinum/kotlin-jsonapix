@@ -4,10 +4,11 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.common.JsonApiXMissingArgumentException
 import com.infinum.jsonapix.core.resources.Attributes
-import com.infinum.jsonapix.core.resources.Links
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
+import com.infinum.jsonapix.processor.LinksInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
@@ -29,6 +30,7 @@ internal object ResourceObjectSpecBuilder {
     fun build(
         className: ClassName,
         metaClassName: ClassName?,
+        linksInfo: LinksInfo?,
         type: String,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
@@ -119,13 +121,13 @@ internal object ResourceObjectSpecBuilder {
         paramsList.add(
             Specs.getNullParamSpec(
                 JsonApiConstants.Keys.LINKS,
-                Links::class.asClassName().copy(nullable = true)
+                linksInfo?.resourceObjectLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true)
             )
         )
         propsList.add(
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.LINKS,
-                Links::class.asClassName().copy(nullable = true)
+                linksInfo?.resourceObjectLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true)
             )
         )
 

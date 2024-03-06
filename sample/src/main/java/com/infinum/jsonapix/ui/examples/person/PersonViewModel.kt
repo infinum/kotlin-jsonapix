@@ -31,9 +31,9 @@ class PersonViewModel @Inject constructor(
                 viewState = PersonState(
                     bodyString,
                     person,
-                    (personModel.rootLinks as? DefaultLinks)?.self,
-                    (personModel.resourceObjectLinks as? DefaultLinks)?.self,
-                    (personModel.relationshipsLinks?.values?.firstOrNull() as? DefaultLinks)?.self,
+                    personModel.rootLinks?.self,
+                    personModel.resourceObjectLinks?.self,
+                    personModel.relationshipsLinks?.values?.firstOrNull()?.self,
                     personModel.rootMeta?.owner
                 )
             } catch (t: Throwable) {

@@ -1,7 +1,9 @@
 package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.core.resources.Errors
 import com.infinum.jsonapix.processor.ClassInfo
+import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
@@ -23,6 +25,8 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
@@ -40,6 +44,7 @@ internal class JsonXExtensionsSpecBuilder {
     fun add(
         type: String,
         metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
         isNullable: Boolean,
         data: ClassName,
         wrapper: ClassName,
@@ -53,6 +58,7 @@ internal class JsonXExtensionsSpecBuilder {
         specsMap[data] = ClassInfo(
             type = type,
             metaInfo = metaInfo,
+            linksInfo = linksInfo,
             isNullable = isNullable,
             jsonWrapperClassName = wrapper,
             jsonWrapperListClassName = wrapperList,
@@ -79,15 +85,21 @@ internal class JsonXExtensionsSpecBuilder {
         customMeta.addAll(meta)
     }
 
-    private fun asJsonXHttpExceptionFunSpec(): FunSpec {
+    private fun decodeJsonApiErrorFunSpec(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
         typeVariableName.bounds
 
-        return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
-            .receiver(HttpException::class)
-            .returns(JsonXHttpException::class)
+        return FunSpec.builder(JsonApiConstants.Members.DECODE_JSON_API_ERROR)
+            .addParameter(
+                ParameterSpec(
+                    name = JsonApiConstants.Members.ERROR_BODY,
+                    type = String::class.asTypeName(),
+                )
+            )
+            .returns(List::class.asClassName().parameterizedBy(typeVariableName))
             .addModifiers(KModifier.INLINE)
+            .beginControlFlow("return try")
             .addTypeVariable(
                 typeVariableName.copy(
                     reified = true,
@@ -95,12 +107,39 @@ internal class JsonXExtensionsSpecBuilder {
                 )
             )
             .addStatement(
-                "return %T(response(), response()?.errorBody()?.charStream()?.readText()?.let { " +
-                    "format.decodeFromString<Errors<${JsonApiConstants.Members.GENERIC_TYPE_VARIABLE}>>(it) }?.errors)",
-                JsonXHttpException::class.asClassName()
+                "format.decodeFromString<%T<%L>>(%L).errors",
+                Errors::class,
+                JsonApiConstants.Members.GENERIC_TYPE_VARIABLE,
+                JsonApiConstants.Members.ERROR_BODY
             )
+            .nextControlFlow("catch (e: %T)", IllegalArgumentException::class.asClassName())
+            .addStatement("emptyList()")
+            .endControlFlow()
             .build()
     }
+
+    private fun asJsonXHttpExceptionFunSpec(): FunSpec {
+        val typeVariableName =
+            TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
+        typeVariableName.bounds
+
+        return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
+            .receiver(HttpException::class)
+            .returns(JsonXHttpException::class.asClassName().parameterizedBy(typeVariableName))
+            .addModifiers(KModifier.INLINE)
+            .addTypeVariable(
+                typeVariableName.copy(
+                    reified = true,
+                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
+                )
+            )
+            .addStatement("val response = response()")
+            .addStatement("val body = response?.errorBody()?.charStream()?.readText()")
+            .addStatement("val errors = if (body != null) %L<Model>(body) else emptyList()",JsonApiConstants.Members.DECODE_JSON_API_ERROR)
+            .addStatement("return JsonXHttpException(response(), errors)")
+            .build()
+    }
+
 
     private fun hasRetrofitModule(): Boolean {
         return try {
@@ -160,7 +199,8 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.resourceObjectClassName,
                     it.value.attributesWrapperClassName,
                     it.value.relationshipsObjectClassName,
-                    it.value.metaInfo?.resourceObjectClassName
+                    it.value.metaInfo?.resourceObjectClassName,
+                    it.value.linksInfo?.resourceObjectLinks
                 )
             )
             fileSpec.addFunction(
@@ -210,6 +250,8 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
 
+        fileSpec.addFunction(decodeJsonApiErrorFunSpec())
+
         if (hasRetrofitModule()) {
             fileSpec.addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
@@ -217,6 +259,7 @@ internal class JsonXExtensionsSpecBuilder {
             )
             fileSpec.addFunction(asJsonXHttpExceptionFunSpec())
         }
+
 
         fileSpec.addFunction(DeserializeFunSpecBuilder.build())
         fileSpec.addFunction(DeserializeListFunSpecBuilder.build())

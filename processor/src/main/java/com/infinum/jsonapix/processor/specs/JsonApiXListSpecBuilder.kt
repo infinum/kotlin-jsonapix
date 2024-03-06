@@ -3,7 +3,9 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
+import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -27,6 +29,8 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         isNullable: Boolean,
         type: String,
         metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
+        customError: ClassName?
     ): FileSpec {
         val modelClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST))
         val itemClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM))
@@ -37,8 +41,17 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         )
 
-        val properties = getBasePropertySpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
-        val params = getBaseParamSpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
+        val properties = getBasePropertySpecs(
+            metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
+            rootLinksClassName = linksInfo?.rootLinks,
+            customError = customError
+        ).toMutableList()
+
+        val params = getBaseParamSpecs(
+            metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
+            rootLinksClassName = linksInfo?.rootLinks,
+            customError = customError
+        ).toMutableList()
 
         params.add(
             ParameterSpec.builder(
@@ -72,6 +85,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                             itemClassName,
                             modelClassName,
                             metaInfo,
+                            linksInfo
                         )
                     )
                     .build()
@@ -92,19 +106,21 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         itemClassName: ClassName,
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
     ): PropertySpec {
 
         val getterFunSpec = FunSpec.builder("get()")
             .addStatement("val items = data.map {")
             .addStatement("val original = it.original(included)")
             .addStatement(
-                "%T(%L,%L,%L?.filterValues{ it != null },%L,%L?.filterValues{ it != null }?.mapValues{ it.value as? %T } )",
+                "%T(\n%L,\n%L,\n%L%T },\n%L,\n%L%T } )",
                 itemClassName,
                 "original",
                 "it.links",
-                "it.relationshipsLinks()",
+                "it.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                linksInfo?.relationshipsLinks ?: DefaultLinks::class,
                 "it.meta",
-                "it.relationshipsMeta()",
+                "it.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
                 metaInfo?.relationshipsClassNAme ?: Meta::class
             )
             .addStatement("}")

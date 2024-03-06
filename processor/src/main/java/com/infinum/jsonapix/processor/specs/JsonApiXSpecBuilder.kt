@@ -3,7 +3,9 @@ package com.infinum.jsonapix.processor.specs
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
+import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
 import com.infinum.jsonapix.processor.extensions.appendIf
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -16,9 +18,9 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
+import kotlin.properties.Delegates
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlin.properties.Delegates
 
 internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
@@ -30,6 +32,8 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         isNullable: Boolean,
         type: String,
         metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
+        customError: ClassName?
     ): FileSpec {
         val modelClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
 
@@ -40,8 +44,17 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         )
 
-        val properties = getBasePropertySpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
-        val params = getBaseParamSpecs(metaInfo?.rootClassName ?: Meta::class.asClassName()).toMutableList()
+        val properties = getBasePropertySpecs(
+            metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
+            rootLinksClassName = linksInfo?.rootLinks,
+            customError = customError
+        ).toMutableList()
+
+        val params = getBaseParamSpecs(
+            metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
+            rootLinksClassName = linksInfo?.rootLinks,
+            customError = customError
+        ).toMutableList()
 
         params.add(
             ParameterSpec.builder(
@@ -74,6 +87,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
                         originalProperty(
                             modelClassName,
                             metaInfo,
+                            linksInfo
                         )
                     )
                     .build()
@@ -93,21 +107,23 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
     private fun originalProperty(
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
+        linksInfo: LinksInfo?,
     ): PropertySpec {
 
         val getterFunSpec = FunSpec.builder("get()")
             .addStatement("val original = data?.original(included)".appendIf("!!") { isNullable.not() })
             .addStatement(
-                "val model = %T(%L,%L,%L,%L,%L,%L,%L,%L?.filterValues{ it != null }?.mapValues{ it.value as? %T } )",
+                "val model = %T(\n%L,\n%L,\n%L,\n%L%T },\n%L,\n%L,\n%L,\n%L%T } )",
                 modelClassName,
                 "original",
                 "links",
                 "data?.links",
-                "data?.relationshipsLinks()\n?.filterValues{ it != null }",
+                "data?.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                linksInfo?.relationshipsLinks ?: DefaultLinks::class,
                 "errors",
                 "meta",
                 "data?.meta",
-                "data?.relationshipsMeta()",
+                "data?.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
                 metaInfo?.relationshipsClassNAme ?: Meta::class
             )
             .addStatement("return model")

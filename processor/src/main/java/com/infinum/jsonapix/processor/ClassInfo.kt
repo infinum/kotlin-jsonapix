@@ -14,4 +14,5 @@ internal data class ClassInfo(
     val includedStatement: CodeBlock?,
     val includedListStatement: CodeBlock?,
     val metaInfo: MetaInfo?,
+    val linksInfo: LinksInfo?,
 )

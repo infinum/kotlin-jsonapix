@@ -20,18 +20,20 @@ internal abstract class BaseJsonApiModelSpecBuilder {
         className: ClassName,
         isRootNullable: Boolean,
         metaInfo: MetaInfo?,
-        linksInfo: LinksInfo?
+        linksInfo: LinksInfo?,
+        customError: ClassName?
     ): List<ParameterSpec>
 
     fun build(
         className: ClassName,
         isRootNullable: Boolean,
         metaInfo: MetaInfo?,
-        linksInfo: LinksInfo?
+        linksInfo: LinksInfo?,
+        customError: ClassName?
     ): FileSpec {
         val generatedName = className.simpleName.withName(getClassSuffixName())
 
-        val params = getParams(className, isRootNullable, metaInfo, linksInfo)
+        val params = getParams(className, isRootNullable, metaInfo, linksInfo, customError)
         val props = params.map { it.toPropSpec() }
 
         return FileSpec.builder(className.packageName, generatedName)
