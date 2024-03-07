@@ -1,3 +1,6 @@
+![Maven Central Version](https://img.shields.io/maven-central/v/com.infinum.jsonapix/processor?style=plastic)
+
+
 ### <img align="left" src="logo.svg" width="48">
 # JsonApiX
 
@@ -46,14 +49,14 @@ plugins {
 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
 // Json API X
-implementation("com.infinum.jsonapix:core:1.0.0")
-kapt("com.infinum.jsonapix:processor:1.0.0")
+implementation("com.infinum.jsonapix:core:<latest-version>")
+kapt("com.infinum.jsonapix:processor:<latest-version>")
 
 // Optional: For Retrofit support
-implementation("com.infinum.jsonapix:retrofit:1.0.0")
+implementation("com.infinum.jsonapix:retrofit:<latest-version>")
 
 // Optional: Custom lint tool checker
-implementation("com.infinum.jsonapix:lint:1.0.0")
+implementation("com.infinum.jsonapix:lint:<latest-version>")
 ```
 
 ## Usage
