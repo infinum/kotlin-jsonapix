@@ -18,7 +18,11 @@ internal object WrapperListFunSpecBuilder {
             mutableListOf<Any>(wrapperClass)
 
         val returnStatement = StringBuilder(
-            "return %T(data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()"
+            """return %T(
+                meta = rootMeta,
+                links = rootLinks,
+                errors = errors,
+                data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()""".trimMargin()
         )
 
         if (includedListStatement != null) {
