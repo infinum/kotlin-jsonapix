@@ -11,6 +11,10 @@ public inline fun <reified T : Annotation, reified R : Any> Element.getAnnotatio
     f: T.() -> R
 ): R = getAnnotation(T::class.java).f()
 
+public inline fun <reified T : Annotation, reified R : Any> Element.getAnnotationParameterValues(
+    f: Array<T>.() -> R
+): R = getAnnotationsByType(T::class.java).f()
+
 @SuppressWarnings("TooGenericExceptionThrown")
 public inline fun <reified T : Annotation> Element.getAnnotationClassValue(
     f: T.() -> KClass<*>
