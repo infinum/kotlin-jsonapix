@@ -2,13 +2,17 @@ package com.infinum.jsonapix.processor
 
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.annotations.JsonApiXError
+import com.infinum.jsonapix.annotations.JsonApiXErrorList
 import com.infinum.jsonapix.annotations.JsonApiXLinks
+import com.infinum.jsonapix.annotations.JsonApiXLinksList
 import com.infinum.jsonapix.annotations.JsonApiXMeta
+import com.infinum.jsonapix.annotations.JsonApiXMetaList
 import com.infinum.jsonapix.annotations.LinksPlacementStrategy
 import com.infinum.jsonapix.annotations.MetaPlacementStrategy
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
+import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValues
 import com.infinum.jsonapix.processor.specs.AttributesSpecBuilder
 import com.infinum.jsonapix.processor.specs.IncludedSpecBuilder
 import com.infinum.jsonapix.processor.specs.JsonApiXListSpecBuilder
@@ -58,14 +62,9 @@ public class JsonApiProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        val linksElements =
-            roundEnv?.getLinksElements().orEmpty()
-        val metaElements = roundEnv?.getMetaElements().orEmpty()
-
-        collector.addCustomLinks(linksElements)
-        collector.addCustomMetas(metaElements)
-
-        processErrorAnnotation(roundEnv)
+        roundEnv?.processLinksAnnotation()
+        roundEnv?.processMetaAnnotations()
+        roundEnv?.processErrorAnnotation()
 
         val elements = roundEnv?.getElementsAnnotatedWith(JsonApiX::class.java)
         // process method might get called multiple times and not finding elements is a possibility
@@ -244,71 +243,136 @@ public class JsonApiProcessor : AbstractProcessor() {
         listFileSpec.writeTo(File(kaptKotlinGeneratedDir))
     }
 
-    private fun processErrorAnnotation(roundEnv: RoundEnvironment?) {
-        roundEnv?.getElementsAnnotatedWith(JsonApiXError::class.java).orEmpty().forEach {
-            val type = it.getAnnotationParameterValue<JsonApiXError, String> { type }
-            val className = ClassName(
-                processingEnv.elementUtils.getPackageOf(it).toString(),
-                it.simpleName.toString()
-            )
-            customErrors[type] = className
+    private fun RoundEnvironment.processErrorAnnotation() {
+        val repeatedAnnotations = this.getElementsAnnotatedWith(JsonApiXErrorList::class.java)
+        val singleAnnotations = this.getElementsAnnotatedWith(JsonApiXError::class.java)
+
+        repeatedAnnotations?.forEach { element ->
+            val types = element.getAnnotationParameterValues<JsonApiXError, List<String>> {
+                this.map { annotation -> annotation.type }
+            }
+            types.forEach { type ->
+                storeCustomError(element = element, type = type)
+            }
         }
+
+        singleAnnotations?.forEach { element ->
+            val type = element.getAnnotationParameterValue<JsonApiXError, String> { type }
+            storeCustomError(element = element, type = type)
+        }
+
         collector.addCustomErrors(customErrors)
     }
 
-    private fun RoundEnvironment.getLinksElements(): List<ClassName> {
-        return getElementsAnnotatedWith(JsonApiXLinks::class.java).map {
-            val type = it.getAnnotationParameterValue<JsonApiXLinks, String> { type }
-            val placementStrategy =
-                it.getAnnotationParameterValue<JsonApiXLinks, LinksPlacementStrategy> { placementStrategy }
-            val className = ClassName(
-                processingEnv.elementUtils.getPackageOf(it).toString(),
-                it.simpleName.toString()
-            )
-            customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
-                when (placementStrategy) {
-                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
-                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className
-                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className
-                }
-            } ?: kotlin.run {
-                val linksInfo = LinksInfo(type)
-                when (placementStrategy) {
-                    LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
-                    LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className
-                    LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className
-                }
-                customLinks.add(linksInfo)
-            }
-            className
-        }
+    private fun storeCustomError(element: Element, type: String) {
+        val className = ClassName(
+            processingEnv.elementUtils.getPackageOf(element).toString(),
+            element.simpleName.toString()
+        )
+        customErrors[type] = className
     }
 
-    private fun RoundEnvironment.getMetaElements(): List<ClassName> {
-        return getElementsAnnotatedWith(JsonApiXMeta::class.java).map {
-            val type = it.getAnnotationParameterValue<JsonApiXMeta, String> { type }
-            val placementStrategy =
-                it.getAnnotationParameterValue<JsonApiXMeta, MetaPlacementStrategy> { placementStrategy }
-            val className = ClassName(
-                processingEnv.elementUtils.getPackageOf(it).toString(),
-                it.simpleName.toString()
-            )
-            customMetas.firstOrNull { metaInfo -> metaInfo.type == type }?.let { metaInfo ->
-                when (placementStrategy) {
-                    MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
-                    MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName = className
-                    MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme = className
+    private fun RoundEnvironment.processLinksAnnotation() {
+        val repeatedAnnotations = this.getElementsAnnotatedWith(JsonApiXLinksList::class.java)
+        val singleAnnotations = this.getElementsAnnotatedWith(JsonApiXLinks::class.java)
+
+        val classNamesFromRepeatedAnnotations = repeatedAnnotations?.flatMap { element ->
+            val typeAndPlacementStrategyList =
+                element.getAnnotationParameterValues<JsonApiXLinks, List<Pair<String, LinksPlacementStrategy>>> {
+                    this.map { annotation -> annotation.type to annotation.placementStrategy }
                 }
-            } ?: kotlin.run {
-                val metaInfo = MetaInfo(type)
-                when (placementStrategy) {
-                    MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
-                    MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName = className
-                    MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme = className
-                }
-                customMetas.add(metaInfo)
+
+            typeAndPlacementStrategyList.map { typeAndPlacementStrategy ->
+                storeCustomLinksAndReturnClassName(
+                    element = element,
+                    type = typeAndPlacementStrategy.first,
+                    placementStrategy = typeAndPlacementStrategy.second
+                )
             }
-            className
         }
+
+        val classNamesFromSingleAnnotations = singleAnnotations?.map { element ->
+            val (type, placementStrategy) =
+                element.getAnnotationParameterValue<JsonApiXLinks, Pair<String, LinksPlacementStrategy>> { type to placementStrategy }
+
+            storeCustomLinksAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
+        }
+
+        collector.addCustomLinks(links = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty())
+    }
+
+    private fun storeCustomLinksAndReturnClassName(element: Element, type: String, placementStrategy: LinksPlacementStrategy): ClassName {
+        val className = ClassName(
+            processingEnv.elementUtils.getPackageOf(element).toString(),
+            element.simpleName.toString()
+        )
+        customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
+            when (placementStrategy) {
+                LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
+                LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className
+                LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className
+            }
+        } ?: kotlin.run {
+            val linksInfo = LinksInfo(type)
+            when (placementStrategy) {
+                LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
+                LinksPlacementStrategy.DATA -> linksInfo.resourceObjectLinks = className
+                LinksPlacementStrategy.RELATIONSHIPS -> linksInfo.relationshipsLinks = className
+            }
+            customLinks.add(linksInfo)
+        }
+        return className
+    }
+
+    private fun RoundEnvironment.processMetaAnnotations() {
+        val repeatedAnnotations = this.getElementsAnnotatedWith(JsonApiXMetaList::class.java)
+        val singleAnnotations = this.getElementsAnnotatedWith(JsonApiXMeta::class.java)
+
+        val classNamesFromRepeatedAnnotations = repeatedAnnotations?.flatMap { element ->
+            val typeAndPlacementStrategyList =
+                element.getAnnotationParameterValues<JsonApiXMeta, List<Pair<String, MetaPlacementStrategy>>> {
+                    this.map { annotation -> annotation.type to annotation.placementStrategy }
+                }
+
+            typeAndPlacementStrategyList.map { typeAndPlacementStrategy ->
+                storeCustomMetaAndReturnClassName(
+                    element = element,
+                    type = typeAndPlacementStrategy.first,
+                    placementStrategy = typeAndPlacementStrategy.second
+                )
+            }
+        }
+
+        val classNamesFromSingleAnnotations = singleAnnotations?.map { element ->
+            val (type, placementStrategy) =
+                element.getAnnotationParameterValue<JsonApiXMeta, Pair<String, MetaPlacementStrategy>> { type to placementStrategy }
+
+            storeCustomMetaAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
+        }
+
+        collector.addCustomMetas(meta = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty())
+    }
+
+    private fun storeCustomMetaAndReturnClassName(element: Element, type: String, placementStrategy: MetaPlacementStrategy): ClassName {
+        val className = ClassName(
+            processingEnv.elementUtils.getPackageOf(element).toString(),
+            element.simpleName.toString()
+        )
+        customMetas.firstOrNull { metaInfo -> metaInfo.type == type }?.let { metaInfo ->
+            when (placementStrategy) {
+                MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
+                MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName = className
+                MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme = className
+            }
+        } ?: kotlin.run {
+            val metaInfo = MetaInfo(type)
+            when (placementStrategy) {
+                MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className
+                MetaPlacementStrategy.DATA -> metaInfo.resourceObjectClassName = className
+                MetaPlacementStrategy.RELATIONSHIPS -> metaInfo.relationshipsClassNAme = className
+            }
+            customMetas.add(metaInfo)
+        }
+        return className
     }
 }
