@@ -547,7 +547,7 @@ internal class TypeAdapterListTest {
 
 
     @Test
-    fun `given a Person List with root meta should generate json a json with root meta info`() {
+    fun `given a Person List with root meta should generate a json with root meta info`() {
         val items = listOf(
             PersonItem(
                 Person(
