@@ -7,7 +7,7 @@ ext {
     ]
     releaseConfig = [
             "group"      : "com.infinum.jsonapix",
-            "version"    : "1.0.1",
-            "versionCode": 0 * 10000 + 0 * 100 + 6
+            "version"    : "1.0.2",
+            "versionCode": 0 * 10000 + 0 * 100 + 7
     ]
 }
