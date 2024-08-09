@@ -14,6 +14,7 @@ import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
+import com.infinum.jsonapix.core.resources.UnknownMeta
 import com.infinum.jsonapix.processor.ClassInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
@@ -40,6 +41,7 @@ internal object WrapperSerializerPropertySpecBuilder {
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
             JsonApiConstants.Members.SUBCLASS
         )
+
         val contextualMember = MemberName(
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
             JsonApiConstants.Members.CONTEXTUAL
@@ -163,6 +165,11 @@ internal object WrapperSerializerPropertySpecBuilder {
                 meta
             )
         }
+
+        codeBlockBuilder.addStatement(
+            "defaultDeserializer{ %T.serializer() }",
+            UnknownMeta::class.asClassName()
+        )
 
         codeBlockBuilder.unindent().addStatement("}")
 
