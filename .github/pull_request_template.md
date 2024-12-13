@@ -4,8 +4,7 @@
     Provide an overview of what this pull request aims to address or achieve.
 -->
 
-**Related issue
-**: <!-- Add the issue number in format [#<number>](link) or set to "None" if this is not related to a reported issue. -->
+**Related issue**: <!-- Add the issue number in format [#<number>](link) or set to "None" if this is not related to a reported issue. -->
 
 ## Changes
 
