@@ -24,6 +24,9 @@
 
 ## Requirements
 
+The library uses KAPT for annotation processing.
+The setup is different on a Kotlin or Java project.
+
 ## Getting started
 
 Firstly, make sure to include `mavenCentral()` in your buildscript and add the serialization plugin:
@@ -55,13 +58,20 @@ implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
 // Json API X
 implementation("com.infinum.jsonapix:core:<latest-version>")
+
+// Kotlin project
 kapt("com.infinum.jsonapix:processor:<latest-version>")
+
+// Java project
+annotationProcessor "com.infinum.jsonapix:processor:<latest-version>"
 
 // Optional: For Retrofit support
 implementation("com.infinum.jsonapix:retrofit:<latest-version>")
 
 // Optional: Custom lint tool checker
 implementation("com.infinum.jsonapix:lint:<latest-version>")
+
+
 ```
 
 ## Usage
