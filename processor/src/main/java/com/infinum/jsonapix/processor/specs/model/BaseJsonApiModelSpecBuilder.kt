@@ -11,8 +11,12 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
+import kotlinx.serialization.Serializable
 
 internal abstract class BaseJsonApiModelSpecBuilder {
+
+    private val serializableClassName = Serializable::class.asClassName()
 
     abstract fun getClassSuffixName(): String
     abstract fun getRootClassName(rootType: ClassName): TypeName
@@ -40,6 +44,7 @@ internal abstract class BaseJsonApiModelSpecBuilder {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addModifiers(KModifier.DATA)
+                    .addAnnotation(serializableClassName)
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(params)
