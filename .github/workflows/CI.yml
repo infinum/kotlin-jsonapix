@@ -1,0 +1,94 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  validation:
+    name: Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v6
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+  lint:
+    name: Lint
+    needs: [ validation ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Save Gradle Caches
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches/
+          key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-caches-${{ runner.os }}-
+      - name: Lint
+        run: ./gradlew lint
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  detekt:
+    name: Detekt
+    needs: [ validation ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Save Gradle Caches
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches/
+          key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-caches-${{ runner.os }}-
+      - name: Detekt
+        run: ./gradlew detektAll
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  ktlint:
+    name: ktlint
+    needs: [ validation ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Save Gradle Caches
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches/
+          key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-caches-${{ runner.os }}-
+      - name: ktlint
+        run: ./gradlew ktlintAll
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  tests:
+    name: Tests
+    needs: [ validation, lint, detekt, ktlint ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Save Gradle Caches
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches/
+          key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-caches-${{ runner.os }}-
+      - name: Unit tests
+        run: ./gradlew clean testDebugUnitTest
+      - name: Stop Gradle
+        run: ./gradlew --stop
