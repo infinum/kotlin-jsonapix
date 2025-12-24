@@ -1,7 +1,6 @@
 package com.infinum.jsonapix.ui.examples.error
 
 import com.infinum.jsonapix.asJsonXHttpException
-import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.data.api.SampleApiService
 import com.infinum.jsonapix.data.assets.JsonAssetReader
 import com.infinum.jsonapix.data.models.PersonalError
