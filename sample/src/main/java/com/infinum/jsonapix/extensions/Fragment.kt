@@ -8,5 +8,5 @@ import com.infinum.jsonapix.ui.shared.FragmentViewBindingDelegate
 fun <T : ViewBinding> Fragment.viewBinding(viewBindingFactory: (View) -> T) =
     FragmentViewBindingDelegate(
         this,
-        viewBindingFactory
+        viewBindingFactory,
     )

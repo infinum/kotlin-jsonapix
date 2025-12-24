@@ -10,5 +10,5 @@ data class Address(
     val street: String,
     val number: Int,
     val country: String,
-    val city: String
+    val city: String,
 ) : JsonApiModel()

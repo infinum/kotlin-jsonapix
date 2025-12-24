@@ -5,14 +5,14 @@ import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 
-internal abstract class BaseResourceObjectFunSpecBuilder() {
+internal abstract class BaseResourceObjectFunSpecBuilder {
 
     abstract fun getClassSuffix(): String
     fun build(
         originalClass: ClassName,
         resourceObjectClass: ClassName,
         attributesClass: ClassName?,
-        relationshipsClass: ClassName?
+        relationshipsClass: ClassName?,
     ): FunSpec {
         val modelClassName = ClassName.bestGuess(originalClass.canonicalName.withName(getClassSuffix()))
 
@@ -23,14 +23,14 @@ internal abstract class BaseResourceObjectFunSpecBuilder() {
 
         if (attributesClass != null) {
             returnStatement.append(
-                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data), "
+                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data), ",
             )
             builderArgs.add(attributesClass)
         }
 
         if (relationshipsClass != null) {
             returnStatement.append(
-                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data), "
+                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(data), ",
             )
             builderArgs.add(relationshipsClass)
         }
@@ -45,7 +45,7 @@ internal abstract class BaseResourceObjectFunSpecBuilder() {
             .returns(resourceObjectClass)
             .addStatement(
                 format = returnStatement.toString(),
-                args = builderArgs.toTypedArray()
+                args = builderArgs.toTypedArray(),
             )
             .build()
     }

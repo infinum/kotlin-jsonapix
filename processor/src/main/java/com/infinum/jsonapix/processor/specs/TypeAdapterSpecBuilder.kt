@@ -24,7 +24,7 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
         modelType: TypeName,
         rootMeta: ClassName?,
         resourceObjectMeta: ClassName?,
-        relationshipsMeta: ClassName?
+        relationshipsMeta: ClassName?,
     ): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
             .addModifiers(KModifier.OVERRIDE)
@@ -41,7 +41,7 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
                 JsonApiConstants.Members.ROOT_META,
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
+                JsonApiConstants.Keys.ERRORS,
             )
             .addStatement("return data.%L", JsonApiConstants.Members.ORIGINAL)
             .build()

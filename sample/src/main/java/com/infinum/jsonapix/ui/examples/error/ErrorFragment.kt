@@ -12,10 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ErrorFragment : BaseFragment<ErrorState, ErrorEvent>() {
 
-    companion object {
-        fun newInstance() = ErrorFragment()
-    }
-
     override val layoutRes: Int = R.layout.fragment_error
 
     override val binding by viewBinding(FragmentErrorBinding::bind)
@@ -31,5 +27,9 @@ class ErrorFragment : BaseFragment<ErrorState, ErrorEvent>() {
         binding.downloadButton.setOnClickListener {
             viewModel.fetchError()
         }
+    }
+
+    companion object {
+        fun newInstance() = ErrorFragment()
     }
 }

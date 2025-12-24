@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.core.adapters
 
+@Suppress("StringLiteralDuplication")
 interface TypeAdapter<Model> {
     fun rootLinks(): String = "links"
     fun resourceObjectLinks(): String = "links"

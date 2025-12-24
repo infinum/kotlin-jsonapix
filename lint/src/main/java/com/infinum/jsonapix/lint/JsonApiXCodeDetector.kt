@@ -8,12 +8,12 @@ import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
+import java.util.EnumSet
 import org.jetbrains.uast.UAnnotated
 import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.getContainingUClass
 import org.jetbrains.uast.getParentOfType
-import java.util.EnumSet
 
 private const val JSON_API_X_QUALIFIED_NAME = "com.infinum.jsonapix.annotations.JsonApiX"
 private const val JSON_API_X_META_QUALIFIED_NAME = "com.infinum.jsonapix.annotations.JsonApiXMeta"
@@ -38,19 +38,19 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
                     JSON_API_X_QUALIFIED_NAME -> validateAnnotationUsage(
                         context,
                         node,
-                        JSON_API_X_SIMPLE_NAME
+                        JSON_API_X_SIMPLE_NAME,
                     )
 
                     JSON_API_X_META_QUALIFIED_NAME -> validateAnnotationUsage(
                         context,
                         node,
-                        JSON_API_X_META_SIMPLE_NAME
+                        JSON_API_X_META_SIMPLE_NAME,
                     )
 
                     JSON_API_X_LINKS_QUALIFIED_NAME -> validateAnnotationUsage(
                         context,
                         node,
-                        JSON_API_X_LINKS_SIMPLE_NAME
+                        JSON_API_X_LINKS_SIMPLE_NAME,
                     )
                 }
             }
@@ -60,15 +60,14 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
     private fun validateAnnotationUsage(
         context: JavaContext,
         node: UAnnotation,
-        annotationName: String
+        annotationName: String,
     ) {
-
         if (isInvalidAnnotationUsage(node)) {
             context.report(
                 createAnnotationUsageIssue(annotationName),
                 node,
                 context.getLocation(node),
-                "$annotationName must be combined with @Serializable"
+                "$annotationName must be combined with @Serializable",
             )
         }
 
@@ -76,20 +75,20 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             context.log(
                 exception = null,
                 format = "$annotationName -> ${isPrimaryDataNullable(node)} -> ${
-                isAllFieldsHasDefaultValues(node)
-                }"
+                    isAllFieldsHasDefaultValues(node)
+                }",
             )
         }
 
         if (annotationName == JSON_API_X_SIMPLE_NAME && isPrimaryDataNullable(node) && !isAllFieldsHasDefaultValues(
-                node
+                node,
             )
         ) {
             context.report(
                 createNullableDataDefaultValuesIssue(),
                 node,
                 context.getLocation(node),
-                "Nullable $JSON_API_X_SIMPLE_NAME  attributes should have default values"
+                "Nullable $JSON_API_X_SIMPLE_NAME  attributes should have default values",
             )
         }
     }
@@ -107,22 +106,33 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
+        @JvmField
+        val annotationIssues: List<Issue> = listOf(
+            createAnnotationUsageIssue(JSON_API_X_SIMPLE_NAME),
+            createAnnotationUsageIssue(JSON_API_X_META_SIMPLE_NAME),
+            createAnnotationUsageIssue(JSON_API_X_LINKS_SIMPLE_NAME),
+            createNullableDataDefaultValuesIssue(),
+        )
+
+        @Suppress("TrimMultilineRawString")
         fun createAnnotationUsageIssue(annotationName: String): Issue =
             Issue.create(
                 id = "Illegal${annotationName}Annotation",
                 briefDescription = "Illegal use of $annotationName annotation",
                 explanation = """
                     $annotationName must be combined with @Serializable from KotlinX Serialization as it's 
-                    mandatory for correct class generation/serialization.""", // no need to .trimIndent(), lint does that automatically
+                    mandatory for correct class generation/serialization.""",
+                // no need to .trimIndent(), lint does that automatically
                 category = Category.CUSTOM_LINT_CHECKS,
                 priority = 8,
                 severity = Severity.ERROR,
                 implementation = Implementation(
                     JsonApiXCodeDetector::class.java,
-                    EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
-                )
+                    EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES),
+                ),
             )
 
+        @Suppress("TrimMultilineRawString")
         fun createNullableDataDefaultValuesIssue(): Issue =
             Issue.create(
                 id = "IllegalNullable${JSON_API_X_SIMPLE_NAME}Annotation",
@@ -136,16 +146,8 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
                 severity = Severity.ERROR,
                 implementation = Implementation(
                     JsonApiXCodeDetector::class.java,
-                    EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
-                )
+                    EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES),
+                ),
             )
-
-        @JvmField
-        val annotationIssues: List<Issue> = listOf(
-            createAnnotationUsageIssue(JSON_API_X_SIMPLE_NAME),
-            createAnnotationUsageIssue(JSON_API_X_META_SIMPLE_NAME),
-            createAnnotationUsageIssue(JSON_API_X_LINKS_SIMPLE_NAME),
-            createNullableDataDefaultValuesIssue()
-        )
     }
 }

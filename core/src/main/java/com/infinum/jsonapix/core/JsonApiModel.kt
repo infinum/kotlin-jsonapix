@@ -15,5 +15,6 @@ abstract class JsonApiModel {
 
     fun type(): String? = type
 
+    @Suppress("FunctionMinLength")
     fun id(): String? = id
 }

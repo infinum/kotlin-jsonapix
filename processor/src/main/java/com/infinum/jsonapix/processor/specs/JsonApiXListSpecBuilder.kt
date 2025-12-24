@@ -30,34 +30,38 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         type: String,
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
-        customError: ClassName?
+        customError: ClassName?,
     ): FileSpec {
-        val modelClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST))
-        val itemClassName = ClassName.bestGuess(className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM))
+        val modelClassName = ClassName.bestGuess(
+            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
+        )
+        val itemClassName = ClassName.bestGuess(
+            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM),
+        )
 
         val generatedName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
             className.packageName,
-            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
+            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName),
         )
 
         val properties = getBasePropertySpecs(
             metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
             rootLinksClassName = linksInfo?.rootLinks,
-            customError = customError
+            customError = customError,
         ).toMutableList()
 
         val params = getBaseParamSpecs(
             metaClassName = metaInfo?.rootClassName ?: Meta::class.asClassName(),
             rootLinksClassName = linksInfo?.rootLinks,
-            customError = customError
+            customError = customError,
         ).toMutableList()
 
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.DATA,
-                List::class.asClassName().parameterizedBy(resourceObjectClassName)
-            ).build()
+                List::class.asClassName().parameterizedBy(resourceObjectClassName),
+            ).build(),
         )
 
         properties.add(dataProperty(resourceObjectClassName))
@@ -65,19 +69,19 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         return FileSpec.builder(className.packageName, generatedName)
             .addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
-                JsonApiConstants.Imports.RESOURCE_IDENTIFIER
+                JsonApiConstants.Imports.RESOURCE_IDENTIFIER,
             )
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName)
+                        JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName),
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(params)
-                            .build()
+                            .build(),
                     )
                     .addProperties(properties)
                     .addProperty(
@@ -85,30 +89,30 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                             itemClassName,
                             modelClassName,
                             metaInfo,
-                            linksInfo
-                        )
+                            linksInfo,
+                        ),
                     )
-                    .build()
+                    .build(),
             )
             .build()
     }
 
     private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
         JsonApiConstants.Keys.DATA,
-        List::class.asClassName().parameterizedBy(resourceObject)
+        List::class.asClassName().parameterizedBy(resourceObject),
     ).addAnnotation(
-        Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA)
+        Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA),
     )
         .initializer(JsonApiConstants.Keys.DATA).addModifiers(KModifier.OVERRIDE)
         .build()
 
+    @Suppress("StringShouldBeRawString")
     private fun originalProperty(
         itemClassName: ClassName,
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
     ): PropertySpec {
-
         val getterFunSpec = FunSpec.builder("get()")
             .addStatement("val items = data.map {")
             .addStatement("val original = it.original(included)")
@@ -121,7 +125,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                 linksInfo?.relationshipsLinks ?: DefaultLinks::class,
                 "it.meta",
                 "it.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
-                metaInfo?.relationshipsClassNAme ?: Meta::class
+                metaInfo?.relationshipsClassNAme ?: Meta::class,
             )
             .addStatement("}")
             .addStatement(
@@ -136,12 +140,13 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
 
         val propertySpec = PropertySpec.builder(
             JsonApiConstants.Members.ORIGINAL,
-            modelClassName, KModifier.OVERRIDE
+            modelClassName,
+            KModifier.OVERRIDE,
         )
             .getter(getterFunSpec)
             .addAnnotation(
                 AnnotationSpec.builder(Transient::class.asClassName())
-                    .build()
+                    .build(),
             )
 
         return propertySpec.build()

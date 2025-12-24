@@ -1,4 +1,4 @@
-@file:SuppressWarnings("TooGenericExceptionCaught")
+@file:Suppress("TooGenericExceptionCaught")
 
 package com.infinum.jsonapix.core.discriminators
 
@@ -20,6 +20,7 @@ import kotlinx.serialization.json.jsonObject
  * Child objects -> Child prefix + type parameter e.g. Attributes_person where person is the type
  * of a class called Person passed as a parameter to JsonApiX annotation.
  */
+@Suppress("LongParameterList")
 class JsonApiDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
@@ -28,7 +29,7 @@ class JsonApiDiscriminator(
     private val rootMeta: String,
     private val resourceObjectMeta: String,
     private val relationshipsMeta: String,
-    private val error: String
+    private val error: String,
 ) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, relationshipsMeta, error) {
 
     @SuppressWarnings("SwallowedException", "LongMethod")
@@ -76,7 +77,7 @@ class JsonApiDiscriminator(
 
             val newRelationshipsObject = relationshipsObject?.takeIf { it !is JsonNull }?.let {
                 val relationshipsDiscriminator = CommonDiscriminator(
-                    JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
+                    JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType),
                 )
                 relationshipsDiscriminator.inject(getNewRelationshipsObject(it))
             }
@@ -91,7 +92,7 @@ class JsonApiDiscriminator(
 
             val newDataObject = dataObject?.takeIf { it !is JsonNull }?.let {
                 val dataDiscriminator = CommonDiscriminator(
-                    JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType)
+                    JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType),
                 )
                 getNewDataObject(
                     dataDiscriminator.inject(it),
@@ -108,14 +109,14 @@ class JsonApiDiscriminator(
                 includedArray = newIncludedArray,
                 linksObject = newRootLinksObject,
                 errorsArray = newErrorsArray,
-                metaObject = newRootMetaObject
+                metaObject = newRootMetaObject,
             )
             return rootDiscriminator.inject(newJsonElement)
         } catch (e: Exception) {
             // TODO Add Timber and custom exceptions
             throw IllegalArgumentException(
                 "Input must be either JSON object or array with the key type defined",
-                e.cause
+                e.cause,
             )
         }
     }
@@ -134,14 +135,14 @@ class JsonApiDiscriminator(
                 dataObject = dataObject,
                 linksObject = null,
                 errorsArray = errorsArray,
-                metaObject = null
+                metaObject = null,
             )
             return rootDiscriminator.extract(newJsonElement)
         } catch (e: Exception) {
             // TODO Add Timber and custom exceptions
             throw IllegalArgumentException(
                 "Input must be either JSON object or array with the key type defined",
-                e.cause
+                e.cause,
             )
         }
     }
@@ -152,15 +153,22 @@ class JsonApiDiscriminator(
     override fun getAttributesObject(jsonElement: JsonElement): JsonElement? =
         getDataObject(jsonElement)?.jsonObject?.get(JsonApiConstants.Keys.ATTRIBUTES)
 
+    @Suppress("LongParameterList")
     private fun getJsonObjectWithDataDiscriminator(
         original: JsonElement,
         dataObject: JsonElement?,
         includedArray: JsonArray?,
         linksObject: JsonElement?,
         errorsArray: JsonArray?,
-        metaObject: JsonElement?
+        metaObject: JsonElement?,
     ): JsonObject {
-        return getDiscriminatedBaseEntries(original, includedArray, linksObject, errorsArray, metaObject).let { entries ->
+        return getDiscriminatedBaseEntries(
+            original,
+            includedArray,
+            linksObject,
+            errorsArray,
+            metaObject,
+        ).let { entries ->
             dataObject?.let { data ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.DATA }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.DATA, data))

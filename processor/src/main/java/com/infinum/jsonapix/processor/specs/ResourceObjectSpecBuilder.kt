@@ -26,7 +26,7 @@ internal object ResourceObjectSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
 
-    @SuppressWarnings("LongMethod")
+    @SuppressWarnings("LongMethod", "LongParameterList")
     fun build(
         className: ClassName,
         metaClassName: ClassName?,
@@ -34,16 +34,16 @@ internal object ResourceObjectSpecBuilder {
         type: String,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
-        manyRelationships: Map<String, TypeName>
+        manyRelationships: Map<String, TypeName>,
     ): FileSpec {
         val generatedName = JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
         val attributesClassName = ClassName(
             className.packageName,
-            JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
+            JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName),
         )
         val relationshipsClassName = ClassName(
             className.packageName,
-            JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
+            JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName),
         )
 
         val paramsList = mutableListOf<ParameterSpec>()
@@ -59,31 +59,31 @@ internal object ResourceObjectSpecBuilder {
                 Specs.getNamedParamSpec(
                     attributesClassName,
                     JsonApiConstants.Keys.ATTRIBUTES,
-                    nullable = true
-                )
+                    nullable = true,
+                ),
             )
             propsList.add(
                 Specs.getNamedPropertySpec(
                     attributesClassName,
                     JsonApiConstants.Keys.ATTRIBUTES,
-                    nullable = true
-                )
+                    nullable = true,
+                ),
             )
         } else {
             paramsList.add(
                 Specs.getNullParamSpec(
                     JsonApiConstants.Keys.ATTRIBUTES,
                     Attributes::class.asClassName()
-                        .copy(nullable = true)
-                )
+                        .copy(nullable = true),
+                ),
             )
             propsList.add(
                 Specs.getNullPropertySpec(
                     JsonApiConstants.Keys.ATTRIBUTES,
                     Attributes::class.asClassName()
                         .copy(nullable = true),
-                    isTransient = true
-                )
+                    isTransient = true,
+                ),
             )
         }
 
@@ -92,56 +92,56 @@ internal object ResourceObjectSpecBuilder {
                 Specs.getNamedParamSpec(
                     relationshipsClassName,
                     JsonApiConstants.Keys.RELATIONSHIPS,
-                    nullable = true
-                )
+                    nullable = true,
+                ),
             )
             propsList.add(
                 Specs.getNamedPropertySpec(
                     relationshipsClassName,
                     JsonApiConstants.Keys.RELATIONSHIPS,
-                    nullable = true
-                )
+                    nullable = true,
+                ),
             )
         } else {
             paramsList.add(
                 Specs.getNullParamSpec(
                     JsonApiConstants.Keys.RELATIONSHIPS,
-                    Relationships::class.asClassName().copy(nullable = true)
-                )
+                    Relationships::class.asClassName().copy(nullable = true),
+                ),
             )
             propsList.add(
                 Specs.getNullPropertySpec(
                     JsonApiConstants.Keys.RELATIONSHIPS,
                     Relationships::class.asClassName().copy(nullable = true),
-                    isTransient = true
-                )
+                    isTransient = true,
+                ),
             )
         }
 
         paramsList.add(
             Specs.getNullParamSpec(
                 JsonApiConstants.Keys.LINKS,
-                linksInfo?.resourceObjectLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true)
-            )
+                linksInfo?.resourceObjectLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
+            ),
         )
         propsList.add(
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.LINKS,
-                linksInfo?.resourceObjectLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true)
-            )
+                linksInfo?.resourceObjectLinks?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
+            ),
         )
 
         paramsList.add(
             Specs.getNullParamSpec(
                 JsonApiConstants.Keys.META,
-                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
-            )
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
+            ),
         )
         propsList.add(
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.META,
-                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true)
-            )
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
+            ),
         )
 
         return FileSpec.builder(className.packageName, generatedName)
@@ -151,41 +151,41 @@ internal object ResourceObjectSpecBuilder {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        ResourceObject::class.asClassName().parameterizedBy(className)
+                        ResourceObject::class.asClassName().parameterizedBy(className),
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(
                         Specs.getSerialNameSpec(
                             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
-                                type
-                            )
-                        )
+                                type,
+                            ),
+                        ),
                     )
                     .primaryConstructor(
                         FunSpec.constructorBuilder()
                             .addParameters(paramsList)
-                            .build()
+                            .build(),
                     )
                     .addFunction(
                         originalFunSpec(
                             className,
                             attributes,
                             oneRelationships,
-                            manyRelationships
-                        )
+                            manyRelationships,
+                        ),
                     )
                     .addProperties(propsList)
-                    .build()
+                    .build(),
             )
             .build()
     }
 
-    @SuppressWarnings("SpreadOperator", "LongMethod")
+    @SuppressWarnings("SpreadOperator", "LongMethod", "CognitiveComplexMethod")
     private fun originalFunSpec(
         className: ClassName,
         attributes: List<PropertySpec>,
         oneRelationships: Map<String, TypeName>,
-        manyRelationships: Map<String, TypeName>
+        manyRelationships: Map<String, TypeName>,
     ): FunSpec {
         val tempVariableName = "tempOriginal"
 
@@ -195,8 +195,8 @@ internal object ResourceObjectSpecBuilder {
         builder.addParameter(
             JsonApiConstants.Keys.INCLUDED,
             List::class.asClassName().parameterizedBy(
-                ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName())
-            ).copy(nullable = true)
+                ResourceObject::class.asClassName().parameterizedBy(Any::class.asClassName()),
+            ).copy(nullable = true),
         )
 
         val codeBlockBuilder = CodeBlock.builder()
@@ -206,14 +206,14 @@ internal object ResourceObjectSpecBuilder {
                 codeBlockBuilder.addStatement(
                     "%N = attributes?.%N,",
                     it.name,
-                    it.name
+                    it.name,
                 )
             } else {
                 codeBlockBuilder.addStatement(
                     "%N = requireNotNull(attributes?.%N, %S),",
                     it.name,
                     it.name,
-                    it.name
+                    it.name,
                 )
             }
         }
@@ -224,12 +224,12 @@ internal object ResourceObjectSpecBuilder {
             if (it.value.isNullable) {
                 codeBlockBuilder.indent().addStatement(
                     "safeRelationships.%N?.data == ResourceIdentifier(it.type, it.id)",
-                    it.key
+                    it.key,
                 )
             } else {
                 codeBlockBuilder.indent().addStatement(
                     "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
-                    it.key
+                    it.key,
                 )
             }
             codeBlockBuilder.unindent()
@@ -240,7 +240,7 @@ internal object ResourceObjectSpecBuilder {
                 codeBlockBuilder.unindent().addStatement(
                     "} ?: throw %T(%S),",
                     JsonApiXMissingArgumentException::class,
-                    it.key
+                    it.key,
                 )
             }
         }
@@ -251,17 +251,17 @@ internal object ResourceObjectSpecBuilder {
             if (it.value.isNullable) {
                 codeBlockBuilder.indent().addStatement(
                     "safeRelationships.%N?.data?.contains(ResourceIdentifier(it.type, it.id)) == true",
-                    it.key
+                    it.key,
                 )
             } else {
                 codeBlockBuilder.indent().addStatement(
                     "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
-                    it.key
+                    it.key,
                 )
             }
             codeBlockBuilder.unindent().addStatement(
                 "}?.map { it.${JsonApiConstants.Members.ORIGINAL}(included) }.takeIf { it?.isNotEmpty() == true } as %T",
-                it.value
+                it.value,
             )
             if (it.value.isNullable) {
                 codeBlockBuilder.unindent().addStatement("},")
@@ -269,7 +269,7 @@ internal object ResourceObjectSpecBuilder {
                 codeBlockBuilder.unindent().addStatement(
                     "} ?: throw %T(%S),",
                     JsonApiXMissingArgumentException::class,
-                    it.key
+                    it.key,
                 )
             }
         }
@@ -286,24 +286,30 @@ internal object ResourceObjectSpecBuilder {
     }
 
     private fun idProperty(): PropertySpec = PropertySpec.builder(
-        JsonApiConstants.Keys.ID, String::class, KModifier.OVERRIDE
+        JsonApiConstants.Keys.ID,
+        String::class,
+        KModifier.OVERRIDE,
     ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ID))
         .initializer(JsonApiConstants.Keys.ID)
         .build()
 
     private fun idParam(): ParameterSpec = ParameterSpec.builder(
-        JsonApiConstants.Keys.ID, String::class
+        JsonApiConstants.Keys.ID,
+        String::class,
     ).defaultValue("%S", "0")
         .build()
 
     private fun typeProperty(): PropertySpec = PropertySpec.builder(
-        JsonApiConstants.Keys.TYPE, String::class, KModifier.OVERRIDE
+        JsonApiConstants.Keys.TYPE,
+        String::class,
+        KModifier.OVERRIDE,
     ).addAnnotation(
-        Specs.getSerialNameSpec(JsonApiConstants.Keys.TYPE)
+        Specs.getSerialNameSpec(JsonApiConstants.Keys.TYPE),
     ).initializer(JsonApiConstants.Keys.TYPE).build()
 
     private fun typeParam(type: String): ParameterSpec = ParameterSpec.builder(
-        JsonApiConstants.Keys.TYPE, String::class
+        JsonApiConstants.Keys.TYPE,
+        String::class,
     ).defaultValue("%S", type)
         .build()
 }

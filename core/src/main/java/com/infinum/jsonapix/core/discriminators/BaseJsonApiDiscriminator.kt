@@ -15,7 +15,7 @@ abstract class BaseJsonApiDiscriminator(
     rootType: String,
     private val relationshipsLinks: String,
     private val relationshipsMeta: String,
-    private val error: String
+    private val error: String,
 ) : Discriminator {
 
     val rootDiscriminator = CommonDiscriminator(rootType)
@@ -92,7 +92,7 @@ abstract class BaseJsonApiDiscriminator(
     }
 
     fun getNewRelationshipsObject(
-        original: JsonElement
+        original: JsonElement,
     ): JsonObject {
         val resultMap = mutableMapOf<String, JsonElement>()
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
@@ -122,7 +122,7 @@ abstract class BaseJsonApiDiscriminator(
     }
 
     fun getNewErrorsArray(
-        original: JsonElement
+        original: JsonElement,
     ): JsonArray {
         val errorDiscriminator = CommonDiscriminator(error)
 
@@ -158,8 +158,8 @@ abstract class BaseJsonApiDiscriminator(
                     val includedDiscriminator =
                         CommonDiscriminator(
                             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(
-                                requireNotNull(TypeExtractor.findType(it))
-                            )
+                                requireNotNull(TypeExtractor.findType(it)),
+                            ),
                         )
                     add(includedDiscriminator.inject(it))
                 }
@@ -171,7 +171,7 @@ abstract class BaseJsonApiDiscriminator(
         includedArray: JsonArray?,
         linksObject: JsonElement?,
         errorsArray: JsonArray?,
-        metaObject: JsonElement?
+        metaObject: JsonElement?,
     ): MutableSet<Map.Entry<String, JsonElement>> {
         original.jsonObject.entries.toMutableSet().let { entries ->
             includedArray?.let { included ->

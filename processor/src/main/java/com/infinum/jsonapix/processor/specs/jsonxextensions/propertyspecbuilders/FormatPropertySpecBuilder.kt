@@ -14,11 +14,11 @@ internal object FormatPropertySpecBuilder {
             .addStatement(JsonApiConstants.Statements.ENCODE_DEFAULTS)
             .addStatement(
                 JsonApiConstants.Statements.CLASS_DISCRIMINATOR_FORMAT,
-                JsonApiConstants.CLASS_DISCRIMINATOR_KEY
+                JsonApiConstants.CLASS_DISCRIMINATOR_KEY,
             )
             .addStatement(
                 JsonApiConstants.Statements.SERIALIZERS_MODULE_FORMAT,
-                JsonApiConstants.Members.JSONX_SERIALIZER_MODULE
+                JsonApiConstants.Members.JSONX_SERIALIZER_MODULE,
             )
             .addStatement(JsonApiConstants.Statements.IGNORE_UNKNOWN_KEYS)
             .unindent()

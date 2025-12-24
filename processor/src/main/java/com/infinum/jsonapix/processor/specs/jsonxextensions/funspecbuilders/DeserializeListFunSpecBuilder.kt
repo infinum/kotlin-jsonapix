@@ -20,6 +20,7 @@ import kotlinx.serialization.json.Json
 
 internal object DeserializeListFunSpecBuilder {
 
+    @Suppress("LongMethod", "LongParameterList")
     fun build(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
@@ -29,13 +30,13 @@ internal object DeserializeListFunSpecBuilder {
         val linksParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build(),
         )
 
         val metaParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build()
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
         )
 
         return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
@@ -52,14 +53,14 @@ internal object DeserializeListFunSpecBuilder {
                 Json::class.asTypeName(),
                 JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
                 jsonObjectMember,
-                JsonApiConstants.Keys.DATA
+                JsonApiConstants.Keys.DATA,
             )
             .addStatement(
                 "val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) %T.%M(Data::class) else %T.%M(de)",
                 TypeExtractor::class.asTypeName(),
                 DeserializeFunSpecMemberProvider.guessTypeMember,
                 TypeExtractor::class.asTypeName(),
-                findTypeMember
+                findTypeMember,
             )
             .addStatement(
                 "val discriminator = %T(%L ?: TypeExtractor.guessType(Model::class), %L, %L, %L, %L, %L, %L, %L)",
@@ -71,15 +72,15 @@ internal object DeserializeListFunSpecBuilder {
                 JsonApiConstants.Members.ROOT_META,
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
+                JsonApiConstants.Keys.ERRORS,
             )
             .addStatement(
                 "val jsonElement = %T.%L(this)",
                 Json::class.asClassName(),
-                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT
+                JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
             )
             .addStatement(
-                "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()"
+                "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()",
             )
             .addStatement(
                 "return %M.%M<%T<%T,%T>>(jsonStringWithDiscriminator)",

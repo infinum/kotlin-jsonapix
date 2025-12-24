@@ -35,8 +35,8 @@ class SampleActivity : BaseActivity<Unit, Unit>() {
                 PersonFragment.newInstance(),
                 DogFragment.newInstance(),
                 CompanyFragment.newInstance(),
-                ErrorFragment.newInstance()
-            )
+                ErrorFragment.newInstance(),
+            ),
         )
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             tab.text = TITLES[position]
