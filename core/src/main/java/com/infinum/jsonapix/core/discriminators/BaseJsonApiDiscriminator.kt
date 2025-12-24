@@ -91,6 +91,14 @@ abstract class BaseJsonApiDiscriminator(
         }
     }
 
+    /**
+     * Processes and validates relationship objects from JSON API response.
+     * 
+     * This method validates that relationship objects do not have an explicit
+     * null value for the 'data' field. According to JSON:API spec, if a relationship
+     * object is present, its data field should either contain valid data or be omitted.
+     * An explicit null value is considered invalid.
+     */
     fun getNewRelationshipsObject(
         original: JsonElement,
     ): JsonObject {
@@ -98,7 +106,19 @@ abstract class BaseJsonApiDiscriminator(
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
         val relationshipsMetaDiscriminator = CommonDiscriminator(relationshipsMeta)
         original.jsonObject.entries.filter { it.value is JsonObject }.forEach { relationshipEntry ->
-            val set = relationshipEntry.value.jsonObject.entries.toMutableSet()
+            val relationshipObject = relationshipEntry.value.jsonObject
+            val dataField = relationshipObject[JsonApiConstants.Keys.DATA]
+            
+            // Validate that if data field is present, it is not explicitly null
+            if (dataField is JsonNull) {
+                throw IllegalArgumentException(
+                    "Invalid relationship data: relationship '${relationshipEntry.key}' " +
+                    "has explicit null data field. Relationships should either omit the " +
+                    "data field or provide valid relationship data."
+                )
+            }
+            
+            val set = relationshipObject.entries.toMutableSet()
             getLinksObject(relationshipEntry.value)?.let { linksObject ->
                 if (linksObject !is JsonNull) {
                     val newLinks = relationshipsLinksDiscriminator.inject(linksObject)
