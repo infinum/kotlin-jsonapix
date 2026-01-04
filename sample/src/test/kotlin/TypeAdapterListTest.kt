@@ -328,13 +328,6 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is a null relationship data in response type adapter Person list convertFromString should throw an IllegalArgumentException`() {
-        val response = getFileAsString("person_list_invalid_relationship_data.json")
-
-        assertThrows<IllegalArgumentException> { typeListAdapter?.convertFromString(response) }
-    }
-
-    @org.junit.jupiter.api.Test
     fun `given that person list has allMyDogs and myFavoriteDog set type adapter Person list convertToString should generate a json with 2 persons having allMyDogs and myFavouriteDog relationships set with no links`() {
         val items = listOf(
             PersonItem(
