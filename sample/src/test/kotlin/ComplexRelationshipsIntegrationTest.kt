@@ -456,8 +456,11 @@ internal class ComplexRelationshipsIntegrationTest {
             adapter!!.convertFromString(json)
         }
 
-        // Should handle missing included resource (id=2) gracefully
-        assertTrue(result.isSuccess || result.isFailure, "Should handle partial includes")
+        // Should handle missing included resource (id=2) gracefully by still deserializing successfully
+        assertTrue(result.isSuccess, "Deserialization should succeed even with partial includes")
+
+        val personModel = result.getOrThrow()
+        assertNotNull(personModel.data)
     }
 
     @Test

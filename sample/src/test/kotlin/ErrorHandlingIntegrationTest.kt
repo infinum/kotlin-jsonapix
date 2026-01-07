@@ -6,6 +6,7 @@ import com.infinum.jsonapix.data.models.PersonalError
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
+import kotlinx.serialization.SerializationException
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -49,12 +50,11 @@ internal class ErrorHandlingIntegrationTest {
 
         // According to JSON:API spec, errors and data should not coexist
         // The adapter should handle error responses gracefully
-        val result = kotlin.runCatching {
+        // According to JSON:API spec, errors and data should not coexist
+        // The adapter should handle error responses by failing
+        assertThrows<Exception> {
             adapter!!.convertFromString(json)
         }
-
-        // Should either succeed with null data or handle gracefully
-        assertTrue(result.isSuccess || result.isFailure, "Should handle error response")
     }
 
     @Test
@@ -68,12 +68,10 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = kotlin.runCatching {
+        // Parsing null data should fail as it doesn't conform to expected structure
+        assertThrows<Exception> {
             adapter!!.convertFromString(json)
         }
-
-        // May succeed or fail depending on implementation - both are acceptable
-        assertTrue(result.isSuccess || result.isFailure, "Should handle null data gracefully")
     }
 
     @Test
@@ -92,13 +90,10 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        // This should either fail gracefully or use default values
-        val result = kotlin.runCatching {
+        // Missing required fields (surname, age) should result in a parsing exception
+        assertThrows<Exception> {
             adapter!!.convertFromString(json)
         }
-
-        // The result depends on whether fields are nullable or have defaults
-        assertTrue(result.isSuccess || result.isFailure, "Should handle missing fields")
     }
 
     @Test
@@ -164,12 +159,10 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        // Should either succeed (type checking might be lenient) or fail
-        val result = kotlin.runCatching {
+        // Wrong resource type causes deserialization to fail
+        assertThrows<SerializationException> {
             adapter!!.convertFromString(json)
         }
-
-        assertTrue(result.isSuccess || result.isFailure, "Should handle wrong type")
     }
 
     @Test
@@ -241,12 +234,10 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = kotlin.runCatching {
+        // Null attributes should result in a parsing failure
+        assertThrows<Exception> {
             adapter!!.convertFromString(json)
         }
-
-        // Depends on how the library handles null attributes
-        assertTrue(result.isSuccess || result.isFailure, "Should handle null attributes")
     }
 
     @Test
@@ -474,33 +465,6 @@ internal class ErrorHandlingIntegrationTest {
     }
 
     @Test
-    fun `given a response with boolean as number when parsing should handle type mismatch`() {
-        val adapter = factory.getAdapter<PersonModel>()
-        assertNotNull(adapter)
-
-        val json = """
-            {
-                "data": {
-                    "type": "person",
-                    "id": "1",
-                    "attributes": {
-                        "name": "Test",
-                        "surname": "User",
-                        "age": "30"
-                    }
-                }
-            }
-        """.trimIndent()
-
-        val result = kotlin.runCatching {
-            adapter!!.convertFromString(json)
-        }
-
-        // Depends on serializer strictness
-        assertTrue(result.isSuccess || result.isFailure, "Should handle type mismatches")
-    }
-
-    @Test
     fun `given JsonXHttpException when created with errors should store them correctly`() {
         val errors = listOf(
             PersonalError("Error 1"),
@@ -545,7 +509,7 @@ internal class ErrorHandlingIntegrationTest {
 
         val converter = JsonXResponseBodyConverter(adapter!!)
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             "invalid json {{{{"
         )
 

@@ -90,7 +90,7 @@ internal class RetrofitIntegrationTest {
         """.trimIndent()
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
@@ -135,7 +135,7 @@ internal class RetrofitIntegrationTest {
         """.trimIndent()
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
@@ -165,7 +165,7 @@ internal class RetrofitIntegrationTest {
         val requestBody = converter.convert(model)
 
         assertNotNull(requestBody, "Request body should not be null")
-        assertEquals(MediaType.get("application/json; charset=UTF-8"), requestBody?.contentType())
+        assertEquals(MediaType.parse("application/json; charset=UTF-8"), requestBody?.contentType())
     }
 
     @Test
@@ -205,7 +205,7 @@ internal class RetrofitIntegrationTest {
         val json = getFileAsString("person_one_and_many_rel.json")
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
@@ -297,7 +297,7 @@ internal class RetrofitIntegrationTest {
         """.trimIndent()
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
@@ -317,7 +317,7 @@ internal class RetrofitIntegrationTest {
         val json = getFileAsString("person_with_root_meta.json")
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
@@ -366,7 +366,7 @@ internal class RetrofitIntegrationTest {
 
         // Convert back using response converter
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
         @Suppress("UNCHECKED_CAST")
@@ -392,7 +392,7 @@ internal class RetrofitIntegrationTest {
         """.trimIndent()
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
@@ -456,7 +456,7 @@ internal class RetrofitIntegrationTest {
         """.trimIndent()
 
         val responseBody = ResponseBody.create(
-            MediaType.get("application/json"),
+            MediaType.parse("application/json"),
             json
         )
 
