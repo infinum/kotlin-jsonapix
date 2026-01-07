@@ -57,8 +57,8 @@ internal class ComplexRelationshipsIntegrationTest {
         // Round-trip test
         val result = adapter.convertFromString(json)
         // The library may include myFavoriteDog in allMyDogs during serialization
-        assertTrue(result.data?.allMyDogs?.size!! >= 3, "Should have at least 3 dogs after round-trip")
-        assertEquals("Max", result.data?.myFavoriteDog?.name)
+        assertTrue(result.data.allMyDogs?.size!! >= 3, "Should have at least 3 dogs after round-trip")
+        assertEquals("Max", result.data.myFavoriteDog?.name)
     }
 
     @Test
@@ -190,17 +190,17 @@ internal class ComplexRelationshipsIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result)
-        assertNotNull(result.data?.personel, "Personnel should be populated")
-        assertEquals(2, result.data?.personel?.size, "Should have 2 employees")
-        assertEquals("Alice", result.data?.personel?.get(0)?.name)
-        assertEquals("Bob", result.data?.personel?.get(1)?.name)
+        assertNotNull(result.data.personel, "Personnel should be populated")
+        assertEquals(2, result.data.personel.size, "Should have 2 employees")
+        assertEquals("Alice", result.data.personel[0].name)
+        assertEquals("Bob", result.data.personel[1].name)
         
-        assertNotNull(result.data?.manager, "Manager should be populated")
-        assertEquals("Charlie", result.data?.manager?.name)
+        assertNotNull(result.data.manager, "Manager should be populated")
+        assertEquals("Charlie", result.data.manager.name)
         
-        assertNotNull(result.data?.address, "Address should be populated")
-        assertEquals("Main St", result.data?.address?.street)
-        assertEquals(123, result.data?.address?.number)
+        assertNotNull(result.data.address, "Address should be populated")
+        assertEquals("Main St", result.data.address.street)
+        assertEquals(123, result.data.address.number)
     }
 
     @Test
@@ -230,8 +230,8 @@ internal class ComplexRelationshipsIntegrationTest {
 
         assertNotNull(result.data)
         // The library may include myFavoriteDog in allMyDogs
-        assertTrue(result.data?.allMyDogs?.size!! >= 10, "Should have at least 10 dogs")
-        assertEquals("Dog1", result.data?.myFavoriteDog?.name)
+        assertTrue(result.data.allMyDogs?.size!! >= 10, "Should have at least 10 dogs")
+        assertEquals("Dog1", result.data.myFavoriteDog?.name)
     }
 
     @Test
@@ -295,25 +295,25 @@ internal class ComplexRelationshipsIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result)
-        assertEquals(4, result.data?.size, "Should have all 4 persons")
+        assertEquals(4, result.data.size, "Should have all 4 persons")
         
         // Verify person 1
-        assertNotNull(result.data?.get(0)?.data?.allMyDogs)
-        assertNotNull(result.data?.get(0)?.data?.myFavoriteDog)
+        assertNotNull(result.data[0].data.allMyDogs)
+        assertNotNull(result.data[0].data.myFavoriteDog)
         // The library may include myFavoriteDog in allMyDogs
-        assertTrue(result.data?.get(0)?.data?.allMyDogs?.size!! >= 2)
+        assertTrue(result.data[0].data.allMyDogs?.size!! >= 2)
         
         // Verify person 2
-        assertNotNull(result.data?.get(1)?.data?.allMyDogs)
-        assertNull(result.data?.get(1)?.data?.myFavoriteDog)
+        assertNotNull(result.data[1].data.allMyDogs)
+        assertNull(result.data[1].data.myFavoriteDog)
         
         // Verify person 3
-        assertNull(result.data?.get(2)?.data?.allMyDogs)
-        assertNotNull(result.data?.get(2)?.data?.myFavoriteDog)
+        assertNull(result.data[2].data.allMyDogs)
+        assertNotNull(result.data[2].data.myFavoriteDog)
         
         // Verify person 4
-        assertNull(result.data?.get(3)?.data?.allMyDogs)
-        assertNull(result.data?.get(3)?.data?.myFavoriteDog)
+        assertNull(result.data[3].data.allMyDogs)
+        assertNull(result.data[3].data.myFavoriteDog)
     }
 
     @Test
@@ -369,11 +369,11 @@ internal class ComplexRelationshipsIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result)
-        assertEquals(2, result.data?.size)
+        assertEquals(2, result.data.size)
         
         // Both persons should have the same dog
-        val dog1 = result.data?.get(0)?.data?.myFavoriteDog
-        val dog2 = result.data?.get(1)?.data?.myFavoriteDog
+        val dog1 = result.data[0].data.myFavoriteDog
+        val dog2 = result.data[1].data.myFavoriteDog
         
         assertNotNull(dog1)
         assertNotNull(dog2)
@@ -402,8 +402,8 @@ internal class ComplexRelationshipsIntegrationTest {
         val result = adapter.convertFromString(json)
         assertNotNull(result)
         // Empty list or null is acceptable depending on serialization behavior
-        assertTrue(result.data?.allMyDogs == null || result.data?.allMyDogs?.isEmpty() == true, "Should have empty list or null")
-        assertNull(result.data?.myFavoriteDog, "Should be null")
+        assertTrue(result.data.allMyDogs == null || result.data.allMyDogs.isNullOrEmpty(), "Should have empty list or null")
+        assertNull(result.data.myFavoriteDog, "Should be null")
     }
 
     @Test
@@ -479,8 +479,8 @@ internal class ComplexRelationshipsIntegrationTest {
         assertNotNull(json)
         
         val result = adapter.convertFromString(json)
-        assertNull(result.data?.allMyDogs)
-        assertNull(result.data?.myFavoriteDog)
+        assertNull(result.data.allMyDogs)
+        assertNull(result.data.myFavoriteDog)
     }
 
     @Test
@@ -515,10 +515,10 @@ internal class ComplexRelationshipsIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.data)
-        assertEquals(5, result.data?.personel?.size)
-        assertEquals("Manager", result.data?.manager?.name)
-        assertEquals("Tech Street", result.data?.address?.street)
-        assertEquals("Employee1", result.data?.personel?.get(0)?.name)
-        assertEquals("Employee5", result.data?.personel?.get(4)?.name)
+        assertEquals(5, result.data.personel.size)
+        assertEquals("Manager", result.data.manager.name)
+        assertEquals("Tech Street", result.data.address.street)
+        assertEquals("Employee1", result.data.personel[0].name)
+        assertEquals("Employee5", result.data.personel[4].name)
     }
 }

@@ -124,9 +124,9 @@ internal class AdapterFactoryIntegrationTest {
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result.data, "Data should not be null")
-        assertEquals("Jane", result.data?.name)
-        assertEquals("Smith", result.data?.surname)
-        assertEquals(25, result.data?.age)
+        assertEquals("Jane", result.data.name)
+        assertEquals("Smith", result.data.surname)
+        assertEquals(25, result.data.age)
     }
 
     @Test
@@ -141,8 +141,8 @@ internal class AdapterFactoryIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result, "Result should not be null")
-        assertEquals("Buddy", result.data?.name)
-        assertEquals(5, result.data?.age)
+        assertEquals("Buddy", result.data.name)
+        assertEquals(5, result.data.age)
     }
 
     @Test
@@ -177,9 +177,9 @@ internal class AdapterFactoryIntegrationTest {
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result.data, "Data should not be null")
-        assertEquals(2, result.data?.size, "Should have 2 persons")
-        assertEquals("Alice", result.data?.get(0)?.data?.name)
-        assertEquals("Bob", result.data?.get(1)?.data?.name)
+        assertEquals(2, result.data.size, "Should have 2 persons")
+        assertEquals("Alice", result.data[0].data.name)
+        assertEquals("Bob", result.data[1].data.name)
     }
 
     @Test
@@ -202,11 +202,11 @@ internal class AdapterFactoryIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result, "Result should not be null")
-        assertNotNull(result.data?.allMyDogs, "All dogs should not be null")
+        assertNotNull(result.data.allMyDogs, "All dogs should not be null")
         // The library may include the favorite dog in the allMyDogs list
-        assertTrue(result.data?.allMyDogs?.size!! >= 2, "Should have at least 2 dogs")
-        assertNotNull(result.data?.myFavoriteDog, "Favorite dog should not be null")
-        assertEquals("Max", result.data?.myFavoriteDog?.name)
+        assertTrue(result.data.allMyDogs?.size!! >= 2, "Should have at least 2 dogs")
+        assertNotNull(result.data.myFavoriteDog, "Favorite dog should not be null")
+        assertEquals("Max", result.data.myFavoriteDog?.name)
     }
 
     @Test
@@ -242,8 +242,8 @@ internal class AdapterFactoryIntegrationTest {
         val personResult = personAdapter.convertFromString(personJson)
         val dogResult = dogAdapter.convertFromString(dogJson)
 
-        assertEquals("John", personResult.data?.name)
-        assertEquals("Buddy", dogResult.data?.name)
+        assertEquals("John", personResult.data.name)
+        assertEquals("Buddy", dogResult.data.name)
     }
 
     @Test
@@ -284,6 +284,6 @@ internal class AdapterFactoryIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result)
-        assertNull(result.data?.myFavoriteDog, "Favorite dog should be null")
+        assertNull(result.data.myFavoriteDog, "Favorite dog should be null")
     }
 }

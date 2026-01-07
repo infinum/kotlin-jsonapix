@@ -195,8 +195,8 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result, "Should parse successfully ignoring unknown fields")
-        assertEquals("Alice", result.data?.name)
-        assertEquals("Smith", result.data?.surname)
+        assertEquals("Alice", result.data.name)
+        assertEquals("Smith", result.data.surname)
     }
 
     @Test
@@ -223,7 +223,7 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result, "Should parse valid items")
-        assertEquals(1, result.data?.size)
+        assertEquals(1, result.data.size)
     }
 
     @Test
@@ -290,8 +290,8 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result, "Should handle relationships without infinite loop")
-        assertNotNull(result.data?.myFavoriteDog)
-        assertEquals("Buddy", result.data?.myFavoriteDog?.name)
+        assertNotNull(result.data.myFavoriteDog)
+        assertEquals("Buddy", result.data.myFavoriteDog?.name)
     }
 
     @Test
@@ -334,7 +334,7 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result, "Should handle duplicate IDs")
-        assertNotNull(result.data?.allMyDogs)
+        assertNotNull(result.data.allMyDogs)
     }
 
     @Test
@@ -393,7 +393,7 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result, "Should handle deep nesting")
-        assertEquals("Deep", result.data?.name)
+        assertEquals("Deep", result.data.name)
     }
 
     @Test
@@ -418,8 +418,8 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result)
-        assertEquals("José", result.data?.name)
-        assertEquals("Müller", result.data?.surname)
+        assertEquals("José", result.data.name)
+        assertEquals("Müller", result.data.surname)
     }
 
     @Test
@@ -444,8 +444,8 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result)
-        assertTrue(result.data?.name?.contains("Boss") == true)
-        assertTrue(result.data?.surname?.contains("O'Brien") == true)
+        assertTrue(result.data.name?.contains("Boss") == true)
+        assertTrue(result.data.surname.contains("O'Brien"))
     }
 
     @Test
@@ -470,7 +470,7 @@ internal class ErrorHandlingIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result)
-        assertEquals(2147483647, result.data?.age)
+        assertEquals(2147483647, result.data.age)
     }
 
     @Test

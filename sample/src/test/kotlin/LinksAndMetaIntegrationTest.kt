@@ -68,7 +68,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.rootMeta)
-        assertEquals("ListOwner", (result.rootMeta as? PersonRootMeta)?.owner)
+        assertEquals("ListOwner", result.rootMeta?.owner)
     }
 
     @Test
@@ -80,7 +80,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result.rootMeta, "Root meta should be parsed")
-        assertEquals("Ali", (result.rootMeta as? PersonRootMeta)?.owner)
+        assertEquals("Ali", result.rootMeta?.owner)
     }
 
     // ========== RESOURCE OBJECT (DATA) META TESTS ==========
@@ -101,7 +101,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.resourceObjectMeta, "Resource meta should be present")
-        assertEquals("ResourceWriter", (result.resourceObjectMeta as? PersonResourceMeta)?.writer)
+        assertEquals("ResourceWriter", result.resourceObjectMeta?.writer)
     }
 
     @Test
@@ -113,7 +113,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result.resourceObjectMeta, "Resource meta should be parsed")
-        assertEquals("Ali", (result.resourceObjectMeta as? PersonResourceMeta)?.writer)
+        assertEquals("Ali", result.resourceObjectMeta?.writer)
     }
 
     @Test
@@ -133,9 +133,9 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.data)
-        assertEquals(1, result.data?.size)
-        assertNotNull(result.data?.get(0)?.resourceObjectMeta)
-        assertEquals("ItemWriter", (result.data?.get(0)?.resourceObjectMeta as? PersonResourceMeta)?.writer)
+        assertEquals(1, result.data.size)
+        assertNotNull(result.data[0].resourceObjectMeta)
+        assertEquals("ItemWriter", result.data[0].resourceObjectMeta?.writer)
     }
 
     // ========== RELATIONSHIPS META TESTS ==========
@@ -159,7 +159,7 @@ internal class LinksAndMetaIntegrationTest {
         // Relationship meta may or may not be preserved depending on serialization
         // The test verifies the library handles relationship meta
         assertNotNull(result, "Result should not be null")
-        assertEquals("Emma", result.data?.name)
+        assertEquals("Emma", result.data.name)
     }
 
     @Test
@@ -186,8 +186,8 @@ internal class LinksAndMetaIntegrationTest {
 
         // Relationship meta handling may vary - verify data integrity
         assertNotNull(result)
-        assertEquals("Frank", result.data?.name)
-        assertTrue(result.data?.allMyDogs?.size!! >= 2)
+        assertEquals("Frank", result.data.name)
+        assertTrue(result.data.allMyDogs?.size!! >= 2)
     }
 
     @Test
@@ -199,7 +199,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter!!.convertFromString(json)
 
         assertNotNull(result.relationshipsMeta)
-        assertEquals("Ali", (result.relationshipsMeta?.get("myFavoriteDog") as? PersonRelationshipMeta)?.user)
+        assertEquals("Ali", result.relationshipsMeta?.get("myFavoriteDog")?.user)
     }
 
     // ========== ALL META TYPES TOGETHER ==========
@@ -234,8 +234,8 @@ internal class LinksAndMetaIntegrationTest {
         // Meta handling may vary during round-trip - verify data integrity
         assertNotNull(result)
         assertNotNull(result.rootMeta)
-        assertEquals("Grace", result.data?.name)
-        assertTrue(result.data?.allMyDogs?.size!! >= 2)
+        assertEquals("Grace", result.data.name)
+        assertTrue(result.data.allMyDogs?.size!! >= 2)
     }
 
     @Test
@@ -250,10 +250,10 @@ internal class LinksAndMetaIntegrationTest {
         assertNotNull(result.resourceObjectMeta, "Resource meta should be present")
         assertNotNull(result.relationshipsMeta, "Relationships meta should be present")
 
-        assertEquals("root", (result.rootMeta as? PersonRootMeta)?.owner)
-        assertEquals("resource", (result.resourceObjectMeta as? PersonResourceMeta)?.writer)
-        assertEquals("relation1", (result.relationshipsMeta?.get("myFavoriteDog") as? PersonRelationshipMeta)?.user)
-        assertEquals("relation2", (result.relationshipsMeta?.get("allMyDogs") as? PersonRelationshipMeta)?.user)
+        assertEquals("root", result.rootMeta?.owner)
+        assertEquals("resource", result.resourceObjectMeta?.writer)
+        assertEquals("relation1", result.relationshipsMeta?.get("myFavoriteDog")?.user)
+        assertEquals("relation2", result.relationshipsMeta?.get("allMyDogs")?.user)
     }
 
     // ========== LINKS TESTS ==========
@@ -277,7 +277,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.rootLinks)
-        assertEquals("https://api.example.com/persons", (result.rootLinks as? DefaultLinks)?.self)
+        assertEquals("https://api.example.com/persons", result.rootLinks?.self)
     }
 
     @Test
@@ -296,7 +296,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.resourceObjectLinks)
-        assertEquals("https://api.example.com/persons/1", (result.resourceObjectLinks as? DefaultLinks)?.self)
+        assertEquals("https://api.example.com/persons/1", result.resourceObjectLinks?.self)
     }
 
     @Test
@@ -320,8 +320,8 @@ internal class LinksAndMetaIntegrationTest {
 
         // Relationship links handling may vary - verify data integrity
         assertNotNull(result)
-        assertEquals("Jack", result.data?.name)
-        assertEquals("Luna", result.data?.myFavoriteDog?.name)
+        assertEquals("Jack", result.data.name)
+        assertEquals("Luna", result.data.myFavoriteDog?.name)
     }
 
     @Test
@@ -363,10 +363,10 @@ internal class LinksAndMetaIntegrationTest {
         assertNotNull(result.resourceObjectLinks)
         assertNotNull(result.relationshipsLinks)
 
-        assertEquals("https://root.link.com", (result.rootLinks as? DefaultLinks)?.self)
-        assertEquals("https://resource.link.com", (result.resourceObjectLinks as? DefaultLinks)?.self)
-        assertEquals("https://relationship1.link.com", (result.relationshipsLinks?.get("myFavoriteDog") as? DefaultLinks)?.self)
-        assertEquals("https://relationship2.link.com", (result.relationshipsLinks?.get("allMyDogs") as? DefaultLinks)?.self)
+        assertEquals("https://root.link.com", result.rootLinks?.self)
+        assertEquals("https://resource.link.com", result.resourceObjectLinks?.self)
+        assertEquals("https://relationship1.link.com", result.relationshipsLinks?.get("myFavoriteDog")?.self)
+        assertEquals("https://relationship2.link.com", result.relationshipsLinks?.get("allMyDogs")?.self)
     }
 
     // ========== PAGINATION LINKS TESTS ==========
@@ -396,7 +396,7 @@ internal class LinksAndMetaIntegrationTest {
         val result = adapter.convertFromString(json)
 
         assertNotNull(result.rootLinks)
-        val links = result.rootLinks as? DefaultLinks
+        val links = result.rootLinks
         assertNotNull(links?.first)
         assertNotNull(links?.last)
         assertNotNull(links?.prev)
@@ -434,7 +434,7 @@ internal class LinksAndMetaIntegrationTest {
 
         assertNotNull(result, "Should parse successfully with null links")
         assertNotNull(result.data)
-        assertEquals("Jason", result.data?.name)
+        assertEquals("Jason", result.data.name)
     }
 
     // ========== COMBINED META AND LINKS ==========
@@ -481,8 +481,8 @@ internal class LinksAndMetaIntegrationTest {
         assertNotNull(result.relationshipsLinks)
         
         // Verify data integrity
-        assertEquals("Nancy", result.data?.name)
-        assertEquals("Oscar", result.data?.myFavoriteDog?.name)
+        assertEquals("Nancy", result.data.name)
+        assertEquals("Oscar", result.data.myFavoriteDog?.name)
     }
 
     private fun getFileAsString(filename: String): String {
