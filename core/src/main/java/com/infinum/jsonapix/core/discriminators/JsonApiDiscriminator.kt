@@ -1,3 +1,5 @@
+@file:SuppressWarnings("TooGenericExceptionCaught")
+
 package com.infinum.jsonapix.core.discriminators
 
 import com.infinum.jsonapix.core.common.JsonApiConstants

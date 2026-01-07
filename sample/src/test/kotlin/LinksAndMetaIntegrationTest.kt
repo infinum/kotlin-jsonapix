@@ -418,9 +418,9 @@ internal class LinksAndMetaIntegrationTest {
         val json = adapter!!.convertToString(model)
         val result = adapter.convertFromString(json)
 
-        // Meta fields may be null or empty map depending on implementation
-        assertTrue(result.rootMeta == null || result.rootMeta.toString() == "{}")
-        assertTrue(result.resourceObjectMeta == null || result.resourceObjectMeta.toString() == "{}")
+        // Meta fields should be null when not provided in JSON
+        assertNull(result.rootMeta)
+        assertNull(result.resourceObjectMeta)
         assertTrue(result.relationshipsMeta == null || result.relationshipsMeta?.isEmpty() == true)
     }
 

@@ -1,9 +1,8 @@
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
-import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonList
+import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonalError
-import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import kotlinx.serialization.SerializationException
@@ -48,8 +47,6 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        // According to JSON:API spec, errors and data should not coexist
-        // The adapter should handle error responses gracefully
         // According to JSON:API spec, errors and data should not coexist
         // The adapter should handle error responses by failing
         assertThrows<Exception> {
