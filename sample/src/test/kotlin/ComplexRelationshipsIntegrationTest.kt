@@ -402,7 +402,7 @@ internal class ComplexRelationshipsIntegrationTest {
         val result = adapter.convertFromString(json)
         assertNotNull(result)
         // Empty list or null is acceptable depending on serialization behavior
-        assertTrue(result.data.allMyDogs == null || result.data.allMyDogs.isNullOrEmpty(), "Should have empty list or null")
+        assertTrue(result.data.allMyDogs.isNullOrEmpty(), "Should have empty list or null")
         assertNull(result.data.myFavoriteDog, "Should be null")
     }
 
