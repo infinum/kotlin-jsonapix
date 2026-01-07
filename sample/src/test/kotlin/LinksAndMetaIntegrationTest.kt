@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
  * Integration tests for Links and Meta handling across all placement strategies.
  * Tests ROOT, DATA (resource object), and RELATIONSHIPS meta placements.
  */
+@Suppress("TooManyFunctions", "StringLiteralDuplication")
 internal class LinksAndMetaIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory

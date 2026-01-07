@@ -3,13 +3,12 @@ import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Person
-import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonList
+import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import okhttp3.MediaType
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -23,6 +22,7 @@ import java.io.InputStreamReader
  * Integration tests for Retrofit module components.
  * Tests the complete workflow of request/response body conversion with Retrofit.
  */
+@Suppress("StringLiteralDuplication")
 internal class RetrofitIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
@@ -35,7 +35,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() {
+    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(converterFactory)
@@ -52,7 +52,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() {
+    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(converterFactory)
@@ -70,7 +70,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() {
+    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() { // ktlint-disable max-line-length
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -197,7 +197,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() {
+    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() { // ktlint-disable max-line-length
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -219,7 +219,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() {
+    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() { // ktlint-disable max-line-length
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -271,7 +271,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() {
+    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() { // ktlint-disable max-line-length
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 

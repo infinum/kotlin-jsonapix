@@ -20,6 +20,7 @@ import org.junit.jupiter.api.assertThrows
  * Integration tests for error handling scenarios.
  * Tests how the library handles malformed JSON, errors, and edge cases.
  */
+@Suppress("TooManyFunctions")
 internal class ErrorHandlingIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory

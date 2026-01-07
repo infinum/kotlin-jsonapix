@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test
  * Integration tests for AdapterFactory.getAdapter() function.
  * Tests the complete workflow of adapter retrieval and type safety.
  */
+@Suppress("StringLiteralDuplication")
 internal class AdapterFactoryIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
