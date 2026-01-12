@@ -8,10 +8,9 @@ import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
+import java.io.InputStreamReader
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.assertThrows
-import java.io.InputStreamReader
 
 internal class TypeAdapterTest {
 
@@ -29,7 +28,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-            myFavoriteDog = Dog(name = "Bella", age = 1)
+            myFavoriteDog = Dog(name = "Bella", age = 1),
         )
 
         val personModel = PersonModel(
@@ -48,7 +47,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             personModel,
-            result
+            result,
         )
     }
 
@@ -59,7 +58,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = null,
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val personModel = PersonModel(
             data = person,
@@ -73,7 +72,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             personModel,
-            result
+            result,
         )
     }
 
@@ -84,7 +83,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = null,
-            myFavoriteDog = Dog(name = "Bella", age = 1)
+            myFavoriteDog = Dog(name = "Bella", age = 1),
         )
         val personModel = PersonModel(
             data = person,
@@ -101,7 +100,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             personModel,
-            result
+            result,
         )
     }
 
@@ -112,7 +111,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = null,
-            myFavoriteDog = Dog(name = "Bella", age = 1)
+            myFavoriteDog = Dog(name = "Bella", age = 1),
         )
         val personModel = PersonModel(
             person,
@@ -128,7 +127,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             personModel,
-            result
+            result,
         )
     }
 
@@ -139,7 +138,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val personModel = PersonModel(
             data = person,
@@ -156,7 +155,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             personModel,
-            result
+            result,
         )
     }
 
@@ -167,7 +166,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val personModel = PersonModel(person)
 
@@ -177,15 +176,23 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             personModel,
-            result
+            result,
         )
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is a null relationship data in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
+    fun `given that there is a null relationship data in response type adapter Person convertFromString should handle it gracefully`() {
         val response = getFileAsString("person_invalid_relationship_data.json")
 
-        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
+        val result = typeAdapter?.convertFromString(response)
+
+        // Verify that null relationship data is handled gracefully
+        Assertions.assertNotNull(result)
+        Assertions.assertEquals("Jason", result?.data?.name)
+        Assertions.assertEquals("Apix", result?.data?.surname)
+        Assertions.assertEquals(28, result?.data?.age)
+        Assertions.assertNull(result?.data?.myFavoriteDog) // Should be null per JSON:API spec
+        Assertions.assertEquals(2, result?.data?.allMyDogs?.size) // Should have 2 dogs
     }
 
     @org.junit.jupiter.api.Test
@@ -195,7 +202,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("0") }, Dog(name = "Bongo", age = 2).apply { setId("0") }),
-            myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
+            myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") },
         ).apply {
             setId("0")
         }
@@ -209,7 +216,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -233,7 +240,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -244,7 +251,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = null,
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
 
         val model = PersonModel(
@@ -257,7 +264,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -268,7 +275,7 @@ internal class TypeAdapterTest {
             surname = "Apix",
             age = 28,
             allMyDogs = listOf(Dog(name = "Bella", age = 1).apply { setId("1") }, Dog(name = "Bongo", age = 2).apply { setId("2") }),
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
 
         val model = PersonModel(
@@ -281,10 +288,9 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
-
 
     @org.junit.jupiter.api.Test
     fun `given that a response that has a root meta, should generate a Person with PersonRootMeta`() {
@@ -308,7 +314,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             model.rootMeta,
-            result?.rootMeta
+            result?.rootMeta,
         )
     }
 
@@ -334,7 +340,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             model.resourceObjectMeta,
-            result?.resourceObjectMeta
+            result?.resourceObjectMeta,
         )
     }
 
@@ -351,7 +357,7 @@ internal class TypeAdapterTest {
 
         val model = PersonModel(
             data = person,
-            relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta)
+            relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
         )
 
         val response = getFileAsString("person_with_one_rel_meta.json")
@@ -360,7 +366,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             model.relationshipsMeta,
-            result?.relationshipsMeta
+            result?.relationshipsMeta,
         )
     }
 
@@ -381,7 +387,7 @@ internal class TypeAdapterTest {
             relationshipsMeta = mapOf(
                 "myFavoriteDog" to firstMeta,
                 "allMyDogs" to secondMeta,
-            )
+            ),
         )
 
         val response = getFileAsString("person_with_many_rel_meta.json")
@@ -390,7 +396,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             model.relationshipsMeta,
-            result?.relationshipsMeta
+            result?.relationshipsMeta,
         )
     }
 
@@ -416,7 +422,7 @@ internal class TypeAdapterTest {
             relationshipsMeta = mapOf(
                 "myFavoriteDog" to relationship1Meta,
                 "allMyDogs" to relationship2Meta,
-            )
+            ),
         )
 
         val response = getFileAsString("person_with_all_metas.json")
@@ -425,7 +431,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             model,
-            result
+            result,
         )
     }
 
@@ -451,7 +457,7 @@ internal class TypeAdapterTest {
             relationshipsLinks = mapOf(
                 "myFavoriteDog" to relationship1Links,
                 "allMyDogs" to relationship2Links,
-            )
+            ),
         )
 
         val response = getFileAsString("person_with_all_links.json")
@@ -460,7 +466,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             model,
-            result
+            result,
         )
     }
 
@@ -486,7 +492,7 @@ internal class TypeAdapterTest {
             relationshipsMeta = mapOf(
                 "myFavoriteDog" to relationship1Meta,
                 "allMyDogs" to relationship2Meta,
-            )
+            ),
         )
 
         val response = getFileAsString("person_with_all_meta_types_encode.json")
@@ -495,7 +501,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -521,7 +527,7 @@ internal class TypeAdapterTest {
             relationshipsLinks = mapOf(
                 "myFavoriteDog" to relationship1Links,
                 "allMyDogs" to relationship2Links,
-            )
+            ),
         )
 
         val response = getFileAsString("person_with_all_links_types_encode.json")
@@ -530,7 +536,7 @@ internal class TypeAdapterTest {
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
     private fun getFileAsString(filename: String): String {
