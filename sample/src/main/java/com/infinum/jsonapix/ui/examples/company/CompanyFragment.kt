@@ -10,10 +10,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class CompanyFragment : BaseFragment<CompanyState, CompanyEvent>() {
 
-    companion object {
-        fun newInstance() = CompanyFragment()
-    }
-
     override val layoutRes: Int = R.layout.fragment_company
 
     override val binding by viewBinding(FragmentCompanyBinding::bind)
@@ -23,4 +19,8 @@ class CompanyFragment : BaseFragment<CompanyState, CompanyEvent>() {
     override fun handleState(state: CompanyState) = Unit
 
     override fun handleEvent(event: CompanyEvent) = Unit
+
+    companion object {
+        fun newInstance() = CompanyFragment()
+    }
 }

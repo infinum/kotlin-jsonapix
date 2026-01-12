@@ -29,11 +29,12 @@ internal object RelationshipsSpecBuilder {
     private val serializableClassName = Serializable::class.asClassName()
     private val serialNameTypeName = SerialName::class.asTypeName()
 
+    @Suppress("LongMethod", "LongParameterList")
     fun build(
         className: ClassName,
         type: String,
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>
+        manyRelationships: List<PropertySpec>,
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 
@@ -62,7 +63,7 @@ internal object RelationshipsSpecBuilder {
                     .addSerialNameAnnotation(it)
                     .initializer(it.name)
                     .build()
-            }
+            },
         )
 
         val params = mapPropertiesToParams(properties)
@@ -74,14 +75,14 @@ internal object RelationshipsSpecBuilder {
             .addAnnotation(
                 Specs.getSerialNameSpec(
                     JsonApiConstants.Prefix.RELATIONSHIPS.withName(
-                        type
-                    )
-                )
+                        type,
+                    ),
+                ),
             )
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(params)
-                    .build()
+                    .build(),
             )
             .addType(
                 TypeSpec.companionObjectBuilder()
@@ -90,10 +91,10 @@ internal object RelationshipsSpecBuilder {
                             className,
                             generatedName,
                             oneRelationships,
-                            manyRelationships
-                        )
+                            manyRelationships,
+                        ),
                     )
-                    .build()
+                    .build(),
             )
             .addProperties(properties)
             .addProperty(linksPropertySpec(oneRelationships, manyRelationships))
@@ -120,12 +121,12 @@ internal object RelationshipsSpecBuilder {
         }
     }
 
-    @SuppressWarnings("SpreadOperator")
+    @SuppressWarnings("SpreadOperator", "StringLiteralDuplication")
     private fun fromOriginalObjectSpec(
         originalClass: ClassName,
         generatedName: String,
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>
+        manyRelationships: List<PropertySpec>,
     ): FunSpec {
         val constructorStringBuilder = StringBuilder()
         val builderArgs = mutableListOf<Any>(generatedName)
@@ -133,12 +134,12 @@ internal object RelationshipsSpecBuilder {
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
-                        "?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                        "?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
                 )
             } else {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}." +
-                        "toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())"
+                        "toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
                 )
             }
 
@@ -154,12 +155,12 @@ internal object RelationshipsSpecBuilder {
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
-                        "?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
+                        "?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })",
                 )
             } else {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
-                        ".toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })"
+                        ".toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })",
                 )
             }
             builderArgs.add(getTypeOfRelationship(property))
@@ -170,7 +171,7 @@ internal object RelationshipsSpecBuilder {
 
         return FunSpec.builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
             .addParameter(
-                ParameterSpec.builder("originalObject", originalClass).build()
+                ParameterSpec.builder("originalObject", originalClass).build(),
             )
             .addStatement("return %L($constructorStringBuilder)", *builderArgs.toTypedArray())
             .returns(ClassName.bestGuess(generatedName))
@@ -179,7 +180,7 @@ internal object RelationshipsSpecBuilder {
 
     private fun linksPropertySpec(
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>
+        manyRelationships: List<PropertySpec>,
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
@@ -204,9 +205,9 @@ internal object RelationshipsSpecBuilder {
                 .asClassName()
                 .parameterizedBy(
                     String::class.asTypeName(),
-                    Links::class.asTypeName().copy(nullable = true)
+                    Links::class.asTypeName().copy(nullable = true),
                 ),
-            KModifier.OVERRIDE
+            KModifier.OVERRIDE,
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
         return builder.initializer(returnStatement).build()
@@ -214,7 +215,7 @@ internal object RelationshipsSpecBuilder {
 
     private fun metaPropertySpec(
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>
+        manyRelationships: List<PropertySpec>,
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
@@ -239,9 +240,9 @@ internal object RelationshipsSpecBuilder {
                 .asClassName()
                 .parameterizedBy(
                     String::class.asTypeName(),
-                    Meta::class.asTypeName().copy(nullable = true)
+                    Meta::class.asTypeName().copy(nullable = true),
                 ),
-            KModifier.OVERRIDE
+            KModifier.OVERRIDE,
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
         return builder.initializer(returnStatement).build()

@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PersonViewModel @Inject constructor(
     private val sampleApiService: SampleApiService,
-    private val jsonAssetReader: JsonAssetReader
+    private val jsonAssetReader: JsonAssetReader,
 ) : BaseViewModel<PersonState, PersonEvent>() {
 
     init {
@@ -34,7 +34,7 @@ class PersonViewModel @Inject constructor(
                     personModel.rootLinks?.self,
                     personModel.resourceObjectLinks?.self,
                     personModel.relationshipsLinks?.values?.firstOrNull()?.self,
-                    personModel.rootMeta?.owner
+                    personModel.rootMeta?.owner,
                 )
             } catch (t: Throwable) {
                 hideLoading()
@@ -67,7 +67,7 @@ class PersonViewModel @Inject constructor(
                     (personsData.rootLinks as DefaultLinks).self,
                     (persons.firstOrNull()?.resourceObjectLinks as? DefaultLinks)?.self,
                     (persons.firstOrNull()?.relationshipsLinks as? Map<String, DefaultLinks>)?.values?.firstOrNull()?.self,
-                    personsData.rootMeta?.owner
+                    personsData.rootMeta?.owner,
                 )
             } catch (t: Throwable) {
                 Log.e("Error", "Test", t)

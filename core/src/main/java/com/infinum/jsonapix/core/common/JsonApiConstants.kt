@@ -105,7 +105,7 @@ object JsonApiConstants {
         val JSON_X = arrayOf(
             "core.JsonApiX",
             "core.resources.ResourceObject",
-            "core.JsonApiModel"
+            "core.JsonApiModel",
         )
 
         val KOTLINX = arrayOf(
@@ -113,26 +113,26 @@ object JsonApiConstants {
             "json.jsonObject",
             "encodeToString",
             "decodeFromString",
-            "PolymorphicSerializer"
+            "PolymorphicSerializer",
         )
 
         val KOTLINX_MODULES = arrayOf(
             "polymorphic",
             "contextual",
             "subclass",
-            "SerializersModule"
+            "SerializersModule",
         )
 
         val CORE_EXTENSIONS = arrayOf(
             "JsonApiDiscriminator",
-            "TypeExtractor"
+            "TypeExtractor",
         )
 
         const val ERRORS = "Errors"
 
         val RELATIONSHIP_EXTENSIONS = arrayOf(
             "toOneRelationshipModel",
-            "toManyRelationshipModel"
+            "toManyRelationshipModel",
         )
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"

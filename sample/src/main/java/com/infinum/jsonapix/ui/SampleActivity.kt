@@ -15,10 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SampleActivity : BaseActivity<Unit, Unit>() {
 
-    companion object {
-        private val TITLES = listOf("Person", "Dog", "Company", "Error")
-    }
-
     override val viewModel: BaseViewModel<Unit, Unit>? = null
 
     override val binding by viewBinding(ActivitySampleBinding::inflate)
@@ -35,11 +31,15 @@ class SampleActivity : BaseActivity<Unit, Unit>() {
                 PersonFragment.newInstance(),
                 DogFragment.newInstance(),
                 CompanyFragment.newInstance(),
-                ErrorFragment.newInstance()
-            )
+                ErrorFragment.newInstance(),
+            ),
         )
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             tab.text = TITLES[position]
         }.attach()
+    }
+
+    companion object {
+        private val TITLES = listOf("Person", "Dog", "Company", "Error")
     }
 }

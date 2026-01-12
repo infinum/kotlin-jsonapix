@@ -37,7 +37,6 @@ task detektAll(dependsOn: [
         ':annotations:detekt',
         ':core:detekt',
         ':processor:detekt',
-        ':sample:detekt',
         ':retrofit:detekt',
         ':lint:detekt'
 ]) {

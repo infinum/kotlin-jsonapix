@@ -10,10 +10,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DogFragment : BaseFragment<DogState, DogEvent>() {
 
-    companion object {
-        fun newInstance() = DogFragment()
-    }
-
     override val layoutRes: Int = R.layout.fragment_dog
 
     override val binding by viewBinding(FragmentDogBinding::bind)
@@ -23,4 +19,8 @@ class DogFragment : BaseFragment<DogState, DogEvent>() {
     override fun handleState(state: DogState) = Unit
 
     override fun handleEvent(event: DogEvent) = Unit
+
+    companion object {
+        fun newInstance() = DogFragment()
+    }
 }

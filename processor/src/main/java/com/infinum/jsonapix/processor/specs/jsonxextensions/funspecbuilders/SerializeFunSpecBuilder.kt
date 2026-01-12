@@ -16,7 +16,9 @@ import kotlinx.serialization.PolymorphicSerializer
 internal object SerializeFunSpecBuilder {
 
     fun build(originalClass: ClassName, isNullable: Boolean): FunSpec {
-        val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
+        val modelClass = ClassName.bestGuess(
+            originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+        )
 
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
@@ -26,13 +28,13 @@ internal object SerializeFunSpecBuilder {
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class)
                 .build(),
             ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class)
-                .build()
+                .build(),
         )
 
         val metaParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build()
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
         )
 
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
@@ -43,7 +45,7 @@ internal object SerializeFunSpecBuilder {
             .returns(String::class)
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
             .addStatement(
-                if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type"
+                if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type",
             )
             .addStatement(
                 "val discriminator = %T(type, %L, %L, %L, %L, %L, %L, %L)",
@@ -54,17 +56,17 @@ internal object SerializeFunSpecBuilder {
                 JsonApiConstants.Members.ROOT_META,
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
+                JsonApiConstants.Keys.ERRORS,
             )
             .addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",
                 formatMember,
                 encodeMember,
                 polymorphicSerializerClass,
-                jsonXClass
+                jsonXClass,
             )
             .addStatement(
-                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()"
+                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()",
             )
             .build()
     }

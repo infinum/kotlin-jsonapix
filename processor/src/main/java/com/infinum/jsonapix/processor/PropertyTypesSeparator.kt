@@ -15,22 +15,15 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
         processClassParameters()
     }
 
-    fun getPrimitiveProperties(): List<PropertySpec> {
-        return primitiveFields.toList()
-    }
+    fun getPrimitiveProperties(): List<PropertySpec> = primitiveFields.toList()
 
-    fun getCompositeProperties(): List<PropertySpec> {
-        return compositeFields.toList()
-    }
+    fun getCompositeProperties(): List<PropertySpec> = compositeFields.toList()
 
-    fun getManyRelationships(): List<PropertySpec> {
-        return compositeFields.filter { it.isManyRelationship() }
-    }
+    fun getManyRelationships(): List<PropertySpec> =
+        compositeFields.filter { it.isManyRelationship() }
 
-    fun getOneRelationships(): List<PropertySpec> {
-
-        return compositeFields.filter { it.isOneRelationship() }
-    }
+    fun getOneRelationships(): List<PropertySpec> =
+        compositeFields.filter { it.isOneRelationship() }
 
     private fun processClassParameters() {
         classType.propertySpecs.filter { !it.delegated }.forEach { property ->

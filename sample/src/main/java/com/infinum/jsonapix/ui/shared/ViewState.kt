@@ -5,4 +5,4 @@ sealed interface LoadingState {
     object Loading : LoadingState
 }
 
-class ErrorEvent(val message: String)
+data class ErrorEvent(val message: String)

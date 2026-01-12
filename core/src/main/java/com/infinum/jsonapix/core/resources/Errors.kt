@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Errors<out ErrorModel : Error>(
-    @SerialName("errors") val errors: List<ErrorModel>
+    @SerialName("errors") val errors: List<ErrorModel>,
 )
 
 @Serializable
 data class DefaultErrors(
-    @SerialName("errors") val errors: List<DefaultError>
+    @SerialName("errors") val errors: List<DefaultError>,
 )

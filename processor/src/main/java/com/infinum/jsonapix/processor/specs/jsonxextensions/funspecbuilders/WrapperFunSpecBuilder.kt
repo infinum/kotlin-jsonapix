@@ -12,7 +12,9 @@ internal object WrapperFunSpecBuilder {
         wrapperClass: ClassName,
         includedListStatement: String?,
     ): FunSpec {
-        val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
+        val modelClass = ClassName.bestGuess(
+            originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+        )
 
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
@@ -35,7 +37,7 @@ internal object WrapperFunSpecBuilder {
             .returns(wrapperClass)
             .addStatement(
                 format = returnStatement.toString(),
-                args = builderArgs.toTypedArray()
+                args = builderArgs.toTypedArray(),
             )
             .build()
     }

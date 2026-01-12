@@ -12,7 +12,9 @@ internal object WrapperListFunSpecBuilder {
         wrapperClass: ClassName,
         includedListStatement: String?,
     ): FunSpec {
-        val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST))
+        val modelClass = ClassName.bestGuess(
+            originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
+        )
 
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
@@ -22,7 +24,8 @@ internal object WrapperListFunSpecBuilder {
                 meta = rootMeta,
                 links = rootLinks,
                 errors = errors,
-                data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()""".trimMargin()
+                data =data?.map { it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }?.filterNotNull().orEmpty()
+            """.trimMargin(),
         )
 
         if (includedListStatement != null) {
@@ -35,7 +38,7 @@ internal object WrapperListFunSpecBuilder {
             .returns(wrapperClass)
             .addStatement(
                 format = returnStatement.toString(),
-                args = builderArgs.toTypedArray()
+                args = builderArgs.toTypedArray(),
             )
             .build()
     }
