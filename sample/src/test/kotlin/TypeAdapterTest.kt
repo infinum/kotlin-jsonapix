@@ -10,7 +10,6 @@ import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.assertThrows
 import java.io.InputStreamReader
 
 internal class TypeAdapterTest {
@@ -182,10 +181,18 @@ internal class TypeAdapterTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is a null relationship data in response type adapter Person convertFromString should throw an IllegalArgumentException`() {
+    fun `given that there is a null relationship data in response type adapter Person convertFromString should handle it gracefully`() {
         val response = getFileAsString("person_invalid_relationship_data.json")
 
-        assertThrows<IllegalArgumentException> { typeAdapter?.convertFromString(response) }
+        val result = typeAdapter?.convertFromString(response)
+
+        // Verify that null relationship data is handled gracefully
+        Assertions.assertNotNull(result)
+        Assertions.assertEquals("Jason", result?.data?.name)
+        Assertions.assertEquals("Apix", result?.data?.surname)
+        Assertions.assertEquals(28, result?.data?.age)
+        Assertions.assertNull(result?.data?.myFavoriteDog) // Should be null per JSON:API spec
+        Assertions.assertEquals(2, result?.data?.allMyDogs?.size) // Should have 2 dogs
     }
 
     @org.junit.jupiter.api.Test

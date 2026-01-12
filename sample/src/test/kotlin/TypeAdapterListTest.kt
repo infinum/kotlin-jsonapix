@@ -12,7 +12,6 @@ import com.infinum.jsonapix.data.models.TypeAdapterList_Person
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.io.InputStreamReader
 
 internal class TypeAdapterListTest {
@@ -328,10 +327,24 @@ internal class TypeAdapterListTest {
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is a null relationship data in response type adapter Person list convertFromString should throw an IllegalArgumentException`() {
+    fun `given that there is a null relationship data in response type adapter Person list convertFromString should handle it gracefully`() {
         val response = getFileAsString("person_list_invalid_relationship_data.json")
 
-        assertThrows<IllegalArgumentException> { typeListAdapter?.convertFromString(response) }
+        val result = typeListAdapter?.convertFromString(response)
+
+        // Verify that null relationship data is handled gracefully
+        Assertions.assertNotNull(result)
+        Assertions.assertEquals(2, result?.data?.size)
+
+        // First person should have myFavoriteDog set
+        Assertions.assertEquals("Jason", result?.data?.get(0)?.data?.name)
+        Assertions.assertNotNull(result?.data?.get(0)?.data?.myFavoriteDog)
+        Assertions.assertEquals(2, result?.data?.get(0)?.data?.allMyDogs?.size)
+
+        // Second person should have myFavoriteDog as null (per JSON:API spec, null is valid)
+        Assertions.assertEquals("Jasminka", result?.data?.get(1)?.data?.name)
+        Assertions.assertNull(result?.data?.get(1)?.data?.myFavoriteDog) // null is acceptable
+        Assertions.assertEquals(2, result?.data?.get(1)?.data?.allMyDogs?.size)
     }
 
     @org.junit.jupiter.api.Test
