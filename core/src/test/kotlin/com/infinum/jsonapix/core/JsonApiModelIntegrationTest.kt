@@ -38,7 +38,7 @@ internal class JsonApiModelIntegrationTest {
         val model = TestModel()
         val expectedType = "test-resource"
 
-        model.setType(expectedType)
+        model.setType(type = expectedType)
         val result = model.type()
 
         assertEquals(expectedType, result, "Type should match the set value")
@@ -49,7 +49,7 @@ internal class JsonApiModelIntegrationTest {
         val model = TestModel()
         val expectedId = "123"
 
-        model.setId(expectedId)
+        model.setId(id = expectedId)
         val result = model.id()
 
         assertEquals(expectedId, result, "ID should match the set value")
@@ -61,8 +61,8 @@ internal class JsonApiModelIntegrationTest {
         val expectedType = "article"
         val expectedId = "456"
 
-        model.setType(expectedType)
-        model.setId(expectedId)
+        model.setType(type = expectedType)
+        model.setId(id = expectedId)
 
         assertEquals(expectedType, model.type(), "Type should match the set value")
         assertEquals(expectedId, model.id(), "ID should match the set value")
@@ -74,10 +74,10 @@ internal class JsonApiModelIntegrationTest {
         val initialType = "person"
         val updatedType = "user"
 
-        model.setType(initialType)
+        model.setType(type = initialType)
         assertEquals(initialType, model.type())
 
-        model.setType(updatedType)
+        model.setType(type = updatedType)
         val result = model.type()
 
         assertEquals(updatedType, result, "Type should be updated to new value")
@@ -90,10 +90,10 @@ internal class JsonApiModelIntegrationTest {
         val initialId = "100"
         val updatedId = "200"
 
-        model.setId(initialId)
+        model.setId(id = initialId)
         assertEquals(initialId, model.id())
 
-        model.setId(updatedId)
+        model.setId(id = updatedId)
         val result = model.id()
 
         assertEquals(updatedId, result, "ID should be updated to new value")
@@ -103,10 +103,10 @@ internal class JsonApiModelIntegrationTest {
     @Test
     fun `given a model when setting type to null should clear type`() {
         val model = TestModel()
-        model.setType("some-type")
+        model.setType(type = "some-type")
         assertNotNull(model.type())
 
-        model.setType(null)
+        model.setType(type = null)
         val result = model.type()
 
         assertNull(result, "Type should be null after clearing")
@@ -115,10 +115,10 @@ internal class JsonApiModelIntegrationTest {
     @Test
     fun `given a model when setting id to null should clear id`() {
         val model = TestModel()
-        model.setId("some-id")
+        model.setId(id = "some-id")
         assertNotNull(model.id())
 
-        model.setId(null)
+        model.setId(id = null)
         val result = model.id()
 
         assertNull(result, "ID should be null after clearing")
@@ -129,10 +129,10 @@ internal class JsonApiModelIntegrationTest {
         val model1 = TestModel()
         val model2 = TestModel()
 
-        model1.setType("person")
-        model1.setId("1")
-        model2.setType("article")
-        model2.setId("2")
+        model1.setType(type = "person")
+        model1.setId(id = "1")
+        model2.setType(type = "article")
+        model2.setId(id = "2")
 
         assertEquals("person", model1.type(), "Model 1 should maintain its own type")
         assertEquals("1", model1.id(), "Model 1 should maintain its own ID")
@@ -145,7 +145,7 @@ internal class JsonApiModelIntegrationTest {
         val model = TestModel()
         val specialType = "complex-type_with-special.chars"
 
-        model.setType(specialType)
+        model.setType(type = specialType)
         val result = model.type()
 
         assertEquals(specialType, result, "Should handle special characters in type")
@@ -156,7 +156,7 @@ internal class JsonApiModelIntegrationTest {
         val model = TestModel()
         val specialId = "uuid-123e4567-e89b-12d3-a456-426614174000"
 
-        model.setId(specialId)
+        model.setId(id = specialId)
         val result = model.id()
 
         assertEquals(specialId, result, "Should handle special characters in ID")
@@ -166,7 +166,7 @@ internal class JsonApiModelIntegrationTest {
     fun `given a model when setting empty string type should store empty string`() {
         val model = TestModel()
 
-        model.setType("")
+        model.setType(type = "")
         val result = model.type()
 
         assertEquals("", result, "Should store empty string as type")
@@ -176,7 +176,7 @@ internal class JsonApiModelIntegrationTest {
     fun `given a model when setting empty string id should store empty string`() {
         val model = TestModel()
 
-        model.setId("")
+        model.setId(id = "")
         val result = model.id()
 
         assertEquals("", result, "Should store empty string as ID")
@@ -187,7 +187,7 @@ internal class JsonApiModelIntegrationTest {
         val model = TestModel()
         val longType = "a".repeat(1000)
 
-        model.setType(longType)
+        model.setType(type = longType)
         val result = model.type()
 
         assertEquals(longType, result, "Should handle very long type strings")
@@ -199,7 +199,7 @@ internal class JsonApiModelIntegrationTest {
         val model = TestModel()
         val longId = "1".repeat(1000)
 
-        model.setId(longId)
+        model.setId(id = longId)
         val result = model.id()
 
         assertEquals(longId, result, "Should handle very long ID strings")
@@ -210,9 +210,9 @@ internal class JsonApiModelIntegrationTest {
     fun `given a model when setting type multiple times should always use latest value`() {
         val model = TestModel()
 
-        model.setType("type1")
-        model.setType("type2")
-        model.setType("type3")
+        model.setType(type = "type1")
+        model.setType(type = "type2")
+        model.setType(type = "type3")
         val result = model.type()
 
         assertEquals("type3", result, "Should use the latest set value")
@@ -222,9 +222,9 @@ internal class JsonApiModelIntegrationTest {
     fun `given a model when setting id multiple times should always use latest value`() {
         val model = TestModel()
 
-        model.setId("id1")
-        model.setId("id2")
-        model.setId("id3")
+        model.setId(id = "id1")
+        model.setId(id = "id2")
+        model.setId(id = "id3")
         val result = model.id()
 
         assertEquals("id3", result, "Should use the latest set value")
@@ -233,10 +233,10 @@ internal class JsonApiModelIntegrationTest {
     @Test
     fun `given a model with type and id when clearing one should not affect the other`() {
         val model = TestModel()
-        model.setType("article")
-        model.setId("123")
+        model.setType(type = "article")
+        model.setId(id = "123")
 
-        model.setType(null)
+        model.setType(type = null)
 
         assertNull(model.type(), "Type should be cleared")
         assertEquals("123", model.id(), "ID should remain unchanged")
@@ -245,10 +245,10 @@ internal class JsonApiModelIntegrationTest {
     @Test
     fun `given a model with type and id when clearing id should not affect type`() {
         val model = TestModel()
-        model.setType("article")
-        model.setId("123")
+        model.setType(type = "article")
+        model.setId(id = "123")
 
-        model.setId(null)
+        model.setId(id = null)
 
         assertEquals("article", model.type(), "Type should remain unchanged")
         assertNull(model.id(), "ID should be cleared")

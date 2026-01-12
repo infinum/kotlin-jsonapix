@@ -93,7 +93,7 @@ internal class AdapterFactoryIntegrationTest {
         )
         val model = PersonModel(data = person)
 
-        val json = adapter!!.convertToString(model)
+        val json = adapter!!.convertToString(input = model)
 
         assertNotNull(json, "JSON should not be null")
         assertTrue(json.contains("\"name\":\"John\""), "JSON should contain name")
@@ -119,7 +119,7 @@ internal class AdapterFactoryIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result.data, "Data should not be null")
@@ -136,8 +136,8 @@ internal class AdapterFactoryIntegrationTest {
         val dog = Dog(name = "Buddy", age = 5)
         val model = DogModel(data = dog)
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result, "Result should not be null")
         assertEquals("Buddy", result.data.name)
@@ -172,7 +172,7 @@ internal class AdapterFactoryIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result.data, "Data should not be null")
@@ -186,19 +186,19 @@ internal class AdapterFactoryIntegrationTest {
         val adapter: TypeAdapter<PersonModel>? = factory.getAdapter()
         assertNotNull(adapter)
 
-        val dog1 = Dog(name = "Max", age = 3).apply { setId("1") }
-        val dog2 = Dog(name = "Rex", age = 5).apply { setId("2") }
+        val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val dog2 = Dog(name = "Rex", age = 5).apply { setId(id = "2") }
         val person = Person(
             name = "Owner",
             surname = "Smith",
             age = 40,
             allMyDogs = listOf(dog1, dog2),
             myFavoriteDog = dog1,
-        ).apply { setId("100") }
+        ).apply { setId(id = "100") }
         val model = PersonModel(data = person)
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result.data.allMyDogs, "All dogs should not be null")
@@ -210,7 +210,7 @@ internal class AdapterFactoryIntegrationTest {
 
     @Test
     fun `given a TypeAdapterFactory when getting adapter using KClass should work correctly`() {
-        val adapter = factory.getAdapter(PersonModel::class)
+        val adapter = factory.getAdapter(type = PersonModel::class)
 
         assertNotNull(adapter, "Adapter should not be null when using KClass")
     }
@@ -224,22 +224,22 @@ internal class AdapterFactoryIntegrationTest {
         assertNotNull(dogAdapter)
 
         // Create test data
-        val person = Person("John", "Doe", 30, null, null)
+        val person = Person(name = "John", surname = "Doe", age = 30, allMyDogs = null, myFavoriteDog = null)
         val personModel = PersonModel(data = person)
-        val dog = Dog("Buddy", 5)
+        val dog = Dog(name = "Buddy", age = 5)
         val dogModel = DogModel(data = dog)
 
         // Serialize both concurrently
-        val personJson = personAdapter!!.convertToString(personModel)
-        val dogJson = dogAdapter!!.convertToString(dogModel)
+        val personJson = personAdapter!!.convertToString(input = personModel)
+        val dogJson = dogAdapter!!.convertToString(input = dogModel)
 
         // Verify both work independently
         assertTrue(personJson.contains("John"))
         assertTrue(dogJson.contains("Buddy"))
 
         // Deserialize both
-        val personResult = personAdapter.convertFromString(personJson)
-        val dogResult = dogAdapter.convertFromString(dogJson)
+        val personResult = personAdapter.convertFromString(input = personJson)
+        val dogResult = dogAdapter.convertFromString(input = dogJson)
 
         assertEquals("John", personResult.data.name)
         assertEquals("Buddy", dogResult.data.name)
@@ -251,7 +251,7 @@ internal class AdapterFactoryIntegrationTest {
         assertNotNull(adapter)
 
         val emptyList = PersonList(data = emptyList())
-        val json = adapter!!.convertToString(emptyList)
+        val json = adapter!!.convertToString(input = emptyList)
 
         assertNotNull(json)
         assertTrue(json.contains("\"data\":[]"), "Should contain empty data array")
@@ -280,7 +280,7 @@ internal class AdapterFactoryIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result)
         assertNull(result.data.myFavoriteDog, "Favorite dog should be null")

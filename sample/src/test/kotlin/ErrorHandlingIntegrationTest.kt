@@ -50,7 +50,7 @@ internal class ErrorHandlingIntegrationTest {
         // According to JSON:API spec, errors and data should not coexist
         // The adapter should handle error responses by failing
         assertThrows<Exception> {
-            adapter!!.convertFromString(json)
+            adapter!!.convertFromString(input = json)
         }
     }
 
@@ -67,7 +67,7 @@ internal class ErrorHandlingIntegrationTest {
 
         // Parsing null data should fail as it doesn't conform to expected structure
         assertThrows<Exception> {
-            adapter!!.convertFromString(json)
+            adapter!!.convertFromString(input = json)
         }
     }
 
@@ -89,7 +89,7 @@ internal class ErrorHandlingIntegrationTest {
 
         // Missing required fields (surname, age) should result in a parsing exception
         assertThrows<Exception> {
-            adapter!!.convertFromString(json)
+            adapter!!.convertFromString(input = json)
         }
     }
 
@@ -118,7 +118,7 @@ internal class ErrorHandlingIntegrationTest {
         assertNotNull(adapter)
 
         assertThrows<Exception> {
-            adapter!!.convertFromString("")
+            adapter!!.convertFromString(input = "")
         }
     }
 
@@ -158,7 +158,7 @@ internal class ErrorHandlingIntegrationTest {
 
         // Wrong resource type causes deserialization to fail
         assertThrows<SerializationException> {
-            adapter!!.convertFromString(json)
+            adapter!!.convertFromString(input = json)
         }
     }
 
@@ -182,7 +182,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should parse successfully ignoring unknown fields")
         assertEquals("Alice", result.data.name)
@@ -210,7 +210,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should parse valid items")
         assertEquals(1, result.data.size)
@@ -233,7 +233,7 @@ internal class ErrorHandlingIntegrationTest {
 
         // Null attributes should result in a parsing failure
         assertThrows<Exception> {
-            adapter!!.convertFromString(json)
+            adapter!!.convertFromString(input = json)
         }
     }
 
@@ -275,7 +275,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should handle relationships without infinite loop")
         assertNotNull(result.data.myFavoriteDog)
@@ -319,7 +319,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should handle duplicate IDs")
         assertNotNull(result.data.allMyDogs)
@@ -353,7 +353,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should handle missing included resource")
         // The relationship might be null if the included resource is not found
@@ -378,7 +378,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        val result = adapter!!.convertFromString(json)
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should handle deep nesting")
         assertEquals("Deep", result.data.name)
@@ -464,10 +464,10 @@ internal class ErrorHandlingIntegrationTest {
     @Test
     fun `given JsonXHttpException when created with errors should store them correctly`() {
         val errors = listOf(
-            PersonalError("Error 1"),
-            PersonalError("Error 2"),
+            PersonalError(desc = "Error 1"),
+            PersonalError(desc = "Error 2"),
         )
-        val exception = JsonXHttpException<PersonalError>(null, errors)
+        val exception = JsonXHttpException<PersonalError>(response = null, errors = errors)
 
         assertNotNull(exception.errors)
         assertEquals(2, exception.errors?.size)
@@ -504,14 +504,14 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
             "invalid json {{{{",
         )
 
         assertThrows<Exception> {
-            converter.convert(responseBody)
+            converter.convert(value = responseBody)
         }
     }
 }

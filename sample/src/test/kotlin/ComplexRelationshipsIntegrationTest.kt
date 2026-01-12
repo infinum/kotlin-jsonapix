@@ -34,9 +34,9 @@ internal class ComplexRelationshipsIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog1 = Dog(name = "Max", age = 3).apply { setId("1") }
-        val dog2 = Dog(name = "Bella", age = 5).apply { setId("2") }
-        val dog3 = Dog(name = "Charlie", age = 2).apply { setId("3") }
+        val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val dog2 = Dog(name = "Bella", age = 5).apply { setId(id = "2") }
+        val dog3 = Dog(name = "Charlie", age = 2).apply { setId(id = "3") }
 
         val person = Person(
             name = "John",
@@ -44,10 +44,10 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 35,
             allMyDogs = listOf(dog1, dog2, dog3),
             myFavoriteDog = dog1,
-        ).apply { setId("100") }
+        ).apply { setId(id = "100") }
 
         val model = PersonModel(data = person)
-        val json = adapter!!.convertToString(model)
+        val json = adapter!!.convertToString(input = model)
 
         assertNotNull(json)
         assertTrue(json.contains("myFavoriteDog"), "Should contain HasOne relationship")
@@ -55,7 +55,7 @@ internal class ComplexRelationshipsIntegrationTest {
         assertTrue(json.contains("\"id\":\"1\""), "Should contain dog IDs")
 
         // Round-trip test
-        val result = adapter.convertFromString(json)
+        val result = adapter.convertFromString(input = json)
         // The library may include myFavoriteDog in allMyDogs during serialization
         assertTrue(result.data.allMyDogs?.size!! >= 3, "Should have at least 3 dogs after round-trip")
         assertEquals("Max", result.data.myFavoriteDog?.name)
@@ -71,7 +71,7 @@ internal class ComplexRelationshipsIntegrationTest {
             number = 123,
             country = "USA",
             city = "New York",
-        ).apply { setId("1") }
+        ).apply { setId(id = "1") }
 
         val employee1 = Person(
             name = "Alice",
@@ -79,7 +79,7 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 30,
             allMyDogs = null,
             myFavoriteDog = null,
-        ).apply { setId("10") }
+        ).apply { setId(id = "10") }
 
         val employee2 = Person(
             name = "Bob",
@@ -87,7 +87,7 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 28,
             allMyDogs = null,
             myFavoriteDog = null,
-        ).apply { setId("11") }
+        ).apply { setId(id = "11") }
 
         val manager = Person(
             name = "Charlie",
@@ -95,19 +95,19 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 45,
             allMyDogs = null,
             myFavoriteDog = null,
-        ).apply { setId("20") }
+        ).apply { setId(id = "20") }
 
         val company = Company(
             personel = listOf(employee1, employee2),
             manager = manager,
             address = address,
         ).apply {
-            setId("1")
-            setType("company")
+            setId(id = "1")
+            setType(type = "company")
         }
 
         val model = CompanyModel(data = company)
-        val json = adapter!!.convertToString(model)
+        val json = adapter!!.convertToString(input = model)
 
         assertNotNull(json)
         assertTrue(json.contains("personel"), "Should contain HasMany relationship")
@@ -209,7 +209,7 @@ internal class ComplexRelationshipsIntegrationTest {
         assertNotNull(adapter)
 
         val dogs = (1..10).map { i ->
-            Dog(name = "Dog$i", age = i).apply { setId("$i") }
+            Dog(name = "Dog$i", age = i).apply { setId(id = "$i") }
         }
 
         val person = Person(
@@ -218,15 +218,15 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 40,
             allMyDogs = dogs,
             myFavoriteDog = dogs.first(),
-        ).apply { setId("1") }
+        ).apply { setId(id = "1") }
 
         val model = PersonModel(data = person)
 
         // Serialize
-        val json = adapter!!.convertToString(model)
+        val json = adapter!!.convertToString(input = model)
 
         // Deserialize
-        val result = adapter.convertFromString(json)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.data)
         // The library may include myFavoriteDog in allMyDogs
@@ -241,8 +241,8 @@ internal class ComplexRelationshipsIntegrationTest {
 
         // Person 1: Has both relationships
         val person1Dogs = listOf(
-            Dog(name = "Max", age = 3).apply { setId("1") },
-            Dog(name = "Bella", age = 5).apply { setId("2") },
+            Dog(name = "Max", age = 3).apply { setId(id = "1") },
+            Dog(name = "Bella", age = 5).apply { setId(id = "2") },
         )
         val person1 = Person(
             name = "Alice",
@@ -250,11 +250,11 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 30,
             allMyDogs = person1Dogs,
             myFavoriteDog = person1Dogs.first(),
-        ).apply { setId("10") }
+        ).apply { setId(id = "10") }
 
         // Person 2: Has only HasMany
         val person2Dogs = listOf(
-            Dog(name = "Charlie", age = 2).apply { setId("3") },
+            Dog(name = "Charlie", age = 2).apply { setId(id = "3") },
         )
         val person2 = Person(
             name = "Bob",
@@ -262,17 +262,17 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 35,
             allMyDogs = person2Dogs,
             myFavoriteDog = null,
-        ).apply { setId("11") }
+        ).apply { setId(id = "11") }
 
         // Person 3: Has only HasOne
-        val person3Dog = Dog(name = "Daisy", age = 4).apply { setId("4") }
+        val person3Dog = Dog(name = "Daisy", age = 4).apply { setId(id = "4") }
         val person3 = Person(
             name = "Carol",
             surname = "White",
             age = 28,
             allMyDogs = null,
             myFavoriteDog = person3Dog,
-        ).apply { setId("12") }
+        ).apply { setId(id = "12") }
 
         // Person 4: Has neither
         val person4 = Person(
@@ -281,7 +281,7 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 40,
             allMyDogs = null,
             myFavoriteDog = null,
-        ).apply { setId("13") }
+        ).apply { setId(id = "13") }
 
         val items = listOf(
             PersonItem(data = person1),
@@ -291,8 +291,8 @@ internal class ComplexRelationshipsIntegrationTest {
         )
         val personList = PersonList(data = items)
 
-        val json = adapter!!.convertToString(personList)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = personList)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result)
         assertEquals(4, result.data.size, "Should have all 4 persons")
@@ -392,14 +392,14 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 25,
             allMyDogs = emptyList(),
             myFavoriteDog = null,
-        ).apply { setId("1") }
+        ).apply { setId(id = "1") }
 
         val model = PersonModel(data = person)
-        val json = adapter!!.convertToString(model)
+        val json = adapter!!.convertToString(input = model)
 
         assertNotNull(json)
 
-        val result = adapter.convertFromString(json)
+        val result = adapter.convertFromString(input = json)
         assertNotNull(result)
         // Empty list or null is acceptable depending on serialization behavior
         assertTrue(result.data.allMyDogs.isNullOrEmpty(), "Should have empty list or null")
@@ -474,14 +474,14 @@ internal class ComplexRelationshipsIntegrationTest {
             age = 30,
             allMyDogs = null, // Explicitly null
             myFavoriteDog = null,
-        ).apply { setId("1") }
+        ).apply { setId(id = "1") }
 
         val model = PersonModel(data = person)
-        val json = adapter!!.convertToString(model)
+        val json = adapter!!.convertToString(input = model)
 
         assertNotNull(json)
 
-        val result = adapter.convertFromString(json)
+        val result = adapter.convertFromString(input = json)
         assertNull(result.data.allMyDogs)
         assertNull(result.data.myFavoriteDog)
     }
@@ -491,31 +491,31 @@ internal class ComplexRelationshipsIntegrationTest {
         val adapter = factory.getAdapter<CompanyModel>()
         assertNotNull(adapter)
 
-        val address = Address("Tech Street", 456, "USA", "San Francisco")
-            .apply { setId("addr1") }
+        val address = Address(street = "Tech Street", number = 456, country = "USA", city = "San Francisco")
+            .apply { setId(id = "addr1") }
 
         val employees = (1..5).map { i ->
-            Person("Employee$i", "Last$i", 25 + i, null, null)
-                .apply { setId("emp$i") }
+            Person(name = "Employee$i", surname = "Last$i", age = 25 + i, allMyDogs = null, myFavoriteDog = null)
+                .apply { setId(id = "emp$i") }
         }
 
-        val manager = Person("Manager", "Boss", 50, null, null)
-            .apply { setId("mgr1") }
+        val manager = Person(name = "Manager", surname = "Boss", age = 50, allMyDogs = null, myFavoriteDog = null)
+            .apply { setId(id = "mgr1") }
 
         val company = Company(
             personel = employees,
             manager = manager,
             address = address,
         ).apply {
-            setId("comp1")
-            setType("company")
+            setId(id = "comp1")
+            setType(type = "company")
         }
 
         val model = CompanyModel(data = company)
 
         // Round-trip
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.data)
         assertEquals(5, result.data.personel.size)

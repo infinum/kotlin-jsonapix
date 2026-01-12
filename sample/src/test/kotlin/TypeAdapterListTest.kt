@@ -20,10 +20,10 @@ internal class TypeAdapterListTest {
 
     @BeforeEach
     fun setup() {
-        typeListAdapter = TypeAdapterFactory().getAdapter(PersonList::class) as? TypeAdapterList_Person
+        typeListAdapter = TypeAdapterFactory().getAdapter(type = PersonList::class) as? TypeAdapterList_Person
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that response for both persons has all rels set type adapter Person list convertFromString should generate a Person class list with full rels on both list item Person`() {
         val items = listOf(
             PersonItem(
@@ -61,9 +61,9 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_one_and_many_rel.json")
+        val response = getFileAsString(filename = "person_list_one_and_many_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -108,9 +108,9 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_first_person_empty_rel_second_person_full_rel.json")
+        val response = getFileAsString(filename = "person_list_first_person_empty_rel_second_person_full_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -155,9 +155,9 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_first_person_full_rel_second_person_no_many_rel.json")
+        val response = getFileAsString(filename = "person_list_first_person_full_rel_second_person_no_many_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -199,9 +199,9 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_first_person_no_many_rels_null_one_rel_second_person_full_rels.json")
+        val response = getFileAsString(filename = "person_list_first_person_no_many_rels_null_one_rel_second_person_full_rels.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -246,9 +246,9 @@ internal class TypeAdapterListTest {
             data = items,
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
-        val response = getFileAsString("person_list_no_included_block.json")
+        val response = getFileAsString(filename = "person_list_no_included_block.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -290,9 +290,9 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_both_person_no_rel.json")
+        val response = getFileAsString(filename = "person_list_both_person_no_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -330,9 +330,9 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_with_included_block_but_with_rel_values_set_as_null_for_both_persons.json")
+        val response = getFileAsString(filename = "person_list_with_included_block_but_with_rel_values_set_as_null_for_both_persons.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -366,9 +366,9 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString("person_list_all_links_null.json")
+        val response = getFileAsString(filename = "person_list_all_links_null.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personList,
@@ -378,9 +378,9 @@ internal class TypeAdapterListTest {
 
     @org.junit.jupiter.api.Test
     fun `given that there is a null relationship data in response type adapter Person list convertFromString should handle it gracefully`() {
-        val response = getFileAsString("person_list_invalid_relationship_data.json")
+        val response = getFileAsString(filename = "person_list_invalid_relationship_data.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         // Verify that null relationship data is handled gracefully
         Assertions.assertNotNull(result)
@@ -429,9 +429,9 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString("person_list_convert_to_string_all_rels.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_all_rels.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -472,9 +472,9 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -511,9 +511,9 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -550,9 +550,9 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -583,11 +583,11 @@ internal class TypeAdapterListTest {
             ),
         )
 
-        val personList = PersonList(items)
+        val personList = PersonList(data = items)
 
-        val response = getFileAsString("person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -623,11 +623,11 @@ internal class TypeAdapterListTest {
                 ),
             ),
         )
-        val personList = PersonList(items)
+        val personList = PersonList(data = items)
 
-        val response = getFileAsString("person_list_all_my_dogs_with_id_set_for_each_dog.json")
+        val response = getFileAsString(filename = "person_list_all_my_dogs_with_id_set_for_each_dog.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -653,9 +653,9 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_root_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -682,9 +682,9 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_resource_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -715,9 +715,9 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_relationships_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -754,9 +754,9 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_all_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_all_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -782,9 +782,9 @@ internal class TypeAdapterListTest {
             data = items,
             rootLinks = rootLinks,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_root_links.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_links.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -811,9 +811,9 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_resource_links.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_links.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -844,9 +844,9 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_relationships_links.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_links.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
@@ -856,9 +856,9 @@ internal class TypeAdapterListTest {
 
     @org.junit.jupiter.api.Test
     fun `given an empty Person list convertFromString should generate no error`() {
-        val response = getFileAsString("person_list_blank_data.json")
+        val response = getFileAsString(filename = "person_list_blank_data.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             result?.data?.isEmpty(),
@@ -869,9 +869,9 @@ internal class TypeAdapterListTest {
     @org.junit.jupiter.api.Test
     fun `given an empty Person list convertToString should generate no error`() {
         val personList = PersonList(data = emptyList())
-        val response = getFileAsString("person_list_blank_data_encode.json")
+        val response = getFileAsString(filename = "person_list_blank_data_encode.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,

@@ -31,7 +31,7 @@ internal class RetrofitIntegrationTest {
     @BeforeEach
     fun setup() {
         factory = TypeAdapterFactory()
-        converterFactory = JsonXConverterFactory(factory)
+        converterFactory = JsonXConverterFactory(adapterFactory = factory)
     }
 
     @Test
@@ -42,9 +42,9 @@ internal class RetrofitIntegrationTest {
             .build()
 
         val converter = converterFactory.responseBodyConverter(
-            PersonModel::class.java,
-            emptyArray(),
-            retrofit,
+            type = PersonModel::class.java,
+            annotations = emptyArray(),
+            retrofit = retrofit,
         )
 
         assertNotNull(converter, "Response body converter should not be null")
@@ -59,10 +59,10 @@ internal class RetrofitIntegrationTest {
             .build()
 
         val converter = converterFactory.requestBodyConverter(
-            PersonModel::class.java,
-            emptyArray(),
-            emptyArray(),
-            retrofit,
+            type = PersonModel::class.java,
+            parameterAnnotations = emptyArray(),
+            methodAnnotations = emptyArray(),
+            retrofit = retrofit,
         )
 
         assertNotNull(converter, "Request body converter should not be null")
@@ -74,7 +74,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = """
             {
                 "data": {
@@ -94,7 +94,7 @@ internal class RetrofitIntegrationTest {
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Converted result should not be null")
         assertEquals("Alice", result?.data?.name)
@@ -108,7 +108,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = """
             {
                 "data": [
@@ -139,7 +139,7 @@ internal class RetrofitIntegrationTest {
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Converted result should not be null")
         assertEquals(2, result?.data?.size)
@@ -152,7 +152,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXRequestBodyConverter(adapter!!)
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
         val person = Person(
             name = "Dave",
             surname = "Brown",
@@ -162,7 +162,7 @@ internal class RetrofitIntegrationTest {
         )
         val model = PersonModel(data = person)
 
-        val requestBody = converter.convert(model)
+        val requestBody = converter.convert(value = model)
 
         assertNotNull(requestBody, "Request body should not be null")
         assertEquals(MediaType.parse("application/json; charset=UTF-8"), requestBody?.contentType())
@@ -173,7 +173,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXRequestBodyConverter(adapter!!)
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
         val person = Person(
             name = "Emma",
             surname = "Davis",
@@ -183,7 +183,7 @@ internal class RetrofitIntegrationTest {
         )
         val model = PersonModel(data = person)
 
-        val requestBody = converter.convert(model)
+        val requestBody = converter.convert(value = model)
         assertNotNull(requestBody)
 
         // Read the content of the request body
@@ -201,15 +201,15 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
-        val json = getFileAsString("person_one_and_many_rel.json")
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
+        val json = getFileAsString(filename = "person_one_and_many_rel.json")
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result?.data?.myFavoriteDog, "myFavoriteDog should be populated from included")
@@ -223,19 +223,19 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXRequestBodyConverter(adapter!!)
-        val dog1 = Dog(name = "Max", age = 3).apply { setId("1") }
-        val dog2 = Dog(name = "Rex", age = 5).apply { setId("2") }
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val dog2 = Dog(name = "Rex", age = 5).apply { setId(id = "2") }
         val person = Person(
             name = "Frank",
             surname = "Miller",
             age = 40,
             allMyDogs = listOf(dog1, dog2),
             myFavoriteDog = dog1,
-        ).apply { setId("10") }
+        ).apply { setId(id = "10") }
         val model = PersonModel(data = person)
 
-        val requestBody = converter.convert(model)
+        val requestBody = converter.convert(value = model)
         assertNotNull(requestBody)
 
         val buffer = okio.Buffer()
@@ -256,14 +256,14 @@ internal class RetrofitIntegrationTest {
 
         // Test multiple different types
         val personConverter = converterFactory.responseBodyConverter(
-            PersonModel::class.java,
-            emptyArray(),
-            retrofit,
+            type = PersonModel::class.java,
+            annotations = emptyArray(),
+            retrofit = retrofit,
         )
         val dogConverter = converterFactory.responseBodyConverter(
-            DogModel::class.java,
-            emptyArray(),
-            retrofit,
+            type = DogModel::class.java,
+            annotations = emptyArray(),
+            retrofit = retrofit,
         )
 
         assertNotNull(personConverter, "Person converter should not be null")
@@ -275,7 +275,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = """
             {
                 "data": {
@@ -301,7 +301,7 @@ internal class RetrofitIntegrationTest {
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result?.rootLinks, "Root links should not be null")
@@ -313,15 +313,15 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
-        val json = getFileAsString("person_with_root_meta.json")
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
+        val json = getFileAsString(filename = "person_with_root_meta.json")
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Result should not be null")
         assertNotNull(result?.rootMeta, "Root meta should not be null")
@@ -336,27 +336,27 @@ internal class RetrofitIntegrationTest {
 
         // Verify both request and response converters can be created
         val requestConverter = converterFactory.requestBodyConverter(
-            PersonModel::class.java,
-            emptyArray(),
-            emptyArray(),
-            retrofit,
+            type = PersonModel::class.java,
+            parameterAnnotations = emptyArray(),
+            methodAnnotations = emptyArray(),
+            retrofit = retrofit,
         )
         val responseConverter = converterFactory.responseBodyConverter(
-            PersonModel::class.java,
-            emptyArray(),
-            retrofit,
+            type = PersonModel::class.java,
+            annotations = emptyArray(),
+            retrofit = retrofit,
         )
 
         assertNotNull(requestConverter, "Request converter should be created")
         assertNotNull(responseConverter, "Response converter should be created")
 
         // Test round-trip conversion
-        val person = Person("Henry", "Taylor", 33, null, null)
+        val person = Person(name = "Henry", surname = "Taylor", age = 33, allMyDogs = null, myFavoriteDog = null)
         val model = PersonModel(data = person)
 
         @Suppress("UNCHECKED_CAST")
         val typedRequestConverter = requestConverter as JsonXRequestBodyConverter<PersonModel>
-        val requestBody = typedRequestConverter.convert(model)
+        val requestBody = typedRequestConverter.convert(value = model)
         assertNotNull(requestBody)
 
         // Extract the JSON from request body
@@ -372,7 +372,7 @@ internal class RetrofitIntegrationTest {
 
         @Suppress("UNCHECKED_CAST")
         val typedResponseConverter = responseConverter as JsonXResponseBodyConverter<PersonModel>
-        val result = typedResponseConverter.convert(responseBody)
+        val result = typedResponseConverter.convert(value = responseBody)
 
         assertNotNull(result)
         assertEquals("Henry", result?.data?.name)
@@ -385,7 +385,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = """
             {
                 "data": []
@@ -397,7 +397,7 @@ internal class RetrofitIntegrationTest {
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Result should not be null")
         assertEquals(0, result?.data?.size, "Data should be empty list")
@@ -408,7 +408,7 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val converter = JsonXRequestBodyConverter(adapter!!)
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
         val person = Person(
             name = "Ian",
             surname = "Anderson",
@@ -418,7 +418,7 @@ internal class RetrofitIntegrationTest {
         )
         val model = PersonModel(data = person)
 
-        val requestBody = converter.convert(model)
+        val requestBody = converter.convert(value = model)
         assertNotNull(requestBody)
 
         val buffer = okio.Buffer()
@@ -434,10 +434,10 @@ internal class RetrofitIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val converter = JsonXResponseBodyConverter(adapter!!)
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
 
         // Create a large JSON payload with many persons
-        val persons = (1..100).joinToString(",") { i ->
+        val persons = (1..100).joinToString(separator = ",") { i ->
             """
             {
                 "type": "person",
@@ -461,7 +461,7 @@ internal class RetrofitIntegrationTest {
             json,
         )
 
-        val result = converter.convert(responseBody)
+        val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Result should not be null")
         assertEquals(100, result?.data?.size, "Should have 100 persons")

@@ -38,15 +38,15 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val person = Person("John", "Doe", 30, null, null).apply { setId("1") }
+        val person = Person(name = "John", surname = "Doe", age = 30, allMyDogs = null, myFavoriteDog = null).apply { setId(id = "1") }
         val rootMeta = PersonRootMeta(owner = "TestOwner")
         val model = PersonModel(
             data = person,
             rootMeta = rootMeta,
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.rootMeta, "Root meta should be present")
         assertEquals("TestOwner", (result.rootMeta as? PersonRootMeta)?.owner)
@@ -57,15 +57,15 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val person1 = Person("Alice", "Smith", 28, null, null)
-        val person2 = Person("Bob", "Jones", 32, null, null)
+        val person1 = Person(name = "Alice", surname = "Smith", age = 28, allMyDogs = null, myFavoriteDog = null)
+        val person2 = Person(name = "Bob", surname = "Jones", age = 32, allMyDogs = null, myFavoriteDog = null)
         val items = listOf(PersonItem(data = person1), PersonItem(data = person2))
         val rootMeta = PersonRootMeta(owner = "ListOwner")
 
         val personList = PersonList(data = items, rootMeta = rootMeta)
 
-        val json = adapter!!.convertToString(personList)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = personList)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.rootMeta)
         assertEquals("ListOwner", result.rootMeta?.owner)
@@ -76,8 +76,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString("person_with_root_meta.json")
-        val result = adapter!!.convertFromString(json)
+        val json = getFileAsString(filename = "person_with_root_meta.json")
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.rootMeta, "Root meta should be parsed")
         assertEquals("Ali", result.rootMeta?.owner)
@@ -90,15 +90,15 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val person = Person("Carol", "White", 35, null, null).apply { setId("1") }
+        val person = Person(name = "Carol", surname = "White", age = 35, allMyDogs = null, myFavoriteDog = null).apply { setId(id = "1") }
         val resourceMeta = PersonResourceMeta(writer = "ResourceWriter")
         val model = PersonModel(
             data = person,
             resourceObjectMeta = resourceMeta,
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.resourceObjectMeta, "Resource meta should be present")
         assertEquals("ResourceWriter", result.resourceObjectMeta?.writer)
@@ -109,8 +109,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString("person_with_resource_meta.json")
-        val result = adapter!!.convertFromString(json)
+        val json = getFileAsString(filename = "person_with_resource_meta.json")
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.resourceObjectMeta, "Resource meta should be parsed")
         assertEquals("Ali", result.resourceObjectMeta?.writer)
@@ -121,7 +121,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val person = Person("Dave", "Brown", 40, null, null)
+        val person = Person(name = "Dave", surname = "Brown", age = 40, allMyDogs = null, myFavoriteDog = null)
         val resourceMeta = PersonResourceMeta(writer = "ItemWriter")
         val item = PersonItem(
             data = person,
@@ -129,8 +129,8 @@ internal class LinksAndMetaIntegrationTest {
         )
         val personList = PersonList(data = listOf(item))
 
-        val json = adapter!!.convertToString(personList)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = personList)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.data)
         assertEquals(1, result.data.size)
@@ -145,16 +145,16 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog = Dog("Max", 3).apply { setId("1") }
-        val person = Person("Emma", "Davis", 29, null, dog).apply { setId("1") }
+        val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val person = Person(name = "Emma", surname = "Davis", age = 29, allMyDogs = null, myFavoriteDog = dog).apply { setId(id = "1") }
         val relationshipMeta = PersonRelationshipMeta(user = "RelUser")
         val model = PersonModel(
             data = person,
             relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         // Relationship meta may or may not be preserved depending on serialization
         // The test verifies the library handles relationship meta
@@ -167,9 +167,9 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog1 = Dog("Max", 3).apply { setId("1") }
-        val dog2 = Dog("Bella", 5).apply { setId("2") }
-        val person = Person("Frank", "Miller", 38, listOf(dog1, dog2), dog1).apply { setId("1") }
+        val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val dog2 = Dog(name = "Bella", age = 5).apply { setId(id = "2") }
+        val person = Person(name = "Frank", surname = "Miller", age = 38, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply { setId(id = "1") }
 
         val meta1 = PersonRelationshipMeta(user = "User1")
         val meta2 = PersonRelationshipMeta(user = "User2")
@@ -181,8 +181,8 @@ internal class LinksAndMetaIntegrationTest {
             ),
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         // Relationship meta handling may vary - verify data integrity
         assertNotNull(result)
@@ -195,8 +195,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString("person_with_one_rel_meta.json")
-        val result = adapter!!.convertFromString(json)
+        val json = getFileAsString(filename = "person_with_one_rel_meta.json")
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.relationshipsMeta)
         assertEquals("Ali", result.relationshipsMeta?.get("myFavoriteDog")?.user)
@@ -209,9 +209,9 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog1 = Dog("Rex", 4).apply { setId("1") }
-        val dog2 = Dog("Spot", 6).apply { setId("2") }
-        val person = Person("Grace", "Wilson", 33, listOf(dog1, dog2), dog1).apply { setId("1") }
+        val dog1 = Dog(name = "Rex", age = 4).apply { setId(id = "1") }
+        val dog2 = Dog(name = "Spot", age = 6).apply { setId(id = "2") }
+        val person = Person(name = "Grace", surname = "Wilson", age = 33, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply { setId(id = "1") }
 
         val rootMeta = PersonRootMeta(owner = "RootOwner")
         val resourceMeta = PersonResourceMeta(writer = "DataWriter")
@@ -228,8 +228,8 @@ internal class LinksAndMetaIntegrationTest {
             ),
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         // Meta handling may vary during round-trip - verify data integrity
         assertNotNull(result)
@@ -243,8 +243,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString("person_with_all_metas.json")
-        val result = adapter!!.convertFromString(json)
+        val json = getFileAsString(filename = "person_with_all_metas.json")
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.rootMeta, "Root meta should be present")
         assertNotNull(result.resourceObjectMeta, "Resource meta should be present")
@@ -263,7 +263,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val person = Person("Henry", "Taylor", 42, null, null)
+        val person = Person(name = "Henry", surname = "Taylor", age = 42, allMyDogs = null, myFavoriteDog = null)
         val rootLinks = DefaultLinks(
             self = "https://api.example.com/persons",
             related = "https://api.example.com/persons/related",
@@ -273,8 +273,8 @@ internal class LinksAndMetaIntegrationTest {
             rootLinks = rootLinks,
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.rootLinks)
         assertEquals("https://api.example.com/persons", result.rootLinks?.self)
@@ -285,15 +285,15 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val person = Person("Iris", "Anderson", 27, null, null)
+        val person = Person(name = "Iris", surname = "Anderson", age = 27, allMyDogs = null, myFavoriteDog = null)
         val resourceLinks = DefaultLinks(self = "https://api.example.com/persons/1")
         val model = PersonModel(
             data = person,
             resourceObjectLinks = resourceLinks,
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.resourceObjectLinks)
         assertEquals("https://api.example.com/persons/1", result.resourceObjectLinks?.self)
@@ -304,8 +304,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog = Dog("Luna", 2).apply { setId("1") }
-        val person = Person("Jack", "Thomas", 31, null, dog).apply { setId("1") }
+        val dog = Dog(name = "Luna", age = 2).apply { setId(id = "1") }
+        val person = Person(name = "Jack", surname = "Thomas", age = 31, allMyDogs = null, myFavoriteDog = dog).apply { setId(id = "1") }
         val relationshipLinks = DefaultLinks(
             self = "https://api.example.com/persons/1/relationships/myFavoriteDog",
             related = "https://api.example.com/persons/1/myFavoriteDog",
@@ -315,8 +315,8 @@ internal class LinksAndMetaIntegrationTest {
             relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         // Relationship links handling may vary - verify data integrity
         assertNotNull(result)
@@ -329,8 +329,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog = Dog("Milo", 7).apply { setId("1") }
-        val person = Person("Karen", "Lee", 36, null, dog).apply { setId("1") }
+        val dog = Dog(name = "Milo", age = 7).apply { setId(id = "1") }
+        val person = Person(name = "Karen", surname = "Lee", age = 36, allMyDogs = null, myFavoriteDog = dog).apply { setId(id = "1") }
 
         val rootLinks = DefaultLinks(self = "https://api.example.com/root")
         val resourceLinks = DefaultLinks(self = "https://api.example.com/persons/1")
@@ -343,8 +343,8 @@ internal class LinksAndMetaIntegrationTest {
             relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.rootLinks)
         assertNotNull(result.resourceObjectLinks)
@@ -356,8 +356,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString("person_with_all_links.json")
-        val result = adapter!!.convertFromString(json)
+        val json = getFileAsString(filename = "person_with_all_links.json")
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.rootLinks)
         assertNotNull(result.resourceObjectLinks)
@@ -376,7 +376,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val person = Person("Laura", "Martinez", 29, null, null)
+        val person = Person(name = "Laura", surname = "Martinez", age = 29, allMyDogs = null, myFavoriteDog = null)
         val item = PersonItem(data = person)
 
         val paginationLinks = DefaultLinks(
@@ -392,8 +392,8 @@ internal class LinksAndMetaIntegrationTest {
             rootLinks = paginationLinks,
         )
 
-        val json = adapter!!.convertToString(personList)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = personList)
+        val result = adapter.convertFromString(input = json)
 
         assertNotNull(result.rootLinks)
         val links = result.rootLinks
@@ -412,11 +412,11 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val person = Person("Mike", "Nelson", 44, null, null)
+        val person = Person(name = "Mike", surname = "Nelson", age = 44, allMyDogs = null, myFavoriteDog = null)
         val model = PersonModel(data = person)
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         // Meta fields should be null when not provided in JSON
         assertNull(result.rootMeta)
@@ -429,8 +429,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString("person_all_types_of_links_null.json")
-        val result = adapter!!.convertFromString(json)
+        val json = getFileAsString(filename = "person_all_types_of_links_null.json")
+        val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should parse successfully with null links")
         assertNotNull(result.data)
@@ -444,8 +444,8 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val dog = Dog("Oscar", 4).apply { setId("1") }
-        val person = Person("Nancy", "Clark", 37, null, dog).apply { setId("1") }
+        val dog = Dog(name = "Oscar", age = 4).apply { setId(id = "1") }
+        val person = Person(name = "Nancy", surname = "Clark", age = 37, allMyDogs = null, myFavoriteDog = dog).apply { setId(id = "1") }
 
         // Create all meta objects
         val rootMeta = PersonRootMeta(owner = "CompleteOwner")
@@ -467,8 +467,8 @@ internal class LinksAndMetaIntegrationTest {
             relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
         )
 
-        val json = adapter!!.convertToString(model)
-        val result = adapter.convertFromString(json)
+        val json = adapter!!.convertToString(input = model)
+        val result = adapter.convertFromString(input = json)
 
         // Verify all meta
         assertNotNull(result.rootMeta)

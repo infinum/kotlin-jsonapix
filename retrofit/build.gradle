@@ -34,6 +34,7 @@ dependencies {
     
     testImplementation packages.junit.api
     testRuntimeOnly packages.junit.engine
+    testRuntimeOnly packages.junit.platform_launcher
     testImplementation packages.junit.params
     testImplementation project(":core")
     testImplementation packages.kotlin.serialization_core

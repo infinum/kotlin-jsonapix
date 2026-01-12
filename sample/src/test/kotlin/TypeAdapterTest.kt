@@ -41,9 +41,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_one_and_many_rel.json")
+        val response = getFileAsString(filename = "person_one_and_many_rel.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personModel,
@@ -66,9 +66,9 @@ internal class TypeAdapterTest {
             resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
         )
 
-        val response = getFileAsString("person_no_included_block.json")
+        val response = getFileAsString(filename = "person_no_included_block.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personModel,
@@ -94,9 +94,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_one_rel.json")
+        val response = getFileAsString(filename = "person_one_rel.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personModel,
@@ -114,7 +114,7 @@ internal class TypeAdapterTest {
             myFavoriteDog = Dog(name = "Bella", age = 1),
         )
         val personModel = PersonModel(
-            person,
+            data = person,
             rootLinks = DefaultLinks(self = "https://root.link.com"),
             resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
             relationshipsLinks = mapOf(
@@ -122,8 +122,8 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_many_rel_null_with_included.json")
-        val result = typeAdapter?.convertFromString(response)
+        val response = getFileAsString(filename = "person_many_rel_null_with_included.json")
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personModel,
@@ -149,9 +149,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_many_rel.json")
+        val response = getFileAsString(filename = "person_many_rel.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personModel,
@@ -168,11 +168,11 @@ internal class TypeAdapterTest {
             allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
             myFavoriteDog = null,
         )
-        val personModel = PersonModel(person)
+        val personModel = PersonModel(data = person)
 
-        val response = getFileAsString("person_all_types_of_links_null.json")
+        val response = getFileAsString(filename = "person_all_types_of_links_null.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             personModel,
@@ -182,9 +182,9 @@ internal class TypeAdapterTest {
 
     @org.junit.jupiter.api.Test
     fun `given that there is a null relationship data in response type adapter Person convertFromString should handle it gracefully`() {
-        val response = getFileAsString("person_invalid_relationship_data.json")
+        val response = getFileAsString(filename = "person_invalid_relationship_data.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         // Verify that null relationship data is handled gracefully
         Assertions.assertNotNull(result)
@@ -210,9 +210,9 @@ internal class TypeAdapterTest {
         val model = PersonModel(
             data = person,
         )
-        val response = getFileAsString("person_no_links_all_rel.json")
+        val response = getFileAsString(filename = "person_no_links_all_rel.json")
 
-        val result = typeAdapter?.convertToString(model)
+        val result = typeAdapter?.convertToString(input = model)
 
         Assertions.assertEquals(
             response,
@@ -234,9 +234,9 @@ internal class TypeAdapterTest {
             data = person,
         )
 
-        val response = getFileAsString("person_one_rel_null_many_rel_empty.json")
+        val response = getFileAsString(filename = "person_one_rel_null_many_rel_empty.json")
 
-        val result = typeAdapter?.convertToString(model)
+        val result = typeAdapter?.convertToString(input = model)
 
         Assertions.assertEquals(
             response,
@@ -258,9 +258,9 @@ internal class TypeAdapterTest {
             data = person,
         )
 
-        val response = getFileAsString("person_one_and_many_rel_as_null.json")
+        val response = getFileAsString(filename = "person_one_and_many_rel_as_null.json")
 
-        val result = typeAdapter?.convertToString(model)
+        val result = typeAdapter?.convertToString(input = model)
 
         Assertions.assertEquals(
             response,
@@ -282,9 +282,9 @@ internal class TypeAdapterTest {
             data = person,
         )
 
-        val response = getFileAsString("person_all_my_dogs_with_id_set_for_each_dog.json")
+        val response = getFileAsString(filename = "person_all_my_dogs_with_id_set_for_each_dog.json")
 
-        val result = typeAdapter?.convertToString(model)
+        val result = typeAdapter?.convertToString(input = model)
 
         Assertions.assertEquals(
             response,
@@ -308,9 +308,9 @@ internal class TypeAdapterTest {
             rootMeta = rootMeta,
         )
 
-        val response = getFileAsString("person_with_root_meta.json")
+        val response = getFileAsString(filename = "person_with_root_meta.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             model.rootMeta,
@@ -334,9 +334,9 @@ internal class TypeAdapterTest {
             resourceObjectMeta = resourceMeta,
         )
 
-        val response = getFileAsString("person_with_resource_meta.json")
+        val response = getFileAsString(filename = "person_with_resource_meta.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             model.resourceObjectMeta,
@@ -360,9 +360,9 @@ internal class TypeAdapterTest {
             relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
         )
 
-        val response = getFileAsString("person_with_one_rel_meta.json")
+        val response = getFileAsString(filename = "person_with_one_rel_meta.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             model.relationshipsMeta,
@@ -390,9 +390,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_with_many_rel_meta.json")
+        val response = getFileAsString(filename = "person_with_many_rel_meta.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             model.relationshipsMeta,
@@ -425,9 +425,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_with_all_metas.json")
+        val response = getFileAsString(filename = "person_with_all_metas.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             model,
@@ -460,9 +460,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_with_all_links.json")
+        val response = getFileAsString(filename = "person_with_all_links.json")
 
-        val result = typeAdapter?.convertFromString(response)
+        val result = typeAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             model,
@@ -495,9 +495,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_with_all_meta_types_encode.json")
+        val response = getFileAsString(filename = "person_with_all_meta_types_encode.json")
 
-        val result = typeAdapter?.convertToString(model)
+        val result = typeAdapter?.convertToString(input = model)
 
         Assertions.assertEquals(
             response,
@@ -530,9 +530,9 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString("person_with_all_links_types_encode.json")
+        val response = getFileAsString(filename = "person_with_all_links_types_encode.json")
 
-        val result = typeAdapter?.convertToString(model)
+        val result = typeAdapter?.convertToString(input = model)
 
         Assertions.assertEquals(
             response,

@@ -30,7 +30,6 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
 import com.squareup.kotlinpoet.metadata.specs.toTypeSpec
-import com.squareup.kotlinpoet.metadata.toKmClass
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -39,6 +38,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
+import kotlin.metadata.jvm.KotlinClassMetadata
 
 @SuppressWarnings("SpreadOperator")
 public class JsonApiProcessor : AbstractProcessor() {
@@ -99,8 +99,11 @@ public class JsonApiProcessor : AbstractProcessor() {
             processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
 
         val metadata = element.getAnnotation(Metadata::class.java)
-        val typeSpec = metadata.toKmClass().toTypeSpec(
-            ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils),
+
+        val kmClass = (KotlinClassMetadata.readStrict(metadata) as KotlinClassMetadata.Class).kmClass
+
+        val typeSpec = kmClass.toTypeSpec(
+            ElementsClassInspector.create(false, processingEnv.elementUtils, processingEnv.typeUtils),
         )
 
         val inputDataClass = ClassName(generatedPackage, className)
