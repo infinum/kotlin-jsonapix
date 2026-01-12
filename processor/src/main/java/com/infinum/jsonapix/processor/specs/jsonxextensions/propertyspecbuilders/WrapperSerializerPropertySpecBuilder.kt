@@ -25,26 +25,26 @@ import kotlinx.serialization.modules.SerializersModule
 
 internal object WrapperSerializerPropertySpecBuilder {
 
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "StringLiteralDuplication")
     fun build(
         specsMap: HashMap<ClassName, ClassInfo>,
         customLinks: List<ClassName>,
         customErrors: Map<String, ClassName>,
-        metas: List<ClassName>
+        metas: List<ClassName>,
     ): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
         val polymorpicMember = MemberName(
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            JsonApiConstants.Members.POLYMORPHIC
+            JsonApiConstants.Members.POLYMORPHIC,
         )
         val subclassMember = MemberName(
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            JsonApiConstants.Members.SUBCLASS
+            JsonApiConstants.Members.SUBCLASS,
         )
 
         val contextualMember = MemberName(
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            JsonApiConstants.Members.CONTEXTUAL
+            JsonApiConstants.Members.CONTEXTUAL,
         )
         codeBlockBuilder.addStatement("%T {", SerializersModule::class)
         codeBlockBuilder.indent()
@@ -69,7 +69,7 @@ internal object WrapperSerializerPropertySpecBuilder {
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,
-                it.resourceObjectClassName
+                it.resourceObjectClassName,
             )
         }
         codeBlockBuilder.unindent().addStatement("}")
@@ -82,7 +82,7 @@ internal object WrapperSerializerPropertySpecBuilder {
                 codeBlockBuilder.addStatement(
                     "%M(%T::class)",
                     subclassMember,
-                    it.attributesWrapperClassName
+                    it.attributesWrapperClassName,
                 )
             }
         }
@@ -96,7 +96,7 @@ internal object WrapperSerializerPropertySpecBuilder {
                 codeBlockBuilder.addStatement(
                     "%M(%T::class)",
                     subclassMember,
-                    it.relationshipsObjectClassName
+                    it.relationshipsObjectClassName,
                 )
             }
         }
@@ -105,7 +105,7 @@ internal object WrapperSerializerPropertySpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T::class) {",
             polymorpicMember,
-            Links::class.asClassName()
+            Links::class.asClassName(),
         )
 
         codeBlockBuilder.indent()
@@ -113,14 +113,14 @@ internal object WrapperSerializerPropertySpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T::class)",
             subclassMember,
-            DefaultLinks::class.asClassName()
+            DefaultLinks::class.asClassName(),
         )
 
         customLinks.forEach { link ->
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,
-                link
+                link,
             )
         }
 
@@ -129,7 +129,7 @@ internal object WrapperSerializerPropertySpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T::class) {",
             polymorpicMember,
-            Error::class.asClassName()
+            Error::class.asClassName(),
         )
 
         codeBlockBuilder.indent()
@@ -137,14 +137,14 @@ internal object WrapperSerializerPropertySpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T::class)",
             subclassMember,
-            DefaultError::class.asClassName()
+            DefaultError::class.asClassName(),
         )
 
         customErrors.forEach { error ->
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,
-                error.value
+                error.value,
             )
         }
 
@@ -153,7 +153,7 @@ internal object WrapperSerializerPropertySpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T::class) {",
             polymorpicMember,
-            Meta::class.asClassName()
+            Meta::class.asClassName(),
         )
 
         codeBlockBuilder.indent()
@@ -162,13 +162,13 @@ internal object WrapperSerializerPropertySpecBuilder {
             codeBlockBuilder.addStatement(
                 "%M(%T::class)",
                 subclassMember,
-                meta
+                meta,
             )
         }
 
         codeBlockBuilder.addStatement(
             "defaultDeserializer{ %T.serializer() }",
-            UnknownMeta::class.asClassName()
+            UnknownMeta::class.asClassName(),
         )
 
         codeBlockBuilder.unindent().addStatement("}")
@@ -176,26 +176,26 @@ internal object WrapperSerializerPropertySpecBuilder {
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            OneRelationshipMember::class.asClassName()
+            OneRelationshipMember::class.asClassName(),
         )
 
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            ManyRelationshipMember::class.asClassName()
+            ManyRelationshipMember::class.asClassName(),
         )
 
         codeBlockBuilder.addStatement(
             "%M(%T.serializer())",
             contextualMember,
-            ResourceIdentifier::class.asClassName()
+            ResourceIdentifier::class.asClassName(),
         )
 
         codeBlockBuilder.unindent().addStatement("}")
 
         return PropertySpec.builder(
             JsonApiConstants.Members.JSONX_SERIALIZER_MODULE,
-            SerializersModule::class
+            SerializersModule::class,
         )
             .initializer(codeBlockBuilder.build()).build()
     }

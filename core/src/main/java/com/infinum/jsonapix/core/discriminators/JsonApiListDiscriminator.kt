@@ -10,6 +10,7 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
+@Suppress("LongParameterList")
 class JsonApiListDiscriminator(
     private val rootType: String,
     private val rootLinks: String,
@@ -18,7 +19,7 @@ class JsonApiListDiscriminator(
     private val rootMeta: String,
     private val resourceObjectMeta: String,
     private val relationshipsMeta: String,
-    private val error: String
+    private val error: String,
 ) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, relationshipsMeta, error) {
 
     // TODO Handle those in a future PR
@@ -48,7 +49,7 @@ class JsonApiListDiscriminator(
 
                 val newRelationshipsObject = relationshipsObject?.takeIf { it !is JsonNull }?.let {
                     val relationshipsDiscriminator = CommonDiscriminator(
-                        JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType)
+                        JsonApiConstants.Prefix.RELATIONSHIPS.withName(rootType),
                     )
                     relationshipsDiscriminator.inject(getNewRelationshipsObject(it))
                 }
@@ -71,7 +72,7 @@ class JsonApiListDiscriminator(
 
                 dataObject.takeIf { it !is JsonNull }?.let {
                     val dataDiscriminator = CommonDiscriminator(
-                        JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType)
+                        JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(rootType),
                     )
                     val newDataObject = getNewDataObject(
                         dataDiscriminator.inject(it),
@@ -103,14 +104,14 @@ class JsonApiListDiscriminator(
                 includedArray = newIncludedArray,
                 linksObject = newRootLinksObject,
                 errorsArray = newErrorsArray,
-                metaObject = newMetaObject
+                metaObject = newMetaObject,
             )
             return rootDiscriminator.inject(newJsonElement)
         } catch (e: Exception) {
             // TODO Add Timber and custom exceptions
             throw IllegalArgumentException(
                 "Input must be either JSON object or array with the key type defined",
-                e.cause
+                e.cause,
             )
         }
     }
@@ -130,14 +131,14 @@ class JsonApiListDiscriminator(
                 dataArray = dataArray?.jsonArray,
                 linksObject = null,
                 errorsArray = errorsArray,
-                metaObject = null
+                metaObject = null,
             )
             return rootDiscriminator.extract(newJsonElement)
         } catch (e: Exception) {
             // TODO Add Timber and custom exceptions
             throw IllegalArgumentException(
                 "Input must be either JSON object or array with the key type defined",
-                e.cause
+                e.cause,
             )
         }
     }
@@ -155,14 +156,14 @@ class JsonApiListDiscriminator(
         includedArray: JsonArray?,
         linksObject: JsonElement?,
         errorsArray: JsonArray?,
-        metaObject: JsonElement?
+        metaObject: JsonElement?,
     ): JsonObject {
         return getDiscriminatedBaseEntries(
             original,
             includedArray,
             linksObject,
             errorsArray,
-            metaObject
+            metaObject,
         ).let { entries ->
             dataArray?.let { data ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.DATA }

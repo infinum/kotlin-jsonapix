@@ -23,11 +23,11 @@ internal object Specs {
     fun getNullPropertySpec(
         name: String,
         typeName: TypeName,
-        isTransient: Boolean = false
+        isTransient: Boolean = false,
     ): PropertySpec = PropertySpec.builder(
         name,
         typeName,
-        KModifier.OVERRIDE
+        KModifier.OVERRIDE,
     ).apply {
         if (isTransient) {
             addAnnotation(transientClassName)
@@ -45,12 +45,14 @@ internal object Specs {
     fun getNamedPropertySpec(
         className: ClassName,
         key: String,
-        nullable: Boolean = false
+        nullable: Boolean = false,
     ): PropertySpec =
         PropertySpec.builder(
-            key, className.copy(nullable = nullable), KModifier.OVERRIDE
+            key,
+            className.copy(nullable = nullable),
+            KModifier.OVERRIDE,
         ).addAnnotation(
-            getSerialNameSpec(key)
+            getSerialNameSpec(key),
         )
             .initializer(key)
             .build()
@@ -58,11 +60,11 @@ internal object Specs {
     fun getNamedParamSpec(
         className: ClassName,
         key: String,
-        nullable: Boolean = false
+        nullable: Boolean = false,
     ): ParameterSpec =
         ParameterSpec.builder(
             key,
-            className.copy(nullable = nullable)
+            className.copy(nullable = nullable),
         ).apply {
             if (nullable) {
                 defaultValue("%L", null)

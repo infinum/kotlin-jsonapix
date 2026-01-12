@@ -24,7 +24,7 @@ abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? = inflater.inflate(layoutRes, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,13 +73,13 @@ abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
     open fun showMessage(
         title: String = getString(R.string.app_name),
         message: String,
-        positiveCallback: (() -> Unit)? = null
+        positiveCallback: (() -> Unit)? = null,
     ) {
         if (!isDetached) {
             getBaseActivity()?.showMessage(
                 title,
                 message,
-                positiveCallback
+                positiveCallback,
             )
         }
     }

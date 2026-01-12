@@ -28,7 +28,7 @@ public class TypeAdapterFactorySpecBuilder {
                 TypeSpec.classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
                     .addSuperinterface(AdapterFactory::class)
                     .addFunction(getAdapterFunSpec())
-                    .build()
+                    .build(),
             )
             .apply {
                 classNames.forEach {
@@ -47,18 +47,21 @@ public class TypeAdapterFactorySpecBuilder {
                 TypeAdapter::class
                     .asClassName()
                     .parameterizedBy(WildcardTypeName.producerOf(Any::class))
-                    .copy(nullable = true)
+                    .copy(nullable = true),
             )
             .beginControlFlow("return when(type.qualifiedName)")
             .apply {
                 classNames.forEach {
-                    addStatement("%S -> TypeAdapter_${it.simpleName}()", it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL))
+                    addStatement(
+                        "%S -> TypeAdapter_${it.simpleName}()",
+                        it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+                    )
                 }
 
                 classNames.forEach {
                     addStatement(
                         "%S -> TypeAdapterList_${it.simpleName}()",
-                        it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST)
+                        it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
                     )
                 }
             }

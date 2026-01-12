@@ -7,20 +7,20 @@ internal object SerializeFunSpecMemberProvider {
 
     val formatMember = MemberName(
         JsonApiConstants.Packages.JSONX,
-        JsonApiConstants.Members.FORMAT
+        JsonApiConstants.Members.FORMAT,
     )
     val encodeMember = MemberName(
         JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-        JsonApiConstants.Members.ENCODE_TO_STRING
+        JsonApiConstants.Members.ENCODE_TO_STRING,
     )
     val jsonApiWrapperMember = MemberName(
         JsonApiConstants.Packages.JSONX,
-        JsonApiConstants.Members.JSONX_WRAPPER_GETTER
+        JsonApiConstants.Members.JSONX_WRAPPER_GETTER,
     )
 
     val jsonApiListWrapperMember =
         MemberName(
             JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER
+            JsonApiConstants.Members.JSONX_WRAPPER_LIST_GETTER,
         )
 }

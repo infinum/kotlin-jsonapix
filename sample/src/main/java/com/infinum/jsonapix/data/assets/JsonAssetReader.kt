@@ -8,9 +8,8 @@ interface JsonAssetReader {
 }
 
 class JsonAssetReaderImpl @Inject constructor(
-    private val assetManager: AssetManager
+    private val assetManager: AssetManager,
 ) : JsonAssetReader {
-    override fun readJsonAsset(path: String): String {
-        return assetManager.open(path).bufferedReader().readText()
-    }
+    override fun readJsonAsset(path: String): String =
+        assetManager.open(path).bufferedReader().readText()
 }

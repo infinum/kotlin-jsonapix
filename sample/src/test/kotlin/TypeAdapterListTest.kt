@@ -9,11 +9,10 @@ import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.data.models.TypeAdapterList_Person
+import java.io.InputStreamReader
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import java.io.InputStreamReader
 
 internal class TypeAdapterListTest {
 
@@ -21,10 +20,10 @@ internal class TypeAdapterListTest {
 
     @BeforeEach
     fun setup() {
-        typeListAdapter = TypeAdapterFactory().getAdapter(PersonList::class) as? TypeAdapterList_Person
+        typeListAdapter = TypeAdapterFactory().getAdapter(type = PersonList::class) as? TypeAdapterList_Person
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that response for both persons has all rels set type adapter Person list convertFromString should generate a Person class list with full rels on both list item Person`() {
         val items = listOf(
             PersonItem(
@@ -33,27 +32,28 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bella", age = 1)
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
                 relationshipsLinks = mapOf(
                     "myFavoriteDog" to DefaultLinks(self = "https://relationship1.link.com"),
                     "allMyDogs" to DefaultLinks(self = "https://relationship1.link.com"),
                 ),
-            ), PersonItem(
+            ),
+            PersonItem(
                 data = Person(
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2)
+                    myFavoriteDog = Dog(name = "Bongo", age = 2),
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
                 relationshipsLinks = mapOf(
                     "myFavoriteDog" to DefaultLinks(self = "https://relationship2.link.com"),
                     "allMyDogs" to DefaultLinks(self = "https://relationship2.link.com"),
                 ),
-            )
+            ),
         )
 
         val personList = PersonList(
@@ -61,12 +61,13 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_one_and_many_rel.json")
+        val response = getFileAsString(filename = "person_list_one_and_many_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -75,7 +76,11 @@ internal class TypeAdapterListTest {
         val items = listOf(
             PersonItem(
                 data = Person(
-                    name = "Jason", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = Dog(name = "Bella", age = 1)
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
                 relationshipsLinks = mapOf(
@@ -88,7 +93,7 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2)
+                    myFavoriteDog = Dog(name = "Bongo", age = 2),
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
                 relationshipsLinks = mapOf(
@@ -103,12 +108,13 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_first_person_empty_rel_second_person_full_rel.json")
+        val response = getFileAsString(filename = "person_list_first_person_empty_rel_second_person_full_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -121,22 +127,27 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bella", age = 1)
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
                 relationshipsLinks = mapOf(
                     "myFavoriteDog" to DefaultLinks(self = "https://relationship1.link.com"),
                     "allMyDogs" to DefaultLinks(self = "https://relationship1.link.com"),
                 ),
-            ), PersonItem(
+            ),
+            PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = Dog(name = "Bongo", age = 2)
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = Dog(name = "Bongo", age = 2),
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
                 relationshipsLinks = mapOf(
                     "myFavoriteDog" to DefaultLinks(self = "https://relationship2.link.com"),
                 ),
-            )
+            ),
         )
 
         val personList = PersonList(
@@ -144,12 +155,13 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_first_person_full_rel_second_person_no_many_rel.json")
+        val response = getFileAsString(filename = "person_list_first_person_full_rel_second_person_no_many_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -158,21 +170,28 @@ internal class TypeAdapterListTest {
         val items = listOf(
             PersonItem(
                 Person(
-                    name = "Jason", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
-            ), PersonItem(
+            ),
+            PersonItem(
                 Person(
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2)
-                ), resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"), relationshipsLinks = mapOf(
+                    myFavoriteDog = Dog(name = "Bongo", age = 2),
+                ),
+                resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
+                relationshipsLinks = mapOf(
                     "myFavoriteDog" to DefaultLinks(self = "https://relationship2.link.com"),
                     "allMyDogs" to DefaultLinks(self = "https://relationship2.link.com"),
-                )
-            )
+                ),
+            ),
         )
 
         val personList = PersonList(
@@ -180,12 +199,13 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_first_person_no_many_rels_null_one_rel_second_person_full_rels.json")
+        val response = getFileAsString(filename = "person_list_first_person_no_many_rels_null_one_rel_second_person_full_rels.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -194,7 +214,11 @@ internal class TypeAdapterListTest {
         val items = listOf(
             PersonItem(
                 Person(
-                    name = "Jason", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
                 relationshipsLinks = mapOf(
@@ -204,26 +228,31 @@ internal class TypeAdapterListTest {
             ),
             PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
                 relationshipsLinks = mapOf(
                     "myFavoriteDog" to DefaultLinks(self = "https://relationship2.link.com"),
                     "allMyDogs" to DefaultLinks(self = "https://relationship2.link.com"),
                 ),
-            )
+            ),
         )
 
         val personList = PersonList(
             data = items,
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
-        val response = getFileAsString("person_list_no_included_block.json")
+        val response = getFileAsString(filename = "person_list_no_included_block.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -232,7 +261,11 @@ internal class TypeAdapterListTest {
         val items = listOf(
             PersonItem(
                 Person(
-                    name = "Jason", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
                 relationshipsLinks = null,
@@ -240,12 +273,16 @@ internal class TypeAdapterListTest {
             ),
             PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
                 relationshipsLinks = null,
                 relationshipsMeta = null,
-            )
+            ),
         )
 
         val personList = PersonList(
@@ -253,12 +290,13 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_both_person_no_rel.json")
+        val response = getFileAsString(filename = "person_list_both_person_no_rel.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -267,16 +305,24 @@ internal class TypeAdapterListTest {
         val items = listOf(
             PersonItem(
                 Person(
-                    name = "Jason", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource1.link.com"),
             ),
             PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = DefaultLinks(self = "https://resource2.link.com"),
-            )
+            ),
         )
 
         val personList = PersonList(
@@ -284,12 +330,13 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString("person_list_with_included_block_but_with_rel_values_set_as_null_for_both_persons.json")
+        val response = getFileAsString(filename = "person_list_with_included_block_but_with_rel_values_set_as_null_for_both_persons.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
@@ -302,36 +349,52 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bella", age = 1)
-                )
-            ), PersonItem(
+                    myFavoriteDog = Dog(name = "Bella", age = 1),
+                ),
+            ),
+            PersonItem(
                 Person(
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(Dog(name = "Bella", age = 1), Dog(name = "Bongo", age = 2)),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2)
-                )
-            )
+                    myFavoriteDog = Dog(name = "Bongo", age = 2),
+                ),
+            ),
         )
         val personList = PersonList(
             data = items,
         )
 
-        val response = getFileAsString("person_list_all_links_null.json")
+        val response = getFileAsString(filename = "person_list_all_links_null.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
-            personList, result
+            personList,
+            result,
         )
     }
 
     @org.junit.jupiter.api.Test
-    fun `given that there is a null relationship data in response type adapter Person list convertFromString should throw an IllegalArgumentException`() {
-        val response = getFileAsString("person_list_invalid_relationship_data.json")
+    fun `given that there is a null relationship data in response type adapter Person list convertFromString should handle it gracefully`() {
+        val response = getFileAsString(filename = "person_list_invalid_relationship_data.json")
 
-        assertThrows<IllegalArgumentException> { typeListAdapter?.convertFromString(response) }
+        val result = typeListAdapter?.convertFromString(input = response)
+
+        // Verify that null relationship data is handled gracefully
+        Assertions.assertNotNull(result)
+        Assertions.assertEquals(2, result?.data?.size)
+
+        // First person should have myFavoriteDog set
+        Assertions.assertEquals("Jason", result?.data?.get(0)?.data?.name)
+        Assertions.assertNotNull(result?.data?.get(0)?.data?.myFavoriteDog)
+        Assertions.assertEquals(2, result?.data?.get(0)?.data?.allMyDogs?.size)
+
+        // Second person should have myFavoriteDog as null (per JSON:API spec, null is valid)
+        Assertions.assertEquals("Jasminka", result?.data?.get(1)?.data?.name)
+        Assertions.assertNull(result?.data?.get(1)?.data?.myFavoriteDog) // null is acceptable
+        Assertions.assertEquals(2, result?.data?.get(1)?.data?.allMyDogs?.size)
     }
 
     @org.junit.jupiter.api.Test
@@ -344,32 +407,35 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("0") },
-                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
-                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
-                )
-            ), PersonItem(
+                        Dog(name = "Bongo", age = 2).apply { setId("0") },
+                    ),
+                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") },
+                ),
+            ),
+            PersonItem(
                 Person(
                     name = "Jasminka",
                     surname = "Apix",
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("0") },
-                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
-                    myFavoriteDog = Dog(name = "Bongo", age = 2).apply { setId("0") }
-                )
-            )
+                        Dog(name = "Bongo", age = 2).apply { setId("0") },
+                    ),
+                    myFavoriteDog = Dog(name = "Bongo", age = 2).apply { setId("0") },
+                ),
+            ),
         )
         val personList = PersonList(
             data = items,
         )
 
-        val response = getFileAsString("person_list_convert_to_string_all_rels.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_all_rels.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -383,9 +449,10 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("0") },
-                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
-                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
-                )
+                        Dog(name = "Bongo", age = 2).apply { setId("0") },
+                    ),
+                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") },
+                ),
             ),
             PersonItem(
                 Person(
@@ -394,23 +461,24 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("0") },
-                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
-                    myFavoriteDog = null
-                )
-            )
+                        Dog(name = "Bongo", age = 2).apply { setId("0") },
+                    ),
+                    myFavoriteDog = null,
+                ),
+            ),
         )
 
         val personList = PersonList(
-            data = items
+            data = items,
         )
 
-        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -424,27 +492,32 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("0") },
-                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
-                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
-                )
+                        Dog(name = "Bongo", age = 2).apply { setId("0") },
+                    ),
+                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") },
+                ),
             ),
             PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = emptyList(), myFavoriteDog = null
-                )
-            )
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = emptyList(),
+                    myFavoriteDog = null,
+                ),
+            ),
         )
 
         val personList = PersonList(
-            data = items
+            data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -458,26 +531,32 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("0") },
-                        Dog(name = "Bongo", age = 2).apply { setId("0") }),
-                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") }
-                ).apply { setId("0") }
-            ), PersonItem(
+                        Dog(name = "Bongo", age = 2).apply { setId("0") },
+                    ),
+                    myFavoriteDog = Dog(name = "Bella", age = 1).apply { setId("0") },
+                ).apply { setId("0") },
+            ),
+            PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
-                ).apply { setId("0") }
-            )
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
+                ).apply { setId("0") },
+            ),
         )
 
         val personList = PersonList(
-            data = items
+            data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -486,24 +565,33 @@ internal class TypeAdapterListTest {
         val items = listOf(
             PersonItem(
                 Person(
-                    name = "Jason", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
-                )
-            ), PersonItem(
+                    name = "Jason",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
+                ),
+            ),
+            PersonItem(
                 Person(
-                    name = "Jasminka", surname = "Apix", age = 28, allMyDogs = null, myFavoriteDog = null
-                )
-            )
+                    name = "Jasminka",
+                    surname = "Apix",
+                    age = 28,
+                    allMyDogs = null,
+                    myFavoriteDog = null,
+                ),
+            ),
         )
 
-        val personList = PersonList(items)
+        val personList = PersonList(data = items)
 
-        val response = getFileAsString("person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -517,9 +605,10 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("1") },
-                        Dog(name = "Bongo", age = 2).apply { setId("2") }),
-                    myFavoriteDog = null
-                )
+                        Dog(name = "Bongo", age = 2).apply { setId("2") },
+                    ),
+                    myFavoriteDog = null,
+                ),
             ),
             PersonItem(
                 Person(
@@ -528,23 +617,23 @@ internal class TypeAdapterListTest {
                     age = 28,
                     allMyDogs = listOf(
                         Dog(name = "Bella", age = 1).apply { setId("1") },
-                        Dog(name = "Bongo", age = 2).apply { setId("2") }),
-                    myFavoriteDog = null
-                )
-            )
+                        Dog(name = "Bongo", age = 2).apply { setId("2") },
+                    ),
+                    myFavoriteDog = null,
+                ),
+            ),
         )
-        val personList = PersonList(items)
+        val personList = PersonList(data = items)
 
-        val response = getFileAsString("person_list_all_my_dogs_with_id_set_for_each_dog.json")
+        val response = getFileAsString(filename = "person_list_all_my_dogs_with_id_set_for_each_dog.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
-
 
     @Test
     fun `given a Person List with root meta should generate a json with root meta info`() {
@@ -555,22 +644,22 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = null,
-                    myFavoriteDog = null
-                )
-            )
+                    myFavoriteDog = null,
+                ),
+            ),
         )
         val rootMeta = PersonRootMeta(owner = "Ali")
         val personList = PersonList(
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_root_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -587,19 +676,19 @@ internal class TypeAdapterListTest {
                     allMyDogs = null,
                     myFavoriteDog = null,
                 ),
-                resourceObjectMeta = resourceMeta
-            )
+                resourceObjectMeta = resourceMeta,
+            ),
         )
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_resource_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -620,19 +709,19 @@ internal class TypeAdapterListTest {
                 relationshipsMeta = mapOf(
                     "myFavoriteDog" to relationship1Meta,
                     "allMyDogs" to relationship2Meta,
-                )
-            )
+                ),
+            ),
         )
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_relationships_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -655,8 +744,8 @@ internal class TypeAdapterListTest {
                 relationshipsMeta = mapOf(
                     "myFavoriteDog" to relationship1Meta,
                     "allMyDogs" to relationship2Meta,
-                )
-            )
+                ),
+            ),
         )
 
         val rootMeta = PersonRootMeta(owner = "root")
@@ -665,13 +754,13 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_all_meta.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_all_meta.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -684,22 +773,22 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = null,
-                    myFavoriteDog = null
-                )
-            )
+                    myFavoriteDog = null,
+                ),
+            ),
         )
         val rootLinks = DefaultLinks(self = "root")
         val personList = PersonList(
             data = items,
             rootLinks = rootLinks,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_root_links.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_links.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -714,21 +803,21 @@ internal class TypeAdapterListTest {
                     surname = "Apix",
                     age = 28,
                     allMyDogs = null,
-                    myFavoriteDog = null
+                    myFavoriteDog = null,
                 ),
                 resourceObjectLinks = resourceLinks,
-            )
+            ),
         )
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_resource_links.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_links.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
@@ -749,44 +838,44 @@ internal class TypeAdapterListTest {
                 relationshipsLinks = mapOf(
                     "myFavoriteDog" to relationship1Links,
                     "allMyDogs" to relationship2Links,
-                )
-            )
+                ),
+            ),
         )
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString("person_list_convert_to_string_with_relationships_links.json")
+        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_links.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 
     @org.junit.jupiter.api.Test
     fun `given an empty Person list convertFromString should generate no error`() {
-        val response = getFileAsString("person_list_blank_data.json")
+        val response = getFileAsString(filename = "person_list_blank_data.json")
 
-        val result = typeListAdapter?.convertFromString(response)
+        val result = typeListAdapter?.convertFromString(input = response)
 
         Assertions.assertEquals(
             result?.data?.isEmpty(),
-            true
+            true,
         )
     }
 
     @org.junit.jupiter.api.Test
     fun `given an empty Person list convertToString should generate no error`() {
         val personList = PersonList(data = emptyList())
-        val response = getFileAsString("person_list_blank_data_encode.json")
+        val response = getFileAsString(filename = "person_list_blank_data_encode.json")
 
-        val result = typeListAdapter?.convertToString(personList)
+        val result = typeListAdapter?.convertToString(input = personList)
 
         Assertions.assertEquals(
             response,
-            result
+            result,
         )
     }
 

@@ -13,10 +13,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
 
-    companion object {
-        fun newInstance() = PersonFragment()
-    }
-
     override val layoutRes: Int = R.layout.fragment_person
 
     override val binding by viewBinding(FragmentPersonBinding::bind)
@@ -47,5 +43,9 @@ class PersonFragment : BaseFragment<PersonState, PersonEvent>() {
         binding.downloadPersonNoRelButton.setOnClickListener {
             viewModel.fetchPersonList(hasRelationships = false)
         }
+    }
+
+    companion object {
+        fun newInstance() = PersonFragment()
     }
 }

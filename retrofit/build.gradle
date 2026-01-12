@@ -31,6 +31,13 @@ dependencies {
     api packages.retrofit.core
     compileOnly project(":core")
     compileOnly packages.kotlin.serialization_core
+    
+    testImplementation packages.junit.api
+    testRuntimeOnly packages.junit.engine
+    testRuntimeOnly packages.junit.platform_launcher
+    testImplementation packages.junit.params
+    testImplementation project(":core")
+    testImplementation packages.kotlin.serialization_core
 }
 
 compileKotlin {
@@ -48,6 +55,13 @@ compileTestKotlin {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+    }
 }
 
 tasks.named('dokkaJavadoc') {

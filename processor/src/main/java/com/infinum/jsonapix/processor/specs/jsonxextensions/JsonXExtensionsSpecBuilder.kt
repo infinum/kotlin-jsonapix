@@ -66,7 +66,7 @@ internal class JsonXExtensionsSpecBuilder {
             attributesWrapperClassName = attributesObject,
             relationshipsObjectClassName = relationshipsObject,
             includedStatement = includedStatement,
-            includedListStatement = includedListStatement
+            includedListStatement = includedListStatement,
         )
     }
 
@@ -95,7 +95,7 @@ internal class JsonXExtensionsSpecBuilder {
                 ParameterSpec(
                     name = JsonApiConstants.Members.ERROR_BODY,
                     type = String::class.asTypeName(),
-                )
+                ),
             )
             .returns(List::class.asClassName().parameterizedBy(typeVariableName))
             .addModifiers(KModifier.INLINE)
@@ -103,14 +103,14 @@ internal class JsonXExtensionsSpecBuilder {
             .addTypeVariable(
                 typeVariableName.copy(
                     reified = true,
-                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
-                )
+                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName()),
+                ),
             )
             .addStatement(
                 "format.decodeFromString<%T<%L>>(%L).errors",
                 Errors::class,
                 JsonApiConstants.Members.GENERIC_TYPE_VARIABLE,
-                JsonApiConstants.Members.ERROR_BODY
+                JsonApiConstants.Members.ERROR_BODY,
             )
             .nextControlFlow("catch (e: %T)", IllegalArgumentException::class.asClassName())
             .addStatement("emptyList()")
@@ -130,17 +130,20 @@ internal class JsonXExtensionsSpecBuilder {
             .addTypeVariable(
                 typeVariableName.copy(
                     reified = true,
-                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName())
-                )
+                    bounds = listOf(com.infinum.jsonapix.core.resources.Error::class.asTypeName()),
+                ),
             )
             .addStatement("val response = response()")
             .addStatement("val body = response?.errorBody()?.charStream()?.readText()")
-            .addStatement("val errors = if (body != null) %L<Model>(body) else emptyList()",JsonApiConstants.Members.DECODE_JSON_API_ERROR)
+            .addStatement(
+                "val errors = if (body != null) %L<Model>(body) else emptyList()",
+                JsonApiConstants.Members.DECODE_JSON_API_ERROR,
+            )
             .addStatement("return JsonXHttpException(response(), errors)")
             .build()
     }
 
-
+    @Suppress("SwallowedException")
     private fun hasRetrofitModule(): Boolean {
         return try {
             Class.forName("com.infinum.jsonapix.retrofit.JsonXHttpException")
@@ -154,42 +157,42 @@ internal class JsonXExtensionsSpecBuilder {
     fun build(): FileSpec {
         val fileSpec = FileSpec.builder(
             JsonApiConstants.Packages.JSONX,
-            JsonApiConstants.FileNames.JSON_X_EXTENSIONS
+            JsonApiConstants.FileNames.JSON_X_EXTENSIONS,
         )
         fileSpec.addAnnotation(
             AnnotationSpec.builder(JvmName::class)
                 .addMember("%S", JsonApiConstants.FileNames.JSON_X_EXTENSIONS)
-                .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE).build()
+                .useSiteTarget(AnnotationSpec.UseSiteTarget.FILE).build(),
         )
 
         fileSpec.addImport(
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-            *JsonApiConstants.Imports.KOTLINX
+            *JsonApiConstants.Imports.KOTLINX,
         )
 
         fileSpec.addImport(
             JsonApiConstants.Packages.CORE_DISCRIMINATORS,
-            *JsonApiConstants.Imports.CORE_EXTENSIONS
+            *JsonApiConstants.Imports.CORE_EXTENSIONS,
         )
 
         fileSpec.addImport(
             JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            *JsonApiConstants.Imports.KOTLINX_MODULES
+            *JsonApiConstants.Imports.KOTLINX_MODULES,
         )
 
         fileSpec.addImport(
             JsonApiConstants.Packages.JSONX,
-            *JsonApiConstants.Imports.JSON_X
+            *JsonApiConstants.Imports.JSON_X,
         )
 
         fileSpec.addImport(
             JsonApiConstants.Packages.CORE_SHARED,
-            JsonApiConstants.Imports.MAP_SAFE
+            JsonApiConstants.Imports.MAP_SAFE,
         )
 
         fileSpec.addImport(
             JsonApiConstants.Packages.CORE_SHARED,
-            JsonApiConstants.Imports.FLAT_MAP_SAFE
+            JsonApiConstants.Imports.FLAT_MAP_SAFE,
         )
 
         specsMap.entries.forEach {
@@ -200,38 +203,38 @@ internal class JsonXExtensionsSpecBuilder {
                     it.value.attributesWrapperClassName,
                     it.value.relationshipsObjectClassName,
                     it.value.metaInfo?.resourceObjectClassName,
-                    it.value.linksInfo?.resourceObjectLinks
-                )
+                    it.value.linksInfo?.resourceObjectLinks,
+                ),
             )
             fileSpec.addFunction(
                 ResourceObjectFunSpecBuilder.build(
                     it.key,
                     it.value.resourceObjectClassName,
                     it.value.attributesWrapperClassName,
-                    it.value.relationshipsObjectClassName
-                )
+                    it.value.relationshipsObjectClassName,
+                ),
             )
             fileSpec.addFunction(
                 ListItemResourceObjectFunSpecBuilder.build(
                     it.key,
                     it.value.resourceObjectClassName,
                     it.value.attributesWrapperClassName,
-                    it.value.relationshipsObjectClassName
-                )
+                    it.value.relationshipsObjectClassName,
+                ),
             )
             fileSpec.addFunction(
                 WrapperFunSpecBuilder.build(
                     it.key,
                     it.value.jsonWrapperClassName,
                     it.value.includedStatement?.toString(),
-                )
+                ),
             )
             fileSpec.addFunction(
                 WrapperListFunSpecBuilder.build(
                     it.key,
                     it.value.jsonWrapperListClassName,
                     it.value.includedListStatement?.toString(),
-                )
+                ),
             )
 
             fileSpec.addFunction(SerializeFunSpecBuilder.build(it.key, it.value.isNullable))
@@ -243,8 +246,8 @@ internal class JsonXExtensionsSpecBuilder {
                 specsMap,
                 customLinks,
                 customErrors,
-                customMeta
-            )
+                customMeta,
+            ),
         )
         fileSpec.addProperty(FormatPropertySpecBuilder.build())
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
@@ -255,11 +258,10 @@ internal class JsonXExtensionsSpecBuilder {
         if (hasRetrofitModule()) {
             fileSpec.addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
-                JsonApiConstants.Imports.ERRORS
+                JsonApiConstants.Imports.ERRORS,
             )
             fileSpec.addFunction(asJsonXHttpExceptionFunSpec())
         }
-
 
         fileSpec.addFunction(DeserializeFunSpecBuilder.build())
         fileSpec.addFunction(DeserializeListFunSpecBuilder.build())

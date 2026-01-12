@@ -2,6 +2,9 @@ apply plugin: "io.gitlab.arturbosch.detekt"
 
 detekt {
     toolVersion = versions.detekt
+    config.setFrom(files("${rootProject.rootDir}/detekt.yml"))
+    source.setFrom(files("src/main/java", "src/main/kotlin"))
+    autoCorrect = true
 }
 
 dependencies {
