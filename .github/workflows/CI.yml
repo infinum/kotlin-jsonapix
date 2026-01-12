@@ -88,7 +88,6 @@ jobs:
           key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-caches-${{ runner.os }}-
-      - name: Unit tests
-        run: ./gradlew clean testDebugUnitTest
+        run: ./gradlew clean test
       - name: Stop Gradle
         run: ./gradlew --stop
