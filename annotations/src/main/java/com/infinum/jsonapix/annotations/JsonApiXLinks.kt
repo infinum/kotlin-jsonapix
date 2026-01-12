@@ -6,7 +6,7 @@ package com.infinum.jsonapix.annotations
 @JvmRepeatable(JsonApiXLinksList::class)
 annotation class JsonApiXLinks(
     val type: String,
-    val placementStrategy: LinksPlacementStrategy = LinksPlacementStrategy.ROOT
+    val placementStrategy: LinksPlacementStrategy = LinksPlacementStrategy.ROOT,
 )
 
 @Target(AnnotationTarget.CLASS)
