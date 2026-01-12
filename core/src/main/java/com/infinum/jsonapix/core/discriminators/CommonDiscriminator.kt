@@ -95,7 +95,6 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
     private fun MutableList<Map.Entry<String, JsonElement>>.removeNestedDiscriminator(key: String) {
         withIndex().firstOrNull { it.value.key == key }?.let {
-
             val metaJsonObject = it.value.value.takeUnless { json -> json is JsonNull }?.jsonObject
             if (metaJsonObject != null) {
                 val meta = removeDiscriminatorEntry(metaJsonObject)

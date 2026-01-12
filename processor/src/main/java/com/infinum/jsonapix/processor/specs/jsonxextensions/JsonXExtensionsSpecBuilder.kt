@@ -135,11 +135,10 @@ internal class JsonXExtensionsSpecBuilder {
             )
             .addStatement("val response = response()")
             .addStatement("val body = response?.errorBody()?.charStream()?.readText()")
-            .addStatement("val errors = if (body != null) %L<Model>(body) else emptyList()",JsonApiConstants.Members.DECODE_JSON_API_ERROR)
+            .addStatement("val errors = if (body != null) %L<Model>(body) else emptyList()", JsonApiConstants.Members.DECODE_JSON_API_ERROR)
             .addStatement("return JsonXHttpException(response(), errors)")
             .build()
     }
-
 
     private fun hasRetrofitModule(): Boolean {
         return try {
@@ -259,7 +258,6 @@ internal class JsonXExtensionsSpecBuilder {
             )
             fileSpec.addFunction(asJsonXHttpExceptionFunSpec())
         }
-
 
         fileSpec.addFunction(DeserializeFunSpecBuilder.build())
         fileSpec.addFunction(DeserializeListFunSpecBuilder.build())

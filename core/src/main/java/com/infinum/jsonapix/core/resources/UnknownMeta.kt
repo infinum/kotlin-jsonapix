@@ -6,4 +6,3 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("meta")
 class UnknownMeta : Meta
-
