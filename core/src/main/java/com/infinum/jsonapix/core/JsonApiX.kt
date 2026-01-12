@@ -11,7 +11,8 @@ import com.infinum.jsonapix.core.resources.ResourceObject
  * including the primary data, included resources, errors, links, and meta information.
  *
  * @param Data The type of the primary data object, typically a domain model.
- * @param Model The type of the original response model, which may include additional fields not covered by this interface.
+ * @param Model The type of the original response model,
+ * which may include additional fields not covered by this interface.
  */
 interface JsonApiX<out Data, out Model> {
     val data: ResourceObject<Data>?

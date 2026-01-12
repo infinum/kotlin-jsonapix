@@ -75,13 +75,13 @@ abstract class BaseActivity<State : Any, Event : Any> : AppCompatActivity() {
     fun showMessage(
         title: String = getString(R.string.app_name),
         message: String,
-        positiveCallback: (() -> Unit)? = null
+        positiveCallback: (() -> Unit)? = null,
     ) {
         showMessageDialog(
             this,
             title,
             message,
-            positiveCallback
+            positiveCallback,
         )
     }
 }

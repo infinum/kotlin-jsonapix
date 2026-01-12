@@ -33,7 +33,6 @@ class ApiModule {
     }
 
     @Provides
-    fun service(retromock: Retromock): SampleApiService {
-        return retromock.create(SampleApiService::class.java)
-    }
+    fun service(retromock: Retromock): SampleApiService =
+        retromock.create(SampleApiService::class.java)
 }

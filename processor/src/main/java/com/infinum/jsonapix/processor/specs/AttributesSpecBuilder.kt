@@ -23,7 +23,7 @@ internal object AttributesSpecBuilder {
     fun build(
         className: ClassName,
         attributes: List<PropertySpec>,
-        type: String
+        type: String,
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
         val parameterSpecs = attributes.map {
@@ -44,17 +44,17 @@ internal object AttributesSpecBuilder {
             .addSuperinterface(Attributes::class.asClassName())
             .addAnnotation(serializableClassName)
             .addAnnotation(
-                Specs.getSerialNameSpec(JsonApiConstants.Prefix.ATTRIBUTES.withName(type))
+                Specs.getSerialNameSpec(JsonApiConstants.Prefix.ATTRIBUTES.withName(type)),
             )
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(parameterSpecs)
-                    .build()
+                    .build(),
             )
             .addType(
                 TypeSpec.companionObjectBuilder()
                     .addFunction(fromOriginalObjectSpec(className, generatedName, attributes))
-                    .build()
+                    .build(),
             )
             .addProperties(attributes)
             .build()
@@ -63,14 +63,14 @@ internal object AttributesSpecBuilder {
     private fun fromOriginalObjectSpec(
         originalClass: ClassName,
         generatedName: String,
-        attributes: List<PropertySpec>
+        attributes: List<PropertySpec>,
     ): FunSpec {
         val constructorString = attributes.joinToString(", ") {
             "${it.name} = originalObject.${it.name}"
         }
         return FunSpec.builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
             .addParameter(
-                ParameterSpec.builder("originalObject", originalClass).build()
+                ParameterSpec.builder("originalObject", originalClass).build(),
             )
             .addStatement("return %L($constructorString)", generatedName)
             .returns(ClassName.bestGuess(generatedName))

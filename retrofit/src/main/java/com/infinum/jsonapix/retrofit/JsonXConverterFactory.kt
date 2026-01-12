@@ -12,7 +12,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
     override fun responseBodyConverter(
         type: Type,
         annotations: Array<out Annotation>,
-        retrofit: Retrofit
+        retrofit: Retrofit,
     ): Converter<ResponseBody, *>? =
         when (type) {
             is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {
@@ -25,7 +25,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
         type: Type,
         parameterAnnotations: Array<out Annotation>,
         methodAnnotations: Array<out Annotation>,
-        retrofit: Retrofit
+        retrofit: Retrofit,
     ): Converter<*, RequestBody>? =
         when (type) {
             is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {

@@ -8,5 +8,5 @@ import javax.inject.Inject
 @HiltViewModel
 class DogViewModel @Inject constructor(
     @Suppress("UnusedPrivateMember")
-    private val sampleApiService: SampleApiService
+    private val sampleApiService: SampleApiService,
 ) : BaseViewModel<DogState, DogEvent>()

@@ -11,5 +11,5 @@ data class DefaultLinks(
     @SerialName("first") val first: String? = null,
     @SerialName("last") val last: String? = null,
     @SerialName("next") val next: String? = null,
-    @SerialName("prev") val prev: String? = null
+    @SerialName("prev") val prev: String? = null,
 ) : Links

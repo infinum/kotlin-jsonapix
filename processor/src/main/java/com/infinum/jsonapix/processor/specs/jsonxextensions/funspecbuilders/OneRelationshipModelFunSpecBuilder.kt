@@ -24,7 +24,7 @@ internal object OneRelationshipModelFunSpecBuilder {
             .addStatement(
                 "return %T(data = %T(type, id))",
                 OneRelationshipMember::class.asClassName(),
-                ResourceIdentifier::class.asClassName()
+                ResourceIdentifier::class.asClassName(),
             )
             .build()
     }

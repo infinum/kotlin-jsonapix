@@ -19,7 +19,9 @@ import kotlinx.serialization.PolymorphicSerializer
 internal object SerializeListFunSpecBuilder {
 
     fun build(originalClass: ClassName): FunSpec {
-        val modelClass = ClassName.bestGuess(originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST))
+        val modelClass = ClassName.bestGuess(
+            originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
+        )
 
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXListClass = JsonApiXList::class.asClassName()
@@ -27,13 +29,13 @@ internal object SerializeListFunSpecBuilder {
         val linksParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build()
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build(),
         )
 
         val metaParams = listOf(
             ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
             ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build()
+            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
         )
 
         return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
@@ -45,7 +47,7 @@ internal object SerializeListFunSpecBuilder {
             .addAnnotation(
                 AnnotationSpec.builder(JvmName::class)
                     .addMember("%S", "${JsonApiConstants.Members.JSONX_SERIALIZE}${originalClass.simpleName}")
-                    .build()
+                    .build(),
             )
             .addStatement("val jsonX = this.%M()", jsonApiListWrapperMember)
             .addStatement(
@@ -62,17 +64,17 @@ internal object SerializeListFunSpecBuilder {
                 JsonApiConstants.Members.ROOT_META,
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
+                JsonApiConstants.Keys.ERRORS,
             )
             .addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",
                 formatMember,
                 encodeMember,
                 polymorphicSerializerClass,
-                jsonXListClass
+                jsonXListClass,
             )
             .addStatement(
-                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()"
+                "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()",
             )
             .build()
     }

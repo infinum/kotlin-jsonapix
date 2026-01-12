@@ -18,6 +18,6 @@ class JsonApiXIssueRegistry : IssueRegistry() {
     override val vendor: Vendor = Vendor(
         vendorName = "Infinum Inc.",
         feedbackUrl = "https://github.com/infinum/kotlin-jsonapix/issues",
-        contact = "https://github.com/infinum/kotlin-jsonapix"
+        contact = "https://github.com/infinum/kotlin-jsonapix",
     )
 }

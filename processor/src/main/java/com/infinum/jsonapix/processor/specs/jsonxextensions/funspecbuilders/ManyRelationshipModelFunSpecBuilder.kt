@@ -25,13 +25,13 @@ internal object ManyRelationshipModelFunSpecBuilder {
                 ParameterSpec.builder(
                     "idMapper",
                     Function1::class.asClassName()
-                        .parameterizedBy(typeVariableName, String::class.asClassName())
-                ).defaultValue("{ \"\" }").build()
+                        .parameterizedBy(typeVariableName, String::class.asClassName()),
+                ).defaultValue("{ \"\" }").build(),
             )
             .addStatement(
                 "return %T(data = map { %T(type, idMapper(it)) })",
                 ManyRelationshipMember::class.asClassName(),
-                ResourceIdentifier::class.asClassName()
+                ResourceIdentifier::class.asClassName(),
             )
             .build()
     }

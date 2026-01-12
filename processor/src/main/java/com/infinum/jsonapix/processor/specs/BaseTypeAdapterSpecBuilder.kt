@@ -31,6 +31,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
 
     public abstract fun getAdditionalImports(): List<String>
 
+    @Suppress("LongMethod", "LongParameterList")
     public fun build(
         className: ClassName,
         rootLinks: ClassName?,
@@ -39,12 +40,12 @@ public abstract class BaseTypeAdapterSpecBuilder {
         rootMeta: ClassName?,
         resourceObjectMeta: ClassName?,
         relationshipsMeta: ClassName?,
-        errors: String?
+        errors: String?,
     ): FileSpec {
         val generatedName = getAdapterPrefixName().withName(className.simpleName)
         val typeAdapterClassName = ClassName(
             className.packageName,
-            generatedName
+            generatedName,
         )
         val modelType = getWrapperClassName(className)
         return FileSpec.builder(className.packageName, generatedName)
@@ -52,18 +53,28 @@ public abstract class BaseTypeAdapterSpecBuilder {
                 TypeSpec.classBuilder(typeAdapterClassName)
                     .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(modelType))
                     .addFunction(convertToStringFunSpec(modelType))
-                    .addFunction(convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta))
+                    .addFunction(
+                        convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta),
+                    )
                     .apply {
                         if (rootLinks != null) {
                             addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks.canonicalName))
                         }
                         if (resourceObjectLinks != null) {
                             addFunction(
-                                linksFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, resourceObjectLinks.canonicalName)
+                                linksFunSpec(
+                                    JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
+                                    resourceObjectLinks.canonicalName,
+                                ),
                             )
                         }
                         if (relationshipsLinks != null) {
-                            addFunction(linksFunSpec(JsonApiConstants.Members.RELATIONSHIPS_LINKS, relationshipsLinks.canonicalName))
+                            addFunction(
+                                linksFunSpec(
+                                    JsonApiConstants.Members.RELATIONSHIPS_LINKS,
+                                    relationshipsLinks.canonicalName,
+                                ),
+                            )
                         }
 
                         if (rootMeta != null) {
@@ -71,18 +82,26 @@ public abstract class BaseTypeAdapterSpecBuilder {
                         }
                         if (resourceObjectMeta != null) {
                             addFunction(
-                                metaFunSpec(JsonApiConstants.Members.RESOURCE_OBJECT_META, resourceObjectMeta.canonicalName)
+                                metaFunSpec(
+                                    JsonApiConstants.Members.RESOURCE_OBJECT_META,
+                                    resourceObjectMeta.canonicalName,
+                                ),
                             )
                         }
                         if (relationshipsMeta != null) {
-                            addFunction(metaFunSpec(JsonApiConstants.Members.RELATIONSHIPS_META, relationshipsMeta.canonicalName))
+                            addFunction(
+                                metaFunSpec(
+                                    JsonApiConstants.Members.RELATIONSHIPS_META,
+                                    relationshipsMeta.canonicalName,
+                                ),
+                            )
                         }
 
                         if (errors != null) {
                             addFunction(errorsFunSpec(errors))
                         }
                     }
-                    .build()
+                    .build(),
             )
             .addImport(
                 JsonApiConstants.Packages.JSONX,
@@ -105,7 +124,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
                 JsonApiConstants.Members.ROOT_META,
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
-                JsonApiConstants.Keys.ERRORS
+                JsonApiConstants.Keys.ERRORS,
             )
             .build()
     }

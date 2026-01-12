@@ -465,7 +465,7 @@ internal class ErrorHandlingIntegrationTest {
     fun `given JsonXHttpException when created with errors should store them correctly`() {
         val errors = listOf(
             PersonalError("Error 1"),
-            PersonalError("Error 2")
+            PersonalError("Error 2"),
         )
         val exception = JsonXHttpException<PersonalError>(null, errors)
 
@@ -507,7 +507,7 @@ internal class ErrorHandlingIntegrationTest {
         val converter = JsonXResponseBodyConverter(adapter!!)
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            "invalid json {{{{"
+            "invalid json {{{{",
         )
 
         assertThrows<Exception> {

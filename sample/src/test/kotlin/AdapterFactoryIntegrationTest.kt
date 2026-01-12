@@ -5,7 +5,6 @@ import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogList
 import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Person
-import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -90,7 +89,7 @@ internal class AdapterFactoryIntegrationTest {
             surname = "Doe",
             age = 30,
             allMyDogs = null,
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val model = PersonModel(data = person)
 
@@ -194,7 +193,7 @@ internal class AdapterFactoryIntegrationTest {
             surname = "Smith",
             age = 40,
             allMyDogs = listOf(dog1, dog2),
-            myFavoriteDog = dog1
+            myFavoriteDog = dog1,
         ).apply { setId("100") }
         val model = PersonModel(data = person)
 

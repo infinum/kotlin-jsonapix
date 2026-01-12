@@ -6,13 +6,13 @@ import com.infinum.jsonapix.data.assets.JsonAssetReader
 import com.infinum.jsonapix.data.models.PersonalError
 import com.infinum.jsonapix.ui.shared.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.HttpException
 import javax.inject.Inject
+import retrofit2.HttpException
 
 @HiltViewModel
 class ErrorViewModel @Inject constructor(
     private val sampleApiService: SampleApiService,
-    private val jsonAssetReader: JsonAssetReader
+    private val jsonAssetReader: JsonAssetReader,
 ) : BaseViewModel<ErrorState, ErrorEvent>() {
 
     @Suppress("UnusedPrivateMember")

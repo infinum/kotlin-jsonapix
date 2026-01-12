@@ -8,6 +8,7 @@ import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
+import java.io.InputStreamReader
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Retrofit
-import java.io.InputStreamReader
 
 /**
  * Integration tests for Retrofit module components.
@@ -44,7 +44,7 @@ internal class RetrofitIntegrationTest {
         val converter = converterFactory.responseBodyConverter(
             PersonModel::class.java,
             emptyArray(),
-            retrofit
+            retrofit,
         )
 
         assertNotNull(converter, "Response body converter should not be null")
@@ -62,7 +62,7 @@ internal class RetrofitIntegrationTest {
             PersonModel::class.java,
             emptyArray(),
             emptyArray(),
-            retrofit
+            retrofit,
         )
 
         assertNotNull(converter, "Request body converter should not be null")
@@ -91,7 +91,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)
@@ -136,7 +136,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)
@@ -158,7 +158,7 @@ internal class RetrofitIntegrationTest {
             surname = "Brown",
             age = 35,
             allMyDogs = null,
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val model = PersonModel(data = person)
 
@@ -179,7 +179,7 @@ internal class RetrofitIntegrationTest {
             surname = "Davis",
             age = 29,
             allMyDogs = null,
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val model = PersonModel(data = person)
 
@@ -206,7 +206,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)
@@ -231,7 +231,7 @@ internal class RetrofitIntegrationTest {
             surname = "Miller",
             age = 40,
             allMyDogs = listOf(dog1, dog2),
-            myFavoriteDog = dog1
+            myFavoriteDog = dog1,
         ).apply { setId("10") }
         val model = PersonModel(data = person)
 
@@ -258,12 +258,12 @@ internal class RetrofitIntegrationTest {
         val personConverter = converterFactory.responseBodyConverter(
             PersonModel::class.java,
             emptyArray(),
-            retrofit
+            retrofit,
         )
         val dogConverter = converterFactory.responseBodyConverter(
             DogModel::class.java,
             emptyArray(),
-            retrofit
+            retrofit,
         )
 
         assertNotNull(personConverter, "Person converter should not be null")
@@ -298,7 +298,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)
@@ -318,7 +318,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)
@@ -339,12 +339,12 @@ internal class RetrofitIntegrationTest {
             PersonModel::class.java,
             emptyArray(),
             emptyArray(),
-            retrofit
+            retrofit,
         )
         val responseConverter = converterFactory.responseBodyConverter(
             PersonModel::class.java,
             emptyArray(),
-            retrofit
+            retrofit,
         )
 
         assertNotNull(requestConverter, "Request converter should be created")
@@ -367,8 +367,9 @@ internal class RetrofitIntegrationTest {
         // Convert back using response converter
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
+
         @Suppress("UNCHECKED_CAST")
         val typedResponseConverter = responseConverter as JsonXResponseBodyConverter<PersonModel>
         val result = typedResponseConverter.convert(responseBody)
@@ -393,7 +394,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)
@@ -413,7 +414,7 @@ internal class RetrofitIntegrationTest {
             surname = "Anderson",
             age = 45,
             allMyDogs = null,
-            myFavoriteDog = null
+            myFavoriteDog = null,
         )
         val model = PersonModel(data = person)
 
@@ -457,7 +458,7 @@ internal class RetrofitIntegrationTest {
 
         val responseBody = ResponseBody.create(
             MediaType.parse("application/json"),
-            json
+            json,
         )
 
         val result = converter.convert(responseBody)

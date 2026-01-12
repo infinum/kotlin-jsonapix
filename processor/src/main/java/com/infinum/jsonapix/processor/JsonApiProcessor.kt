@@ -53,14 +53,14 @@ public class JsonApiProcessor : AbstractProcessor() {
         mutableSetOf(
             JsonApiX::class.java.name,
             JsonApiXLinks::class.java.name,
-            JsonApiXMeta::class.java.name
+            JsonApiXMeta::class.java.name,
         )
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
     override fun process(
         annotations: MutableSet<out TypeElement>?,
-        roundEnv: RoundEnvironment?
+        roundEnv: RoundEnvironment?,
     ): Boolean {
         roundEnv?.processLinksAnnotation()
         roundEnv?.processMetaAnnotations()
@@ -73,7 +73,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 if (it.kind != ElementKind.CLASS) {
                     processingEnv.messager.printMessage(
                         Diagnostic.Kind.ERROR,
-                        "Only classes can be annotated"
+                        "Only classes can be annotated",
                     )
                     return true
                 }
@@ -100,7 +100,7 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val metadata = element.getAnnotation(Metadata::class.java)
         val typeSpec = metadata.toKmClass().toTypeSpec(
-            ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils)
+            ElementsClassInspector.create(processingEnv.elementUtils, processingEnv.typeUtils),
         )
 
         val inputDataClass = ClassName(generatedPackage, className)
@@ -124,7 +124,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 AttributesSpecBuilder.build(
                     ClassName(generatedPackage, className),
                     primitives,
-                    type
+                    type,
                 )
             val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
                 .addType(attributesTypeSpec).build()
@@ -145,7 +145,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 inputDataClass,
                 type,
                 oneRelationships,
-                manyRelationships
+                manyRelationships,
             )
 
             val relationshipsFileSpec =
@@ -153,11 +153,11 @@ public class JsonApiProcessor : AbstractProcessor() {
                     .addType(relationshipsTypeSpec)
                     .addImport(
                         JsonApiConstants.Packages.CORE,
-                        JsonApiConstants.Imports.JSON_API_MODEL
+                        JsonApiConstants.Imports.JSON_API_MODEL,
                     )
                     .addImport(
                         JsonApiConstants.Packages.JSONX,
-                        *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS
+                        *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS,
                     )
                     .build()
             relationshipsFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
@@ -184,12 +184,12 @@ public class JsonApiProcessor : AbstractProcessor() {
             relationshipsObject = relationshipsClassName,
             includedStatement = IncludedSpecBuilder.build(
                 oneRelationships,
-                manyRelationships
+                manyRelationships,
             ),
             includedListStatement = IncludedSpecBuilder.buildForList(
                 oneRelationships,
-                manyRelationships
-            )
+                manyRelationships,
+            ),
         )
 
         adapterFactoryCollector.add(inputDataClass)
@@ -202,13 +202,33 @@ public class JsonApiProcessor : AbstractProcessor() {
                 type = type,
                 attributes = primitives,
                 oneRelationships = mapOf(*oneRelationships.map { it.name to it.type }.toTypedArray()),
-                manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray())
+                manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()),
             )
 
-        val wrapperFileSpec = JsonApiXSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo, customError)
-        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(inputDataClass, isNullable, type, metaInfo, linksInfo, customError)
+        val wrapperFileSpec = JsonApiXSpecBuilder.build(
+            inputDataClass,
+            isNullable,
+            type,
+            metaInfo,
+            linksInfo,
+            customError,
+        )
+        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(
+            inputDataClass,
+            isNullable,
+            type,
+            metaInfo,
+            linksInfo,
+            customError,
+        )
         val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
-        val listItemFileSpec = JsonApiListItemSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
+        val listItemFileSpec = JsonApiListItemSpecBuilder.build(
+            inputDataClass,
+            isNullable,
+            metaInfo,
+            linksInfo,
+            customError,
+        )
         val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
 
         val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
@@ -219,7 +239,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootMeta = metaInfo?.rootClassName,
             resourceObjectMeta = metaInfo?.resourceObjectClassName,
             relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customError?.canonicalName
+            errors = customError?.canonicalName,
         )
 
         val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
@@ -230,7 +250,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             rootMeta = metaInfo?.rootClassName,
             resourceObjectMeta = metaInfo?.resourceObjectClassName,
             relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customError?.canonicalName
+            errors = customError?.canonicalName,
         )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
@@ -267,7 +287,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     private fun storeCustomError(element: Element, type: String) {
         val className = ClassName(
             processingEnv.elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString()
+            element.simpleName.toString(),
         )
         customErrors[type] = className
     }
@@ -286,7 +306,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 storeCustomLinksAndReturnClassName(
                     element = element,
                     type = typeAndPlacementStrategy.first,
-                    placementStrategy = typeAndPlacementStrategy.second
+                    placementStrategy = typeAndPlacementStrategy.second,
                 )
             }
         }
@@ -298,13 +318,15 @@ public class JsonApiProcessor : AbstractProcessor() {
             storeCustomLinksAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
         }
 
-        collector.addCustomLinks(links = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty())
+        collector.addCustomLinks(
+            links = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty(),
+        )
     }
 
     private fun storeCustomLinksAndReturnClassName(element: Element, type: String, placementStrategy: LinksPlacementStrategy): ClassName {
         val className = ClassName(
             processingEnv.elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString()
+            element.simpleName.toString(),
         )
         customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
             when (placementStrategy) {
@@ -338,7 +360,7 @@ public class JsonApiProcessor : AbstractProcessor() {
                 storeCustomMetaAndReturnClassName(
                     element = element,
                     type = typeAndPlacementStrategy.first,
-                    placementStrategy = typeAndPlacementStrategy.second
+                    placementStrategy = typeAndPlacementStrategy.second,
                 )
             }
         }
@@ -350,13 +372,15 @@ public class JsonApiProcessor : AbstractProcessor() {
             storeCustomMetaAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
         }
 
-        collector.addCustomMetas(meta = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty())
+        collector.addCustomMetas(
+            meta = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty(),
+        )
     }
 
     private fun storeCustomMetaAndReturnClassName(element: Element, type: String, placementStrategy: MetaPlacementStrategy): ClassName {
         val className = ClassName(
             processingEnv.elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString()
+            element.simpleName.toString(),
         )
         customMetas.firstOrNull { metaInfo -> metaInfo.type == type }?.let { metaInfo ->
             when (placementStrategy) {

@@ -9,7 +9,7 @@ internal object IncludedSpecBuilder {
 
     fun build(
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>
+        manyRelationships: List<PropertySpec>,
     ): CodeBlock {
         val statement = StringBuilder("listOfNotNull(")
 
@@ -19,7 +19,8 @@ internal object IncludedSpecBuilder {
                 """data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                     relationshipsMeta?.get("${prop.name}"),
                     relationshipsLinks?.get("${prop.name}")
-                )}""".trimMargin()
+                )}
+                """.trimMargin(),
             )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
@@ -33,7 +34,8 @@ internal object IncludedSpecBuilder {
                 """*data.${prop.name}.mapSafe { it.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                         relationshipsMeta?.get("${prop.name}"),
                         relationshipsLinks?.get("${prop.name}")
-                    )}}.toTypedArray()""".trimMargin()
+                    )}}.toTypedArray()
+                """.trimMargin(),
             )
             if (index != manyRelationships.lastIndex) {
                 statement.append(", ")
@@ -46,17 +48,17 @@ internal object IncludedSpecBuilder {
 
     fun buildForList(
         oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>
+        manyRelationships: List<PropertySpec>,
     ): CodeBlock {
         val statement = StringBuilder("listOfNotNull(")
         oneRelationships.forEachIndexed { index, prop ->
             statement.append(
-                """*data.mapSafe {item -> 
+                """*data.mapSafe {item ->
                     item.data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                         item.relationshipsMeta?.get("${prop.name}"),
                         item.relationshipsLinks?.get("${prop.name}")
                     )} }.toTypedArray()
-                    """.trimMargin()
+                """.trimMargin(),
             )
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
@@ -71,7 +73,8 @@ internal object IncludedSpecBuilder {
                 """it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                      item.relationshipsMeta?.get("${prop.name}"),
                      item.relationshipsLinks?.get("${prop.name}")
-                )""".trimMargin()
+                )
+                """.trimMargin(),
             )
             statement.append("} }.toTypedArray()")
             if (index != manyRelationships.lastIndex) {

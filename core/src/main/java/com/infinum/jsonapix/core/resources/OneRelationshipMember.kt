@@ -3,6 +3,7 @@ package com.infinum.jsonapix.core.resources
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Suppress("UseDataClass")
 @Serializable
 class OneRelationshipMember(
     @SerialName("data") val data: ResourceIdentifier? = null,

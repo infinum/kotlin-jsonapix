@@ -9,15 +9,15 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asClassName
 
 internal object OriginalDataResourceObjectFunSpecBuilder {
+    @Suppress("LongMethod", "LongParameterList")
     fun build(
         originalClass: ClassName,
         resourceObjectClass: ClassName,
         attributesClass: ClassName?,
         relationshipsClass: ClassName?,
         resourceMeta: ClassName?,
-        resourceLinksClass: ClassName?
+        resourceLinksClass: ClassName?,
     ): FunSpec {
-
         val returnStatement = StringBuilder("return %T(")
         val builderArgs = mutableListOf<Any>(resourceObjectClass)
 
@@ -25,26 +25,26 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
 
         if (attributesClass != null) {
             returnStatement.append(
-                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this), "
+                "attributes = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this), ",
             )
             builderArgs.add(attributesClass)
         }
 
         if (relationshipsClass != null) {
             returnStatement.append(
-                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this), "
+                "relationships = %T.${JsonApiConstants.Members.FROM_ORIGINAL_OBJECT}(this), ",
             )
             builderArgs.add(relationshipsClass)
         }
 
         returnStatement.append("meta = meta as? %T, ")
         builderArgs.add(
-            resourceMeta ?: Meta::class
+            resourceMeta ?: Meta::class,
         )
 
         returnStatement.append("links = links as? %T")
         builderArgs.add(
-            resourceLinksClass ?: DefaultLinks::class
+            resourceLinksClass ?: DefaultLinks::class,
         )
         returnStatement.append(")")
 
@@ -57,11 +57,11 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
             )
             .addParameter(
                 "links",
-                Links::class.asClassName().copy(nullable = true)
+                Links::class.asClassName().copy(nullable = true),
             )
             .addStatement(
                 format = returnStatement.toString(),
-                args = builderArgs.toTypedArray()
+                args = builderArgs.toTypedArray(),
             )
             .build()
     }

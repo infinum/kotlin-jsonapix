@@ -19,23 +19,23 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
         isRootNullable: Boolean,
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
-        customError: ClassName?
+        customError: ClassName?,
     ): List<ParameterSpec> {
         return listOf(
             JsonApiConstants.Keys.DATA.asParam(
                 className = getRootClassName(className),
                 isNullable = isRootNullable,
-                defaultValue = JsonApiConstants.Defaults.NULL.takeIf { isRootNullable }
+                defaultValue = JsonApiConstants.Defaults.NULL.takeIf { isRootNullable },
             ),
             JsonApiConstants.Members.ROOT_LINKS.asParam(
                 className = linksInfo?.rootLinks ?: DefaultLinks::class.asClassName(),
                 isNullable = true,
-                defaultValue = JsonApiConstants.Defaults.NULL
+                defaultValue = JsonApiConstants.Defaults.NULL,
             ),
             JsonApiConstants.Members.RESOURCE_OBJECT_LINKS.asParam(
                 className = linksInfo?.resourceObjectLinks ?: DefaultLinks::class.asClassName(),
                 isNullable = true,
-                defaultValue = JsonApiConstants.Defaults.NULL
+                defaultValue = JsonApiConstants.Defaults.NULL,
             ),
             JsonApiConstants.Members.RELATIONSHIPS_LINKS.asParam(
                 className = Map::class.asClassName().parameterizedBy(
@@ -67,7 +67,7 @@ internal object JsonApiModelSpecBuilder : BaseJsonApiModelSpecBuilder() {
                 ),
                 isNullable = true,
                 defaultValue = JsonApiConstants.Defaults.EMPTY_MAP,
-            )
+            ),
         )
     }
 }

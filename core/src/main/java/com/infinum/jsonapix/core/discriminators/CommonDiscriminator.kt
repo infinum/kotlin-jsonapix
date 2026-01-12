@@ -23,9 +23,8 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
 
     override fun inject(jsonElement: JsonElement): JsonElement {
         return when (jsonElement) {
-            is JsonObject -> {
+            is JsonObject ->
                 addDiscriminatorEntry(jsonElement)
-            }
 
             is JsonArray -> {
                 val jsonArray = jsonElement.jsonArray
@@ -37,17 +36,15 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 JsonArray(newJsonArray)
             }
 
-            else -> {
+            else ->
                 throw IllegalArgumentException("Input must be either JSON object or array")
-            }
         }
     }
 
     override fun extract(jsonElement: JsonElement): JsonElement {
         return when (jsonElement) {
-            is JsonObject -> {
+            is JsonObject ->
                 removeDiscriminatorEntry(jsonElement)
-            }
 
             is JsonArray -> {
                 val jsonArray = jsonElement.jsonArray
@@ -59,9 +56,8 @@ class CommonDiscriminator(private val discriminator: String) : Discriminator {
                 JsonArray(newJsonArray)
             }
 
-            else -> {
+            else ->
                 throw IllegalArgumentException("Input must be either JSON object or array")
-            }
         }
     }
 
