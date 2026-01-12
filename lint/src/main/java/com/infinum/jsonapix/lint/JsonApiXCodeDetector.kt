@@ -75,7 +75,7 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             context.log(
                 exception = null,
                 format = "$annotationName -> ${isPrimaryDataNullable(node)} -> ${
-                    isAllFieldsHasDefaultValues(node)
+                isAllFieldsHasDefaultValues(node)
                 }",
             )
         }
