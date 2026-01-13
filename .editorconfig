@@ -1,5 +1,12 @@
 root=true
 [*.{kt,kts}]
-max_line_length=140
+max_line_length=180
 indent_style = space
 indent_size = 4
+
+# IntelliJ IDEA import ordering
+ij_kotlin_imports_layout = *,|,java.**,|,javax.**,|,kotlin.**,|,^
+ij_kotlin_packages_to_use_import_on_demand = unset
+
+[**/test/**/*.{kt,kts}]
+max_line_length=off

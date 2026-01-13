@@ -9,13 +9,13 @@ import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
-import java.io.InputStreamReader
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.InputStreamReader
 
 /**
  * Integration tests for Links and Meta handling across all placement strategies.
@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test
  */
 @Suppress("TooManyFunctions", "StringLiteralDuplication")
 internal class LinksAndMetaIntegrationTest {
-
     private lateinit var factory: TypeAdapterFactory
 
     @BeforeEach
@@ -40,10 +39,11 @@ internal class LinksAndMetaIntegrationTest {
 
         val person = Person(name = "John", surname = "Doe", age = 30, allMyDogs = null, myFavoriteDog = null).apply { setId(id = "1") }
         val rootMeta = PersonRootMeta(owner = "TestOwner")
-        val model = PersonModel(
-            data = person,
-            rootMeta = rootMeta,
-        )
+        val model =
+            PersonModel(
+                data = person,
+                rootMeta = rootMeta,
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -92,10 +92,11 @@ internal class LinksAndMetaIntegrationTest {
 
         val person = Person(name = "Carol", surname = "White", age = 35, allMyDogs = null, myFavoriteDog = null).apply { setId(id = "1") }
         val resourceMeta = PersonResourceMeta(writer = "ResourceWriter")
-        val model = PersonModel(
-            data = person,
-            resourceObjectMeta = resourceMeta,
-        )
+        val model =
+            PersonModel(
+                data = person,
+                resourceObjectMeta = resourceMeta,
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -123,10 +124,11 @@ internal class LinksAndMetaIntegrationTest {
 
         val person = Person(name = "Dave", surname = "Brown", age = 40, allMyDogs = null, myFavoriteDog = null)
         val resourceMeta = PersonResourceMeta(writer = "ItemWriter")
-        val item = PersonItem(
-            data = person,
-            resourceObjectMeta = resourceMeta,
-        )
+        val item =
+            PersonItem(
+                data = person,
+                resourceObjectMeta = resourceMeta,
+            )
         val personList = PersonList(data = listOf(item))
 
         val json = adapter!!.convertToString(input = personList)
@@ -148,10 +150,11 @@ internal class LinksAndMetaIntegrationTest {
         val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
         val person = Person(name = "Emma", surname = "Davis", age = 29, allMyDogs = null, myFavoriteDog = dog).apply { setId(id = "1") }
         val relationshipMeta = PersonRelationshipMeta(user = "RelUser")
-        val model = PersonModel(
-            data = person,
-            relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
-        )
+        val model =
+            PersonModel(
+                data = person,
+                relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -169,17 +172,22 @@ internal class LinksAndMetaIntegrationTest {
 
         val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
         val dog2 = Dog(name = "Bella", age = 5).apply { setId(id = "2") }
-        val person = Person(name = "Frank", surname = "Miller", age = 38, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply { setId(id = "1") }
+        val person =
+            Person(name = "Frank", surname = "Miller", age = 38, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply {
+                setId(id = "1")
+            }
 
         val meta1 = PersonRelationshipMeta(user = "User1")
         val meta2 = PersonRelationshipMeta(user = "User2")
-        val model = PersonModel(
-            data = person,
-            relationshipsMeta = mapOf(
-                "myFavoriteDog" to meta1,
-                "allMyDogs" to meta2,
-            ),
-        )
+        val model =
+            PersonModel(
+                data = person,
+                relationshipsMeta =
+                    mapOf(
+                        "myFavoriteDog" to meta1,
+                        "allMyDogs" to meta2,
+                    ),
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -211,22 +219,27 @@ internal class LinksAndMetaIntegrationTest {
 
         val dog1 = Dog(name = "Rex", age = 4).apply { setId(id = "1") }
         val dog2 = Dog(name = "Spot", age = 6).apply { setId(id = "2") }
-        val person = Person(name = "Grace", surname = "Wilson", age = 33, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply { setId(id = "1") }
+        val person =
+            Person(name = "Grace", surname = "Wilson", age = 33, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply {
+                setId(id = "1")
+            }
 
         val rootMeta = PersonRootMeta(owner = "RootOwner")
         val resourceMeta = PersonResourceMeta(writer = "DataWriter")
         val rel1Meta = PersonRelationshipMeta(user = "RelUser1")
         val rel2Meta = PersonRelationshipMeta(user = "RelUser2")
 
-        val model = PersonModel(
-            data = person,
-            rootMeta = rootMeta,
-            resourceObjectMeta = resourceMeta,
-            relationshipsMeta = mapOf(
-                "myFavoriteDog" to rel1Meta,
-                "allMyDogs" to rel2Meta,
-            ),
-        )
+        val model =
+            PersonModel(
+                data = person,
+                rootMeta = rootMeta,
+                resourceObjectMeta = resourceMeta,
+                relationshipsMeta =
+                    mapOf(
+                        "myFavoriteDog" to rel1Meta,
+                        "allMyDogs" to rel2Meta,
+                    ),
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -264,14 +277,16 @@ internal class LinksAndMetaIntegrationTest {
         assertNotNull(adapter)
 
         val person = Person(name = "Henry", surname = "Taylor", age = 42, allMyDogs = null, myFavoriteDog = null)
-        val rootLinks = DefaultLinks(
-            self = "https://api.example.com/persons",
-            related = "https://api.example.com/persons/related",
-        )
-        val model = PersonModel(
-            data = person,
-            rootLinks = rootLinks,
-        )
+        val rootLinks =
+            DefaultLinks(
+                self = "https://api.example.com/persons",
+                related = "https://api.example.com/persons/related",
+            )
+        val model =
+            PersonModel(
+                data = person,
+                rootLinks = rootLinks,
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -287,10 +302,11 @@ internal class LinksAndMetaIntegrationTest {
 
         val person = Person(name = "Iris", surname = "Anderson", age = 27, allMyDogs = null, myFavoriteDog = null)
         val resourceLinks = DefaultLinks(self = "https://api.example.com/persons/1")
-        val model = PersonModel(
-            data = person,
-            resourceObjectLinks = resourceLinks,
-        )
+        val model =
+            PersonModel(
+                data = person,
+                resourceObjectLinks = resourceLinks,
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -306,14 +322,16 @@ internal class LinksAndMetaIntegrationTest {
 
         val dog = Dog(name = "Luna", age = 2).apply { setId(id = "1") }
         val person = Person(name = "Jack", surname = "Thomas", age = 31, allMyDogs = null, myFavoriteDog = dog).apply { setId(id = "1") }
-        val relationshipLinks = DefaultLinks(
-            self = "https://api.example.com/persons/1/relationships/myFavoriteDog",
-            related = "https://api.example.com/persons/1/myFavoriteDog",
-        )
-        val model = PersonModel(
-            data = person,
-            relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
-        )
+        val relationshipLinks =
+            DefaultLinks(
+                self = "https://api.example.com/persons/1/relationships/myFavoriteDog",
+                related = "https://api.example.com/persons/1/myFavoriteDog",
+            )
+        val model =
+            PersonModel(
+                data = person,
+                relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -336,12 +354,13 @@ internal class LinksAndMetaIntegrationTest {
         val resourceLinks = DefaultLinks(self = "https://api.example.com/persons/1")
         val relationshipLinks = DefaultLinks(self = "https://api.example.com/persons/1/relationships/myFavoriteDog")
 
-        val model = PersonModel(
-            data = person,
-            rootLinks = rootLinks,
-            resourceObjectLinks = resourceLinks,
-            relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
-        )
+        val model =
+            PersonModel(
+                data = person,
+                rootLinks = rootLinks,
+                resourceObjectLinks = resourceLinks,
+                relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)
@@ -379,18 +398,20 @@ internal class LinksAndMetaIntegrationTest {
         val person = Person(name = "Laura", surname = "Martinez", age = 29, allMyDogs = null, myFavoriteDog = null)
         val item = PersonItem(data = person)
 
-        val paginationLinks = DefaultLinks(
-            self = "https://api.example.com/persons?page=2",
-            first = "https://api.example.com/persons?page=1",
-            last = "https://api.example.com/persons?page=10",
-            prev = "https://api.example.com/persons?page=1",
-            next = "https://api.example.com/persons?page=3",
-        )
+        val paginationLinks =
+            DefaultLinks(
+                self = "https://api.example.com/persons?page=2",
+                first = "https://api.example.com/persons?page=1",
+                last = "https://api.example.com/persons?page=10",
+                prev = "https://api.example.com/persons?page=1",
+                next = "https://api.example.com/persons?page=3",
+            )
 
-        val personList = PersonList(
-            data = listOf(item),
-            rootLinks = paginationLinks,
-        )
+        val personList =
+            PersonList(
+                data = listOf(item),
+                rootLinks = paginationLinks,
+            )
 
         val json = adapter!!.convertToString(input = personList)
         val result = adapter.convertFromString(input = json)
@@ -457,15 +478,16 @@ internal class LinksAndMetaIntegrationTest {
         val resourceLinks = DefaultLinks(self = "https://api.example.com/persons/1")
         val relationshipLinks = DefaultLinks(self = "https://api.example.com/persons/1/relationships/myFavoriteDog")
 
-        val model = PersonModel(
-            data = person,
-            rootMeta = rootMeta,
-            resourceObjectMeta = resourceMeta,
-            relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
-            rootLinks = rootLinks,
-            resourceObjectLinks = resourceLinks,
-            relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
-        )
+        val model =
+            PersonModel(
+                data = person,
+                rootMeta = rootMeta,
+                resourceObjectMeta = resourceMeta,
+                relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
+                rootLinks = rootLinks,
+                resourceObjectLinks = resourceLinks,
+                relationshipsLinks = mapOf("myFavoriteDog" to relationshipLinks),
+            )
 
         val json = adapter!!.convertToString(input = model)
         val result = adapter.convertFromString(input = json)

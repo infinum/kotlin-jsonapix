@@ -15,7 +15,6 @@ class PersonViewModel @Inject constructor(
     private val sampleApiService: SampleApiService,
     private val jsonAssetReader: JsonAssetReader,
 ) : BaseViewModel<PersonState, PersonEvent>() {
-
     init {
         fetchPerson()
     }
@@ -33,7 +32,10 @@ class PersonViewModel @Inject constructor(
                     person,
                     personModel.rootLinks?.self,
                     personModel.resourceObjectLinks?.self,
-                    personModel.relationshipsLinks?.values?.firstOrNull()?.self,
+                    personModel.relationshipsLinks
+                        ?.values
+                        ?.firstOrNull()
+                        ?.self,
                     personModel.rootMeta?.owner,
                 )
             } catch (t: Throwable) {
@@ -61,14 +63,15 @@ class PersonViewModel @Inject constructor(
                 }
                 Log.d("Person", personsData.toString())
                 hideLoading()
-                viewState = PersonState(
-                    bodyString,
-                    persons.first().data,
-                    (personsData.rootLinks as DefaultLinks).self,
-                    (persons.firstOrNull()?.resourceObjectLinks as? DefaultLinks)?.self,
-                    (persons.firstOrNull()?.relationshipsLinks as? Map<String, DefaultLinks>)?.values?.firstOrNull()?.self,
-                    personsData.rootMeta?.owner,
-                )
+                viewState =
+                    PersonState(
+                        bodyString,
+                        persons.first().data,
+                        (personsData.rootLinks as DefaultLinks).self,
+                        persons.firstOrNull()?.resourceObjectLinks?.self,
+                        (persons.firstOrNull()?.relationshipsLinks as? Map<String, DefaultLinks>)?.values?.firstOrNull()?.self,
+                        personsData.rootMeta?.owner,
+                    )
             } catch (t: Throwable) {
                 Log.e("Error", "Test", t)
             }

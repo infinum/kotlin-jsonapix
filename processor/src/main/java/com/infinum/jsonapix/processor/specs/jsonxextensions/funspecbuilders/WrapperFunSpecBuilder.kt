@@ -6,22 +6,23 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 
 internal object WrapperFunSpecBuilder {
-
     fun build(
         originalClass: ClassName,
         wrapperClass: ClassName,
         includedListStatement: String?,
     ): FunSpec {
-        val modelClass = ClassName.bestGuess(
-            originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
-        )
+        val modelClass =
+            ClassName.bestGuess(
+                originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+            )
 
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
 
-        val returnStatement = StringBuilder(
-            "return %T(data = ${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()",
-        )
+        val returnStatement =
+            StringBuilder(
+                "return %T(data = ${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()",
+            )
 
         if (includedListStatement != null) {
             returnStatement.append(", ")
@@ -32,13 +33,13 @@ internal object WrapperFunSpecBuilder {
         returnStatement.append(", links = rootLinks")
 
         returnStatement.append(")")
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_WRAPPER_GETTER)
+        return FunSpec
+            .builder(JsonApiConstants.Members.JSONX_WRAPPER_GETTER)
             .receiver(modelClass)
             .returns(wrapperClass)
             .addStatement(
                 format = returnStatement.toString(),
                 args = builderArgs.toTypedArray(),
-            )
-            .build()
+            ).build()
     }
 }

@@ -8,15 +8,15 @@ import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
-import java.io.InputStreamReader
-import okhttp3.MediaType
-import okhttp3.ResponseBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Retrofit
+import java.io.InputStreamReader
 
 /**
  * Integration tests for Retrofit module components.
@@ -24,7 +24,6 @@ import retrofit2.Retrofit
  */
 @Suppress("StringLiteralDuplication")
 internal class RetrofitIntegrationTest {
-
     private lateinit var factory: TypeAdapterFactory
     private lateinit var converterFactory: JsonXConverterFactory
 
@@ -34,48 +33,58 @@ internal class RetrofitIntegrationTest {
         converterFactory = JsonXConverterFactory(adapterFactory = factory)
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.example.com/")
-            .addConverterFactory(converterFactory)
-            .build()
+    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() {
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl("https://api.example.com/")
+                .addConverterFactory(converterFactory)
+                .build()
 
-        val converter = converterFactory.responseBodyConverter(
-            type = PersonModel::class.java,
-            annotations = emptyArray(),
-            retrofit = retrofit,
-        )
+        val converter =
+            converterFactory.responseBodyConverter(
+                type = PersonModel::class.java,
+                annotations = emptyArray(),
+                retrofit = retrofit,
+            )
 
         assertNotNull(converter, "Response body converter should not be null")
         assertTrue(converter is JsonXResponseBodyConverter<*>, "Should be JsonXResponseBodyConverter")
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.example.com/")
-            .addConverterFactory(converterFactory)
-            .build()
+    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() {
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl("https://api.example.com/")
+                .addConverterFactory(converterFactory)
+                .build()
 
-        val converter = converterFactory.requestBodyConverter(
-            type = PersonModel::class.java,
-            parameterAnnotations = emptyArray(),
-            methodAnnotations = emptyArray(),
-            retrofit = retrofit,
-        )
+        val converter =
+            converterFactory.requestBodyConverter(
+                type = PersonModel::class.java,
+                parameterAnnotations = emptyArray(),
+                methodAnnotations = emptyArray(),
+                retrofit = retrofit,
+            )
 
         assertNotNull(converter, "Request body converter should not be null")
         assertTrue(converter is JsonXRequestBodyConverter<*>, "Should be JsonXRequestBodyConverter")
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -87,12 +96,9 @@ internal class RetrofitIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -109,7 +115,8 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val json = """
+        val json =
+            """
             {
                 "data": [
                     {
@@ -132,19 +139,30 @@ internal class RetrofitIntegrationTest {
                     }
                 ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Converted result should not be null")
         assertEquals(2, result?.data?.size)
-        assertEquals("Bob", result?.data?.get(0)?.data?.name)
-        assertEquals("Carol", result?.data?.get(1)?.data?.name)
+        assertEquals(
+            "Bob",
+            result
+                ?.data
+                ?.get(0)
+                ?.data
+                ?.name,
+        )
+        assertEquals(
+            "Carol",
+            result
+                ?.data
+                ?.get(1)
+                ?.data
+                ?.name,
+        )
     }
 
     @Test
@@ -153,19 +171,20 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
-        val person = Person(
-            name = "Dave",
-            surname = "Brown",
-            age = 35,
-            allMyDogs = null,
-            myFavoriteDog = null,
-        )
+        val person =
+            Person(
+                name = "Dave",
+                surname = "Brown",
+                age = 35,
+                allMyDogs = null,
+                myFavoriteDog = null,
+            )
         val model = PersonModel(data = person)
 
         val requestBody = converter.convert(value = model)
 
         assertNotNull(requestBody, "Request body should not be null")
-        assertEquals(MediaType.parse("application/json; charset=UTF-8"), requestBody?.contentType())
+        assertEquals("application/json; charset=UTF-8".toMediaTypeOrNull(), requestBody?.contentType())
     }
 
     @Test
@@ -174,13 +193,14 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
-        val person = Person(
-            name = "Emma",
-            surname = "Davis",
-            age = 29,
-            allMyDogs = null,
-            myFavoriteDog = null,
-        )
+        val person =
+            Person(
+                name = "Emma",
+                surname = "Davis",
+                age = 29,
+                allMyDogs = null,
+                myFavoriteDog = null,
+            )
         val model = PersonModel(data = person)
 
         val requestBody = converter.convert(value = model)
@@ -196,18 +216,16 @@ internal class RetrofitIntegrationTest {
         assertTrue(content.contains("29"), "Request body should contain age")
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = getFileAsString(filename = "person_one_and_many_rel.json")
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -218,21 +236,23 @@ internal class RetrofitIntegrationTest {
         assertEquals("Bella", result?.data?.myFavoriteDog?.name)
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() { // ktlint-disable max-line-length
+    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
         val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
         val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
         val dog2 = Dog(name = "Rex", age = 5).apply { setId(id = "2") }
-        val person = Person(
-            name = "Frank",
-            surname = "Miller",
-            age = 40,
-            allMyDogs = listOf(dog1, dog2),
-            myFavoriteDog = dog1,
-        ).apply { setId(id = "10") }
+        val person =
+            Person(
+                name = "Frank",
+                surname = "Miller",
+                age = 40,
+                allMyDogs = listOf(dog1, dog2),
+                myFavoriteDog = dog1,
+            ).apply { setId(id = "10") }
         val model = PersonModel(data = person)
 
         val requestBody = converter.convert(value = model)
@@ -249,34 +269,40 @@ internal class RetrofitIntegrationTest {
 
     @Test
     fun `given a Retrofit instance with JsonXConverterFactory when making multiple conversions should work correctly`() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.example.com/")
-            .addConverterFactory(converterFactory)
-            .build()
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl("https://api.example.com/")
+                .addConverterFactory(converterFactory)
+                .build()
 
         // Test multiple different types
-        val personConverter = converterFactory.responseBodyConverter(
-            type = PersonModel::class.java,
-            annotations = emptyArray(),
-            retrofit = retrofit,
-        )
-        val dogConverter = converterFactory.responseBodyConverter(
-            type = DogModel::class.java,
-            annotations = emptyArray(),
-            retrofit = retrofit,
-        )
+        val personConverter =
+            converterFactory.responseBodyConverter(
+                type = PersonModel::class.java,
+                annotations = emptyArray(),
+                retrofit = retrofit,
+            )
+        val dogConverter =
+            converterFactory.responseBodyConverter(
+                type = DogModel::class.java,
+                annotations = emptyArray(),
+                retrofit = retrofit,
+            )
 
         assertNotNull(personConverter, "Person converter should not be null")
         assertNotNull(dogConverter, "Dog converter should not be null")
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -294,12 +320,9 @@ internal class RetrofitIntegrationTest {
                     "self": "https://api.example.com/persons/1"
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -316,10 +339,7 @@ internal class RetrofitIntegrationTest {
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = getFileAsString(filename = "person_with_root_meta.json")
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -329,23 +349,27 @@ internal class RetrofitIntegrationTest {
 
     @Test
     fun `given a JsonXConverterFactory when used in complete Retrofit setup should integrate seamlessly`() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.example.com/")
-            .addConverterFactory(converterFactory)
-            .build()
+        val retrofit =
+            Retrofit
+                .Builder()
+                .baseUrl("https://api.example.com/")
+                .addConverterFactory(converterFactory)
+                .build()
 
         // Verify both request and response converters can be created
-        val requestConverter = converterFactory.requestBodyConverter(
-            type = PersonModel::class.java,
-            parameterAnnotations = emptyArray(),
-            methodAnnotations = emptyArray(),
-            retrofit = retrofit,
-        )
-        val responseConverter = converterFactory.responseBodyConverter(
-            type = PersonModel::class.java,
-            annotations = emptyArray(),
-            retrofit = retrofit,
-        )
+        val requestConverter =
+            converterFactory.requestBodyConverter(
+                type = PersonModel::class.java,
+                parameterAnnotations = emptyArray(),
+                methodAnnotations = emptyArray(),
+                retrofit = retrofit,
+            )
+        val responseConverter =
+            converterFactory.responseBodyConverter(
+                type = PersonModel::class.java,
+                annotations = emptyArray(),
+                retrofit = retrofit,
+            )
 
         assertNotNull(requestConverter, "Request converter should be created")
         assertNotNull(responseConverter, "Response converter should be created")
@@ -365,10 +389,7 @@ internal class RetrofitIntegrationTest {
         val json = buffer.readUtf8()
 
         // Convert back using response converter
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         @Suppress("UNCHECKED_CAST")
         val typedResponseConverter = responseConverter as JsonXResponseBodyConverter<PersonModel>
@@ -386,16 +407,14 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val json = """
+        val json =
+            """
             {
                 "data": []
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -409,13 +428,14 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
-        val person = Person(
-            name = "Ian",
-            surname = "Anderson",
-            age = 45,
-            allMyDogs = null,
-            myFavoriteDog = null,
-        )
+        val person =
+            Person(
+                name = "Ian",
+                surname = "Anderson",
+                age = 45,
+                allMyDogs = null,
+                myFavoriteDog = null,
+            )
         val model = PersonModel(data = person)
 
         val requestBody = converter.convert(value = model)
@@ -437,36 +457,49 @@ internal class RetrofitIntegrationTest {
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
 
         // Create a large JSON payload with many persons
-        val persons = (1..100).joinToString(separator = ",") { i ->
-            """
-            {
-                "type": "person",
-                "id": "$i",
-                "attributes": {
-                    "name": "Person$i",
-                    "surname": "Last$i",
-                    "age": ${20 + i}
+        val persons =
+            (1..100).joinToString(separator = ",") { i ->
+                """
+                {
+                    "type": "person",
+                    "id": "$i",
+                    "attributes": {
+                        "name": "Person$i",
+                        "surname": "Last$i",
+                        "age": ${20 + i}
+                    }
                 }
+                """.trimIndent()
             }
-            """.trimIndent()
-        }
-        val json = """
+        val json =
+            """
             {
                 "data": [$persons]
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
         assertNotNull(result, "Result should not be null")
         assertEquals(100, result?.data?.size, "Should have 100 persons")
-        assertEquals("Person1", result?.data?.get(0)?.data?.name)
-        assertEquals("Person100", result?.data?.get(99)?.data?.name)
+        assertEquals(
+            "Person1",
+            result
+                ?.data
+                ?.get(0)
+                ?.data
+                ?.name,
+        )
+        assertEquals(
+            "Person100",
+            result
+                ?.data
+                ?.get(99)
+                ?.data
+                ?.name,
+        )
     }
 
     private fun getFileAsString(filename: String): String {

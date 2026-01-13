@@ -6,8 +6,8 @@ import com.infinum.jsonapix.data.models.PersonalError
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import kotlinx.serialization.SerializationException
-import okhttp3.MediaType
-import okhttp3.ResponseBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.assertThrows
  */
 @Suppress("TooManyFunctions")
 internal class ErrorHandlingIntegrationTest {
-
     private lateinit var factory: TypeAdapterFactory
 
     @BeforeEach
@@ -35,7 +34,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "errors": [
                     {
@@ -45,7 +45,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         // According to JSON:API spec, errors and data should not coexist
         // The adapter should handle error responses by failing
@@ -59,11 +59,12 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": null
             }
-        """.trimIndent()
+            """.trimIndent()
 
         // Parsing null data should fail as it doesn't conform to expected structure
         assertThrows<Exception> {
@@ -76,7 +77,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -85,7 +87,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         // Missing required fields (surname, age) should result in a parsing exception
         assertThrows<Exception> {
@@ -98,14 +100,15 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
                     "attributes": "invalid"
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         assertThrows<Exception> {
             adapter!!.convertFromString(json)
@@ -127,11 +130,12 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person"
-        """.trimIndent()
+            """.trimIndent()
 
         assertThrows<Exception> {
             adapter!!.convertFromString(json)
@@ -143,7 +147,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "wrong-type",
@@ -154,7 +159,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         // Wrong resource type causes deserialization to fail
         assertThrows<SerializationException> {
@@ -167,7 +172,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -180,7 +186,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -194,7 +200,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": [
                     {
@@ -208,7 +215,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -221,7 +228,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -229,7 +237,7 @@ internal class ErrorHandlingIntegrationTest {
                     "attributes": null
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         // Null attributes should result in a parsing failure
         assertThrows<Exception> {
@@ -243,7 +251,8 @@ internal class ErrorHandlingIntegrationTest {
         assertNotNull(adapter)
 
         // JSON:API handles circular refs via relationships and included
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -273,7 +282,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -287,7 +296,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -317,7 +327,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -330,7 +340,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -351,7 +362,7 @@ internal class ErrorHandlingIntegrationTest {
                 },
                 "included": []
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -364,7 +375,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -376,7 +388,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -389,7 +401,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -401,7 +414,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(json)
 
@@ -415,7 +428,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -427,7 +441,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(json)
 
@@ -441,7 +455,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -453,7 +468,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(json)
 
@@ -463,10 +478,11 @@ internal class ErrorHandlingIntegrationTest {
 
     @Test
     fun `given JsonXHttpException when created with errors should store them correctly`() {
-        val errors = listOf(
-            PersonalError(desc = "Error 1"),
-            PersonalError(desc = "Error 2"),
-        )
+        val errors =
+            listOf(
+                PersonalError(desc = "Error 1"),
+                PersonalError(desc = "Error 2"),
+            )
         val exception = JsonXHttpException<PersonalError>(response = null, errors = errors)
 
         assertNotNull(exception.errors)
@@ -481,7 +497,8 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             [
                 {
                     "type": "person",
@@ -492,7 +509,7 @@ internal class ErrorHandlingIntegrationTest {
                     }
                 }
             ]
-        """.trimIndent()
+            """.trimIndent()
 
         assertThrows<Exception> {
             adapter!!.convertFromString(json)
@@ -505,10 +522,7 @@ internal class ErrorHandlingIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            "invalid json {{{{",
-        )
+        val responseBody = "invalid json {{{{".toResponseBody("application/json".toMediaTypeOrNull())
 
         assertThrows<Exception> {
             converter.convert(value = responseBody)

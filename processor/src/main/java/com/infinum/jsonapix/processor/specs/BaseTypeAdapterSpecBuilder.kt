@@ -15,8 +15,8 @@ import com.squareup.kotlinpoet.asClassName
 private const val DEFAULT_RETURN_STRING = "return %S"
 
 public abstract class BaseTypeAdapterSpecBuilder {
-
     public abstract fun getAdapterPrefixName(): String
+
     public abstract fun getClassSuffixName(): String
 
     public abstract fun getRootModel(className: ClassName): TypeName
@@ -43,20 +43,22 @@ public abstract class BaseTypeAdapterSpecBuilder {
         errors: String?,
     ): FileSpec {
         val generatedName = getAdapterPrefixName().withName(className.simpleName)
-        val typeAdapterClassName = ClassName(
-            className.packageName,
-            generatedName,
-        )
+        val typeAdapterClassName =
+            ClassName(
+                className.packageName,
+                generatedName,
+            )
         val modelType = getWrapperClassName(className)
-        return FileSpec.builder(className.packageName, generatedName)
+        return FileSpec
+            .builder(className.packageName, generatedName)
             .addType(
-                TypeSpec.classBuilder(typeAdapterClassName)
+                TypeSpec
+                    .classBuilder(typeAdapterClassName)
                     .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(modelType))
                     .addFunction(convertToStringFunSpec(modelType))
                     .addFunction(
                         convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta),
-                    )
-                    .apply {
+                    ).apply {
                         if (rootLinks != null) {
                             addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks.canonicalName))
                         }
@@ -100,18 +102,16 @@ public abstract class BaseTypeAdapterSpecBuilder {
                         if (errors != null) {
                             addFunction(errorsFunSpec(errors))
                         }
-                    }
-                    .build(),
-            )
-            .addImport(
+                    }.build(),
+            ).addImport(
                 JsonApiConstants.Packages.JSONX,
                 getAdditionalImports(),
-            )
-            .build()
+            ).build()
     }
 
-    private fun convertToStringFunSpec(modelType: TypeName): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Members.CONVERT_TO_STRING)
+    private fun convertToStringFunSpec(modelType: TypeName): FunSpec =
+        FunSpec
+            .builder(JsonApiConstants.Members.CONVERT_TO_STRING)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", modelType)
             .returns(String::class)
@@ -125,34 +125,39 @@ public abstract class BaseTypeAdapterSpecBuilder {
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS,
-            )
-            .build()
-    }
+            ).build()
 
-    private fun getWrapperClassName(rootType: ClassName): TypeName =
-        ClassName.bestGuess(rootType.canonicalName.withName(getClassSuffixName()))
+    private fun getWrapperClassName(rootType: ClassName): TypeName = ClassName.bestGuess(
+        rootType.canonicalName.withName(getClassSuffixName()),
+    )
 
-    private fun linksFunSpec(methodName: String, links: String): FunSpec {
-        return FunSpec.builder(methodName)
+    private fun linksFunSpec(
+        methodName: String,
+        links: String,
+    ): FunSpec =
+        FunSpec
+            .builder(methodName)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
             .addStatement(DEFAULT_RETURN_STRING, links)
             .build()
-    }
 
-    private fun errorsFunSpec(errors: String): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Keys.ERRORS)
+    private fun errorsFunSpec(errors: String): FunSpec =
+        FunSpec
+            .builder(JsonApiConstants.Keys.ERRORS)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
             .addStatement(DEFAULT_RETURN_STRING, errors)
             .build()
-    }
 
-    private fun metaFunSpec(methodName: String, meta: String): FunSpec {
-        return FunSpec.builder(methodName)
+    private fun metaFunSpec(
+        methodName: String,
+        meta: String,
+    ): FunSpec =
+        FunSpec
+            .builder(methodName)
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
             .addStatement(DEFAULT_RETURN_STRING, meta)
             .build()
-    }
 }

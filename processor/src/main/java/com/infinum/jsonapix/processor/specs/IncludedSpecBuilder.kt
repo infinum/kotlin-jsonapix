@@ -6,7 +6,6 @@ import com.squareup.kotlinpoet.PropertySpec
 import java.lang.StringBuilder
 
 internal object IncludedSpecBuilder {
-
     fun build(
         oneRelationships: List<PropertySpec>,
         manyRelationships: List<PropertySpec>,

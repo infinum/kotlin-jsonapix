@@ -25,10 +25,11 @@ abstract class BaseViewModel<State, Event> : ViewModel() {
     val eventFlow: SharedFlow<Event> = mutableEventFlow
     val errorFlow: SharedFlow<ErrorEvent> = mutableErrorFlow
 
-    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
-        Log.e("NIKOLA", "error = $t")
-        hideLoading()
-    }
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, t ->
+            Log.e("NIKOLA", "error = $t")
+            hideLoading()
+        }
 
     protected var viewState: State?
         get() = mutableStateFlow.value
@@ -63,9 +64,14 @@ abstract class BaseViewModel<State, Event> : ViewModel() {
     }
 
     protected fun launch(block: suspend CoroutineScope.() -> Unit) =
-        viewModelScope.launch(coroutineExceptionHandler + Dispatchers.Main, block = block)
+        viewModelScope.launch(
+            context = coroutineExceptionHandler + Dispatchers.Main,
+            block = block,
+        )
 
     @Suppress("FunctionMinLength")
     protected suspend fun <T> io(block: suspend CoroutineScope.() -> T) =
-        withContext(coroutineExceptionHandler + Dispatchers.IO) { block.invoke(this) }
+        withContext(coroutineExceptionHandler + Dispatchers.IO) {
+            block.invoke(this)
+        }
 }

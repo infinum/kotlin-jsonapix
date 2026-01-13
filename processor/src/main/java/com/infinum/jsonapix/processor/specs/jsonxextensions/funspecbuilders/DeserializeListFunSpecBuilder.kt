@@ -19,7 +19,6 @@ import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 
 internal object DeserializeListFunSpecBuilder {
-
     @Suppress("LongMethod", "LongParameterList")
     fun build(): FunSpec {
         val typeVariableName =
@@ -27,19 +26,22 @@ internal object DeserializeListFunSpecBuilder {
         val dataVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.DATA_TYPE_VARIABLE)
 
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build(),
-        )
+        val linksParams =
+            listOf(
+                ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build(),
+            )
 
-        val metaParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
-        )
+        val metaParams =
+            listOf(
+                ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
+            )
 
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
+        return FunSpec
+            .builder(JsonApiConstants.Members.JSONX_LIST_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(dataVariableName.copy(reified = true))
@@ -54,15 +56,13 @@ internal object DeserializeListFunSpecBuilder {
                 JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
                 jsonObjectMember,
                 JsonApiConstants.Keys.DATA,
-            )
-            .addStatement(
+            ).addStatement(
                 "val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) %T.%M(Data::class) else %T.%M(de)",
                 TypeExtractor::class.asTypeName(),
                 DeserializeFunSpecMemberProvider.guessTypeMember,
                 TypeExtractor::class.asTypeName(),
                 findTypeMember,
-            )
-            .addStatement(
+            ).addStatement(
                 "val discriminator = %T(%L ?: TypeExtractor.guessType(Model::class), %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiListDiscriminator::class,
                 JsonApiConstants.Keys.TYPE,
@@ -73,23 +73,19 @@ internal object DeserializeListFunSpecBuilder {
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS,
-            )
-            .addStatement(
+            ).addStatement(
                 "val jsonElement = %T.%L(this)",
                 Json::class.asClassName(),
                 JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
-            )
-            .addStatement(
+            ).addStatement(
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()",
-            )
-            .addStatement(
+            ).addStatement(
                 "return %M.%M<%T<%T,%T>>(jsonStringWithDiscriminator)",
                 formatMember,
                 decodeMember,
                 JsonApiXList::class,
                 dataVariableName,
                 typeVariableName,
-            )
-            .build()
+            ).build()
     }
 }

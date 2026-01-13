@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class CompanyFragment : BaseFragment<CompanyState, CompanyEvent>() {
-
     override val layoutRes: Int = R.layout.fragment_company
 
     override val binding by viewBinding(FragmentCompanyBinding::bind)

@@ -25,7 +25,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 internal object RelationshipsSpecBuilder {
-
     private val serializableClassName = Serializable::class.asClassName()
     private val serialNameTypeName = SerialName::class.asTypeName()
 
@@ -38,26 +37,30 @@ internal object RelationshipsSpecBuilder {
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 
-        val properties: MutableList<PropertySpec> = oneRelationships.map {
-            val builder = if (it.type.isNullable) {
-                PropertySpec.builder(it.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
-            } else {
-                PropertySpec.builder(it.name, OneRelationshipMember::class)
-            }
+        val properties: MutableList<PropertySpec> =
+            oneRelationships
+                .map {
+                    val builder =
+                        if (it.type.isNullable) {
+                            PropertySpec.builder(it.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
+                        } else {
+                            PropertySpec.builder(it.name, OneRelationshipMember::class)
+                        }
 
-            builder
-                .addSerialNameAnnotation(it)
-                .initializer(it.name)
-                .build()
-        }.toMutableList()
+                    builder
+                        .addSerialNameAnnotation(it)
+                        .initializer(it.name)
+                        .build()
+                }.toMutableList()
 
         properties.addAll(
             manyRelationships.map {
-                val builder = if (it.type.isNullable) {
-                    PropertySpec.builder(it.name, ManyRelationshipMember::class.asTypeName().copy(nullable = true))
-                } else {
-                    PropertySpec.builder(it.name, ManyRelationshipMember::class)
-                }
+                val builder =
+                    if (it.type.isNullable) {
+                        PropertySpec.builder(it.name, ManyRelationshipMember::class.asTypeName().copy(nullable = true))
+                    } else {
+                        PropertySpec.builder(it.name, ManyRelationshipMember::class)
+                    }
 
                 builder
                     .addSerialNameAnnotation(it)
@@ -68,7 +71,8 @@ internal object RelationshipsSpecBuilder {
 
         val params = mapPropertiesToParams(properties)
 
-        return TypeSpec.classBuilder(generatedName)
+        return TypeSpec
+            .classBuilder(generatedName)
             .addModifiers(KModifier.DATA)
             .addSuperinterface(Relationships::class)
             .addAnnotation(serializableClassName)
@@ -78,14 +82,14 @@ internal object RelationshipsSpecBuilder {
                         type,
                     ),
                 ),
-            )
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
+            ).primaryConstructor(
+                FunSpec
+                    .constructorBuilder()
                     .addParameters(params)
                     .build(),
-            )
-            .addType(
-                TypeSpec.companionObjectBuilder()
+            ).addType(
+                TypeSpec
+                    .companionObjectBuilder()
                     .addFunction(
                         fromOriginalObjectSpec(
                             className,
@@ -93,33 +97,32 @@ internal object RelationshipsSpecBuilder {
                             oneRelationships,
                             manyRelationships,
                         ),
-                    )
-                    .build(),
-            )
-            .addProperties(properties)
+                    ).build(),
+            ).addProperties(properties)
             .addProperty(linksPropertySpec(oneRelationships, manyRelationships))
             .addProperty(metaPropertySpec(oneRelationships, manyRelationships))
             .build()
     }
 
-    private fun PropertySpec.Builder.addSerialNameAnnotation(originalProperty: PropertySpec): PropertySpec.Builder = this.apply {
-        val serialNameAnnotation = originalProperty.annotations.findAnnotationWithTypeName(serialNameTypeName)
-            ?: Specs.getSerialNameSpec(originalProperty.name)
+    private fun PropertySpec.Builder.addSerialNameAnnotation(originalProperty: PropertySpec): PropertySpec.Builder =
+        this.apply {
+            val serialNameAnnotation =
+                originalProperty.annotations.findAnnotationWithTypeName(serialNameTypeName)
+                    ?: Specs.getSerialNameSpec(originalProperty.name)
 
-        addAnnotation(serialNameAnnotation)
-    }
+            addAnnotation(serialNameAnnotation)
+        }
 
-    private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> {
-        return properties.map {
-            ParameterSpec.builder(it.name, it.type)
+    private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> =
+        properties.map {
+            ParameterSpec
+                .builder(it.name, it.type)
                 .apply {
                     if (it.type.isNullable) {
                         defaultValue("%L", null)
                     }
-                }
-                .build()
+                }.build()
         }
-    }
 
     @SuppressWarnings("SpreadOperator", "StringLiteralDuplication")
     private fun fromOriginalObjectSpec(
@@ -169,11 +172,11 @@ internal object RelationshipsSpecBuilder {
             }
         }
 
-        return FunSpec.builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
+        return FunSpec
+            .builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
             .addParameter(
                 ParameterSpec.builder("originalObject", originalClass).build(),
-            )
-            .addStatement("return %L($constructorStringBuilder)", *builderArgs.toTypedArray())
+            ).addStatement("return %L($constructorStringBuilder)", *builderArgs.toTypedArray())
             .returns(ClassName.bestGuess(generatedName))
             .build()
     }
@@ -184,31 +187,35 @@ internal object RelationshipsSpecBuilder {
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
-                "\"${it.name}\" to ${it.name}?.links, "
-            } else {
-                "\"${it.name}\" to ${it.name}.links, "
-            }
+            returnStatement +=
+                if (it.type.isNullable) {
+                    "\"${it.name}\" to ${it.name}?.links, "
+                } else {
+                    "\"${it.name}\" to ${it.name}.links, "
+                }
         }
         manyRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
-                "\"${it.name}\" to ${it.name}?.links, "
-            } else {
-                "\"${it.name}\" to ${it.name}.links, "
-            }
+            returnStatement +=
+                if (it.type.isNullable) {
+                    "\"${it.name}\" to ${it.name}?.links, "
+                } else {
+                    "\"${it.name}\" to ${it.name}.links, "
+                }
         }
         returnStatement += ")"
 
-        val builder = PropertySpec.builder(
-            JsonApiConstants.Keys.LINKS,
-            Map::class
-                .asClassName()
-                .parameterizedBy(
-                    String::class.asTypeName(),
-                    Links::class.asTypeName().copy(nullable = true),
-                ),
-            KModifier.OVERRIDE,
-        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
+        val builder =
+            PropertySpec
+                .builder(
+                    JsonApiConstants.Keys.LINKS,
+                    Map::class
+                        .asClassName()
+                        .parameterizedBy(
+                            String::class.asTypeName(),
+                            Links::class.asTypeName().copy(nullable = true),
+                        ),
+                    KModifier.OVERRIDE,
+                ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
         return builder.initializer(returnStatement).build()
     }
@@ -219,41 +226,48 @@ internal object RelationshipsSpecBuilder {
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
-                "\"${it.name}\" to ${it.name}?.meta, "
-            } else {
-                "\"${it.name}\" to ${it.name}.meta, "
-            }
+            returnStatement +=
+                if (it.type.isNullable) {
+                    "\"${it.name}\" to ${it.name}?.meta, "
+                } else {
+                    "\"${it.name}\" to ${it.name}.meta, "
+                }
         }
         manyRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
-                "\"${it.name}\" to ${it.name}?.meta, "
-            } else {
-                "\"${it.name}\" to ${it.name}.meta, "
-            }
+            returnStatement +=
+                if (it.type.isNullable) {
+                    "\"${it.name}\" to ${it.name}?.meta, "
+                } else {
+                    "\"${it.name}\" to ${it.name}.meta, "
+                }
         }
         returnStatement += ")"
 
-        val builder = PropertySpec.builder(
-            JsonApiConstants.Keys.META,
-            Map::class
-                .asClassName()
-                .parameterizedBy(
-                    String::class.asTypeName(),
-                    Meta::class.asTypeName().copy(nullable = true),
-                ),
-            KModifier.OVERRIDE,
-        ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
+        val builder =
+            PropertySpec
+                .builder(
+                    JsonApiConstants.Keys.META,
+                    Map::class
+                        .asClassName()
+                        .parameterizedBy(
+                            String::class.asTypeName(),
+                            Meta::class.asTypeName().copy(nullable = true),
+                        ),
+                    KModifier.OVERRIDE,
+                ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
         return builder.initializer(returnStatement).build()
     }
 
-    private fun getTypeOfRelationship(property: PropertySpec): String {
-        return property.annotations.first { annotation ->
-            annotation.typeName == HasOne::class.asTypeName() ||
-                annotation.typeName == HasMany::class.asTypeName()
-        }.members.first { member ->
-            member.toString().trim().startsWith("type")
-        }.toString().split("=")[1].trim()
-    }
+    private fun getTypeOfRelationship(property: PropertySpec): String =
+        property.annotations
+            .first { annotation ->
+                annotation.typeName == HasOne::class.asTypeName() ||
+                    annotation.typeName == HasMany::class.asTypeName()
+            }.members
+            .first { member ->
+                member.toString().trim().startsWith("type")
+            }.toString()
+            .split("=")[1]
+            .trim()
 }

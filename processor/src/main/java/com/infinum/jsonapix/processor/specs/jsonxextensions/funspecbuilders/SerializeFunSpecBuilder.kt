@@ -14,30 +14,38 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.PolymorphicSerializer
 
 internal object SerializeFunSpecBuilder {
-
-    fun build(originalClass: ClassName, isNullable: Boolean): FunSpec {
-        val modelClass = ClassName.bestGuess(
-            originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
-        )
+    fun build(
+        originalClass: ClassName,
+        isNullable: Boolean,
+    ): FunSpec {
+        val modelClass =
+            ClassName.bestGuess(
+                originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+            )
 
         val polymorphicSerializerClass = PolymorphicSerializer::class.asClassName()
         val jsonXClass = JsonApiX::class.asClassName()
 
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class)
-                .build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class)
-                .build(),
-        )
+        val linksParams =
+            listOf(
+                ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
+                ParameterSpec
+                    .builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class)
+                    .build(),
+                ParameterSpec
+                    .builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class)
+                    .build(),
+            )
 
-        val metaParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
-        )
+        val metaParams =
+            listOf(
+                ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
+            )
 
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_SERIALIZE)
+        return FunSpec
+            .builder(JsonApiConstants.Members.JSONX_SERIALIZE)
             .receiver(modelClass)
             .addParameters(linksParams)
             .addParameters(metaParams)
@@ -46,8 +54,7 @@ internal object SerializeFunSpecBuilder {
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
             .addStatement(
                 if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type",
-            )
-            .addStatement(
+            ).addStatement(
                 "val discriminator = %T(type, %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class.asClassName(),
                 JsonApiConstants.Members.ROOT_LINKS,
@@ -57,17 +64,14 @@ internal object SerializeFunSpecBuilder {
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS,
-            )
-            .addStatement(
+            ).addStatement(
                 "val jsonString = %M.%M(%T(%T::class), jsonX)",
                 formatMember,
                 encodeMember,
                 polymorphicSerializerClass,
                 jsonXClass,
-            )
-            .addStatement(
+            ).addStatement(
                 "return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()",
-            )
-            .build()
+            ).build()
     }
 }

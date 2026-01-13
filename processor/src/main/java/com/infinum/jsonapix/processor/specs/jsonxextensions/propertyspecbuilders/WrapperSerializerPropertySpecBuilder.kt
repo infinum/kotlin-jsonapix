@@ -24,7 +24,6 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.modules.SerializersModule
 
 internal object WrapperSerializerPropertySpecBuilder {
-
     @Suppress("LongMethod", "StringLiteralDuplication")
     fun build(
         specsMap: HashMap<ClassName, ClassInfo>,
@@ -33,21 +32,25 @@ internal object WrapperSerializerPropertySpecBuilder {
         metas: List<ClassName>,
     ): PropertySpec {
         val codeBlockBuilder = CodeBlock.builder()
-        val polymorpicMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            JsonApiConstants.Members.POLYMORPHIC,
-        )
-        val subclassMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            JsonApiConstants.Members.SUBCLASS,
-        )
+        val polymorpicMember =
+            MemberName(
+                JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
+                JsonApiConstants.Members.POLYMORPHIC,
+            )
+        val subclassMember =
+            MemberName(
+                JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
+                JsonApiConstants.Members.SUBCLASS,
+            )
 
-        val contextualMember = MemberName(
-            JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
-            JsonApiConstants.Members.CONTEXTUAL,
-        )
+        val contextualMember =
+            MemberName(
+                JsonApiConstants.Packages.KOTLINX_SERIALIZATION_MODULES,
+                JsonApiConstants.Members.CONTEXTUAL,
+            )
         codeBlockBuilder.addStatement("%T {", SerializersModule::class)
-        codeBlockBuilder.indent()
+        codeBlockBuilder
+            .indent()
             .addStatement("%M(%T::class) {", polymorpicMember, JsonApiX::class)
         codeBlockBuilder.indent()
         specsMap.values.forEach {
@@ -193,10 +196,11 @@ internal object WrapperSerializerPropertySpecBuilder {
 
         codeBlockBuilder.unindent().addStatement("}")
 
-        return PropertySpec.builder(
-            JsonApiConstants.Members.JSONX_SERIALIZER_MODULE,
-            SerializersModule::class,
-        )
-            .initializer(codeBlockBuilder.build()).build()
+        return PropertySpec
+            .builder(
+                JsonApiConstants.Members.JSONX_SERIALIZER_MODULE,
+                SerializersModule::class,
+            ).initializer(codeBlockBuilder.build())
+            .build()
     }
 }

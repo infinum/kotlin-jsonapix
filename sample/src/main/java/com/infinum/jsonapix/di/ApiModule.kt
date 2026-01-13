@@ -15,24 +15,25 @@ import retrofit2.Retrofit
 @Module
 @InstallIn(SingletonComponent::class)
 class ApiModule {
-
     @Provides
-    fun retrofit(): Retrofit {
-        return Retrofit.Builder()
+    fun retrofit(): Retrofit =
+        Retrofit
+            .Builder()
             .addConverterFactory(JsonXConverterFactory(TypeAdapterFactory()))
             .baseUrl("https://www.example.com")
             .build()
-    }
 
     @Provides
-    fun retromock(retrofit: Retrofit, @ApplicationContext context: Context): Retromock {
-        return Retromock.Builder()
+    fun retromock(
+        retrofit: Retrofit,
+        @ApplicationContext context: Context,
+    ): Retromock =
+        Retromock
+            .Builder()
             .retrofit(retrofit)
             .defaultBodyFactory(context.assets::open)
             .build()
-    }
 
     @Provides
-    fun service(retromock: Retromock): SampleApiService =
-        retromock.create(SampleApiService::class.java)
+    fun service(retromock: Retromock): SampleApiService = retromock.create(SampleApiService::class.java)
 }

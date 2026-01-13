@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test
  */
 @Suppress("StringLiteralDuplication")
 internal class AdapterFactoryIntegrationTest {
-
     private lateinit var factory: TypeAdapterFactory
 
     @BeforeEach
@@ -84,13 +83,14 @@ internal class AdapterFactoryIntegrationTest {
         val adapter: TypeAdapter<PersonModel>? = factory.getAdapter()
         assertNotNull(adapter)
 
-        val person = Person(
-            name = "John",
-            surname = "Doe",
-            age = 30,
-            allMyDogs = null,
-            myFavoriteDog = null,
-        )
+        val person =
+            Person(
+                name = "John",
+                surname = "Doe",
+                age = 30,
+                allMyDogs = null,
+                myFavoriteDog = null,
+            )
         val model = PersonModel(data = person)
 
         val json = adapter!!.convertToString(input = model)
@@ -106,7 +106,8 @@ internal class AdapterFactoryIntegrationTest {
         val adapter: TypeAdapter<PersonModel>? = factory.getAdapter()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -117,7 +118,7 @@ internal class AdapterFactoryIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -149,7 +150,8 @@ internal class AdapterFactoryIntegrationTest {
         val adapter: TypeAdapter<PersonList>? = factory.getAdapter()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": [
                     {
@@ -170,7 +172,7 @@ internal class AdapterFactoryIntegrationTest {
                     }
                 ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 
@@ -188,13 +190,14 @@ internal class AdapterFactoryIntegrationTest {
 
         val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
         val dog2 = Dog(name = "Rex", age = 5).apply { setId(id = "2") }
-        val person = Person(
-            name = "Owner",
-            surname = "Smith",
-            age = 40,
-            allMyDogs = listOf(dog1, dog2),
-            myFavoriteDog = dog1,
-        ).apply { setId(id = "100") }
+        val person =
+            Person(
+                name = "Owner",
+                surname = "Smith",
+                age = 40,
+                allMyDogs = listOf(dog1, dog2),
+                myFavoriteDog = dog1,
+            ).apply { setId(id = "100") }
         val model = PersonModel(data = person)
 
         val json = adapter!!.convertToString(input = model)
@@ -262,7 +265,8 @@ internal class AdapterFactoryIntegrationTest {
         val adapter: TypeAdapter<PersonModel>? = factory.getAdapter()
         assertNotNull(adapter)
 
-        val json = """
+        val json =
+            """
             {
                 "data": {
                     "type": "person",
@@ -278,7 +282,7 @@ internal class AdapterFactoryIntegrationTest {
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = adapter!!.convertFromString(input = json)
 

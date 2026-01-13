@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class DogFragment : BaseFragment<DogState, DogEvent>() {
-
     override val layoutRes: Int = R.layout.fragment_dog
 
     override val binding by viewBinding(FragmentDogBinding::bind)

@@ -11,8 +11,12 @@ annotation class JsonApiXLinks(
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiXLinksList(val value: Array<JsonApiXLinks>)
+annotation class JsonApiXLinksList(
+    val value: Array<JsonApiXLinks>,
+)
 
 enum class LinksPlacementStrategy {
-    ROOT, DATA, RELATIONSHIPS
+    ROOT,
+    DATA,
+    RELATIONSHIPS,
 }

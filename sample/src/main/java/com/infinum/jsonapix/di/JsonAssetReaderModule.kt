@@ -10,7 +10,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 interface JsonAssetReaderModule {
-
     @Binds
     fun jsonAssetReader(impl: JsonAssetReaderImpl): JsonAssetReader
 }

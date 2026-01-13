@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
  * Tests the complete workflow of type and id management in JSON:API resource objects.
  */
 internal class JsonApiModelIntegrationTest {
-
     // Test model implementation
     private class TestModel : JsonApiModel()
 

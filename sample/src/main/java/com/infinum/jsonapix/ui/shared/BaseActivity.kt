@@ -16,6 +16,7 @@ abstract class BaseActivity<State : Any, Event : Any> : AppCompatActivity() {
     private var loader: LoaderView? = null
 
     abstract fun handleState(state: State)
+
     abstract fun handleEvent(event: Event)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,17 +29,20 @@ abstract class BaseActivity<State : Any, Event : Any> : AppCompatActivity() {
         }
 
         lifecycleScope.launchWhenCreated {
-            viewModel?.loadingStateFlow
+            viewModel
+                ?.loadingStateFlow
                 ?.collect { state -> handleLoading(state) }
         }
 
         lifecycleScope.launchWhenCreated {
-            viewModel?.eventFlow
+            viewModel
+                ?.eventFlow
                 ?.collect { event -> handleEvent(event) }
         }
 
         lifecycleScope.launchWhenCreated {
-            viewModel?.errorFlow
+            viewModel
+                ?.errorFlow
                 ?.collect { event -> showMessage("Error", event.message) }
         }
     }

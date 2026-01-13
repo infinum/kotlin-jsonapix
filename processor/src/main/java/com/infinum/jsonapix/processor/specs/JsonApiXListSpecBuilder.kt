@@ -21,7 +21,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
-
     private val serializableClassName = Serializable::class.asClassName()
 
     override fun build(
@@ -58,32 +57,33 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         ).toMutableList()
 
         params.add(
-            ParameterSpec.builder(
-                JsonApiConstants.Keys.DATA,
-                List::class.asClassName().parameterizedBy(resourceObjectClassName),
-            ).build(),
+            ParameterSpec
+                .builder(
+                    JsonApiConstants.Keys.DATA,
+                    List::class.asClassName().parameterizedBy(resourceObjectClassName),
+                ).build(),
         )
 
         properties.add(dataProperty(resourceObjectClassName))
 
-        return FileSpec.builder(className.packageName, generatedName)
+        return FileSpec
+            .builder(className.packageName, generatedName)
             .addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
                 JsonApiConstants.Imports.RESOURCE_IDENTIFIER,
-            )
-            .addType(
-                TypeSpec.classBuilder(generatedName)
+            ).addType(
+                TypeSpec
+                    .classBuilder(generatedName)
                     .addSuperinterface(
                         JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName),
-                    )
-                    .addAnnotation(serializableClassName)
+                    ).addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
                     .primaryConstructor(
-                        FunSpec.constructorBuilder()
+                        FunSpec
+                            .constructorBuilder()
                             .addParameters(params)
                             .build(),
-                    )
-                    .addProperties(properties)
+                    ).addProperties(properties)
                     .addProperty(
                         originalProperty(
                             itemClassName,
@@ -91,20 +91,22 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                             metaInfo,
                             linksInfo,
                         ),
-                    )
-                    .build(),
-            )
-            .build()
+                    ).build(),
+            ).build()
     }
 
-    private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
-        JsonApiConstants.Keys.DATA,
-        List::class.asClassName().parameterizedBy(resourceObject),
-    ).addAnnotation(
-        Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA),
-    )
-        .initializer(JsonApiConstants.Keys.DATA).addModifiers(KModifier.OVERRIDE)
-        .build()
+    private fun dataProperty(resourceObject: ClassName): PropertySpec =
+        PropertySpec
+            .builder(
+                JsonApiConstants.Keys.DATA,
+                List::class.asClassName().parameterizedBy(resourceObject),
+            )
+            .addAnnotation(
+                Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA),
+            )
+            .initializer(JsonApiConstants.Keys.DATA)
+            .addModifiers(KModifier.OVERRIDE)
+            .build()
 
     @Suppress("StringShouldBeRawString")
     private fun originalProperty(
@@ -113,41 +115,43 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
     ): PropertySpec {
-        val getterFunSpec = FunSpec.builder("get()")
-            .addStatement("val items = data.map {")
-            .addStatement("val original = it.original(included)")
-            .addStatement(
-                "%T(\n%L,\n%L,\n%L%T },\n%L,\n%L%T } )",
-                itemClassName,
-                "original",
-                "it.links",
-                "it.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
-                linksInfo?.relationshipsLinks ?: DefaultLinks::class,
-                "it.meta",
-                "it.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
-                metaInfo?.relationshipsClassNAme ?: Meta::class,
-            )
-            .addStatement("}")
-            .addStatement(
-                "return %T(%L, %L, %L, %L)",
-                modelClassName,
-                "items",
-                "links",
-                "errors",
-                "meta",
-            )
-            .build()
+        val getterFunSpec =
+            FunSpec
+                .builder("get()")
+                .addStatement("val items = data.map {")
+                .addStatement("val original = it.original(included)")
+                .addStatement(
+                    "%T(\n%L,\n%L,\n%L%T },\n%L,\n%L%T } )",
+                    itemClassName,
+                    "original",
+                    "it.links",
+                    "it.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                    linksInfo?.relationshipsLinks ?: DefaultLinks::class,
+                    "it.meta",
+                    "it.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                    metaInfo?.relationshipsClassNAme ?: Meta::class,
+                ).addStatement("}")
+                .addStatement(
+                    "return %T(%L, %L, %L, %L)",
+                    modelClassName,
+                    "items",
+                    "links",
+                    "errors",
+                    "meta",
+                ).build()
 
-        val propertySpec = PropertySpec.builder(
-            JsonApiConstants.Members.ORIGINAL,
-            modelClassName,
-            KModifier.OVERRIDE,
-        )
-            .getter(getterFunSpec)
-            .addAnnotation(
-                AnnotationSpec.builder(Transient::class.asClassName())
-                    .build(),
-            )
+        val propertySpec =
+            PropertySpec
+                .builder(
+                    JsonApiConstants.Members.ORIGINAL,
+                    modelClassName,
+                    KModifier.OVERRIDE,
+                ).getter(getterFunSpec)
+                .addAnnotation(
+                    AnnotationSpec
+                        .builder(Transient::class.asClassName())
+                        .build(),
+                )
 
         return propertySpec.build()
     }

@@ -15,11 +15,12 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Serializable
 
 internal abstract class BaseJsonApiModelSpecBuilder {
-
     private val serializableClassName = Serializable::class.asClassName()
 
     abstract fun getClassSuffixName(): String
+
     abstract fun getRootClassName(rootType: ClassName): TypeName
+
     abstract fun getParams(
         className: ClassName,
         isRootNullable: Boolean,
@@ -40,39 +41,43 @@ internal abstract class BaseJsonApiModelSpecBuilder {
         val params = getParams(className, isRootNullable, metaInfo, linksInfo, customError)
         val props = params.map { it.toPropSpec() }
 
-        return FileSpec.builder(className.packageName, generatedName)
+        return FileSpec
+            .builder(className.packageName, generatedName)
             .addType(
-                TypeSpec.classBuilder(generatedName)
+                TypeSpec
+                    .classBuilder(generatedName)
                     .addModifiers(KModifier.DATA)
                     .addAnnotation(serializableClassName)
                     .primaryConstructor(
-                        FunSpec.constructorBuilder()
+                        FunSpec
+                            .constructorBuilder()
                             .addParameters(params)
                             .build(),
-                    )
-                    .addProperties(props)
+                    ).addProperties(props)
                     .build(),
-            )
-            .build()
+            ).build()
     }
 
-    protected fun String.asParam(className: TypeName, isNullable: Boolean, defaultValue: String? = null): ParameterSpec {
-        return ParameterSpec.builder(
-            this,
-            className.copy(isNullable),
-        ).apply {
-            if (defaultValue != null) {
-                defaultValue(defaultValue)
-            }
-        }.build()
-    }
+    protected fun String.asParam(
+        className: TypeName,
+        isNullable: Boolean,
+        defaultValue: String? = null,
+    ): ParameterSpec =
+        ParameterSpec
+            .builder(
+                this,
+                className.copy(isNullable),
+            ).apply {
+                if (defaultValue != null) {
+                    defaultValue(defaultValue)
+                }
+            }.build()
 
-    private fun ParameterSpec.toPropSpec(): PropertySpec {
-        return PropertySpec.builder(
-            name,
-            type,
-        )
-            .initializer(name)
+    private fun ParameterSpec.toPropSpec(): PropertySpec =
+        PropertySpec
+            .builder(
+                name,
+                type,
+            ).initializer(name)
             .build()
-    }
 }

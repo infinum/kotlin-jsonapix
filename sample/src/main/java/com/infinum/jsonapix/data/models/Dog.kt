@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 
 @JsonApiX("dog")
 @Serializable
-data class Dog(val age: Int, val name: String) : JsonApiModel()
+data class Dog(
+    val age: Int,
+    val name: String,
+) : JsonApiModel()

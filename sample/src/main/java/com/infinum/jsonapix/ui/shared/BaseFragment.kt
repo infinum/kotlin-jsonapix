@@ -11,12 +11,13 @@ import com.infinum.jsonapix.R
 import kotlinx.coroutines.flow.collect
 
 abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
-
     abstract val layoutRes: Int
     protected abstract val binding: ViewBinding
 
     protected abstract val viewModel: BaseViewModel<State, Event>?
+
     abstract fun handleState(state: State)
+
     abstract fun handleEvent(event: Event)
 
     private fun getBaseActivity(): BaseActivity<*, *>? = activity as? BaseActivity<*, *>
@@ -27,7 +28,10 @@ abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
         savedInstanceState: Bundle?,
     ): View? = inflater.inflate(layoutRes, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launchWhenCreated {
             viewModel?.stateFlow?.collect { state ->
@@ -36,17 +40,20 @@ abstract class BaseFragment<State : Any, Event : Any> : Fragment() {
         }
 
         lifecycleScope.launchWhenCreated {
-            viewModel?.loadingStateFlow
+            viewModel
+                ?.loadingStateFlow
                 ?.collect { state -> handleLoading(state) }
         }
 
         lifecycleScope.launchWhenCreated {
-            viewModel?.eventFlow
+            viewModel
+                ?.eventFlow
                 ?.collect { event -> handleEvent(event) }
         }
 
         lifecycleScope.launchWhenCreated {
-            viewModel?.errorFlow
+            viewModel
+                ?.errorFlow
                 ?.collect { event -> showMessage("Error", event.message) }
         }
     }

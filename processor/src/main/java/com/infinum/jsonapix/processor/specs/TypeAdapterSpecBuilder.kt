@@ -8,16 +8,16 @@ import com.squareup.kotlinpoet.TypeName
 
 public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
     override fun getAdapterPrefixName(): String = JsonApiConstants.Prefix.TYPE_ADAPTER
+
     override fun getClassSuffixName(): String = JsonApiConstants.Suffix.JSON_API_MODEL
 
     override fun getRootModel(className: ClassName): TypeName = className
 
-    override fun getAdditionalImports(): List<String> {
-        return listOf(
+    override fun getAdditionalImports(): List<String> =
+        listOf(
             JsonApiConstants.Members.JSONX_SERIALIZE,
             JsonApiConstants.Members.JSONX_DESERIALIZE,
         )
-    }
 
     override fun convertFromStringFunSpec(
         className: ClassName,
@@ -25,8 +25,9 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
         rootMeta: ClassName?,
         resourceObjectMeta: ClassName?,
         relationshipsMeta: ClassName?,
-    ): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
+    ): FunSpec =
+        FunSpec
+            .builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("input", String::class)
             .returns(modelType)
@@ -42,8 +43,6 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS,
-            )
-            .addStatement("return data.%L", JsonApiConstants.Members.ORIGINAL)
+            ).addStatement("return data.%L", JsonApiConstants.Members.ORIGINAL)
             .build()
-    }
 }

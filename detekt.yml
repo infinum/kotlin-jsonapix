@@ -307,7 +307,7 @@ formatting:
     active: true
     autoCorrect: true
   ChainWrapping:
-    active: true
+    active: false
     autoCorrect: true
   ClassName:
     active: false # The same as ClassNaming from naming
@@ -344,13 +344,13 @@ formatting:
   FunctionReturnTypeSpacing:
     active: true
     autoCorrect: true
-    maxLineLength: 140
+    maxLineLength: 180
   FunctionSignature:
     active: false
     autoCorrect: true
     forceMultilineWhenParameterCountGreaterOrEqualThan: 2147483647
     functionBodyExpressionWrapping: 'default'
-    maxLineLength: 140
+    maxLineLength: 180
     indentSize: 4
   FunctionStartOfBodySpacing:
     active: true
@@ -367,9 +367,9 @@ formatting:
     autoCorrect: true
     indentSize: 4
   ImportOrdering:
-    active: true
+    active: false
     layout: '*,^'
-    autoCorrect: true
+    autoCorrect: false
   Indentation:
     active: true
     indentSize: 4
@@ -380,7 +380,7 @@ formatting:
     autoCorrect: true
   MaximumLineLength:
     active: true
-    maxLineLength: 140
+    maxLineLength: 180
     autoCorrect: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
   ModifierListSpacing:
@@ -458,12 +458,12 @@ formatting:
     autoCorrect: true
   ParameterListWrapping:
     active: true
-    maxLineLength: 140
+    maxLineLength: 180
     autoCorrect: true
   ParameterWrapping:
     active: true
     autoCorrect: true
-    maxLineLength: 140
+    maxLineLength: 180
     indentSize: 4
   PropertyName:
     active: false
@@ -471,7 +471,7 @@ formatting:
   PropertyWrapping:
     active: true
     autoCorrect: true
-    maxLineLength: 140
+    maxLineLength: 180
     indentSize: 4
   SpacingAroundAngleBrackets:
     active: true
@@ -546,7 +546,7 @@ formatting:
   Wrapping:
     active: true
     autoCorrect: true
-    maxLineLength: 140
+    maxLineLength: 180
     indentSize: 4
 
 naming:
@@ -801,7 +801,7 @@ style:
   ExplicitItLambdaParameter:
     active: true
   ExpressionBodySyntax:
-    active: true
+    active: false
     includeLineWrapping: false
   ForbiddenAnnotation:
     active: true
@@ -881,7 +881,7 @@ style:
     maxChainedCalls: 5
   MaxLineLength:
     active: false  # The same as MaximumLineLength from formatting
-    maxLineLength: 140
+    maxLineLength: 180
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false

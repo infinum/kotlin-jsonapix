@@ -11,7 +11,8 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 class AssetsModule {
-
     @Provides
-    fun assets(@ApplicationContext context: Context): AssetManager = context.assets
+    fun assets(
+        @ApplicationContext context: Context,
+    ): AssetManager = context.assets
 }

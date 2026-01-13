@@ -17,8 +17,7 @@ import kotlinx.serialization.json.jsonPrimitive
  * Only use with JSON Arrays that contain objects of the same type
  */
 object TypeExtractor {
-    fun guessType(clazz: KAnnotatedElement): String =
-        (clazz.annotations.first { it is JsonApiX } as? JsonApiX)?.type!!
+    fun guessType(clazz: KAnnotatedElement): String = (clazz.annotations.first { it is JsonApiX } as? JsonApiX)?.type!!
 
     @SuppressWarnings("SwallowedException")
     fun findType(jsonElement: JsonElement?): String? {
@@ -32,11 +31,13 @@ object TypeExtractor {
                     val type = jsonElement.jsonObject[JsonApiConstants.Keys.TYPE]
                     type?.jsonPrimitive?.content!!
                 }
+
                 is JsonArray -> {
                     val first = jsonElement.jsonArray[0]
                     val type = first.jsonObject[JsonApiConstants.Keys.TYPE]
                     type?.jsonPrimitive?.content!!
                 }
+
                 else ->
                     throw IllegalArgumentException(
                         "Input must be either JSON object or array with the key type defined",

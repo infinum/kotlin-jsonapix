@@ -10,11 +10,11 @@ import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 
 internal object OneRelationshipModelFunSpecBuilder {
-
     fun build(): FunSpec {
         val typeVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.GENERIC_TYPE_VARIABLE)
-        return FunSpec.builder(JsonApiConstants.Members.TO_ONE_RELATIONSHIP_MODEL)
+        return FunSpec
+            .builder(JsonApiConstants.Members.TO_ONE_RELATIONSHIP_MODEL)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(typeVariableName.copy(reified = true))
             .receiver(typeVariableName)
@@ -25,7 +25,6 @@ internal object OneRelationshipModelFunSpecBuilder {
                 "return %T(data = %T(type, id))",
                 OneRelationshipMember::class.asClassName(),
                 ResourceIdentifier::class.asClassName(),
-            )
-            .build()
+            ).build()
     }
 }

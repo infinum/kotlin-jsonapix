@@ -27,8 +27,8 @@ internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
         customError: ClassName?,
-    ): List<ParameterSpec> {
-        return listOf(
+    ): List<ParameterSpec> =
+        listOf(
             JsonApiConstants.Keys.DATA.asParam(
                 className = getRootClassName(className),
                 isNullable = isRootNullable,
@@ -50,5 +50,4 @@ internal object JsonApiListSpecBuilder : BaseJsonApiModelSpecBuilder() {
                 defaultValue = JsonApiConstants.Defaults.NULL,
             ),
         )
-    }
 }

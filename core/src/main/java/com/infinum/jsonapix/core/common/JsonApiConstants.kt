@@ -5,7 +5,6 @@ package com.infinum.jsonapix.core.common
  * as well as prefixes for the generated classes
  */
 object JsonApiConstants {
-
     const val CLASS_DISCRIMINATOR_KEY = "#class"
     const val SERIAL_NAME_FORMAT = "value = %S"
 
@@ -102,38 +101,43 @@ object JsonApiConstants {
     }
 
     object Imports {
-        val JSON_X = arrayOf(
-            "core.JsonApiX",
-            "core.resources.ResourceObject",
-            "core.JsonApiModel",
-        )
+        val JSON_X =
+            arrayOf(
+                "core.JsonApiX",
+                "core.resources.ResourceObject",
+                "core.JsonApiModel",
+            )
 
-        val KOTLINX = arrayOf(
-            "json.Json",
-            "json.jsonObject",
-            "encodeToString",
-            "decodeFromString",
-            "PolymorphicSerializer",
-        )
+        val KOTLINX =
+            arrayOf(
+                "json.Json",
+                "json.jsonObject",
+                "encodeToString",
+                "decodeFromString",
+                "PolymorphicSerializer",
+            )
 
-        val KOTLINX_MODULES = arrayOf(
-            "polymorphic",
-            "contextual",
-            "subclass",
-            "SerializersModule",
-        )
+        val KOTLINX_MODULES =
+            arrayOf(
+                "polymorphic",
+                "contextual",
+                "subclass",
+                "SerializersModule",
+            )
 
-        val CORE_EXTENSIONS = arrayOf(
-            "JsonApiDiscriminator",
-            "TypeExtractor",
-        )
+        val CORE_EXTENSIONS =
+            arrayOf(
+                "JsonApiDiscriminator",
+                "TypeExtractor",
+            )
 
         const val ERRORS = "Errors"
 
-        val RELATIONSHIP_EXTENSIONS = arrayOf(
-            "toOneRelationshipModel",
-            "toManyRelationshipModel",
-        )
+        val RELATIONSHIP_EXTENSIONS =
+            arrayOf(
+                "toOneRelationshipModel",
+                "toManyRelationshipModel",
+            )
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
         const val JSON_API_MODEL = "JsonApiModel"

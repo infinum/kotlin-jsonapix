@@ -12,4 +12,6 @@ class EmptyData : JsonApiModel()
 
 @Serializable
 @JsonApiXMeta("emptyData")
-data class EmptyDataMeta(val owner: String) : Meta
+data class EmptyDataMeta(
+    val owner: String,
+) : Meta

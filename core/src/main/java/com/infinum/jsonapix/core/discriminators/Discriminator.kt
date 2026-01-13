@@ -7,7 +7,6 @@ import kotlinx.serialization.json.JsonElement
  * from serialized/deserialized objects
  */
 interface Discriminator {
-
     fun inject(jsonElement: JsonElement): JsonElement
 
     fun extract(jsonElement: JsonElement): JsonElement

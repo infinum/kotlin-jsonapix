@@ -15,32 +15,31 @@ import com.squareup.kotlinpoet.asClassName
 import kotlin.reflect.KClass
 
 public class TypeAdapterFactorySpecBuilder {
-
     private val classNames = mutableListOf<ClassName>()
 
     public fun add(className: ClassName) {
         classNames.add(className)
     }
 
-    public fun build(): FileSpec {
-        return FileSpec.builder(JsonApiConstants.Packages.JSONX, JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
+    public fun build(): FileSpec =
+        FileSpec
+            .builder(JsonApiConstants.Packages.JSONX, JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
             .addType(
-                TypeSpec.classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
+                TypeSpec
+                    .classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
                     .addSuperinterface(AdapterFactory::class)
                     .addFunction(getAdapterFunSpec())
                     .build(),
-            )
-            .apply {
+            ).apply {
                 classNames.forEach {
                     addImport(it.packageName, "TypeAdapter_${it.simpleName}")
                     addImport(it.packageName, "TypeAdapterList_${it.simpleName}")
                 }
-            }
-            .build()
-    }
+            }.build()
 
-    private fun getAdapterFunSpec(): FunSpec {
-        return FunSpec.builder(JsonApiConstants.Members.GET_ADAPTER)
+    private fun getAdapterFunSpec(): FunSpec =
+        FunSpec
+            .builder(JsonApiConstants.Members.GET_ADAPTER)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("type", KClass::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(Any::class)))
             .returns(
@@ -48,8 +47,7 @@ public class TypeAdapterFactorySpecBuilder {
                     .asClassName()
                     .parameterizedBy(WildcardTypeName.producerOf(Any::class))
                     .copy(nullable = true),
-            )
-            .beginControlFlow("return when(type.qualifiedName)")
+            ).beginControlFlow("return when(type.qualifiedName)")
             .apply {
                 classNames.forEach {
                     addStatement(
@@ -64,9 +62,7 @@ public class TypeAdapterFactorySpecBuilder {
                         it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
                     )
                 }
-            }
-            .addStatement("else -> null")
+            }.addStatement("else -> null")
             .endControlFlow()
             .build()
-    }
 }

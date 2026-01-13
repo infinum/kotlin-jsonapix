@@ -6,8 +6,9 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 
-internal class PropertyTypesSeparator(private val classType: TypeSpec) {
-
+internal class PropertyTypesSeparator(
+    private val classType: TypeSpec,
+) {
     private val primitiveFields = mutableListOf<PropertySpec>()
     private val compositeFields = mutableListOf<PropertySpec>()
 
@@ -19,11 +20,9 @@ internal class PropertyTypesSeparator(private val classType: TypeSpec) {
 
     fun getCompositeProperties(): List<PropertySpec> = compositeFields.toList()
 
-    fun getManyRelationships(): List<PropertySpec> =
-        compositeFields.filter { it.isManyRelationship() }
+    fun getManyRelationships(): List<PropertySpec> = compositeFields.filter { it.isManyRelationship() }
 
-    fun getOneRelationships(): List<PropertySpec> =
-        compositeFields.filter { it.isOneRelationship() }
+    fun getOneRelationships(): List<PropertySpec> = compositeFields.filter { it.isOneRelationship() }
 
     private fun processClassParameters() {
         classType.propertySpecs.filter { !it.delegated }.forEach { property ->

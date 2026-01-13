@@ -8,7 +8,6 @@ import com.infinum.jsonapix.data.models.PersonModel
 import retrofit2.http.GET
 
 interface SampleApiService {
-
     @Mock
     @MockResponse(body = "responses/person.json")
     @GET("/person")

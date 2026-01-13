@@ -17,7 +17,6 @@ abstract class BaseJsonApiDiscriminator(
     private val relationshipsMeta: String,
     private val error: String,
 ) : Discriminator {
-
     val rootDiscriminator = CommonDiscriminator(rootType)
 
     abstract override fun inject(jsonElement: JsonElement): JsonElement
@@ -28,34 +27,33 @@ abstract class BaseJsonApiDiscriminator(
 
     abstract fun getAttributesObject(jsonElement: JsonElement): JsonElement?
 
-    fun getJsonArrayEntry(key: String, data: JsonArray): Map.Entry<String, JsonArray> {
-        return object : Map.Entry<String, JsonArray> {
+    fun getJsonArrayEntry(
+        key: String,
+        data: JsonArray,
+    ): Map.Entry<String, JsonArray> =
+        object : Map.Entry<String, JsonArray> {
             override val key: String = key
             override val value: JsonArray = data
         }
-    }
 
-    fun getDataObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.DATA].takeUnless { it is JsonNull }
+    fun getDataObject(jsonElement: JsonElement) = jsonElement.jsonObject[JsonApiConstants.Keys.DATA].takeUnless { it is JsonNull }
 
-    fun getIncludedArray(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.INCLUDED].takeUnless { it is JsonNull }
+    fun getIncludedArray(jsonElement: JsonElement) = jsonElement.jsonObject[JsonApiConstants.Keys.INCLUDED].takeUnless { it is JsonNull }
 
-    fun getLinksObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.LINKS].takeUnless { it is JsonNull }
+    fun getLinksObject(jsonElement: JsonElement) = jsonElement.jsonObject[JsonApiConstants.Keys.LINKS].takeUnless { it is JsonNull }
 
-    fun getMetaObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.META].takeUnless { it is JsonNull }
+    fun getMetaObject(jsonElement: JsonElement) = jsonElement.jsonObject[JsonApiConstants.Keys.META].takeUnless { it is JsonNull }
 
-    fun getErrorsObject(jsonElement: JsonElement) =
-        jsonElement.jsonObject[JsonApiConstants.Keys.ERRORS].takeUnless { it is JsonNull }
+    fun getErrorsObject(jsonElement: JsonElement) = jsonElement.jsonObject[JsonApiConstants.Keys.ERRORS].takeUnless { it is JsonNull }
 
-    fun getJsonObjectEntry(key: String, data: JsonElement): Map.Entry<String, JsonElement> {
-        return object : Map.Entry<String, JsonElement> {
+    fun getJsonObjectEntry(
+        key: String,
+        data: JsonElement,
+    ): Map.Entry<String, JsonElement> =
+        object : Map.Entry<String, JsonElement> {
             override val key: String = key
             override val value: JsonElement = data
         }
-    }
 
     fun getNewDataObject(
         original: JsonElement,
@@ -63,8 +61,8 @@ abstract class BaseJsonApiDiscriminator(
         relationshipsObject: JsonElement?,
         linksObject: JsonElement?,
         metaObject: JsonElement?,
-    ): JsonObject {
-        return original.jsonObject.entries.toMutableSet().let { entries ->
+    ): JsonObject =
+        original.jsonObject.entries.toMutableSet().let { entries ->
             attributesObject?.let { attributes ->
                 entries.removeAll { it.key == JsonApiConstants.Keys.ATTRIBUTES }
                 entries.add(getJsonObjectEntry(JsonApiConstants.Keys.ATTRIBUTES, attributes))
@@ -89,16 +87,15 @@ abstract class BaseJsonApiDiscriminator(
             resultMap.putAll(entries.map { Pair(it.key, it.value) })
             JsonObject(resultMap)
         }
-    }
 
-    fun getNewRelationshipsObject(
-        original: JsonElement,
-    ): JsonObject {
+    fun getNewRelationshipsObject(original: JsonElement): JsonObject {
         val resultMap = mutableMapOf<String, JsonElement>()
         val relationshipsLinksDiscriminator = CommonDiscriminator(relationshipsLinks)
         val relationshipsMetaDiscriminator = CommonDiscriminator(relationshipsMeta)
         original.jsonObject.entries.filter { it.value is JsonObject }.forEach { relationshipEntry ->
-            val set = relationshipEntry.value.jsonObject.entries.toMutableSet()
+            val set =
+                relationshipEntry.value.jsonObject.entries
+                    .toMutableSet()
             getLinksObject(relationshipEntry.value)?.let { linksObject ->
                 if (linksObject !is JsonNull) {
                     val newLinks = relationshipsLinksDiscriminator.inject(linksObject)
@@ -121,9 +118,7 @@ abstract class BaseJsonApiDiscriminator(
         return JsonObject(resultMap)
     }
 
-    fun getNewErrorsArray(
-        original: JsonElement,
-    ): JsonArray {
+    fun getNewErrorsArray(original: JsonElement): JsonArray {
         val errorDiscriminator = CommonDiscriminator(error)
 
         return buildJsonArray {

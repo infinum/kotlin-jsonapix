@@ -5,8 +5,9 @@ import android.content.Context
 import android.os.Bundle
 import com.infinum.jsonapix.R
 
-class LoaderView(context: Context) : Dialog(context) {
-
+class LoaderView(
+    context: Context,
+) : Dialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.view_loader)

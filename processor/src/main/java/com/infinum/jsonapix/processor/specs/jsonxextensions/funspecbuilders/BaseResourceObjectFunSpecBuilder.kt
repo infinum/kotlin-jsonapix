@@ -6,8 +6,8 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 
 internal abstract class BaseResourceObjectFunSpecBuilder {
-
     abstract fun getClassSuffix(): String
+
     fun build(
         originalClass: ClassName,
         resourceObjectClass: ClassName,
@@ -40,13 +40,13 @@ internal abstract class BaseResourceObjectFunSpecBuilder {
 
         returnStatement.append(")")
 
-        return FunSpec.builder(JsonApiConstants.Members.TO_RESOURCE_OBJECT)
+        return FunSpec
+            .builder(JsonApiConstants.Members.TO_RESOURCE_OBJECT)
             .receiver(modelClassName)
             .returns(resourceObjectClass)
             .addStatement(
                 format = returnStatement.toString(),
                 args = builderArgs.toTypedArray(),
-            )
-            .build()
+            ).build()
     }
 }

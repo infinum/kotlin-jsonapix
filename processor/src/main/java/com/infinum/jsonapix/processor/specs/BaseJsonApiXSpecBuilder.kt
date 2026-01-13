@@ -20,7 +20,6 @@ import com.squareup.kotlinpoet.asClassName
 import kotlinx.serialization.Contextual
 
 internal abstract class BaseJsonApiXSpecBuilder {
-
     @Suppress("LongParameterList")
     abstract fun build(
         className: ClassName,
@@ -41,19 +40,25 @@ internal abstract class BaseJsonApiXSpecBuilder {
         params.add(
             Specs.getNullParamSpec(
                 JsonApiConstants.Keys.INCLUDED,
-                List::class.asClassName().parameterizedBy(
-                    ResourceObject::class.asClassName()
-                        .parameterizedBy(getAnnotatedAnyType()),
-                ).copy(nullable = true),
+                List::class
+                    .asClassName()
+                    .parameterizedBy(
+                        ResourceObject::class
+                            .asClassName()
+                            .parameterizedBy(getAnnotatedAnyType()),
+                    ).copy(nullable = true),
             ),
         )
 
         params.add(
-            ParameterSpec.builder(
-                JsonApiConstants.Keys.ERRORS,
-                List::class.asClassName()
-                    .parameterizedBy(customError ?: DefaultError::class.asClassName()).copy(nullable = true),
-            ).defaultValue("%L", "null")
+            ParameterSpec
+                .builder(
+                    JsonApiConstants.Keys.ERRORS,
+                    List::class
+                        .asClassName()
+                        .parameterizedBy(customError ?: DefaultError::class.asClassName())
+                        .copy(nullable = true),
+                ).defaultValue("%L", "null")
                 .build(),
         )
 
@@ -65,10 +70,12 @@ internal abstract class BaseJsonApiXSpecBuilder {
         )
 
         params.add(
-            ParameterSpec.builder(
-                JsonApiConstants.Keys.META,
-                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
-            ).defaultValue("%L", "null").build(),
+            ParameterSpec
+                .builder(
+                    JsonApiConstants.Keys.META,
+                    metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
+                ).defaultValue("%L", "null")
+                .build(),
         )
         return params
     }
@@ -82,10 +89,13 @@ internal abstract class BaseJsonApiXSpecBuilder {
         properties.add(
             Specs.getNullPropertySpec(
                 JsonApiConstants.Keys.INCLUDED,
-                List::class.asClassName().parameterizedBy(
-                    ResourceObject::class.asClassName()
-                        .parameterizedBy(getAnnotatedAnyType()),
-                ).copy(nullable = true),
+                List::class
+                    .asClassName()
+                    .parameterizedBy(
+                        ResourceObject::class
+                            .asClassName()
+                            .parameterizedBy(getAnnotatedAnyType()),
+                    ).copy(nullable = true),
             ),
         )
         properties.add(errorsProperty(customError))
@@ -102,31 +112,33 @@ internal abstract class BaseJsonApiXSpecBuilder {
         return ANY.copy(annotations = ANY.annotations + contextual)
     }
 
-    private fun errorsProperty(customError: ClassName?): PropertySpec = PropertySpec.builder(
-        JsonApiConstants.Keys.ERRORS,
-        List::class.asClassName().parameterizedBy(
-            customError ?: DefaultError::class.asClassName(),
-        ).copy(nullable = true),
-        KModifier.OVERRIDE,
-    )
-        .addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ERRORS))
-        .initializer(JsonApiConstants.Keys.ERRORS)
-        .build()
+    private fun errorsProperty(customError: ClassName?): PropertySpec =
+        PropertySpec
+            .builder(
+                JsonApiConstants.Keys.ERRORS,
+                List::class
+                    .asClassName()
+                    .parameterizedBy(
+                        customError ?: DefaultError::class.asClassName(),
+                    ).copy(nullable = true),
+                KModifier.OVERRIDE,
+            ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.ERRORS))
+            .initializer(JsonApiConstants.Keys.ERRORS)
+            .build()
 
-    private fun linksProperty(rootLinksClassName: ClassName?): PropertySpec = Specs.getNullPropertySpec(
-        name = JsonApiConstants.Keys.LINKS,
-        typeName = rootLinksClassName?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
-    )
+    private fun linksProperty(rootLinksClassName: ClassName?): PropertySpec =
+        Specs.getNullPropertySpec(
+            name = JsonApiConstants.Keys.LINKS,
+            typeName = rootLinksClassName?.copy(nullable = true) ?: DefaultLinks::class.asClassName().copy(nullable = true),
+        )
 
-    private fun metaProperty(
-        metaClassName: ClassName?,
-    ): PropertySpec {
-        return PropertySpec.builder(
-            JsonApiConstants.Keys.META,
-            metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
-            KModifier.OVERRIDE,
-        ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.META))
+    private fun metaProperty(metaClassName: ClassName?): PropertySpec =
+        PropertySpec
+            .builder(
+                JsonApiConstants.Keys.META,
+                metaClassName?.copy(nullable = true) ?: Meta::class.asClassName().copy(nullable = true),
+                KModifier.OVERRIDE,
+            ).addAnnotation(Specs.getSerialNameSpec(JsonApiConstants.Keys.META))
             .initializer(JsonApiConstants.Keys.META)
             .build()
-    }
 }

@@ -48,21 +48,19 @@ internal object OriginalDataResourceObjectFunSpecBuilder {
         )
         returnStatement.append(")")
 
-        return FunSpec.builder(JsonApiConstants.Members.TO_RESOURCE_OBJECT)
+        return FunSpec
+            .builder(JsonApiConstants.Members.TO_RESOURCE_OBJECT)
             .receiver(originalClass)
             .returns(resourceObjectClass)
             .addParameter(
                 "meta",
                 Meta::class.asClassName().copy(nullable = true),
-            )
-            .addParameter(
+            ).addParameter(
                 "links",
                 Links::class.asClassName().copy(nullable = true),
-            )
-            .addStatement(
+            ).addStatement(
                 format = returnStatement.toString(),
                 args = builderArgs.toTypedArray(),
-            )
-            .build()
+            ).build()
     }
 }

@@ -11,7 +11,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ErrorFragment : BaseFragment<ErrorState, ErrorEvent>() {
-
     override val layoutRes: Int = R.layout.fragment_error
 
     override val binding by viewBinding(FragmentErrorBinding::bind)
@@ -22,7 +21,10 @@ class ErrorFragment : BaseFragment<ErrorState, ErrorEvent>() {
 
     override fun handleEvent(event: ErrorEvent) = Unit
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.downloadButton.setOnClickListener {
             viewModel.fetchError()

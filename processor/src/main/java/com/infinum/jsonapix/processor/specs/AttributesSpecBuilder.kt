@@ -16,7 +16,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 internal object AttributesSpecBuilder {
-
     private val serializableClassName = Serializable::class.asClassName()
     private val serialNameTypeName = SerialName::class.asTypeName()
 
@@ -26,37 +25,38 @@ internal object AttributesSpecBuilder {
         type: String,
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
-        val parameterSpecs = attributes.map {
-            ParameterSpec.builder(it.name, it.type)
-                .apply {
-                    if (it.annotations.missingTypeName(serialNameTypeName)) {
-                        addAnnotation(Specs.getSerialNameSpec(it.name))
-                    }
-                    if (it.type.isNullable) {
-                        defaultValue("%L", null)
-                    }
-                }
-                .build()
-        }
+        val parameterSpecs =
+            attributes.map {
+                ParameterSpec
+                    .builder(it.name, it.type)
+                    .apply {
+                        if (it.annotations.missingTypeName(serialNameTypeName)) {
+                            addAnnotation(Specs.getSerialNameSpec(it.name))
+                        }
+                        if (it.type.isNullable) {
+                            defaultValue("%L", null)
+                        }
+                    }.build()
+            }
 
-        return TypeSpec.classBuilder(generatedName)
+        return TypeSpec
+            .classBuilder(generatedName)
             .addModifiers(KModifier.DATA)
             .addSuperinterface(Attributes::class.asClassName())
             .addAnnotation(serializableClassName)
             .addAnnotation(
                 Specs.getSerialNameSpec(JsonApiConstants.Prefix.ATTRIBUTES.withName(type)),
-            )
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
+            ).primaryConstructor(
+                FunSpec
+                    .constructorBuilder()
                     .addParameters(parameterSpecs)
                     .build(),
-            )
-            .addType(
-                TypeSpec.companionObjectBuilder()
+            ).addType(
+                TypeSpec
+                    .companionObjectBuilder()
                     .addFunction(fromOriginalObjectSpec(className, generatedName, attributes))
                     .build(),
-            )
-            .addProperties(attributes)
+            ).addProperties(attributes)
             .build()
     }
 
@@ -65,14 +65,15 @@ internal object AttributesSpecBuilder {
         generatedName: String,
         attributes: List<PropertySpec>,
     ): FunSpec {
-        val constructorString = attributes.joinToString(", ") {
-            "${it.name} = originalObject.${it.name}"
-        }
-        return FunSpec.builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
+        val constructorString =
+            attributes.joinToString(", ") {
+                "${it.name} = originalObject.${it.name}"
+            }
+        return FunSpec
+            .builder(JsonApiConstants.Members.FROM_ORIGINAL_OBJECT)
             .addParameter(
                 ParameterSpec.builder("originalObject", originalClass).build(),
-            )
-            .addStatement("return %L($constructorString)", generatedName)
+            ).addStatement("return %L($constructorString)", generatedName)
             .returns(ClassName.bestGuess(generatedName))
             .build()
     }

@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SampleActivity : BaseActivity<Unit, Unit>() {
-
     override val viewModel: BaseViewModel<Unit, Unit>? = null
 
     override val binding by viewBinding(ActivitySampleBinding::inflate)
@@ -25,15 +24,16 @@ class SampleActivity : BaseActivity<Unit, Unit>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding.pager.adapter = SamplePagerAdapter(
-            this,
-            listOf(
-                PersonFragment.newInstance(),
-                DogFragment.newInstance(),
-                CompanyFragment.newInstance(),
-                ErrorFragment.newInstance(),
-            ),
-        )
+        binding.pager.adapter =
+            SamplePagerAdapter(
+                this,
+                listOf(
+                    PersonFragment.newInstance(),
+                    DogFragment.newInstance(),
+                    CompanyFragment.newInstance(),
+                    ErrorFragment.newInstance(),
+                ),
+            )
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             tab.text = TITLES[position]
         }.attach()

@@ -24,16 +24,24 @@ data class Person(
 
 @Serializable
 @JsonApiXMeta("person")
-data class PersonRootMeta(val owner: String) : Meta
+data class PersonRootMeta(
+    val owner: String,
+) : Meta
 
 @Serializable
 @JsonApiXMeta("person", MetaPlacementStrategy.DATA)
-data class PersonResourceMeta(val writer: String) : Meta
+data class PersonResourceMeta(
+    val writer: String,
+) : Meta
 
 @Serializable
 @JsonApiXMeta("person", MetaPlacementStrategy.RELATIONSHIPS)
-data class PersonRelationshipMeta(val user: String) : Meta
+data class PersonRelationshipMeta(
+    val user: String,
+) : Meta
 
 @Serializable
 @JsonApiXError("person")
-data class PersonalError(val desc: String) : com.infinum.jsonapix.core.resources.Error
+data class PersonalError(
+    val desc: String,
+) : com.infinum.jsonapix.core.resources.Error

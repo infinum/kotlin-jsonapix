@@ -15,9 +15,10 @@ class JsonApiXIssueRegistry : IssueRegistry() {
     // works with Studio 4.1 or later; see com.android.tools.lint.detector.api.Api / ApiKt
     override val minApi: Int = MIN_API
 
-    override val vendor: Vendor = Vendor(
-        vendorName = "Infinum Inc.",
-        feedbackUrl = "https://github.com/infinum/kotlin-jsonapix/issues",
-        contact = "https://github.com/infinum/kotlin-jsonapix",
-    )
+    override val vendor: Vendor =
+        Vendor(
+            vendorName = "Infinum Inc.",
+            feedbackUrl = "https://github.com/infinum/kotlin-jsonapix/issues",
+            contact = "https://github.com/infinum/kotlin-jsonapix",
+        )
 }

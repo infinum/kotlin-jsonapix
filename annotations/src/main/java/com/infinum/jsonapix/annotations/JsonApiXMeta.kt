@@ -11,8 +11,12 @@ annotation class JsonApiXMeta(
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class JsonApiXMetaList(val value: Array<JsonApiXMeta>)
+annotation class JsonApiXMetaList(
+    val value: Array<JsonApiXMeta>,
+)
 
 enum class MetaPlacementStrategy {
-    ROOT, DATA, RELATIONSHIPS
+    ROOT,
+    DATA,
+    RELATIONSHIPS,
 }

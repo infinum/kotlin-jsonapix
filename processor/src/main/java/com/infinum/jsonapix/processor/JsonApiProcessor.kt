@@ -42,7 +42,6 @@ import kotlin.metadata.jvm.KotlinClassMetadata
 
 @SuppressWarnings("SpreadOperator")
 public class JsonApiProcessor : AbstractProcessor() {
-
     private val collector = JsonXExtensionsSpecBuilder()
     private val adapterFactoryCollector = TypeAdapterFactorySpecBuilder()
     private val customLinks = mutableListOf<LinksInfo>()
@@ -92,7 +91,11 @@ public class JsonApiProcessor : AbstractProcessor() {
     }
 
     @SuppressWarnings("LongMethod")
-    private fun processAnnotation(element: Element, type: String, isNullable: Boolean) {
+    private fun processAnnotation(
+        element: Element,
+        type: String,
+        isNullable: Boolean,
+    ) {
         val className = element.simpleName.toString()
         val generatedPackage = processingEnv.elementUtils.getPackageOf(element).toString()
         val kaptKotlinGeneratedDir =
@@ -102,9 +105,10 @@ public class JsonApiProcessor : AbstractProcessor() {
 
         val kmClass = (KotlinClassMetadata.readStrict(metadata) as KotlinClassMetadata.Class).kmClass
 
-        val typeSpec = kmClass.toTypeSpec(
-            ElementsClassInspector.create(false, processingEnv.elementUtils, processingEnv.typeUtils),
-        )
+        val typeSpec =
+            kmClass.toTypeSpec(
+                ElementsClassInspector.create(false, processingEnv.elementUtils, processingEnv.typeUtils),
+            )
 
         val inputDataClass = ClassName(generatedPackage, className)
         val generatedJsonWrapperName = JsonApiConstants.Prefix.JSON_API_X.withName(className)
@@ -129,8 +133,11 @@ public class JsonApiProcessor : AbstractProcessor() {
                     primitives,
                     type,
                 )
-            val attributesFileSpec = FileSpec.builder(generatedPackage, attributesTypeSpec.name!!)
-                .addType(attributesTypeSpec).build()
+            val attributesFileSpec =
+                FileSpec
+                    .builder(generatedPackage, attributesTypeSpec.name!!)
+                    .addType(attributesTypeSpec)
+                    .build()
 
             attributesFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
@@ -144,25 +151,25 @@ public class JsonApiProcessor : AbstractProcessor() {
         val manyRelationships = membersSeparator.getManyRelationships()
 
         if (oneRelationships.isNotEmpty() || manyRelationships.isNotEmpty()) {
-            val relationshipsTypeSpec = RelationshipsSpecBuilder.build(
-                inputDataClass,
-                type,
-                oneRelationships,
-                manyRelationships,
-            )
+            val relationshipsTypeSpec =
+                RelationshipsSpecBuilder.build(
+                    inputDataClass,
+                    type,
+                    oneRelationships,
+                    manyRelationships,
+                )
 
             val relationshipsFileSpec =
-                FileSpec.builder(generatedPackage, relationshipsTypeSpec.name!!)
+                FileSpec
+                    .builder(generatedPackage, relationshipsTypeSpec.name!!)
                     .addType(relationshipsTypeSpec)
                     .addImport(
                         JsonApiConstants.Packages.CORE,
                         JsonApiConstants.Imports.JSON_API_MODEL,
-                    )
-                    .addImport(
+                    ).addImport(
                         JsonApiConstants.Packages.JSONX,
                         *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS,
-                    )
-                    .build()
+                    ).build()
             relationshipsFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
 
             val generatedRelationshipsObjectName =
@@ -208,53 +215,58 @@ public class JsonApiProcessor : AbstractProcessor() {
                 manyRelationships = mapOf(*manyRelationships.map { it.name to it.type }.toTypedArray()),
             )
 
-        val wrapperFileSpec = JsonApiXSpecBuilder.build(
-            inputDataClass,
-            isNullable,
-            type,
-            metaInfo,
-            linksInfo,
-            customError,
-        )
-        val wrapperListFileSpec = JsonApiXListSpecBuilder.build(
-            inputDataClass,
-            isNullable,
-            type,
-            metaInfo,
-            linksInfo,
-            customError,
-        )
+        val wrapperFileSpec =
+            JsonApiXSpecBuilder.build(
+                inputDataClass,
+                isNullable,
+                type,
+                metaInfo,
+                linksInfo,
+                customError,
+            )
+        val wrapperListFileSpec =
+            JsonApiXListSpecBuilder.build(
+                inputDataClass,
+                isNullable,
+                type,
+                metaInfo,
+                linksInfo,
+                customError,
+            )
         val modelFileSpec = JsonApiModelSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
-        val listItemFileSpec = JsonApiListItemSpecBuilder.build(
-            inputDataClass,
-            isNullable,
-            metaInfo,
-            linksInfo,
-            customError,
-        )
+        val listItemFileSpec =
+            JsonApiListItemSpecBuilder.build(
+                inputDataClass,
+                isNullable,
+                metaInfo,
+                linksInfo,
+                customError,
+            )
         val listFileSpec = JsonApiListSpecBuilder.build(inputDataClass, isNullable, metaInfo, linksInfo, customError)
 
-        val typeAdapterFileSpec = TypeAdapterSpecBuilder.build(
-            className = inputDataClass,
-            rootLinks = linksInfo?.rootLinks,
-            resourceObjectLinks = linksInfo?.resourceObjectLinks,
-            relationshipsLinks = linksInfo?.relationshipsLinks,
-            rootMeta = metaInfo?.rootClassName,
-            resourceObjectMeta = metaInfo?.resourceObjectClassName,
-            relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customError?.canonicalName,
-        )
+        val typeAdapterFileSpec =
+            TypeAdapterSpecBuilder.build(
+                className = inputDataClass,
+                rootLinks = linksInfo?.rootLinks,
+                resourceObjectLinks = linksInfo?.resourceObjectLinks,
+                relationshipsLinks = linksInfo?.relationshipsLinks,
+                rootMeta = metaInfo?.rootClassName,
+                resourceObjectMeta = metaInfo?.resourceObjectClassName,
+                relationshipsMeta = metaInfo?.relationshipsClassNAme,
+                errors = customError?.canonicalName,
+            )
 
-        val typeAdapterListFileSpec = TypeAdapterListSpecBuilder.build(
-            className = inputDataClass,
-            rootLinks = linksInfo?.rootLinks,
-            resourceObjectLinks = linksInfo?.resourceObjectLinks,
-            relationshipsLinks = linksInfo?.relationshipsLinks,
-            rootMeta = metaInfo?.rootClassName,
-            resourceObjectMeta = metaInfo?.resourceObjectClassName,
-            relationshipsMeta = metaInfo?.relationshipsClassNAme,
-            errors = customError?.canonicalName,
-        )
+        val typeAdapterListFileSpec =
+            TypeAdapterListSpecBuilder.build(
+                className = inputDataClass,
+                rootLinks = linksInfo?.rootLinks,
+                resourceObjectLinks = linksInfo?.resourceObjectLinks,
+                relationshipsLinks = linksInfo?.relationshipsLinks,
+                rootMeta = metaInfo?.rootClassName,
+                resourceObjectMeta = metaInfo?.resourceObjectClassName,
+                relationshipsMeta = metaInfo?.relationshipsClassNAme,
+                errors = customError?.canonicalName,
+            )
 
         resourceFileSpec.writeTo(File(kaptKotlinGeneratedDir!!))
         wrapperFileSpec.writeTo(File(kaptKotlinGeneratedDir))
@@ -271,9 +283,10 @@ public class JsonApiProcessor : AbstractProcessor() {
         val singleAnnotations = this.getElementsAnnotatedWith(JsonApiXError::class.java)
 
         repeatedAnnotations?.forEach { element ->
-            val types = element.getAnnotationParameterValues<JsonApiXError, List<String>> {
-                this.map { annotation -> annotation.type }
-            }
+            val types =
+                element.getAnnotationParameterValues<JsonApiXError, List<String>> {
+                    this.map { annotation -> annotation.type }
+                }
             types.forEach { type ->
                 storeCustomError(element = element, type = type)
             }
@@ -287,11 +300,15 @@ public class JsonApiProcessor : AbstractProcessor() {
         collector.addCustomErrors(customErrors)
     }
 
-    private fun storeCustomError(element: Element, type: String) {
-        val className = ClassName(
-            processingEnv.elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString(),
-        )
+    private fun storeCustomError(
+        element: Element,
+        type: String,
+    ) {
+        val className =
+            ClassName(
+                processingEnv.elementUtils.getPackageOf(element).toString(),
+                element.simpleName.toString(),
+            )
         customErrors[type] = className
     }
 
@@ -299,38 +316,45 @@ public class JsonApiProcessor : AbstractProcessor() {
         val repeatedAnnotations = this.getElementsAnnotatedWith(JsonApiXLinksList::class.java)
         val singleAnnotations = this.getElementsAnnotatedWith(JsonApiXLinks::class.java)
 
-        val classNamesFromRepeatedAnnotations = repeatedAnnotations?.flatMap { element ->
-            val typeAndPlacementStrategyList =
-                element.getAnnotationParameterValues<JsonApiXLinks, List<Pair<String, LinksPlacementStrategy>>> {
-                    this.map { annotation -> annotation.type to annotation.placementStrategy }
+        val classNamesFromRepeatedAnnotations =
+            repeatedAnnotations?.flatMap { element ->
+                val typeAndPlacementStrategyList =
+                    element.getAnnotationParameterValues<JsonApiXLinks, List<Pair<String, LinksPlacementStrategy>>> {
+                        this.map { annotation -> annotation.type to annotation.placementStrategy }
+                    }
+
+                typeAndPlacementStrategyList.map { typeAndPlacementStrategy ->
+                    storeCustomLinksAndReturnClassName(
+                        element = element,
+                        type = typeAndPlacementStrategy.first,
+                        placementStrategy = typeAndPlacementStrategy.second,
+                    )
                 }
-
-            typeAndPlacementStrategyList.map { typeAndPlacementStrategy ->
-                storeCustomLinksAndReturnClassName(
-                    element = element,
-                    type = typeAndPlacementStrategy.first,
-                    placementStrategy = typeAndPlacementStrategy.second,
-                )
             }
-        }
 
-        val classNamesFromSingleAnnotations = singleAnnotations?.map { element ->
-            val (type, placementStrategy) =
-                element.getAnnotationParameterValue<JsonApiXLinks, Pair<String, LinksPlacementStrategy>> { type to placementStrategy }
+        val classNamesFromSingleAnnotations =
+            singleAnnotations?.map { element ->
+                val (type, placementStrategy) =
+                    element.getAnnotationParameterValue<JsonApiXLinks, Pair<String, LinksPlacementStrategy>> { type to placementStrategy }
 
-            storeCustomLinksAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
-        }
+                storeCustomLinksAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
+            }
 
         collector.addCustomLinks(
             links = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty(),
         )
     }
 
-    private fun storeCustomLinksAndReturnClassName(element: Element, type: String, placementStrategy: LinksPlacementStrategy): ClassName {
-        val className = ClassName(
-            processingEnv.elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString(),
-        )
+    private fun storeCustomLinksAndReturnClassName(
+        element: Element,
+        type: String,
+        placementStrategy: LinksPlacementStrategy,
+    ): ClassName {
+        val className =
+            ClassName(
+                processingEnv.elementUtils.getPackageOf(element).toString(),
+                element.simpleName.toString(),
+            )
         customLinks.firstOrNull { linksInfo -> linksInfo.type == type }?.let { linksInfo ->
             when (placementStrategy) {
                 LinksPlacementStrategy.ROOT -> linksInfo.rootLinks = className
@@ -353,38 +377,45 @@ public class JsonApiProcessor : AbstractProcessor() {
         val repeatedAnnotations = this.getElementsAnnotatedWith(JsonApiXMetaList::class.java)
         val singleAnnotations = this.getElementsAnnotatedWith(JsonApiXMeta::class.java)
 
-        val classNamesFromRepeatedAnnotations = repeatedAnnotations?.flatMap { element ->
-            val typeAndPlacementStrategyList =
-                element.getAnnotationParameterValues<JsonApiXMeta, List<Pair<String, MetaPlacementStrategy>>> {
-                    this.map { annotation -> annotation.type to annotation.placementStrategy }
+        val classNamesFromRepeatedAnnotations =
+            repeatedAnnotations?.flatMap { element ->
+                val typeAndPlacementStrategyList =
+                    element.getAnnotationParameterValues<JsonApiXMeta, List<Pair<String, MetaPlacementStrategy>>> {
+                        this.map { annotation -> annotation.type to annotation.placementStrategy }
+                    }
+
+                typeAndPlacementStrategyList.map { typeAndPlacementStrategy ->
+                    storeCustomMetaAndReturnClassName(
+                        element = element,
+                        type = typeAndPlacementStrategy.first,
+                        placementStrategy = typeAndPlacementStrategy.second,
+                    )
                 }
-
-            typeAndPlacementStrategyList.map { typeAndPlacementStrategy ->
-                storeCustomMetaAndReturnClassName(
-                    element = element,
-                    type = typeAndPlacementStrategy.first,
-                    placementStrategy = typeAndPlacementStrategy.second,
-                )
             }
-        }
 
-        val classNamesFromSingleAnnotations = singleAnnotations?.map { element ->
-            val (type, placementStrategy) =
-                element.getAnnotationParameterValue<JsonApiXMeta, Pair<String, MetaPlacementStrategy>> { type to placementStrategy }
+        val classNamesFromSingleAnnotations =
+            singleAnnotations?.map { element ->
+                val (type, placementStrategy) =
+                    element.getAnnotationParameterValue<JsonApiXMeta, Pair<String, MetaPlacementStrategy>> { type to placementStrategy }
 
-            storeCustomMetaAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
-        }
+                storeCustomMetaAndReturnClassName(element = element, type = type, placementStrategy = placementStrategy)
+            }
 
         collector.addCustomMetas(
             meta = classNamesFromRepeatedAnnotations.orEmpty() + classNamesFromSingleAnnotations.orEmpty(),
         )
     }
 
-    private fun storeCustomMetaAndReturnClassName(element: Element, type: String, placementStrategy: MetaPlacementStrategy): ClassName {
-        val className = ClassName(
-            processingEnv.elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString(),
-        )
+    private fun storeCustomMetaAndReturnClassName(
+        element: Element,
+        type: String,
+        placementStrategy: MetaPlacementStrategy,
+    ): ClassName {
+        val className =
+            ClassName(
+                processingEnv.elementUtils.getPackageOf(element).toString(),
+                element.simpleName.toString(),
+            )
         customMetas.firstOrNull { metaInfo -> metaInfo.type == type }?.let { metaInfo ->
             when (placementStrategy) {
                 MetaPlacementStrategy.ROOT -> metaInfo.rootClassName = className

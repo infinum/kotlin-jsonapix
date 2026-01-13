@@ -14,6 +14,5 @@ fun showMessageDialog(
         .setMessage(message)
         .setPositiveButton("Ok") { _, _ ->
             positiveCallback?.invoke()
-        }
-        .show()
+        }.show()
 }

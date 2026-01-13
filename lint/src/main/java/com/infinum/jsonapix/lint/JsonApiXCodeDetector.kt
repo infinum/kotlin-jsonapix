@@ -25,37 +25,38 @@ private const val SERIALIZABLE = "kotlinx.serialization.Serializable"
 private const val JSON_API_X_IS_NULLABLE_ATTR = "isNullable"
 
 @Suppress("UnstableApiUsage")
-class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
+class JsonApiXCodeDetector :
+    Detector(),
+    Detector.UastScanner {
+    override fun getApplicableUastTypes(): List<Class<out UElement>> = listOf(UAnnotation::class.java)
 
-    override fun getApplicableUastTypes(): List<Class<out UElement>> =
-        listOf(UAnnotation::class.java)
-
-    override fun createUastHandler(context: JavaContext): UElementHandler {
-        return object : UElementHandler() {
-
+    override fun createUastHandler(context: JavaContext): UElementHandler =
+        object : UElementHandler() {
             override fun visitAnnotation(node: UAnnotation) {
                 when (node.qualifiedName) {
-                    JSON_API_X_QUALIFIED_NAME -> validateAnnotationUsage(
-                        context,
-                        node,
-                        JSON_API_X_SIMPLE_NAME,
-                    )
+                    JSON_API_X_QUALIFIED_NAME ->
+                        validateAnnotationUsage(
+                            context,
+                            node,
+                            JSON_API_X_SIMPLE_NAME,
+                        )
 
-                    JSON_API_X_META_QUALIFIED_NAME -> validateAnnotationUsage(
-                        context,
-                        node,
-                        JSON_API_X_META_SIMPLE_NAME,
-                    )
+                    JSON_API_X_META_QUALIFIED_NAME ->
+                        validateAnnotationUsage(
+                            context,
+                            node,
+                            JSON_API_X_META_SIMPLE_NAME,
+                        )
 
-                    JSON_API_X_LINKS_QUALIFIED_NAME -> validateAnnotationUsage(
-                        context,
-                        node,
-                        JSON_API_X_LINKS_SIMPLE_NAME,
-                    )
+                    JSON_API_X_LINKS_QUALIFIED_NAME ->
+                        validateAnnotationUsage(
+                            context,
+                            node,
+                            JSON_API_X_LINKS_SIMPLE_NAME,
+                        )
                 }
             }
         }
-    }
 
     private fun validateAnnotationUsage(
         context: JavaContext,
@@ -78,7 +79,9 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
             )
         }
 
-        if (annotationName == JSON_API_X_SIMPLE_NAME && isPrimaryDataNullable(node) && !isAllFieldsHasDefaultValues(
+        if (annotationName == JSON_API_X_SIMPLE_NAME &&
+            isPrimaryDataNullable(node) &&
+            !isAllFieldsHasDefaultValues(
                 node,
             )
         ) {
@@ -92,25 +95,28 @@ class JsonApiXCodeDetector : Detector(), Detector.UastScanner {
     }
 
     private fun isInvalidAnnotationUsage(node: UAnnotation): Boolean =
-        node.getParentOfType<UAnnotated>()?.uAnnotations?.any { it.qualifiedName == SERIALIZABLE }
+        node
+            .getParentOfType<UAnnotated>()
+            ?.uAnnotations
+            ?.any { it.qualifiedName == SERIALIZABLE }
             ?.not() ?: false
 
     private fun isPrimaryDataNullable(annotation: UAnnotation): Boolean =
-        annotation.attributeValues.firstOrNull { it.name == JSON_API_X_IS_NULLABLE_ATTR }
+        annotation.attributeValues
+            .firstOrNull { it.name == JSON_API_X_IS_NULLABLE_ATTR }
             ?.evaluate() as? Boolean ?: false
 
-    private fun isAllFieldsHasDefaultValues(annotation: UAnnotation): Boolean =
-        annotation.getContainingUClass()?.fields?.all { it.uastInitializer != null } ?: false
+    private fun isAllFieldsHasDefaultValues(annotation: UAnnotation): Boolean = annotation.getContainingUClass()?.fields?.all { it.uastInitializer != null } ?: false
 
     companion object {
-
         @JvmField
-        val annotationIssues: List<Issue> = listOf(
-            createAnnotationUsageIssue(JSON_API_X_SIMPLE_NAME),
-            createAnnotationUsageIssue(JSON_API_X_META_SIMPLE_NAME),
-            createAnnotationUsageIssue(JSON_API_X_LINKS_SIMPLE_NAME),
-            createNullableDataDefaultValuesIssue(),
-        )
+        val annotationIssues: List<Issue> =
+            listOf(
+                createAnnotationUsageIssue(JSON_API_X_SIMPLE_NAME),
+                createAnnotationUsageIssue(JSON_API_X_META_SIMPLE_NAME),
+                createAnnotationUsageIssue(JSON_API_X_LINKS_SIMPLE_NAME),
+                createNullableDataDefaultValuesIssue(),
+            )
 
         @Suppress("TrimMultilineRawString")
         fun createAnnotationUsageIssue(annotationName: String): Issue =

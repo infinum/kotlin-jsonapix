@@ -18,7 +18,6 @@ import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 
 internal object DeserializeFunSpecBuilder {
-
     @Suppress("LongMethod")
     fun build(): FunSpec {
         val typeVariableName =
@@ -26,19 +25,22 @@ internal object DeserializeFunSpecBuilder {
         val dataVariableName =
             TypeVariableName.invoke(JsonApiConstants.Members.DATA_TYPE_VARIABLE)
 
-        val linksParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build(),
-        )
+        val linksParams =
+            listOf(
+                ParameterSpec.builder(JsonApiConstants.Members.ROOT_LINKS, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_LINKS, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_LINKS, String::class).build(),
+            )
 
-        val metaParams = listOf(
-            ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
-            ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
-        )
+        val metaParams =
+            listOf(
+                ParameterSpec.builder(JsonApiConstants.Members.ROOT_META, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RESOURCE_OBJECT_META, String::class).build(),
+                ParameterSpec.builder(JsonApiConstants.Members.RELATIONSHIPS_META, String::class).build(),
+            )
 
-        return FunSpec.builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
+        return FunSpec
+            .builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(dataVariableName.copy(reified = true))
@@ -55,8 +57,7 @@ internal object DeserializeFunSpecBuilder {
                 JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
                 jsonObjectMember,
                 JsonApiConstants.Keys.DATA,
-            )
-            .addStatement(
+            ).addStatement(
                 "val discriminator = %T(%L ?: TypeExtractor.guessType(Model::class), %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class,
                 JsonApiConstants.Keys.TYPE,
@@ -67,23 +68,19 @@ internal object DeserializeFunSpecBuilder {
                 JsonApiConstants.Members.RESOURCE_OBJECT_META,
                 JsonApiConstants.Members.RELATIONSHIPS_META,
                 JsonApiConstants.Keys.ERRORS,
-            )
-            .addStatement(
+            ).addStatement(
                 "val jsonElement = %T.%L(this)",
                 Json::class.asClassName(),
                 JsonApiConstants.Members.PARSE_TO_JSON_ELEMENT,
-            )
-            .addStatement(
+            ).addStatement(
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()",
-            )
-            .addStatement(
+            ).addStatement(
                 "return %M.%M<%T<%T,%T>>(jsonStringWithDiscriminator)",
                 formatMember,
                 decodeMember,
                 JsonApiX::class,
                 dataVariableName,
                 typeVariableName,
-            )
-            .build()
+            ).build()
     }
 }
