@@ -1,9 +1,9 @@
 apply plugin: "maven-publish"
 apply plugin: "signing"
 
-task javadocsJar(type: Jar, dependsOn: "dokkaJavadoc") {
+task javadocsJar(type: Jar, dependsOn: "dokkaGenerate") {
     getArchiveClassifier().set("javadoc")
-    from dokkaJavadoc.outputDirectory
+    from layout.buildDirectory.dir("javadoc")
 }
 
 task sourcesJar(type: Jar) {
