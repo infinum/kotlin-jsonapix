@@ -1,6 +1,6 @@
 ext.versions = [
         "gradle"       : '8.13.0',
-        "kotlin"       : "2.2.0",
+        "kotlin"       : "2.2.21",
         "poet"         : '2.2.0',
         "serialization": '1.9.0',
         "core_ktx"     : '1.17.0',
