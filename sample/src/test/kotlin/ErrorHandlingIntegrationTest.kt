@@ -7,7 +7,9 @@ import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import kotlinx.serialization.SerializationException
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -505,10 +507,7 @@ internal class ErrorHandlingIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            "invalid json {{{{",
-        )
+        val responseBody = "invalid json {{{{".toResponseBody("application/json".toMediaTypeOrNull())
 
         assertThrows<Exception> {
             converter.convert(value = responseBody)
