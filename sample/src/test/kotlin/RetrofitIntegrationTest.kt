@@ -35,7 +35,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
+    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(converterFactory)
@@ -52,7 +52,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
+    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(converterFactory)
@@ -70,7 +70,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -197,7 +197,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -219,7 +219,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() { // ktlint-disable max-line-length
+    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -271,7 +271,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 

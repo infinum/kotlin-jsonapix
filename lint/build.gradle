@@ -2,7 +2,6 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 apply from: "$rootDir/detekt.gradle"
-apply from: "$rootDir/ktlint.gradle"
 apply from: "$rootDir/dokka.gradle"
 apply from: "$rootDir/maven-publish.gradle"
 

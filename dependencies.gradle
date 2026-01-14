@@ -6,7 +6,6 @@ ext.versions = [
         "core_ktx"     : '1.12.0',
         "appcompat"    : '1.6.1',
         "detekt"       : "1.23.4",
-        "ktlint"       : "11.3.1",
         "retrofit"     : "2.9.0",
         "retromock"    : "1.1.1",
         "hilt"         : "2.57.1",
@@ -38,9 +37,6 @@ ext.packages = [
         "detekt"   : [
                 "plugin"    : "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${versions.detekt}",
                 "formatting": "io.gitlab.arturbosch.detekt:detekt-formatting:${versions.detekt}"
-        ],
-        "ktlint"   : [
-                "plugin": "org.jlleitschuh.gradle:ktlint-gradle:${versions.ktlint}"
         ],
         "lint"     : [
                 "core"  : "com.android.tools.lint:lint:${versions.lint}",
