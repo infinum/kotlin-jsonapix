@@ -1,28 +1,26 @@
 apply plugin: "org.jetbrains.dokka"
 
-tasks.named("dokkaJavadoc") {
-    outputDirectory.set(file("$buildDir/javadoc"))
+dokka {
+    dokkaPublications.named("html") {
+        outputDirectory.set(project.layout.buildDirectory.dir("javadoc"))
+    }
 
-    dokkaSourceSets {
-        named("main") {
-            includeNonPublic.set(false)
-            skipDeprecated.set(false)
-            reportUndocumented.set(true)
-            skipEmptyPackages.set(true)
-            platform.set(org.jetbrains.dokka.Platform.jvm)
-            sourceLink {
-                localDirectory.set(file("src/main/kotlin"))
-                remoteUrl.set(uri("https://github.com/infinum/android-jsonapix/"))
-                remoteLineSuffix.set("#L")
-            }
-            jdkVersion.set(17)
-            noStdlibLink.set(false)
-            noAndroidSdkLink.set(false)
-            noJdkLink.set(false)
-            perPackageOption {
-                prefix = "com.infinum.jsonapix.sample"
-                suppress = true
-            }
+    dokkaSourceSets.named("main") {
+        skipDeprecated.set(false)
+        reportUndocumented.set(true)
+        skipEmptyPackages.set(true)
+
+        sourceLink {
+            localDirectory.set(file("src/main/kotlin"))
+            remoteUrl.set(uri("https://github.com/infinum/android-jsonapix/"))
+            remoteLineSuffix.set("#L")
+        }
+
+        jdkVersion.set(17)
+
+        perPackageOption {
+            matchingRegex.set("com\\.infinum\\.jsonapix\\.sample.*")
+            suppress.set(true)
         }
     }
 }

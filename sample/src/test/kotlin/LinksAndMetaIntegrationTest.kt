@@ -421,7 +421,7 @@ internal class LinksAndMetaIntegrationTest {
         // Meta fields should be null when not provided in JSON
         assertNull(result.rootMeta)
         assertNull(result.resourceObjectMeta)
-        assertTrue(result.relationshipsMeta == null || result.relationshipsMeta?.isEmpty() == true)
+        assertTrue(result.relationshipsMeta == null || result.relationshipsMeta.isEmpty() == true)
     }
 
     @Test

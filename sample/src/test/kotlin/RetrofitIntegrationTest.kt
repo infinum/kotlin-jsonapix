@@ -10,7 +10,9 @@ import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -35,7 +37,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
+    fun `given a JsonXConverterFactory when getting response body converter for PersonModel should return valid converter`() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(converterFactory)
@@ -52,7 +54,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() { // ktlint-disable max-line-length
+    fun `given a JsonXConverterFactory when getting request body converter for PersonModel should return valid converter`() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.example.com/")
             .addConverterFactory(converterFactory)
@@ -70,7 +72,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting valid JSON response body should return PersonModel`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -89,10 +91,7 @@ internal class RetrofitIntegrationTest {
             }
         """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -134,10 +133,7 @@ internal class RetrofitIntegrationTest {
             }
         """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -165,7 +161,7 @@ internal class RetrofitIntegrationTest {
         val requestBody = converter.convert(value = model)
 
         assertNotNull(requestBody, "Request body should not be null")
-        assertEquals(MediaType.parse("application/json; charset=UTF-8"), requestBody?.contentType())
+        assertEquals("application/json; charset=UTF-8".toMediaTypeOrNull(), requestBody?.contentType())
     }
 
     @Test
@@ -188,7 +184,7 @@ internal class RetrofitIntegrationTest {
 
         // Read the content of the request body
         val buffer = okio.Buffer()
-        requestBody!!.writeTo(buffer)
+        requestBody?.writeTo(buffer)
         val content = buffer.readUtf8()
 
         assertTrue(content.contains("Emma"), "Request body should contain name")
@@ -197,17 +193,14 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting response with relationships should include included resources`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = getFileAsString(filename = "person_one_and_many_rel.json")
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -219,7 +212,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() { // ktlint-disable max-line-length
+    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -239,7 +232,7 @@ internal class RetrofitIntegrationTest {
         assertNotNull(requestBody)
 
         val buffer = okio.Buffer()
-        requestBody!!.writeTo(buffer)
+        requestBody?.writeTo(buffer)
         val content = buffer.readUtf8()
 
         assertTrue(content.contains("relationships"), "Should contain relationships")
@@ -271,7 +264,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() { // ktlint-disable max-line-length
+    fun `given a JsonXResponseBodyConverter when converting response with links should preserve links`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -296,10 +289,7 @@ internal class RetrofitIntegrationTest {
             }
         """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -316,10 +306,7 @@ internal class RetrofitIntegrationTest {
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val json = getFileAsString(filename = "person_with_root_meta.json")
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -361,14 +348,11 @@ internal class RetrofitIntegrationTest {
 
         // Extract the JSON from request body
         val buffer = okio.Buffer()
-        requestBody!!.writeTo(buffer)
+        requestBody?.writeTo(buffer)
         val json = buffer.readUtf8()
 
         // Convert back using response converter
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         @Suppress("UNCHECKED_CAST")
         val typedResponseConverter = responseConverter as JsonXResponseBodyConverter<PersonModel>
@@ -392,10 +376,7 @@ internal class RetrofitIntegrationTest {
             }
         """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
@@ -422,7 +403,7 @@ internal class RetrofitIntegrationTest {
         assertNotNull(requestBody)
 
         val buffer = okio.Buffer()
-        requestBody!!.writeTo(buffer)
+        requestBody?.writeTo(buffer)
         val content = buffer.readUtf8()
 
         assertTrue(content.contains("Ian"), "Should contain person name")
@@ -456,10 +437,7 @@ internal class RetrofitIntegrationTest {
             }
         """.trimIndent()
 
-        val responseBody = ResponseBody.create(
-            MediaType.parse("application/json"),
-            json,
-        )
+        val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
         val result = converter.convert(value = responseBody)
 
