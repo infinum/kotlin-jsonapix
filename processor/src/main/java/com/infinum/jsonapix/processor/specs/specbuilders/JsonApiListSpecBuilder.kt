@@ -1,12 +1,12 @@
-package com.infinum.jsonapix.processor.specs.model
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.DefaultError
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
-import com.infinum.jsonapix.processor.LinksInfo
-import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.specs.models.LinksInfo
+import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy

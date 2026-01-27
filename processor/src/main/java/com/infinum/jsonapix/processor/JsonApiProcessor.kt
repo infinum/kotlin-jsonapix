@@ -53,10 +53,10 @@ public class JsonApiProcessor : AbstractProcessor() {
     ): Boolean {
         if (roundEnv == null) return true
 
-        // Collect data from all subprocessors
-        val linksResult = jsonApiXLinksSubprocessor.process(roundEnv)
-        val metaResult = jsonApiXMetaSubprocessor.process(roundEnv)
-        val errorResult = jsonApiXErrorSubprocessor.process(roundEnv)
+        // Collect holders from all subprocessors
+        val linksHolders = jsonApiXLinksSubprocessor.process(roundEnv)
+        val metaHolders = jsonApiXMetaSubprocessor.process(roundEnv)
+        val errorHolders = jsonApiXErrorSubprocessor.process(roundEnv)
         val holders = jsonApiXSubprocessor.process(roundEnv)
 
         // Only generate if we have JsonApiX annotated classes
@@ -66,13 +66,13 @@ public class JsonApiProcessor : AbstractProcessor() {
         val outputDir = processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
             ?.let(::File) ?: return true
 
-        // Generate all specs via MainSpec
+        // Generate all specs via MainSpecGenerator
         JsonApiXMainSpecGenerator(
             outputDir = outputDir,
             holders = holders,
-            linksResult = linksResult,
-            metaResult = metaResult,
-            errorResult = errorResult
+            linksHolders = linksHolders,
+            metaHolders = metaHolders,
+            errorHolders = errorHolders
         ).generate()
 
         return true

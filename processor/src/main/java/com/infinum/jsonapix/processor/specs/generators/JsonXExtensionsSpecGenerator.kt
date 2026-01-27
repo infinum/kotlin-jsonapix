@@ -2,10 +2,12 @@ package com.infinum.jsonapix.processor.specs.generators
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
-import com.infinum.jsonapix.processor.models.JsonApiXErrorResult
+import com.infinum.jsonapix.processor.extensions.toLinksInfo
+import com.infinum.jsonapix.processor.extensions.toMetaInfo
+import com.infinum.jsonapix.processor.models.JsonApiXErrorHolder
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
-import com.infinum.jsonapix.processor.models.JsonApiXLinksResult
-import com.infinum.jsonapix.processor.models.JsonApiXMetaResult
+import com.infinum.jsonapix.processor.models.JsonApiXLinksHolder
+import com.infinum.jsonapix.processor.models.JsonApiXMetaHolder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
 import com.infinum.jsonapix.processor.specs.specbuilders.IncludedSpecBuilder
 import com.squareup.kotlinpoet.ClassName
@@ -13,30 +15,30 @@ import java.io.File
 
 internal class JsonXExtensionsSpecGenerator(
     private val holders: Set<JsonApiXHolder>,
-    private val linksResult: JsonApiXLinksResult,
-    private val metaResult: JsonApiXMetaResult,
-    private val errorResult: JsonApiXErrorResult
+    private val linksHolders: Set<JsonApiXLinksHolder>,
+    private val metaHolders: Set<JsonApiXMetaHolder>,
+    private val errorHolders: Set<JsonApiXErrorHolder>
 ) : SpecGenerator {
 
     override fun generate(outputDir: File) {
         val builder = JsonXExtensionsSpecBuilder()
 
         // Setup custom types
-        builder.addCustomLinks(linksResult.customLinksClassNames)
-        builder.addCustomMetas(metaResult.customMetaClassNames)
-        builder.addCustomErrors(errorResult.customErrors)
+        builder.addCustomLinks(linksHolders.map { it.className })
+        builder.addCustomMetas(metaHolders.map { it.className })
+        builder.addCustomErrors(errorHolders.associate { it.type to it.className })
 
-        // Register each holder
+        // Add each holder
         holders.forEach { holder ->
-            registerHolder(builder, holder)
+            addHolder(builder, holder)
         }
 
         builder.build().writeTo(outputDir)
     }
 
-    private fun registerHolder(builder: JsonXExtensionsSpecBuilder, holder: JsonApiXHolder) {
-        val metaInfo = metaResult.metaInfoMap[holder.type]
-        val linksInfo = linksResult.linksInfoMap[holder.type]
+    private fun addHolder(builder: JsonXExtensionsSpecBuilder, holder: JsonApiXHolder) {
+        val metaInfo = metaHolders.toMetaInfo(holder.type)
+        val linksInfo = linksHolders.toLinksInfo(holder.type)
 
         val generatedPackage = holder.className.packageName
         val className = holder.className

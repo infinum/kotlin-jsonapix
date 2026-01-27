@@ -3,8 +3,8 @@ package com.infinum.jsonapix.processor.specs.specbuilders
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
-import com.infinum.jsonapix.processor.LinksInfo
-import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.specs.models.LinksInfo
+import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec

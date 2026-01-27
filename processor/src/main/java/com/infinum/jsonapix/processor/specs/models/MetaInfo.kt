@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor
+package com.infinum.jsonapix.processor.specs.models
 
 import com.squareup.kotlinpoet.ClassName
 

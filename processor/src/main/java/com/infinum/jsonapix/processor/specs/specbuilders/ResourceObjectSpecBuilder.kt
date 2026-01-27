@@ -8,7 +8,7 @@ import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
-import com.infinum.jsonapix.processor.LinksInfo
+import com.infinum.jsonapix.processor.specs.models.LinksInfo
 import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock

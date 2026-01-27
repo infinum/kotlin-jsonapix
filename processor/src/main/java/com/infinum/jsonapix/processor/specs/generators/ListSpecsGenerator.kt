@@ -1,10 +1,10 @@
 package com.infinum.jsonapix.processor.specs.generators
 
-import com.infinum.jsonapix.processor.LinksInfo
-import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.specs.models.LinksInfo
+import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
-import com.infinum.jsonapix.processor.specs.model.JsonApiListItemSpecBuilder
-import com.infinum.jsonapix.processor.specs.model.JsonApiListSpecBuilder
+import com.infinum.jsonapix.processor.specs.specbuilders.JsonApiListItemSpecBuilder
+import com.infinum.jsonapix.processor.specs.specbuilders.JsonApiListSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import java.io.File
 

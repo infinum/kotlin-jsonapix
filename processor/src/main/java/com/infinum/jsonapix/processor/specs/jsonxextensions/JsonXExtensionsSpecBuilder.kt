@@ -2,9 +2,9 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Errors
-import com.infinum.jsonapix.processor.ClassInfo
-import com.infinum.jsonapix.processor.LinksInfo
-import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.specs.models.ClassInfo
+import com.infinum.jsonapix.processor.specs.models.LinksInfo
+import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ListItemResourceObjectFunSpecBuilder
