@@ -1,31 +1,30 @@
 package com.infinum.jsonapix.processor.subprocessors
 
 import com.infinum.jsonapix.processor.collectors.JsonApiXErrorCollector
-import com.infinum.jsonapix.processor.models.JsonApiXErrorHolder
+import com.infinum.jsonapix.processor.models.JsonApiXErrorResult
 import com.infinum.jsonapix.processor.validators.JsonApiXErrorValidator
 import com.squareup.kotlinpoet.ClassName
 import javax.annotation.processing.RoundEnvironment
 
-internal class JsonApiXErrorSubprocessor : CommonSubprocessor() {
+internal class JsonApiXErrorSubprocessor : CommonSubprocessor<JsonApiXErrorResult>() {
 
-    private val _customErrors = mutableMapOf<String, ClassName>()
-
-    val customErrors: Map<String, ClassName>
-        get() = _customErrors
-
-    override fun process(roundEnvironment: RoundEnvironment) {
+    override fun process(roundEnvironment: RoundEnvironment): JsonApiXErrorResult {
         val collector = JsonApiXErrorCollector(roundEnvironment, elementUtils)
         val validator = JsonApiXErrorValidator()
 
         val holders = collector.collect()
         val validatedHolders = validator.validate(holders)
 
-        validatedHolders.forEach { holder ->
-            processErrorHolder(holder)
+        if (validatedHolders.isEmpty()) {
+            return JsonApiXErrorResult.EMPTY
         }
-    }
 
-    private fun processErrorHolder(holder: JsonApiXErrorHolder) {
-        _customErrors[holder.type] = holder.className
+        val customErrors = mutableMapOf<String, ClassName>()
+
+        validatedHolders.forEach { holder ->
+            customErrors[holder.type] = holder.className
+        }
+
+        return JsonApiXErrorResult(customErrors)
     }
 }

@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.squareup.kotlinpoet.ClassName
@@ -22,9 +22,6 @@ public object TypeAdapterSpecBuilder : BaseTypeAdapterSpecBuilder() {
     override fun convertFromStringFunSpec(
         className: ClassName,
         modelType: TypeName,
-        rootMeta: ClassName?,
-        resourceObjectMeta: ClassName?,
-        relationshipsMeta: ClassName?,
     ): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.CONVERT_FROM_STRING)
             .addModifiers(KModifier.OVERRIDE)

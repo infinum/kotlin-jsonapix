@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.squareup.kotlinpoet.CodeBlock

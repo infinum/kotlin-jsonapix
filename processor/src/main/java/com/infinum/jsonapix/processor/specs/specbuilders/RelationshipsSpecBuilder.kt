@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
@@ -10,6 +10,7 @@ import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.processor.extensions.findAnnotationWithTypeName
+import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec

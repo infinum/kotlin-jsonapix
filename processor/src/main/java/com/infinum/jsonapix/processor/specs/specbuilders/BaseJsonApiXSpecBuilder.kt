@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.DefaultError
@@ -7,6 +7,7 @@ import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName

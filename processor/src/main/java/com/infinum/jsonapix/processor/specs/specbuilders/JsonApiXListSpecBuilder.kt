@@ -1,13 +1,13 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
-import com.infinum.jsonapix.core.JsonApiX
+import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
-import com.infinum.jsonapix.processor.extensions.appendIf
+import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -18,15 +18,13 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
-import kotlin.properties.Delegates
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
+internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private val serializableClassName = Serializable::class.asClassName()
 
-    private var isNullable by Delegates.notNull<Boolean>()
     override fun build(
         className: ClassName,
         isNullable: Boolean,
@@ -36,11 +34,13 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         customError: ClassName?,
     ): FileSpec {
         val modelClassName = ClassName.bestGuess(
-            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
+        )
+        val itemClassName = ClassName.bestGuess(
+            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM),
         )
 
-        this.isNullable = isNullable
-        val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
+        val generatedName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
             className.packageName,
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName),
@@ -61,7 +61,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.DATA,
-                resourceObjectClassName.copy(nullable = isNullable),
+                List::class.asClassName().parameterizedBy(resourceObjectClassName),
             ).build(),
         )
 
@@ -75,7 +75,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiX::class.asClassName().parameterizedBy(className, modelClassName),
+                        JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName),
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
@@ -87,6 +87,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
                     .addProperties(properties)
                     .addProperty(
                         originalProperty(
+                            itemClassName,
                             modelClassName,
                             metaInfo,
                             linksInfo,
@@ -99,7 +100,7 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
         JsonApiConstants.Keys.DATA,
-        resourceObject.copy(nullable = isNullable),
+        List::class.asClassName().parameterizedBy(resourceObject),
     ).addAnnotation(
         Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA),
     )
@@ -108,27 +109,34 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     @Suppress("StringShouldBeRawString")
     private fun originalProperty(
+        itemClassName: ClassName,
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
     ): PropertySpec {
         val getterFunSpec = FunSpec.builder("get()")
-            .addStatement("val original = data?.original(included)".appendIf("!!") { isNullable.not() })
+            .addStatement("val items = data.map {")
+            .addStatement("val original = it.original(included)")
             .addStatement(
-                "val model = %T(\n%L,\n%L,\n%L,\n%L%T },\n%L,\n%L,\n%L,\n%L%T } )",
-                modelClassName,
+                "%T(\n%L,\n%L,\n%L%T },\n%L,\n%L%T } )",
+                itemClassName,
                 "original",
-                "links",
-                "data?.links",
-                "data?.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                "it.links",
+                "it.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
                 linksInfo?.relationshipsLinks ?: DefaultLinks::class,
-                "errors",
-                "meta",
-                "data?.meta",
-                "data?.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                "it.meta",
+                "it.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
                 metaInfo?.relationshipsClassNAme ?: Meta::class,
             )
-            .addStatement("return model")
+            .addStatement("}")
+            .addStatement(
+                "return %T(%L, %L, %L, %L)",
+                modelClassName,
+                "items",
+                "links",
+                "errors",
+                "meta",
+            )
             .build()
 
         val propertySpec = PropertySpec.builder(

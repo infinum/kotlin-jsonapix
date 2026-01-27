@@ -1,12 +1,14 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
-import com.infinum.jsonapix.core.JsonApiXList
+import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.processor.LinksInfo
 import com.infinum.jsonapix.processor.MetaInfo
+import com.infinum.jsonapix.processor.extensions.appendIf
+import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -17,13 +19,15 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
+import kotlin.properties.Delegates
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
+internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private val serializableClassName = Serializable::class.asClassName()
 
+    private var isNullable by Delegates.notNull<Boolean>()
     override fun build(
         className: ClassName,
         isNullable: Boolean,
@@ -33,13 +37,11 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         customError: ClassName?,
     ): FileSpec {
         val modelClassName = ClassName.bestGuess(
-            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
-        )
-        val itemClassName = ClassName.bestGuess(
-            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST_ITEM),
+            className.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
         )
 
-        val generatedName = JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
+        this.isNullable = isNullable
+        val generatedName = JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
         val resourceObjectClassName = ClassName(
             className.packageName,
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName),
@@ -60,7 +62,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.DATA,
-                List::class.asClassName().parameterizedBy(resourceObjectClassName),
+                resourceObjectClassName.copy(nullable = isNullable),
             ).build(),
         )
 
@@ -74,7 +76,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
             .addType(
                 TypeSpec.classBuilder(generatedName)
                     .addSuperinterface(
-                        JsonApiXList::class.asClassName().parameterizedBy(className, modelClassName),
+                        JsonApiX::class.asClassName().parameterizedBy(className, modelClassName),
                     )
                     .addAnnotation(serializableClassName)
                     .addAnnotation(Specs.getSerialNameSpec(type))
@@ -86,7 +88,6 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
                     .addProperties(properties)
                     .addProperty(
                         originalProperty(
-                            itemClassName,
                             modelClassName,
                             metaInfo,
                             linksInfo,
@@ -99,7 +100,7 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     private fun dataProperty(resourceObject: ClassName): PropertySpec = PropertySpec.builder(
         JsonApiConstants.Keys.DATA,
-        List::class.asClassName().parameterizedBy(resourceObject),
+        resourceObject.copy(nullable = isNullable),
     ).addAnnotation(
         Specs.getSerialNameSpec(JsonApiConstants.Keys.DATA),
     )
@@ -108,34 +109,27 @@ internal object JsonApiXListSpecBuilder : BaseJsonApiXSpecBuilder() {
 
     @Suppress("StringShouldBeRawString")
     private fun originalProperty(
-        itemClassName: ClassName,
         modelClassName: ClassName,
         metaInfo: MetaInfo?,
         linksInfo: LinksInfo?,
     ): PropertySpec {
         val getterFunSpec = FunSpec.builder("get()")
-            .addStatement("val items = data.map {")
-            .addStatement("val original = it.original(included)")
+            .addStatement("val original = data?.original(included)".appendIf("!!") { isNullable.not() })
             .addStatement(
-                "%T(\n%L,\n%L,\n%L%T },\n%L,\n%L%T } )",
-                itemClassName,
-                "original",
-                "it.links",
-                "it.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
-                linksInfo?.relationshipsLinks ?: DefaultLinks::class,
-                "it.meta",
-                "it.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
-                metaInfo?.relationshipsClassNAme ?: Meta::class,
-            )
-            .addStatement("}")
-            .addStatement(
-                "return %T(%L, %L, %L, %L)",
+                "val model = %T(\n%L,\n%L,\n%L,\n%L%T },\n%L,\n%L,\n%L,\n%L%T } )",
                 modelClassName,
-                "items",
+                "original",
                 "links",
+                "data?.links",
+                "data?.relationshipsLinks()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                linksInfo?.relationshipsLinks ?: DefaultLinks::class,
                 "errors",
                 "meta",
+                "data?.meta",
+                "data?.relationshipsMeta()?.filterValues{ it != null }?.mapValues{ it.value as? ",
+                metaInfo?.relationshipsClassNAme ?: Meta::class,
             )
+            .addStatement("return model")
             .build()
 
         val propertySpec = PropertySpec.builder(

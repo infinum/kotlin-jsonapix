@@ -1,5 +1,6 @@
 package com.infinum.jsonapix.processor
 
+import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.processor.collectors.JsonApiXCollector
 import com.infinum.jsonapix.processor.collectors.JsonApiXErrorCollector
 import com.infinum.jsonapix.processor.collectors.JsonApiXLinksCollector
@@ -8,10 +9,12 @@ import com.infinum.jsonapix.processor.configurations.JsonApiXConfiguration
 import com.infinum.jsonapix.processor.configurations.JsonApiXErrorConfiguration
 import com.infinum.jsonapix.processor.configurations.JsonApiXLinksConfiguration
 import com.infinum.jsonapix.processor.configurations.JsonApiXMetaConfiguration
+import com.infinum.jsonapix.processor.specs.generators.JsonApiXMainSpecGenerator
 import com.infinum.jsonapix.processor.subprocessors.JsonApiXErrorSubprocessor
 import com.infinum.jsonapix.processor.subprocessors.JsonApiXLinksSubprocessor
 import com.infinum.jsonapix.processor.subprocessors.JsonApiXMetaSubprocessor
 import com.infinum.jsonapix.processor.subprocessors.JsonApiXSubprocessor
+import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
@@ -27,7 +30,7 @@ public class JsonApiProcessor : AbstractProcessor() {
     private val jsonApiXSubprocessor = JsonApiXSubprocessor()
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> =
-        setOf(
+        mutableSetOf(
             JsonApiXCollector.SUPPORTED,
             JsonApiXLinksCollector.SUPPORTED,
             JsonApiXMetaCollector.SUPPORTED,
@@ -46,26 +49,31 @@ public class JsonApiProcessor : AbstractProcessor() {
 
     override fun process(
         annotations: MutableSet<out TypeElement>?,
-        roundEnv: RoundEnvironment,
+        roundEnv: RoundEnvironment?,
     ): Boolean {
-        // Process Links, Meta, and Errors first (JsonApiX depends on their results)
-        jsonApiXLinksSubprocessor.process(roundEnv)
-        jsonApiXMetaSubprocessor.process(roundEnv)
-        jsonApiXErrorSubprocessor.process(roundEnv)
+        if (roundEnv == null) return true
 
-        // Pass collected data to JsonApiX subprocessor
-        jsonApiXSubprocessor.setLinksInfo(
-            jsonApiXLinksSubprocessor.linksInfoMap,
-            jsonApiXLinksSubprocessor.customLinksClassNames
-        )
-        jsonApiXSubprocessor.setMetaInfo(
-            jsonApiXMetaSubprocessor.metaInfoMap,
-            jsonApiXMetaSubprocessor.customMetaClassNames
-        )
-        jsonApiXSubprocessor.setCustomErrors(jsonApiXErrorSubprocessor.customErrors)
+        // Collect data from all subprocessors
+        val linksResult = jsonApiXLinksSubprocessor.process(roundEnv)
+        val metaResult = jsonApiXMetaSubprocessor.process(roundEnv)
+        val errorResult = jsonApiXErrorSubprocessor.process(roundEnv)
+        val holders = jsonApiXSubprocessor.process(roundEnv)
 
-        // Process JsonApiX annotations
-        jsonApiXSubprocessor.process(roundEnv)
+        // Only generate if we have JsonApiX annotated classes
+        if (holders.isEmpty()) return true
+
+        // Get output directory
+        val outputDir = processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]
+            ?.let(::File) ?: return true
+
+        // Generate all specs via MainSpec
+        JsonApiXMainSpecGenerator(
+            outputDir = outputDir,
+            holders = holders,
+            linksResult = linksResult,
+            metaResult = metaResult,
+            errorResult = errorResult
+        ).generate()
 
         return true
     }

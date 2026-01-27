@@ -1,4 +1,4 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.adapters.AdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
@@ -16,18 +16,12 @@ import kotlin.reflect.KClass
 
 public class TypeAdapterFactorySpecBuilder {
 
-    private val classNames = mutableListOf<ClassName>()
-
-    public fun add(className: ClassName) {
-        classNames.add(className)
-    }
-
-    public fun build(): FileSpec {
+    public fun build(classNames: List<ClassName>): FileSpec {
         return FileSpec.builder(JsonApiConstants.Packages.JSONX, JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
             .addType(
                 TypeSpec.classBuilder(JsonApiConstants.FileNames.TYPE_ADAPTER_FACTORY)
                     .addSuperinterface(AdapterFactory::class)
-                    .addFunction(getAdapterFunSpec())
+                    .addFunction(getAdapterFunSpec(classNames))
                     .build(),
             )
             .apply {
@@ -39,7 +33,7 @@ public class TypeAdapterFactorySpecBuilder {
             .build()
     }
 
-    private fun getAdapterFunSpec(): FunSpec {
+    private fun getAdapterFunSpec(classNames: List<ClassName>): FunSpec {
         return FunSpec.builder(JsonApiConstants.Members.GET_ADAPTER)
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("type", KClass::class.asClassName().parameterizedBy(WildcardTypeName.producerOf(Any::class)))

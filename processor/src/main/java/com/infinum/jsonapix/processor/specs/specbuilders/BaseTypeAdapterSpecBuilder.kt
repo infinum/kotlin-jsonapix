@@ -1,8 +1,10 @@
-package com.infinum.jsonapix.processor.specs
+package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
+import com.infinum.jsonapix.processor.LinksInfo
+import com.infinum.jsonapix.processor.MetaInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -24,22 +26,15 @@ public abstract class BaseTypeAdapterSpecBuilder {
     public abstract fun convertFromStringFunSpec(
         className: ClassName,
         modelType: TypeName,
-        rootMeta: ClassName?,
-        resourceObjectMeta: ClassName?,
-        relationshipsMeta: ClassName?,
     ): FunSpec
 
     public abstract fun getAdditionalImports(): List<String>
 
-    @Suppress("LongMethod", "LongParameterList")
+    @Suppress("LongMethod")
     public fun build(
         className: ClassName,
-        rootLinks: ClassName?,
-        resourceObjectLinks: ClassName?,
-        relationshipsLinks: ClassName?,
-        rootMeta: ClassName?,
-        resourceObjectMeta: ClassName?,
-        relationshipsMeta: ClassName?,
+        linksInfo: LinksInfo?,
+        metaInfo: MetaInfo?,
         errors: String?,
     ): FileSpec {
         val generatedName = getAdapterPrefixName().withName(className.simpleName)
@@ -53,14 +48,13 @@ public abstract class BaseTypeAdapterSpecBuilder {
                 TypeSpec.classBuilder(typeAdapterClassName)
                     .addSuperinterface(TypeAdapter::class.asClassName().parameterizedBy(modelType))
                     .addFunction(convertToStringFunSpec(modelType))
-                    .addFunction(
-                        convertFromStringFunSpec(className, modelType, rootMeta, resourceObjectMeta, relationshipsMeta),
-                    )
+                    .addFunction(convertFromStringFunSpec(className, modelType))
                     .apply {
-                        if (rootLinks != null) {
+                        // Links functions
+                        linksInfo?.rootLinks?.let { rootLinks ->
                             addFunction(linksFunSpec(JsonApiConstants.Members.ROOT_LINKS, rootLinks.canonicalName))
                         }
-                        if (resourceObjectLinks != null) {
+                        linksInfo?.resourceObjectLinks?.let { resourceObjectLinks ->
                             addFunction(
                                 linksFunSpec(
                                     JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
@@ -68,7 +62,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
                                 ),
                             )
                         }
-                        if (relationshipsLinks != null) {
+                        linksInfo?.relationshipsLinks?.let { relationshipsLinks ->
                             addFunction(
                                 linksFunSpec(
                                     JsonApiConstants.Members.RELATIONSHIPS_LINKS,
@@ -77,10 +71,11 @@ public abstract class BaseTypeAdapterSpecBuilder {
                             )
                         }
 
-                        if (rootMeta != null) {
+                        // Meta functions
+                        metaInfo?.rootClassName?.let { rootMeta ->
                             addFunction(metaFunSpec(JsonApiConstants.Members.ROOT_META, rootMeta.canonicalName))
                         }
-                        if (resourceObjectMeta != null) {
+                        metaInfo?.resourceObjectClassName?.let { resourceObjectMeta ->
                             addFunction(
                                 metaFunSpec(
                                     JsonApiConstants.Members.RESOURCE_OBJECT_META,
@@ -88,7 +83,7 @@ public abstract class BaseTypeAdapterSpecBuilder {
                                 ),
                             )
                         }
-                        if (relationshipsMeta != null) {
+                        metaInfo?.relationshipsClassNAme?.let { relationshipsMeta ->
                             addFunction(
                                 metaFunSpec(
                                     JsonApiConstants.Members.RELATIONSHIPS_META,
