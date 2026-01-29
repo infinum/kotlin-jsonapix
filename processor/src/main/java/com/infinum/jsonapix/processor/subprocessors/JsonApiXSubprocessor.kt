@@ -13,7 +13,7 @@ internal class JsonApiXSubprocessor : CommonSubprocessor<Set<JsonApiXHolder>>() 
             elementUtils = elementUtils,
             typeUtils = typeUtils
         )
-        val validator = JsonApiXValidator(messager)
+        val validator = JsonApiXValidator()
 
         val holders = collector.collect()
         return validator.validate(holders)

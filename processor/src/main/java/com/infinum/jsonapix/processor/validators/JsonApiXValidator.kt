@@ -5,9 +5,7 @@ import javax.annotation.processing.Messager
 import javax.lang.model.element.ElementKind
 import javax.tools.Diagnostic
 
-internal class JsonApiXValidator(
-    private val messager: Messager
-) : Validator<JsonApiXHolder> {
+internal class JsonApiXValidator() : Validator<JsonApiXHolder> {
 
     override fun validate(elements: Set<JsonApiXHolder>): Set<JsonApiXHolder> {
         // All holders collected are already filtered to be classes

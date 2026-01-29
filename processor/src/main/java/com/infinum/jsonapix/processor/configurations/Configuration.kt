@@ -9,8 +9,6 @@ internal interface Configuration {
 
     fun messager(): Messager
 
-    fun outputDir(): File?
-
     fun elementUtils(): Elements
 
     fun typeUtils(): Types
