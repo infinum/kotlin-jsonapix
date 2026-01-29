@@ -1,8 +1,8 @@
 package com.infinum.jsonapix.processor.specs.generators
 
+import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.specs.models.LinksInfo
 import com.infinum.jsonapix.processor.specs.models.MetaInfo
-import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.specs.specbuilders.JsonApiListItemSpecBuilder
 import com.infinum.jsonapix.processor.specs.specbuilders.JsonApiListSpecBuilder
 import com.squareup.kotlinpoet.ClassName
@@ -12,7 +12,7 @@ internal class ListSpecsGenerator(
     private val holder: JsonApiXHolder,
     private val metaInfo: MetaInfo?,
     private val linksInfo: LinksInfo?,
-    private val customError: ClassName?
+    private val customError: ClassName?,
 ) : SpecGenerator {
 
     override fun generate(outputDir: File) {
@@ -22,7 +22,7 @@ internal class ListSpecsGenerator(
             isRootNullable = holder.isNullable,
             metaInfo = metaInfo,
             linksInfo = linksInfo,
-            customError = customError
+            customError = customError,
         )
         listItemFileSpec.writeTo(outputDir)
 
@@ -32,7 +32,7 @@ internal class ListSpecsGenerator(
             isRootNullable = holder.isNullable,
             metaInfo = metaInfo,
             linksInfo = linksInfo,
-            customError = customError
+            customError = customError,
         )
         listFileSpec.writeTo(outputDir)
     }

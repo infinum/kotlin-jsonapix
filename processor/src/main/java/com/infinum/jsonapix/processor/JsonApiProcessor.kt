@@ -34,7 +34,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             JsonApiXCollector.SUPPORTED,
             JsonApiXLinksCollector.SUPPORTED,
             JsonApiXMetaCollector.SUPPORTED,
-            JsonApiXErrorCollector.SUPPORTED
+            JsonApiXErrorCollector.SUPPORTED,
         ).flatten().toMutableSet()
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
@@ -47,6 +47,7 @@ public class JsonApiProcessor : AbstractProcessor() {
         jsonApiXSubprocessor.init(JsonApiXConfiguration(processingEnv))
     }
 
+    @Suppress("ReturnCount")
     override fun process(
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?,
@@ -72,7 +73,7 @@ public class JsonApiProcessor : AbstractProcessor() {
             holders = holders,
             linksHolders = linksHolders,
             metaHolders = metaHolders,
-            errorHolders = errorHolders
+            errorHolders = errorHolders,
         ).generate()
 
         return true

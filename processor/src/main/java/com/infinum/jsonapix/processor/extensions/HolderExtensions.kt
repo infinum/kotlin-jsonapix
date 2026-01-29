@@ -39,6 +39,5 @@ internal fun Set<JsonApiXMetaHolder>.toMetaInfo(type: String): MetaInfo? {
     }
 }
 
-internal fun Set<JsonApiXErrorHolder>.toCustomError(type: String): ClassName? {
-    return find { it.type == type }?.className
-}
+internal fun Set<JsonApiXErrorHolder>.toCustomError(type: String): ClassName? =
+    find { it.type == type }?.className

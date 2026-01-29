@@ -11,7 +11,7 @@ internal class JsonApiXSubprocessor : CommonSubprocessor<Set<JsonApiXHolder>>() 
         val collector = JsonApiXCollector(
             roundEnvironment = roundEnvironment,
             elementUtils = elementUtils,
-            typeUtils = typeUtils
+            typeUtils = typeUtils,
         )
         val validator = JsonApiXValidator()
 

@@ -6,7 +6,7 @@ import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
 internal abstract class CommonConfiguration(
-    private val processingEnv: ProcessingEnvironment
+    private val processingEnv: ProcessingEnvironment,
 ) : Configuration {
 
     override fun messager(): Messager = processingEnv.messager

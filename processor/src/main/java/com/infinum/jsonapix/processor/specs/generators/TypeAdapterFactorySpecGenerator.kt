@@ -5,7 +5,7 @@ import com.infinum.jsonapix.processor.specs.specbuilders.TypeAdapterFactorySpecB
 import java.io.File
 
 internal class TypeAdapterFactorySpecGenerator(
-    private val holders: Set<JsonApiXHolder>
+    private val holders: Set<JsonApiXHolder>,
 ) : SpecGenerator {
 
     override fun generate(outputDir: File) {

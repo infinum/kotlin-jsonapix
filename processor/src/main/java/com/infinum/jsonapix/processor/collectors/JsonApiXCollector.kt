@@ -21,16 +21,8 @@ import kotlin.metadata.jvm.KotlinClassMetadata
 internal class JsonApiXCollector(
     private val roundEnvironment: RoundEnvironment,
     private val elementUtils: Elements,
-    private val typeUtils: Types
+    private val typeUtils: Types,
 ) : Collector<JsonApiXHolder> {
-
-    companion object {
-        val SUPPORTED = setOf(
-            JsonApiX::class.java.name,
-            HasOne::class.java.name,
-            HasMany::class.java.name
-        )
-    }
 
     override fun collect(): Set<JsonApiXHolder> {
         return roundEnvironment.getElementsAnnotatedWith(JsonApiX::class.java)
@@ -41,6 +33,7 @@ internal class JsonApiXCollector(
             ?: emptySet()
     }
 
+    @Suppress("ReturnCount")
     private fun collectFromElement(element: Element): JsonApiXHolder? {
         val type = element.getAnnotationParameterValue<JsonApiX, String> { type }
         val isNullable = element.getAnnotationParameterValue<JsonApiX, Boolean> { isNullable }
@@ -50,12 +43,12 @@ internal class JsonApiXCollector(
             ?: return null
 
         val typeSpec = kmClass.toTypeSpec(
-            ElementsClassInspector.create(false, elementUtils, typeUtils)
+            ElementsClassInspector.create(false, elementUtils, typeUtils),
         )
 
         val className = ClassName(
             elementUtils.getPackageOf(element).toString(),
-            element.simpleName.toString()
+            element.simpleName.toString(),
         )
 
         val (primitiveProperties, oneRelationships, manyRelationships) = separateProperties(typeSpec)
@@ -66,12 +59,12 @@ internal class JsonApiXCollector(
             isNullable = isNullable,
             primitiveProperties = primitiveProperties,
             oneRelationships = oneRelationships,
-            manyRelationships = manyRelationships
+            manyRelationships = manyRelationships,
         )
     }
 
     private fun separateProperties(
-        typeSpec: TypeSpec
+        typeSpec: TypeSpec,
     ): Triple<List<PropertySpec>, List<PropertySpec>, List<PropertySpec>> {
         val primitiveProperties = mutableListOf<PropertySpec>()
         val oneRelationships = mutableListOf<PropertySpec>()
@@ -95,5 +88,13 @@ internal class JsonApiXCollector(
         }
 
         return Triple(primitiveProperties, oneRelationships, manyRelationships)
+    }
+
+    companion object {
+        val SUPPORTED = setOf(
+            JsonApiX::class.java.name,
+            HasOne::class.java.name,
+            HasMany::class.java.name,
+        )
     }
 }

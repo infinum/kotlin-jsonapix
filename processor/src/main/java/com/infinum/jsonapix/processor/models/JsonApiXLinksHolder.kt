@@ -6,5 +6,5 @@ import com.squareup.kotlinpoet.ClassName
 internal data class JsonApiXLinksHolder(
     val type: String,
     val placementStrategy: LinksPlacementStrategy,
-    val className: ClassName
+    val className: ClassName,
 ) : Holder

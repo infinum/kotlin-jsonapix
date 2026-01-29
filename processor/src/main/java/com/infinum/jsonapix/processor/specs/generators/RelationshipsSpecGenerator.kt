@@ -6,8 +6,9 @@ import com.infinum.jsonapix.processor.specs.specbuilders.RelationshipsSpecBuilde
 import com.squareup.kotlinpoet.FileSpec
 import java.io.File
 
+@Suppress("SpreadOperator")
 internal class RelationshipsSpecGenerator(
-    private val holder: JsonApiXHolder
+    private val holder: JsonApiXHolder,
 ) : SpecGenerator {
 
     override fun generate(outputDir: File) {
@@ -17,7 +18,7 @@ internal class RelationshipsSpecGenerator(
             className = holder.className,
             type = holder.type,
             oneRelationships = holder.oneRelationships,
-            manyRelationships = holder.manyRelationships
+            manyRelationships = holder.manyRelationships,
         )
 
         val fileSpec = FileSpec.builder(holder.className.packageName, typeSpec.name!!)

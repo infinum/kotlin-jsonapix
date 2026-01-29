@@ -2,9 +2,6 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Errors
-import com.infinum.jsonapix.processor.specs.models.ClassInfo
-import com.infinum.jsonapix.processor.specs.models.LinksInfo
-import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ListItemResourceObjectFunSpecBuilder
@@ -18,6 +15,9 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Wrap
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.WrapperListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.FormatPropertySpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.WrapperSerializerPropertySpecBuilder
+import com.infinum.jsonapix.processor.specs.models.ClassInfo
+import com.infinum.jsonapix.processor.specs.models.LinksInfo
+import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName

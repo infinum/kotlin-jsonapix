@@ -9,5 +9,5 @@ internal data class JsonApiXHolder(
     val isNullable: Boolean,
     val primitiveProperties: List<PropertySpec>,
     val oneRelationships: List<PropertySpec>,
-    val manyRelationships: List<PropertySpec>
+    val manyRelationships: List<PropertySpec>,
 ) : Holder

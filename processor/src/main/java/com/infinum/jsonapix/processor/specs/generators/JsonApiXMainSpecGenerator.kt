@@ -14,7 +14,7 @@ internal class JsonApiXMainSpecGenerator(
     private val holders: Set<JsonApiXHolder>,
     private val linksHolders: Set<JsonApiXLinksHolder>,
     private val metaHolders: Set<JsonApiXMetaHolder>,
-    private val errorHolders: Set<JsonApiXErrorHolder>
+    private val errorHolders: Set<JsonApiXErrorHolder>,
 ) {
 
     fun generate() {

@@ -11,15 +11,8 @@ import javax.lang.model.util.Elements
 
 internal class JsonApiXErrorCollector(
     private val roundEnvironment: RoundEnvironment,
-    private val elementUtils: Elements
+    private val elementUtils: Elements,
 ) : Collector<JsonApiXErrorHolder> {
-
-    companion object {
-        val SUPPORTED = setOf(
-            JsonApiXError::class.java.name,
-            JsonApiXErrorList::class.java.name
-        )
-    }
 
     override fun collect(): Set<JsonApiXErrorHolder> {
         val holders = mutableSetOf<JsonApiXErrorHolder>()
@@ -36,9 +29,9 @@ internal class JsonApiXErrorCollector(
                         type = type,
                         className = ClassName(
                             elementUtils.getPackageOf(element).toString(),
-                            element.simpleName.toString()
-                        )
-                    )
+                            element.simpleName.toString(),
+                        ),
+                    ),
                 )
             }
         }
@@ -52,12 +45,19 @@ internal class JsonApiXErrorCollector(
                     type = type,
                     className = ClassName(
                         elementUtils.getPackageOf(element).toString(),
-                        element.simpleName.toString()
-                    )
-                )
+                        element.simpleName.toString(),
+                    ),
+                ),
             )
         }
 
         return holders
+    }
+
+    companion object {
+        val SUPPORTED = setOf(
+            JsonApiXError::class.java.name,
+            JsonApiXErrorList::class.java.name,
+        )
     }
 }

@@ -12,15 +12,8 @@ import javax.lang.model.util.Elements
 
 internal class JsonApiXMetaCollector(
     private val roundEnvironment: RoundEnvironment,
-    private val elementUtils: Elements
+    private val elementUtils: Elements,
 ) : Collector<JsonApiXMetaHolder> {
-
-    companion object {
-        val SUPPORTED = setOf(
-            JsonApiXMeta::class.java.name,
-            JsonApiXMetaList::class.java.name
-        )
-    }
 
     override fun collect(): Set<JsonApiXMetaHolder> {
         val holders = mutableSetOf<JsonApiXMetaHolder>()
@@ -39,9 +32,9 @@ internal class JsonApiXMetaCollector(
                         placementStrategy = placementStrategy,
                         className = ClassName(
                             elementUtils.getPackageOf(element).toString(),
-                            element.simpleName.toString()
-                        )
-                    )
+                            element.simpleName.toString(),
+                        ),
+                    ),
                 )
             }
         }
@@ -59,12 +52,19 @@ internal class JsonApiXMetaCollector(
                     placementStrategy = placementStrategy,
                     className = ClassName(
                         elementUtils.getPackageOf(element).toString(),
-                        element.simpleName.toString()
-                    )
-                )
+                        element.simpleName.toString(),
+                    ),
+                ),
             )
         }
 
         return holders
+    }
+
+    companion object {
+        val SUPPORTED = setOf(
+            JsonApiXMeta::class.java.name,
+            JsonApiXMetaList::class.java.name,
+        )
     }
 }

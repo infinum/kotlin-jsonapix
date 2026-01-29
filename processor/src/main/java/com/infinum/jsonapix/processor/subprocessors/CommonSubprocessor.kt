@@ -5,6 +5,7 @@ import javax.annotation.processing.Messager
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
+@Suppress("LateinitUsage")
 internal abstract class CommonSubprocessor<R> : Subprocessor<R> {
 
     protected lateinit var messager: Messager

@@ -6,5 +6,5 @@ import com.squareup.kotlinpoet.ClassName
 internal data class JsonApiXMetaHolder(
     val type: String,
     val placementStrategy: MetaPlacementStrategy,
-    val className: ClassName
+    val className: ClassName,
 ) : Holder

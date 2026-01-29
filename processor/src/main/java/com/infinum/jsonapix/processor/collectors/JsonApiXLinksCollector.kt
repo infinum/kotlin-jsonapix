@@ -12,15 +12,8 @@ import javax.lang.model.util.Elements
 
 internal class JsonApiXLinksCollector(
     private val roundEnvironment: RoundEnvironment,
-    private val elementUtils: Elements
+    private val elementUtils: Elements,
 ) : Collector<JsonApiXLinksHolder> {
-
-    companion object {
-        val SUPPORTED = setOf(
-            JsonApiXLinks::class.java.name,
-            JsonApiXLinksList::class.java.name
-        )
-    }
 
     override fun collect(): Set<JsonApiXLinksHolder> {
         val holders = mutableSetOf<JsonApiXLinksHolder>()
@@ -39,9 +32,9 @@ internal class JsonApiXLinksCollector(
                         placementStrategy = placementStrategy,
                         className = ClassName(
                             elementUtils.getPackageOf(element).toString(),
-                            element.simpleName.toString()
-                        )
-                    )
+                            element.simpleName.toString(),
+                        ),
+                    ),
                 )
             }
         }
@@ -59,12 +52,19 @@ internal class JsonApiXLinksCollector(
                     placementStrategy = placementStrategy,
                     className = ClassName(
                         elementUtils.getPackageOf(element).toString(),
-                        element.simpleName.toString()
-                    )
-                )
+                        element.simpleName.toString(),
+                    ),
+                ),
             )
         }
 
         return holders
+    }
+
+    companion object {
+        val SUPPORTED = setOf(
+            JsonApiXLinks::class.java.name,
+            JsonApiXLinksList::class.java.name,
+        )
     }
 }

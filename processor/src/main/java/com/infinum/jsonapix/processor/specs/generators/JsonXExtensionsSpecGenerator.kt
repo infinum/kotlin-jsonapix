@@ -17,7 +17,7 @@ internal class JsonXExtensionsSpecGenerator(
     private val holders: Set<JsonApiXHolder>,
     private val linksHolders: Set<JsonApiXLinksHolder>,
     private val metaHolders: Set<JsonApiXMetaHolder>,
-    private val errorHolders: Set<JsonApiXErrorHolder>
+    private val errorHolders: Set<JsonApiXErrorHolder>,
 ) : SpecGenerator {
 
     override fun generate(outputDir: File) {
@@ -45,31 +45,35 @@ internal class JsonXExtensionsSpecGenerator(
 
         val jsonWrapperClassName = ClassName(
             generatedPackage,
-            JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName)
+            JsonApiConstants.Prefix.JSON_API_X.withName(className.simpleName),
         )
         val jsonWrapperListClassName = ClassName(
             generatedPackage,
-            JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName)
+            JsonApiConstants.Prefix.JSON_API_X_LIST.withName(className.simpleName),
         )
         val resourceObjectClassName = ClassName(
             generatedPackage,
-            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName)
+            JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName),
         )
 
         val attributesClassName = if (holder.primitiveProperties.isNotEmpty()) {
             ClassName(
                 generatedPackage,
-                JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
+                JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName),
             )
-        } else null
+        } else {
+            null
+        }
 
         val relationshipsClassName =
             if (holder.oneRelationships.isNotEmpty() || holder.manyRelationships.isNotEmpty()) {
                 ClassName(
                     generatedPackage,
-                    JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
+                    JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName),
                 )
-            } else null
+            } else {
+                null
+            }
 
         builder.add(
             type = holder.type,
@@ -83,7 +87,7 @@ internal class JsonXExtensionsSpecGenerator(
             attributesObject = attributesClassName,
             relationshipsObject = relationshipsClassName,
             includedStatement = IncludedSpecBuilder.build(holder.oneRelationships, holder.manyRelationships),
-            includedListStatement = IncludedSpecBuilder.buildForList(holder.oneRelationships, holder.manyRelationships)
+            includedListStatement = IncludedSpecBuilder.buildForList(holder.oneRelationships, holder.manyRelationships),
         )
     }
 }
