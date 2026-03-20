@@ -18,7 +18,7 @@ internal class AttributesSpecGenerator(
             type = holder.type,
         )
 
-        val fileSpec = FileSpec.builder(holder.className.packageName, typeSpec.name!!)
+        val fileSpec = FileSpec.builder(holder.className.packageName, requireNotNull(typeSpec.name))
             .addType(typeSpec)
             .build()
 

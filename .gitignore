@@ -9,6 +9,7 @@
 .DS_Store
 /build
 /captures
+/refactor_comparison
 .cxx
 
 # Created by https://www.toptal.com/developers/gitignore/api/android,androidstudio,kotlin,java
