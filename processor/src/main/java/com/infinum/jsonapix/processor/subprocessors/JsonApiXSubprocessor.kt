@@ -44,12 +44,12 @@ internal class JsonApiXSubprocessor : CommonSubprocessor() {
             holders = holders,
             linksHolders = linksHolders,
             metaHolders = metaHolders,
-            errorHolders = errorHolders
+            errorHolders = errorHolders,
         )
     }
 
     private fun collectJsonApiX(roundEnvironment: RoundEnvironment): Set<JsonApiXHolder> {
-        val holders = JsonApiXCollector(roundEnvironment,elementUtils, typeUtils,).collect()
+        val holders = JsonApiXCollector(roundEnvironment, elementUtils, typeUtils).collect()
         val validator = JsonApiXValidator()
         return validator.validate(holders)
     }
