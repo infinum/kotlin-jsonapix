@@ -15,7 +15,7 @@ import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.core.resources.UnknownMeta
-import com.infinum.jsonapix.processor.ClassInfo
+import com.infinum.jsonapix.processor.specs.models.ClassInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.MemberName
