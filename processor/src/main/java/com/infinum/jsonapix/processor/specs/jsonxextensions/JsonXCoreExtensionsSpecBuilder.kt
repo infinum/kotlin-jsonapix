@@ -134,7 +134,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
                 "val errors = if (body != null) %L<Model>(body) else emptyList()",
                 JsonApiConstants.Members.DECODE_JSON_API_ERROR,
             )
-            .addStatement("return JsonXHttpException(response(), errors)")
+            .addStatement("return JsonXHttpException(response, errors)")
             .build()
     }
 
