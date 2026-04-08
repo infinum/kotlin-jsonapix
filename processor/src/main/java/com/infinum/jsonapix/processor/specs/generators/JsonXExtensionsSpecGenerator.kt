@@ -8,7 +8,10 @@ import com.infinum.jsonapix.processor.models.JsonApiXErrorHolder
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.models.JsonApiXLinksHolder
 import com.infinum.jsonapix.processor.models.JsonApiXMetaHolder
-import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXCoreExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXModelExtensionsSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXSerializerModuleSpecBuilder
+import com.infinum.jsonapix.processor.specs.models.ClassInfo
 import com.infinum.jsonapix.processor.specs.specbuilders.IncludedSpecBuilder
 import com.squareup.kotlinpoet.ClassName
 import java.io.File
@@ -21,22 +24,28 @@ internal class JsonXExtensionsSpecGenerator(
 ) : SpecGenerator {
 
     override fun generate(outputDir: File) {
-        val builder = JsonXExtensionsSpecBuilder()
+        val specsMap = hashMapOf<ClassName, ClassInfo>()
 
-        // Setup custom types
-        builder.addCustomLinks(linksHolders.map { it.className })
-        builder.addCustomMetas(metaHolders.map { it.className })
-        builder.addCustomErrors(errorHolders.associate { it.type to it.className })
-
-        // Add each holder
+        // 1. Write one extensions file per holder
         holders.forEach { holder ->
-            addHolder(builder, holder)
+            val classInfo = buildClassInfo(holder)
+            specsMap[holder.className] = classInfo
+            JsonXModelExtensionsSpecBuilder.build(holder.className, classInfo).writeTo(outputDir)
         }
 
-        builder.build().writeTo(outputDir)
+        // 2. Write the serializer module file (with format property)
+        JsonXSerializerModuleSpecBuilder.build(
+            specsMap = specsMap,
+            customLinks = linksHolders.map { it.className },
+            customErrors = errorHolders.associate { it.type to it.className },
+            customMeta = metaHolders.map { it.className },
+        ).writeTo(outputDir)
+
+        // 3. Write the core extensions file
+        JsonXCoreExtensionsSpecBuilder.build().writeTo(outputDir)
     }
 
-    private fun addHolder(builder: JsonXExtensionsSpecBuilder, holder: JsonApiXHolder) {
+    private fun buildClassInfo(holder: JsonApiXHolder): ClassInfo {
         val metaInfo = metaHolders.toMetaInfo(holder.type)
         val linksInfo = linksHolders.toLinksInfo(holder.type)
 
@@ -75,17 +84,16 @@ internal class JsonXExtensionsSpecGenerator(
                 null
             }
 
-        builder.add(
+        return ClassInfo(
             type = holder.type,
             metaInfo = metaInfo,
             linksInfo = linksInfo,
             isNullable = holder.isNullable,
-            data = className,
-            wrapper = jsonWrapperClassName,
-            wrapperList = jsonWrapperListClassName,
-            resourceObject = resourceObjectClassName,
-            attributesObject = attributesClassName,
-            relationshipsObject = relationshipsClassName,
+            jsonWrapperClassName = jsonWrapperClassName,
+            jsonWrapperListClassName = jsonWrapperListClassName,
+            resourceObjectClassName = resourceObjectClassName,
+            attributesWrapperClassName = attributesClassName,
+            relationshipsObjectClassName = relationshipsClassName,
             includedStatement = IncludedSpecBuilder.build(holder.oneRelationships, holder.manyRelationships),
             includedListStatement = IncludedSpecBuilder.buildForList(holder.oneRelationships, holder.manyRelationships),
         )
