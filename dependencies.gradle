@@ -1,5 +1,5 @@
 ext.versions = [
-        "gradle"       : '8.13.0',
+        "gradle"       : '9.3.0',
         "kotlin"       : "2.2.21",
         "poet"         : '2.2.0',
         "serialization": '1.9.0',
@@ -8,19 +8,20 @@ ext.versions = [
         "detekt"       : "1.23.8",
         "retrofit"     : "3.0.0",
         "retromock"    : "1.3.0",
-        "hilt"         : "2.57.2",
+        "hilt"         : "2.60.1",
         "lifecycle"    : "2.10.0",
         "activity"     : "1.12.2",
         "fragment"     : "1.8.9",
         "material"     : "1.13.0",
-        "dokka"        : "2.1.0",
+        "dokka"        : "2.2.0",
         "jsonapix"     : "1.0.0",
-        "lint"         : '31.13.2',
+        "lint"         : '32.2.1',
         "junit"        : '5.13.4'
 ]
 
 ext.packages = [
-        "gradle"   : "com.android.tools.build:gradle:${versions.gradle}",
+        "gradle"     : "com.android.tools.build:gradle:${versions.gradle}",
+        "legacy_kapt": "com.android.legacy-kapt:com.android.legacy-kapt.gradle.plugin:${versions.gradle}",
         "kotlin"   : [
                 "plugin"              : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                 "core"                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
@@ -74,6 +75,7 @@ ext.packages = [
                 "core"     : "com.infinum.jsonapix:core:${versions.jsonapix}",
                 "processor": "com.infinum.jsonapix:processor:${versions.jsonapix}",
                 "retrofit" : "com.infinum.jsonapix:retrofit:${versions.jsonapix}",
+                "lint"     : "com.infinum.jsonapix:lint:${versions.jsonapix}",
         ],
         "junit"    : [
                 "engine"           : "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",

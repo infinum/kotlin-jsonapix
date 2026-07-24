@@ -30,13 +30,17 @@ dependencies {
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
     implementation packages.kotlin.poet_metadata
-    // Using compileOnly cause an error with new version from hilt
-    // TODO: https://app.productive.io/1-infinum/tasks/6780558
+    // These must be implementation rather than compileOnly: the processor loads
+    // classes from them at annotation-processing runtime (class literals in the
+    // generated specs), so they have to be published as runtime dependencies to
+    // end up on consumers' kapt classpath. AGP 9's legacy-kapt no longer exposes
+    // the consumer's compile classpath to annotation processors, which used to
+    // mask this.
     implementation project(":annotations")
-    compileOnly project(":core")
-    compileOnly packages.kotlin.serialization_core
-    compileOnly packages.retrofit.core
-    compileOnly project(":retrofit")
+    implementation project(":core")
+    implementation packages.kotlin.serialization_core
+    implementation packages.retrofit.core
+    implementation project(":retrofit")
 }
 
 compileKotlin {

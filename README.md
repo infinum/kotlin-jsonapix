@@ -48,7 +48,7 @@ Then add the following dependencies and enable `kapt` and `kotlinx-serialization
 ```groovy
 plugins {
     id "kotlinx-serialization"
-    id "kotlin-kapt"
+    id "kotlin-kapt" or id "com.android.legacy-kapt" -> depends on your AGP version
 }
 ```
 
