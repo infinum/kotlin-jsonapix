@@ -12,6 +12,7 @@ buildscript {
 
     dependencies {
         classpath packages.gradle
+        classpath packages.legacy_kapt
         classpath packages.kotlin.plugin
         classpath packages.kotlin.serialization_plugin
         classpath packages.detekt.plugin

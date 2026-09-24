@@ -1,22 +1,20 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
     id "kotlinx-serialization"
-    id "kotlin-kapt"
+    id "com.android.legacy-kapt"
     id "dagger.hilt.android.plugin"
 }
 
 apply from: "$rootDir/detekt.gradle"
 
 android {
-    compileSdkVersion buildConfig.compileSdk
-    buildToolsVersion buildConfig.buildTools
+    compileSdk buildConfig.compileSdk
 
     defaultConfig {
         applicationId "com.infinum.jsonapix.sample"
-        minSdkVersion buildConfig.minSdk
-        targetSdkVersion buildConfig.targetSdk
-        versionCode releaseConfig.versionCode
+        minSdk buildConfig.minSdk
+        targetSdk buildConfig.targetSdk
+        versionCode 1
         versionName releaseConfig.version
     }
 
@@ -36,10 +34,6 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     testOptions {
         unitTests.all {
             useJUnitPlatform()
@@ -49,6 +43,12 @@ android {
         }
     }
     namespace 'com.infinum.jsonapix'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
 }
 
 dependencies {
