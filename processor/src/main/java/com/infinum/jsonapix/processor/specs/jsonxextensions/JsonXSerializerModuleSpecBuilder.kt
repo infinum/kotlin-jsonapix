@@ -15,6 +15,7 @@ import com.squareup.kotlinpoet.FileSpec
  */
 internal object JsonXSerializerModuleSpecBuilder {
 
+    @SuppressWarnings("SpreadOperator")
     fun build(
         specsMap: HashMap<ClassName, ClassInfo>,
         customLinks: List<ClassName>,

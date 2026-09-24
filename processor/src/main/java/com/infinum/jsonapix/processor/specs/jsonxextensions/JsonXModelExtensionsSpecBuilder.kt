@@ -23,7 +23,7 @@ import com.squareup.kotlinpoet.FileSpec
  * - Model.toJsonApiXString(...)
  * - List.toJsonApiXString(...)
  */
-@SuppressWarnings("SpreadOperator")
+@SuppressWarnings("SpreadOperator", "LongMethod")
 internal object JsonXModelExtensionsSpecBuilder {
 
     fun build(originalClass: ClassName, classInfo: ClassInfo): FileSpec {

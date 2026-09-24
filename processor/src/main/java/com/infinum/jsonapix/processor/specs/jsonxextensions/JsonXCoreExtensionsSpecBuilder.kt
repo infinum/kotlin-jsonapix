@@ -9,7 +9,6 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Many
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
