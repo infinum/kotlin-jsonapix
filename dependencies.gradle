@@ -1,9 +1,9 @@
 ext.versions = [
-        "gradle"       : '9.4.0',
+        "gradle"       : '9.4.1',
         "kotlin"       : "2.4.20",
         "poet"         : '2.4.0',
         "serialization": '1.11.0',
-        "core_ktx"     : '1.17.0',
+        "core_ktx"     : '1.19.1',
         "appcompat"    : '1.8.0',
         "detekt"       : "1.23.8",
         "retrofit"     : "3.0.0",
@@ -11,11 +11,11 @@ ext.versions = [
         "hilt"         : "2.60.1",
         "lifecycle"    : "2.11.0",
         "activity"     : "1.13.0",
-        "fragment"     : "1.9.0",
+        "fragment"     : "1.9.1",
         "material"     : "1.14.0",
         "dokka"        : "2.2.0",
         "jsonapix"     : "1.2.0",
-        "lint"         : '32.4.0',
+        "lint"         : '32.4.1',
         "junit"        : '6.1.3'
 ]
 
