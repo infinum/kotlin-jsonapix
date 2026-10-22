@@ -2,7 +2,7 @@ package com.infinum.jsonapix.processor.validators
 
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 
-internal class JsonApiXValidator : Validator<JsonApiXHolder> {
+public class JsonApiXValidator : Validator<JsonApiXHolder> {
 
     // All holders collected are already filtered to be classes
     // Additional validation can be added here if needed

@@ -1,3 +1,3 @@
 package com.infinum.jsonapix.processor.models
 
-internal interface Holder
+public interface Holder

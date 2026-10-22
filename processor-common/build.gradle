@@ -1,0 +1,55 @@
+plugins {
+    id "java-library"
+    id "kotlin"
+}
+
+apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/dokka.gradle"
+apply from: "$rootDir/maven-publish.gradle"
+
+ext.mavenPublishProperties = [
+        group      : releaseConfig.group,
+        version    : releaseConfig.version,
+        artifactId   : "processor-common",
+        repository : [
+                url     : sonatype.url,
+                username: sonatype.username,
+                password: sonatype.password
+        ],
+        name       : "JsonApiX Processor Common",
+        description: "Code generation shared by the JsonApiX processors",
+        url        : "https://github.com/infinum/android-jsonapix",
+        scm        : [
+                connection: "https://github.com/infinum/android-jsonapix.git",
+                url       : "https://github.com/infinum/android-jsonapix"
+        ]
+]
+
+dependencies {
+    implementation packages.kotlin.core
+    // Holders and CodeOutput expose KotlinPoet types and the placement strategy annotations.
+    api packages.kotlin.poet
+    // These must be api or implementation rather than compileOnly: the processors load
+    // classes from them at annotation-processing runtime (class literals in the generated
+    // specs), so they have to be published as runtime dependencies to end up on consumers'
+    // kapt classpath. AGP 9's legacy-kapt no longer exposes the consumer's compile classpath
+    // to annotation processors, which used to mask this.
+    api project(":annotations")
+    implementation project(":core")
+    implementation packages.kotlin.serialization_core
+    implementation packages.retrofit.core
+    implementation project(":retrofit")
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs += [
+                '-Xexplicit-api=strict'
+        ]
+    }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}

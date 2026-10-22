@@ -1,7 +1,6 @@
 package com.infinum.jsonapix.processor.configurations
 
-import com.infinum.jsonapix.core.common.JsonApiConstants
-import java.io.File
+import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.util.Elements
@@ -17,6 +16,5 @@ internal abstract class CommonConfiguration(
 
     override fun typeUtils(): Types = processingEnv.typeUtils
 
-    override fun outputDir(): File? =
-        processingEnv.options[JsonApiConstants.KAPT_KOTLIN_GENERATED_OPTION_NAME]?.let(::File)
+    override fun filer(): Filer = processingEnv.filer
 }
