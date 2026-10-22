@@ -4,7 +4,7 @@ import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.specs.models.LinksInfo
 import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.infinum.jsonapix.processor.specs.specbuilders.ResourceObjectSpecBuilder
-import java.io.File
+import com.squareup.kotlinpoet.FileSpec
 
 @Suppress("SpreadOperator")
 internal class ResourceObjectSpecGenerator(
@@ -13,7 +13,7 @@ internal class ResourceObjectSpecGenerator(
     private val linksInfo: LinksInfo?,
 ) : SpecGenerator {
 
-    override fun generate(outputDir: File) {
+    override fun generate(): List<FileSpec> {
         val fileSpec = ResourceObjectSpecBuilder.build(
             className = holder.className,
             metaClassName = metaInfo?.resourceObjectClassName,
@@ -24,6 +24,6 @@ internal class ResourceObjectSpecGenerator(
             manyRelationships = mapOf(*holder.manyRelationships.map { it.name to it.type }.toTypedArray()),
         )
 
-        fileSpec.writeTo(outputDir)
+        return listOf(fileSpec)
     }
 }

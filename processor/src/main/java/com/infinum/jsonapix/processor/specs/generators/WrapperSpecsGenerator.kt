@@ -6,7 +6,7 @@ import com.infinum.jsonapix.processor.specs.models.MetaInfo
 import com.infinum.jsonapix.processor.specs.specbuilders.JsonApiXListSpecBuilder
 import com.infinum.jsonapix.processor.specs.specbuilders.JsonApiXSpecBuilder
 import com.squareup.kotlinpoet.ClassName
-import java.io.File
+import com.squareup.kotlinpoet.FileSpec
 
 internal class WrapperSpecsGenerator(
     private val holder: JsonApiXHolder,
@@ -15,7 +15,7 @@ internal class WrapperSpecsGenerator(
     private val customError: ClassName?,
 ) : SpecGenerator {
 
-    override fun generate(outputDir: File) {
+    override fun generate(): List<FileSpec> {
         // Generate JsonApiX wrapper
         val wrapperFileSpec = JsonApiXSpecBuilder.build(
             className = holder.className,
@@ -25,7 +25,6 @@ internal class WrapperSpecsGenerator(
             linksInfo = linksInfo,
             customError = customError,
         )
-        wrapperFileSpec.writeTo(outputDir)
 
         // Generate JsonApiXList wrapper
         val wrapperListFileSpec = JsonApiXListSpecBuilder.build(
@@ -36,6 +35,7 @@ internal class WrapperSpecsGenerator(
             linksInfo = linksInfo,
             customError = customError,
         )
-        wrapperListFileSpec.writeTo(outputDir)
+
+        return listOf(wrapperFileSpec, wrapperListFileSpec)
     }
 }
