@@ -27,7 +27,6 @@ ext.mavenPublishProperties = [
 
 dependencies {
     implementation packages.kotlin.core
-    // Holders and CodeOutput expose KotlinPoet types and the placement strategy annotations.
     api packages.kotlin.poet
     // These must be api or implementation rather than compileOnly: the processors load
     // classes from them at annotation-processing runtime (class literals in the generated
