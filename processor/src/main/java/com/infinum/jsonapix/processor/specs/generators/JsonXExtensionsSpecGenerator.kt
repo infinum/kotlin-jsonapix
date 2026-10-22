@@ -14,7 +14,7 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.JsonXSerializerModul
 import com.infinum.jsonapix.processor.specs.models.ClassInfo
 import com.infinum.jsonapix.processor.specs.specbuilders.IncludedSpecBuilder
 import com.squareup.kotlinpoet.ClassName
-import java.io.File
+import com.squareup.kotlinpoet.FileSpec
 
 internal class JsonXExtensionsSpecGenerator(
     private val holders: Set<JsonApiXHolder>,
@@ -23,26 +23,28 @@ internal class JsonXExtensionsSpecGenerator(
     private val errorHolders: Set<JsonApiXErrorHolder>,
 ) : SpecGenerator {
 
-    override fun generate(outputDir: File) {
+    override fun generate(): List<FileSpec> {
         val specsMap = hashMapOf<ClassName, ClassInfo>()
 
-        // 1. Write one extensions file per holder
-        holders.forEach { holder ->
+        // 1. Build one extensions file per holder
+        val modelExtensionsFileSpecs = holders.map { holder ->
             val classInfo = buildClassInfo(holder)
             specsMap[holder.className] = classInfo
-            JsonXModelExtensionsSpecBuilder.build(holder.className, classInfo).writeTo(outputDir)
+            JsonXModelExtensionsSpecBuilder.build(holder.className, classInfo)
         }
 
-        // 2. Write the serializer module file (with format property)
-        JsonXSerializerModuleSpecBuilder.build(
+        // 2. Build the serializer module file (with format property)
+        val serializerModuleFileSpec = JsonXSerializerModuleSpecBuilder.build(
             specsMap = specsMap,
             customLinks = linksHolders.map { it.className },
             customErrors = errorHolders.associate { it.type to it.className },
             customMeta = metaHolders.map { it.className },
-        ).writeTo(outputDir)
+        )
 
-        // 3. Write the core extensions file
-        JsonXCoreExtensionsSpecBuilder.build().writeTo(outputDir)
+        // 3. Build the core extensions file
+        val coreExtensionsFileSpec = JsonXCoreExtensionsSpecBuilder.build()
+
+        return modelExtensionsFileSpecs + serializerModuleFileSpec + coreExtensionsFileSpec
     }
 
     private fun buildClassInfo(holder: JsonApiXHolder): ClassInfo {

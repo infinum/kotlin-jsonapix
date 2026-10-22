@@ -4,15 +4,14 @@ import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.specs.specbuilders.RelationshipsSpecBuilder
 import com.squareup.kotlinpoet.FileSpec
-import java.io.File
 
 @Suppress("SpreadOperator")
 internal class RelationshipsSpecGenerator(
     private val holder: JsonApiXHolder,
 ) : SpecGenerator {
 
-    override fun generate(outputDir: File) {
-        if (holder.oneRelationships.isEmpty() && holder.manyRelationships.isEmpty()) return
+    override fun generate(): List<FileSpec> {
+        if (holder.oneRelationships.isEmpty() && holder.manyRelationships.isEmpty()) return emptyList()
 
         val typeSpec = RelationshipsSpecBuilder.build(
             className = holder.className,
@@ -27,6 +26,6 @@ internal class RelationshipsSpecGenerator(
             .addImport(JsonApiConstants.Packages.JSONX, *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS)
             .build()
 
-        fileSpec.writeTo(outputDir)
+        return listOf(fileSpec)
     }
 }

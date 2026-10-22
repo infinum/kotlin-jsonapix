@@ -1,7 +1,7 @@
 package com.infinum.jsonapix.processor.specs.generators
 
-import java.io.File
+import com.squareup.kotlinpoet.FileSpec
 
 internal interface SpecGenerator {
-    fun generate(outputDir: File)
+    fun generate(): List<FileSpec>
 }

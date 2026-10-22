@@ -3,14 +3,13 @@ package com.infinum.jsonapix.processor.specs.generators
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.specs.specbuilders.AttributesSpecBuilder
 import com.squareup.kotlinpoet.FileSpec
-import java.io.File
 
 internal class AttributesSpecGenerator(
     private val holder: JsonApiXHolder,
 ) : SpecGenerator {
 
-    override fun generate(outputDir: File) {
-        if (holder.primitiveProperties.isEmpty()) return
+    override fun generate(): List<FileSpec> {
+        if (holder.primitiveProperties.isEmpty()) return emptyList()
 
         val typeSpec = AttributesSpecBuilder.build(
             className = holder.className,
@@ -22,6 +21,6 @@ internal class AttributesSpecGenerator(
             .addType(typeSpec)
             .build()
 
-        fileSpec.writeTo(outputDir)
+        return listOf(fileSpec)
     }
 }
