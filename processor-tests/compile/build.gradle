@@ -1,0 +1,96 @@
+plugins {
+    id "java-library"
+    id "kotlin"
+    // Only for the fixture source sets below, whose golden files call generated serializers.
+    id "kotlinx-serialization"
+}
+
+apply from: "$rootDir/detekt.gradle"
+
+// This module only has test sources, so detekt checks those instead of src/main.
+detekt {
+    source.setFrom(files("src/test/kotlin"))
+}
+
+def fixturesDir = file("src/test/fixtures")
+def goldensDir = file("src/test/goldens")
+def updateGoldens = providers.gradleProperty("updateGoldens").map { it.toBoolean() }.getOrElse(false)
+
+// Each fixture gets its own source set with its golden files, so the IDE resolves and highlights
+// them. Fixtures declare the same classes, so they can't share one source set. No build or test
+// task compiles these source sets; the compile tests compile the fixtures themselves.
+def fixtureSourceSets = fixturesDir.listFiles({ it.isDirectory() } as FileFilter).collect { dir ->
+    sourceSets.create("fixture" + dir.name.split("-").collect { it.capitalize() }.join()) {
+        kotlin.srcDirs = [dir, new File(goldensDir, dir.name)]
+    }
+}
+
+dependencies {
+    testImplementation project(":processor")
+    testImplementation packages.kctfork.core
+    testImplementation packages.kotlin.serialization_compiler_plugin
+    testImplementation packages.diff_utils
+    testImplementation packages.junit.api
+    testImplementation packages.junit.params
+    testRuntimeOnly packages.junit.engine
+    testRuntimeOnly packages.junit.platform_launcher
+
+    // The compile tests compile the fixtures against the test runtime classpath, and the IDE
+    // resolves them through their source sets, so both need everything the fixtures reference.
+    (["testRuntimeOnly"] + fixtureSourceSets*.implementationConfigurationName).each { configuration ->
+        add(configuration, project(":annotations"))
+        add(configuration, project(":core"))
+        add(configuration, project(":retrofit"))
+        add(configuration, packages.kotlin.serialization_core)
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+compileTestKotlin {
+    compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+        exceptionFormat = "full"
+    }
+
+    // The compiler and KAPT run in-process, so they need more memory than the default
+    // and access to javac internals.
+    maxHeapSize = "2g"
+    jvmArgs(
+            "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+    )
+
+    systemProperty "jsonapix.fixturesDir", fixturesDir.absolutePath
+    systemProperty "jsonapix.goldensDir", goldensDir.absolutePath
+    systemProperty "jsonapix.updateGoldens", updateGoldens
+
+    // File trees rather than directories, so a missing goldens directory is not an error.
+    inputs.files(fileTree(fixturesDir)).withPropertyName("fixtures").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(fileTree(goldensDir)).withPropertyName("goldens").withPathSensitivity(PathSensitivity.RELATIVE)
+    if (updateGoldens) {
+        outputs.upToDateWhen { false }
+    }
+}

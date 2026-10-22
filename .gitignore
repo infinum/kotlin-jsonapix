@@ -256,3 +256,7 @@ fabric.properties
 
 publish.properties
 *.gpg
+
+# KSP support planning: spec, ADRs and tickets are kept local
+/.scratch/
+/docs

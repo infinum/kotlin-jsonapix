@@ -6,5 +6,16 @@
   "reviewers": [
     "thisAAY",
     "DrakslerT"
+  ],
+  "packageRules": [
+    {
+      "description": "kctfork is built against one Kotlin compiler version, so it is upgraded together with Kotlin",
+      "matchPackageNames": [
+        "org.jetbrains.kotlin:**",
+        "dev.zacsweers.kctfork:**"
+      ],
+      "groupName": "Kotlin and kctfork",
+      "separateMajorMinor": false
+    }
   ]
 }
