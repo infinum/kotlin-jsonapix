@@ -1,3 +1,5 @@
+package com.infinum.jsonapix.processor.behavior
+
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
@@ -18,7 +20,7 @@ import org.junit.jupiter.api.Test
  * Integration tests for AdapterFactory.getAdapter() function.
  * Tests the complete workflow of adapter retrieval and type safety.
  */
-@Suppress("StringLiteralDuplication")
+@Suppress("StringLiteralDuplication", "StringShouldBeRawString")
 internal class AdapterFactoryIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory

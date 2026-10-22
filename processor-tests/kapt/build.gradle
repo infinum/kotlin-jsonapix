@@ -1,0 +1,55 @@
+plugins {
+    id "java-library"
+    id "kotlin"
+    id "kotlin-kapt"
+    id "kotlinx-serialization"
+}
+
+apply from: "$rootDir/detekt.gradle"
+
+// The behavior suite lives in a shared directory so that every backend module compiles the same
+// files. Its models are main sources, which this module runs through KAPT like a consumer would.
+def behaviorDir = file("../behavior/src")
+
+sourceSets {
+    main {
+        kotlin.srcDirs = ["$behaviorDir/main/kotlin"]
+    }
+    test {
+        kotlin.srcDirs = ["$behaviorDir/test/kotlin"]
+        resources.srcDirs = ["$behaviorDir/test/resources"]
+    }
+}
+
+detekt {
+    source.setFrom(files("$behaviorDir/main/kotlin", "$behaviorDir/test/kotlin"))
+}
+
+dependencies {
+    implementation project(":core")
+    implementation project(":retrofit")
+    implementation packages.kotlin.serialization_core
+    kapt project(":processor")
+
+    testImplementation packages.junit.api
+    testRuntimeOnly packages.junit.engine
+    testRuntimeOnly packages.junit.platform_launcher
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+    }
+}

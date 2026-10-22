@@ -1,3 +1,5 @@
+package com.infinum.jsonapix.processor.behavior
+
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
@@ -9,9 +11,7 @@ import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
