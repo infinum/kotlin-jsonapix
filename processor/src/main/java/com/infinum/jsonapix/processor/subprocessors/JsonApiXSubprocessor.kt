@@ -26,9 +26,7 @@ internal class JsonApiXSubprocessor : CommonSubprocessor() {
         val metaHolders = collectMeta(roundEnvironment)
         val errorHolders = collectErrors(roundEnvironment)
 
-        val dir = outputDir ?: return
-
-        JsonApiXGenerator(KaptCodeOutput(dir)).generate(
+        JsonApiXGenerator(KaptCodeOutput(filer, elementUtils)).generate(
             holders = holders,
             linksHolders = linksHolders,
             metaHolders = metaHolders,

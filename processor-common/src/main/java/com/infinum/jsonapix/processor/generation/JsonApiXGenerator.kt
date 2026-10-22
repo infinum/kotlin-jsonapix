@@ -19,11 +19,11 @@ import com.infinum.jsonapix.processor.specs.generators.TypeAdapterSpecsGenerator
 import com.infinum.jsonapix.processor.specs.generators.WrapperSpecsGenerator
 import com.squareup.kotlinpoet.ClassName
 
-internal class JsonApiXGenerator(
+public class JsonApiXGenerator(
     private val output: CodeOutput,
 ) {
 
-    fun generate(
+    public fun generate(
         holders: Set<JsonApiXHolder>,
         linksHolders: Set<JsonApiXLinksHolder>,
         metaHolders: Set<JsonApiXMetaHolder>,
