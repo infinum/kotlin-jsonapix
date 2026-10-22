@@ -1,3 +1,5 @@
+package com.infinum.jsonapix.processor.behavior
+
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Address
@@ -19,7 +21,7 @@ import org.junit.jupiter.api.Test
  * Integration tests for complex relationship scenarios.
  * Tests HasOne and HasMany relationships with multiple nesting levels.
  */
-@Suppress("StringLiteralDuplication")
+@Suppress("StringLiteralDuplication", "StringShouldBeRawString")
 internal class ComplexRelationshipsIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory

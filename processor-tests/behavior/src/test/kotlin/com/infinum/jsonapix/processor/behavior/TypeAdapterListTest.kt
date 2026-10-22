@@ -1,3 +1,5 @@
+package com.infinum.jsonapix.processor.behavior
+
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.resources.DefaultLinks
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+@Suppress("LargeClass", "TooManyFunctions")
 internal class TypeAdapterListTest {
 
     private var typeListAdapter: TypeAdapter<PersonList>? = null

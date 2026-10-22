@@ -1,3 +1,5 @@
+package com.infinum.jsonapix.processor.behavior
+
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter

@@ -1,3 +1,5 @@
+package com.infinum.jsonapix.processor.behavior
+
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.core.resources.DefaultLinks
@@ -169,7 +171,9 @@ internal class LinksAndMetaIntegrationTest {
 
         val dog1 = Dog(name = "Max", age = 3).apply { setId(id = "1") }
         val dog2 = Dog(name = "Bella", age = 5).apply { setId(id = "2") }
-        val person = Person(name = "Frank", surname = "Miller", age = 38, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply { setId(id = "1") }
+        val person = Person(name = "Frank", surname = "Miller", age = 38, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply {
+            setId(id = "1")
+        }
 
         val meta1 = PersonRelationshipMeta(user = "User1")
         val meta2 = PersonRelationshipMeta(user = "User2")
@@ -211,7 +215,9 @@ internal class LinksAndMetaIntegrationTest {
 
         val dog1 = Dog(name = "Rex", age = 4).apply { setId(id = "1") }
         val dog2 = Dog(name = "Spot", age = 6).apply { setId(id = "2") }
-        val person = Person(name = "Grace", surname = "Wilson", age = 33, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply { setId(id = "1") }
+        val person = Person(name = "Grace", surname = "Wilson", age = 33, allMyDogs = listOf(dog1, dog2), myFavoriteDog = dog1).apply {
+            setId(id = "1")
+        }
 
         val rootMeta = PersonRootMeta(owner = "RootOwner")
         val resourceMeta = PersonResourceMeta(writer = "DataWriter")
