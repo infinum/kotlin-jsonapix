@@ -9,11 +9,11 @@ internal class AttributesSpecGenerator(
 ) : SpecGenerator {
 
     override fun generate(): List<FileSpec> {
-        if (holder.primitiveProperties.isEmpty()) return emptyList()
+        if (holder.attributes.isEmpty()) return emptyList()
 
         val typeSpec = AttributesSpecBuilder.build(
             className = holder.className,
-            attributes = holder.primitiveProperties,
+            attributes = holder.attributes,
             type = holder.type,
         )
 
