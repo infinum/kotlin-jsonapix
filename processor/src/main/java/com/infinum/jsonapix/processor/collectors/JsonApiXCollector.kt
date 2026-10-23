@@ -84,9 +84,15 @@ internal class JsonApiXCollector(
                 it.typeName == SerialName::class.asTypeName()
             }?.getStringParameterValue(SerialName::value.name)
 
-            // Holders carry the @SerialName value as a field rather than as an annotation on the property.
+            // Holders carry these values as fields rather than as annotations on the property.
             val property = propertySpec.toBuilder()
-                .apply { annotations.removeAll { it.typeName == SerialName::class.asTypeName() } }
+                .apply {
+                    annotations.removeAll {
+                        it.typeName == HasOne::class.asTypeName() ||
+                            it.typeName == HasMany::class.asTypeName() ||
+                            it.typeName == SerialName::class.asTypeName()
+                    }
+                }
                 .build()
 
             when {

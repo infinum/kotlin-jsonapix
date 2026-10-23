@@ -9,11 +9,13 @@ import java.io.File
  */
 internal class Fixture(val name: String, private val dir: File) {
 
-    fun sources(): List<SourceFile> =
+    /** The fixture's source files, sorted by name. */
+    fun files(): List<File> =
         dir.listFiles { file -> file.extension == "kt" }
             .orEmpty()
             .sortedBy { it.name }
-            .map { SourceFile.kotlin(it.name, it.readText(), trimIndent = false) }
+
+    fun sources(): List<SourceFile> = files().map { it.toSourceFile() }
 
     override fun toString(): String = name
 
@@ -24,5 +26,9 @@ internal class Fixture(val name: String, private val dir: File) {
                 .orEmpty()
                 .sortedBy { it.name }
                 .map { Fixture(it.name, it) }
+
+        fun named(name: String): Fixture = all().single { it.name == name }
     }
 }
+
+internal fun File.toSourceFile(): SourceFile = SourceFile.kotlin(name, readText(), trimIndent = false)

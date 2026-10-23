@@ -30,6 +30,14 @@ task deployProcessorCommon(dependsOn: [
     description = "Deploy module to repositories"
 }
 
+task deployProcessorKsp(dependsOn: [
+        ':processor-ksp:clean',
+        ':processor-ksp:publishReleasePublicationToSonatypeMavenCentralRepository'
+]) {
+    group = "Deploy"
+    description = "Deploy module to repositories"
+}
+
 task deployRetrofit(dependsOn: [
         ':retrofit:clean',
         ':retrofit:publishReleasePublicationToSonatypeMavenCentralRepository'
@@ -43,6 +51,7 @@ task deployAll(dependsOn: [
         'deployCore',
         'deployProcessor',
         'deployProcessorCommon',
+        'deployProcessorKsp',
         'deployRetrofit',
 ]) {
     group = "Deploy"
@@ -54,11 +63,13 @@ task deployDebug(dependsOn: [
         ':core:clean',
         ':processor:clean',
         ':processor-common:clean',
+        ':processor-ksp:clean',
         ':retrofit:clean',
         ':annotations:publishToMavenLocal',
         ':core:publishToMavenLocal',
         ':processor:publishToMavenLocal',
         ':processor-common:publishToMavenLocal',
+        ':processor-ksp:publishToMavenLocal',
         ':retrofit:publishToMavenLocal',
 ]) {
     group = "Deploy"
