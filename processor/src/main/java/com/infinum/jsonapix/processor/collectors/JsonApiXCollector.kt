@@ -4,9 +4,11 @@ import com.infinum.jsonapix.annotations.HasMany
 import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
+import com.infinum.jsonapix.processor.extensions.getStringParameterValue
+import com.infinum.jsonapix.processor.models.AttributeProperty
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
+import com.infinum.jsonapix.processor.models.RelationshipProperty
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.metadata.classinspectors.ElementsClassInspector
@@ -17,6 +19,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import kotlin.metadata.jvm.KotlinClassMetadata
+import kotlinx.serialization.SerialName
 
 internal class JsonApiXCollector(
     private val roundEnvironment: RoundEnvironment,
@@ -51,13 +54,13 @@ internal class JsonApiXCollector(
             element.simpleName.toString(),
         )
 
-        val (primitiveProperties, oneRelationships, manyRelationships) = separateProperties(typeSpec)
+        val (attributes, oneRelationships, manyRelationships) = separateProperties(typeSpec)
 
         return JsonApiXHolder(
             className = className,
             type = type,
             isNullable = isNullable,
-            primitiveProperties = primitiveProperties,
+            attributes = attributes,
             oneRelationships = oneRelationships,
             manyRelationships = manyRelationships,
         )
@@ -65,10 +68,10 @@ internal class JsonApiXCollector(
 
     private fun separateProperties(
         typeSpec: TypeSpec,
-    ): Triple<List<PropertySpec>, List<PropertySpec>, List<PropertySpec>> {
-        val primitiveProperties = mutableListOf<PropertySpec>()
-        val oneRelationships = mutableListOf<PropertySpec>()
-        val manyRelationships = mutableListOf<PropertySpec>()
+    ): Triple<List<AttributeProperty>, List<RelationshipProperty>, List<RelationshipProperty>> {
+        val attributes = mutableListOf<AttributeProperty>()
+        val oneRelationships = mutableListOf<RelationshipProperty>()
+        val manyRelationships = mutableListOf<RelationshipProperty>()
 
         typeSpec.propertySpecs.filter { !it.delegated }.forEach { propertySpec ->
             val hasOneAnnotation = propertySpec.annotations.firstOrNull {
@@ -77,17 +80,37 @@ internal class JsonApiXCollector(
             val hasManyAnnotation = propertySpec.annotations.firstOrNull {
                 it.typeName == HasMany::class.asTypeName()
             }
+            val serialName = propertySpec.annotations.firstOrNull {
+                it.typeName == SerialName::class.asTypeName()
+            }?.getStringParameterValue(SerialName::value.name)
+
+            // Holders carry the @SerialName value as a field rather than as an annotation on the property.
+            val property = propertySpec.toBuilder()
+                .apply { annotations.removeAll { it.typeName == SerialName::class.asTypeName() } }
+                .build()
 
             when {
-                hasOneAnnotation != null -> oneRelationships.add(propertySpec)
+                hasOneAnnotation != null -> oneRelationships.add(
+                    RelationshipProperty(
+                        property = property,
+                        type = hasOneAnnotation.getStringParameterValue(HasOne::type.name),
+                        serialName = serialName,
+                    ),
+                )
 
-                hasManyAnnotation != null -> manyRelationships.add(propertySpec)
+                hasManyAnnotation != null -> manyRelationships.add(
+                    RelationshipProperty(
+                        property = property,
+                        type = hasManyAnnotation.getStringParameterValue(HasMany::type.name),
+                        serialName = serialName,
+                    ),
+                )
 
-                else -> primitiveProperties.add(propertySpec)
+                else -> attributes.add(AttributeProperty(property = property, serialName = serialName))
             }
         }
 
-        return Triple(primitiveProperties, oneRelationships, manyRelationships)
+        return Triple(attributes, oneRelationships, manyRelationships)
     }
 
     companion object {

@@ -1,7 +1,5 @@
 package com.infinum.jsonapix.processor.specs.specbuilders
 
-import com.infinum.jsonapix.annotations.HasMany
-import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Links
@@ -9,7 +7,7 @@ import com.infinum.jsonapix.core.resources.ManyRelationshipMember
 import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
-import com.infinum.jsonapix.processor.extensions.findAnnotationWithTypeName
+import com.infinum.jsonapix.processor.models.RelationshipProperty
 import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -21,48 +19,48 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 internal object RelationshipsSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
-    private val serialNameTypeName = SerialName::class.asTypeName()
 
     @Suppress("LongMethod", "LongParameterList")
     fun build(
         className: ClassName,
         type: String,
-        oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>,
+        oneRelationships: List<RelationshipProperty>,
+        manyRelationships: List<RelationshipProperty>,
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
+        val oneRelationshipProperties = oneRelationships.map { it.property }
+        val manyRelationshipProperties = manyRelationships.map { it.property }
 
-        val properties: MutableList<PropertySpec> = oneRelationships.map {
-            val builder = if (it.type.isNullable) {
-                PropertySpec.builder(it.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
+        val properties: MutableList<PropertySpec> = oneRelationships.map { relationship ->
+            val builder = if (relationship.property.type.isNullable) {
+                PropertySpec.builder(relationship.property.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
             } else {
-                PropertySpec.builder(it.name, OneRelationshipMember::class)
+                PropertySpec.builder(relationship.property.name, OneRelationshipMember::class)
             }
 
             builder
-                .addSerialNameAnnotation(it)
-                .initializer(it.name)
+                .addSerialNameAnnotation(relationship)
+                .initializer(relationship.property.name)
                 .build()
         }.toMutableList()
 
         properties.addAll(
-            manyRelationships.map {
-                val builder = if (it.type.isNullable) {
-                    PropertySpec.builder(it.name, ManyRelationshipMember::class.asTypeName().copy(nullable = true))
+            manyRelationships.map { relationship ->
+                val builder = if (relationship.property.type.isNullable) {
+                    PropertySpec.builder(relationship.property.name, ManyRelationshipMember::class.asTypeName().copy(nullable = true))
                 } else {
-                    PropertySpec.builder(it.name, ManyRelationshipMember::class)
+                    PropertySpec.builder(relationship.property.name, ManyRelationshipMember::class)
                 }
 
                 builder
-                    .addSerialNameAnnotation(it)
-                    .initializer(it.name)
+                    .addSerialNameAnnotation(relationship)
+                    .initializer(relationship.property.name)
                     .build()
             },
         )
@@ -98,17 +96,13 @@ internal object RelationshipsSpecBuilder {
                     .build(),
             )
             .addProperties(properties)
-            .addProperty(linksPropertySpec(oneRelationships, manyRelationships))
-            .addProperty(metaPropertySpec(oneRelationships, manyRelationships))
+            .addProperty(linksPropertySpec(oneRelationshipProperties, manyRelationshipProperties))
+            .addProperty(metaPropertySpec(oneRelationshipProperties, manyRelationshipProperties))
             .build()
     }
 
-    private fun PropertySpec.Builder.addSerialNameAnnotation(originalProperty: PropertySpec): PropertySpec.Builder = this.apply {
-        val serialNameAnnotation = originalProperty.annotations.findAnnotationWithTypeName(serialNameTypeName)
-            ?: Specs.getSerialNameSpec(originalProperty.name)
-
-        addAnnotation(serialNameAnnotation)
-    }
+    private fun PropertySpec.Builder.addSerialNameAnnotation(relationship: RelationshipProperty): PropertySpec.Builder =
+        addAnnotation(Specs.getSerialNameSpec(relationship.serialName ?: relationship.property.name))
 
     private fun mapPropertiesToParams(properties: List<PropertySpec>): List<ParameterSpec> {
         return properties.map {
@@ -126,25 +120,26 @@ internal object RelationshipsSpecBuilder {
     private fun fromOriginalObjectSpec(
         originalClass: ClassName,
         generatedName: String,
-        oneRelationships: List<PropertySpec>,
-        manyRelationships: List<PropertySpec>,
+        oneRelationships: List<RelationshipProperty>,
+        manyRelationships: List<RelationshipProperty>,
     ): FunSpec {
         val constructorStringBuilder = StringBuilder()
         val builderArgs = mutableListOf<Any>(generatedName)
-        oneRelationships.forEachIndexed { index, property ->
+        oneRelationships.forEachIndexed { index, relationship ->
+            val property = relationship.property
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
-                        "?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
+                        "?.toOneRelationshipModel(%S, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
                 )
             } else {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}." +
-                        "toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
+                        "toOneRelationshipModel(%S, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
                 )
             }
 
-            builderArgs.add(getTypeOfRelationship(property))
+            builderArgs.add(relationship.type)
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
@@ -152,19 +147,20 @@ internal object RelationshipsSpecBuilder {
             }
         }
 
-        manyRelationships.forEachIndexed { index, property ->
+        manyRelationships.forEachIndexed { index, relationship ->
+            val property = relationship.property
             if (property.type.isNullable) {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
-                        "?.toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })",
+                        "?.toManyRelationshipModel(%S, { (it as? JsonApiModel)?.id().orEmpty() })",
                 )
             } else {
                 constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
-                        ".toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })",
+                        ".toManyRelationshipModel(%S, { (it as? JsonApiModel)?.id().orEmpty() })",
                 )
             }
-            builderArgs.add(getTypeOfRelationship(property))
+            builderArgs.add(relationship.type)
             if (index != manyRelationships.lastIndex) {
                 constructorStringBuilder.append(", ")
             }
@@ -247,14 +243,5 @@ internal object RelationshipsSpecBuilder {
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
         return builder.initializer(returnStatement).build()
-    }
-
-    private fun getTypeOfRelationship(property: PropertySpec): String {
-        return property.annotations.first { annotation ->
-            annotation.typeName == HasOne::class.asTypeName() ||
-                annotation.typeName == HasMany::class.asTypeName()
-        }.members.first { member ->
-            member.toString().trim().startsWith("type")
-        }.toString().split("=")[1].trim()
     }
 }
