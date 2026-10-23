@@ -38,6 +38,7 @@ task detektAll(dependsOn: [
         ':core:detekt',
         ':processor:detekt',
         ':processor-common:detekt',
+        ':processor-ksp:detekt',
         ':retrofit:detekt',
         ':lint:detekt',
         ':processor-tests:compile:detekt',

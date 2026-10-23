@@ -43,19 +43,19 @@ public class JsonApiXGenerator(
                 ModelSpecGenerator(holder, metaInfo, linksInfo, customError),
                 ListSpecsGenerator(holder, metaInfo, linksInfo, customError),
                 TypeAdapterSpecsGenerator(holder, metaInfo, linksInfo, customError),
-            ).write(originatingModels = setOf(holder.className))
+            ).write(originatingModels = setOf(holder.className), aggregating = false)
         }
 
         // Generate aggregate specs, each originating from every model
         listOf(
             JsonXExtensionsSpecGenerator(holders, linksHolders, metaHolders, errorHolders),
             TypeAdapterFactorySpecGenerator(holders),
-        ).write(originatingModels = holders.mapTo(linkedSetOf()) { it.className })
+        ).write(originatingModels = holders.mapTo(linkedSetOf()) { it.className }, aggregating = true)
     }
 
-    private fun List<SpecGenerator>.write(originatingModels: Set<ClassName>) {
+    private fun List<SpecGenerator>.write(originatingModels: Set<ClassName>, aggregating: Boolean) {
         forEach { generator ->
-            generator.generate().forEach { fileSpec -> output.write(fileSpec, originatingModels) }
+            generator.generate().forEach { fileSpec -> output.write(fileSpec, originatingModels, aggregating) }
         }
     }
 }

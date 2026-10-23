@@ -1,7 +1,10 @@
 package com.infinum.jsonapix.processor.compile
 
 import com.infinum.jsonapix.processor.JsonApiProcessor
+import com.infinum.jsonapix.processor.ksp.JsonApiXSymbolProcessorProvider
 import com.tschuchort.compiletesting.KotlinCompilation
+import com.tschuchort.compiletesting.configureKsp
+import com.tschuchort.compiletesting.kspSourcesDir
 import java.io.File
 
 /**
@@ -19,6 +22,18 @@ internal enum class Backend {
 
         override fun generatedSourceDirs(compilation: KotlinCompilation): List<File> =
             listOf(compilation.kaptKotlinGeneratedDir, compilation.kaptSourceDir)
+    },
+
+    KSP {
+        override fun configure(compilation: KotlinCompilation) {
+            // configureKsp sets up KSP2 before adding providers, which fails on an unconfigured compilation.
+            compilation.configureKsp {
+                symbolProcessorProviders.add(JsonApiXSymbolProcessorProvider())
+            }
+        }
+
+        override fun generatedSourceDirs(compilation: KotlinCompilation): List<File> =
+            listOf(compilation.kspSourcesDir.resolve("kotlin"), compilation.kspSourcesDir.resolve("java"))
     },
     ;
 
