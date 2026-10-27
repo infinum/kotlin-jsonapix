@@ -93,7 +93,8 @@ ext.packages = [
                 "ksp" : "dev.zacsweers.kctfork:ksp:${versions.kctfork}"
         ],
         "ksp"      : [
-                "api": "com.google.devtools.ksp:symbol-processing-api:${versions.ksp}"
+                "api"   : "com.google.devtools.ksp:symbol-processing-api:${versions.ksp}",
+                "plugin": "com.google.devtools.ksp:symbol-processing-gradle-plugin:${versions.ksp}"
         ],
         "diff_utils": "io.github.java-diff-utils:java-diff-utils:${versions.diff_utils}"
 ]
