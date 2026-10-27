@@ -73,19 +73,19 @@ public val jsonApiXSerializerModule: SerializersModule = SerializersModule {
   }
   polymorphic(Links::class) {
     subclass(DefaultLinks::class)
-    subclass(ArticleResourceLinks::class)
-    subclass(TagLinks::class)
     subclass(ArticleRelationshipsLinks::class)
+    subclass(ArticleResourceLinks::class)
     subclass(ArticleRootLinks::class)
+    subclass(TagLinks::class)
   }
   polymorphic(Error::class) {
     subclass(DefaultError::class)
-    subclass(CommentError::class)
     subclass(ArticleError::class)
+    subclass(CommentError::class)
   }
   polymorphic(Meta::class) {
-    subclass(ArticleResourceMeta::class)
     subclass(ArticleRelationshipsMeta::class)
+    subclass(ArticleResourceMeta::class)
     subclass(ArticleRootMeta::class)
     defaultDeserializer{ UnknownMeta.serializer() }
   }

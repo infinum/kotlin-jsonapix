@@ -9,8 +9,8 @@ import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.collectors.Collector
 import com.infinum.jsonapix.processor.ksp.extensions.getArgumentValue
+import com.infinum.jsonapix.processor.ksp.extensions.holderClassName
 import com.infinum.jsonapix.processor.ksp.extensions.isOfType
-import com.infinum.jsonapix.processor.ksp.extensions.modelClassName
 import com.infinum.jsonapix.processor.models.AttributeProperty
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.models.RelationshipProperty
@@ -33,7 +33,7 @@ internal class KspJsonApiXCollector(
         val (attributes, oneRelationships, manyRelationships) = separateProperties(declaration)
 
         return JsonApiXHolder(
-            className = declaration.modelClassName(),
+            className = declaration.holderClassName(),
             type = annotation.getArgumentValue<String>(JsonApiX::type.name),
             isNullable = annotation.getArgumentValue<Boolean>(JsonApiX::isNullable.name),
             attributes = attributes,

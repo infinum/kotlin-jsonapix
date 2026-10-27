@@ -12,8 +12,18 @@ import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.generation.JsonApiXGenerator
 import com.infinum.jsonapix.processor.ksp.KspCodeOutput
 import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXCollector
+import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXErrorCollector
+import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXLinksCollector
+import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXMetaCollector
+import com.infinum.jsonapix.processor.models.JsonApiXErrorHolder
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
+import com.infinum.jsonapix.processor.models.JsonApiXLinksHolder
+import com.infinum.jsonapix.processor.models.JsonApiXMetaHolder
+import com.infinum.jsonapix.processor.validators.JsonApiXErrorValidator
+import com.infinum.jsonapix.processor.validators.JsonApiXLinksValidator
+import com.infinum.jsonapix.processor.validators.JsonApiXMetaValidator
 import com.infinum.jsonapix.processor.validators.JsonApiXValidator
+import kotlin.reflect.KClass
 
 /**
  * Generates the code for all models at once, because the aggregate files depend on every model.
@@ -28,9 +38,6 @@ internal class KspJsonApiXSubprocessor(
 
     private var generated = false
 
-    // javac reports a Kotlin object as a class, so the KAPT collector treats objects as models too.
-    val MODEL_CLASS_KINDS = setOf(ClassKind.CLASS, ClassKind.OBJECT)
-
     /** Processes one round and returns the symbols to defer to the next one. */
     fun process(resolver: Resolver): List<KSAnnotated> {
         val models = findModels(resolver)
@@ -42,28 +49,56 @@ internal class KspJsonApiXSubprocessor(
                 }
                 emptyList()
             }
-            models.any { !it.validate(enableNewFeatures = false) } -> models
             else -> {
-                generate(models)
-                emptyList()
+                val links = findAnnotatedClasses(resolver, KspJsonApiXLinksCollector.SUPPORTED)
+                val meta = findAnnotatedClasses(resolver, KspJsonApiXMetaCollector.SUPPORTED)
+                val errors = findAnnotatedClasses(resolver, KspJsonApiXErrorCollector.SUPPORTED)
+
+                if (models.any { !it.validate(enableNewFeatures = false) }) {
+                    // A later round only finds symbols in new files and deferred symbols, so the links,
+                    // meta and error classes are deferred with the models.
+                    models + links + meta + errors
+                } else {
+                    generate(models, links, meta, errors)
+                    emptyList()
+                }
             }
         }
     }
 
-    /** Finds the models the KAPT collector would collect: Kotlin classes and objects annotated with `@JsonApiX`. */
+    /**
+     * Finds the models the KAPT collector would collect: Kotlin classes and objects annotated with `@JsonApiX`.
+     * The KAPT collector reads Kotlin metadata and only accepts what javac reports as a class.
+     */
     private fun findModels(resolver: Resolver): List<KSClassDeclaration> =
-        resolver.getSymbolsWithAnnotation(JsonApiX::class.java.name)
-            .filterIsInstance<KSClassDeclaration>()
+        findAnnotatedClasses(resolver, setOf(JsonApiX::class))
             .filter { it.origin == Origin.KOTLIN && it.classKind in MODEL_CLASS_KINDS }
+
+    /**
+     * Finds the classes annotated with any of [annotations]. The KAPT links, meta and error collectors
+     * accept every annotated class, so this doesn't filter by origin or class kind.
+     */
+    private fun findAnnotatedClasses(
+        resolver: Resolver,
+        annotations: Set<KClass<out Annotation>>,
+    ): List<KSClassDeclaration> =
+        annotations.asSequence()
+            .flatMap { resolver.getSymbolsWithAnnotation(it.java.name) }
+            .filterIsInstance<KSClassDeclaration>()
+            .distinct()
             .toList()
 
-    private fun generate(models: List<KSClassDeclaration>) {
-        JsonApiXGenerator(KspCodeOutput(codeGenerator, models)).generate(
+    private fun generate(
+        models: List<KSClassDeclaration>,
+        links: List<KSClassDeclaration>,
+        meta: List<KSClassDeclaration>,
+        errors: List<KSClassDeclaration>,
+    ) {
+        JsonApiXGenerator(KspCodeOutput(codeGenerator, models, links + meta + errors)).generate(
             holders = collectJsonApiX(models),
-            // Links, meta and error annotations aren't collected under KSP yet.
-            linksHolders = emptySet(),
-            metaHolders = emptySet(),
-            errorHolders = emptySet(),
+            linksHolders = collectLinks(links),
+            metaHolders = collectMeta(meta),
+            errorHolders = collectErrors(errors),
         )
         generated = true
     }
@@ -74,7 +109,27 @@ internal class KspJsonApiXSubprocessor(
         return validator.validate(holders)
     }
 
+    private fun collectLinks(declarations: List<KSClassDeclaration>): Set<JsonApiXLinksHolder> {
+        val holders = KspJsonApiXLinksCollector(declarations).collect()
+        val validator = JsonApiXLinksValidator()
+        return validator.validate(holders)
+    }
+
+    private fun collectMeta(declarations: List<KSClassDeclaration>): Set<JsonApiXMetaHolder> {
+        val holders = KspJsonApiXMetaCollector(declarations).collect()
+        val validator = JsonApiXMetaValidator()
+        return validator.validate(holders)
+    }
+
+    private fun collectErrors(declarations: List<KSClassDeclaration>): Set<JsonApiXErrorHolder> {
+        val holders = KspJsonApiXErrorCollector(declarations).collect()
+        val validator = JsonApiXErrorValidator()
+        return validator.validate(holders)
+    }
+
     private companion object {
 
+        // javac reports a Kotlin object as a class, so the KAPT collector treats objects as models too.
+        val MODEL_CLASS_KINDS = setOf(ClassKind.CLASS, ClassKind.OBJECT)
     }
 }

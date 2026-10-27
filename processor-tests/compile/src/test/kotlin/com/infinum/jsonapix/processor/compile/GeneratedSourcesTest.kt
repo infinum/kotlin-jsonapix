@@ -2,7 +2,6 @@ package com.infinum.jsonapix.processor.compile
 
 import java.io.File
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -21,10 +20,6 @@ internal class GeneratedSourcesTest {
         backend: Backend,
         @TempDir workingDir: File,
     ) {
-        assumeFalse(backend == Backend.KSP && fixture.name in FIXTURES_PENDING_KSP) {
-            "KSP doesn't collect links, meta and error annotations yet."
-        }
-
         val generated = compile(fixture.sources(), backend, workingDir)
         assertTrue(generated.isNotEmpty()) { "$backend generated no files for fixture '$fixture'." }
 
@@ -39,9 +34,6 @@ internal class GeneratedSourcesTest {
     }
 
     companion object {
-
-        /** Fixtures with links, meta or error annotations, which the KSP backend doesn't collect yet. */
-        private val FIXTURES_PENDING_KSP = setOf("company", "empty-data", "links-meta-error", "person")
 
         @JvmStatic
         fun fixturesAndBackends(): List<Arguments> =

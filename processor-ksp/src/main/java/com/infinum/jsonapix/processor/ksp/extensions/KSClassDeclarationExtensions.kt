@@ -4,8 +4,8 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.ClassName
 
 /**
- * The class name holders use for a model. Like the KAPT collector, it is built from the package and
- * the simple name, rather than from the full nesting of the declaration.
+ * The class name holders use for a declaration. Like the KAPT collectors, it is built from the package
+ * and the simple name, rather than from the full nesting of the declaration.
  */
-internal fun KSClassDeclaration.modelClassName(): ClassName =
+internal fun KSClassDeclaration.holderClassName(): ClassName =
     ClassName(packageName.asString(), simpleName.asString())

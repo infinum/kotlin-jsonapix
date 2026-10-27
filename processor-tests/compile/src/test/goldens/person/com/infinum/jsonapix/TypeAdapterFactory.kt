@@ -11,10 +11,10 @@ import kotlin.reflect.KClass
 
 public class TypeAdapterFactory : AdapterFactory {
   override fun getAdapter(type: KClass<out Any>): TypeAdapter<out Any>? = when(type.qualifiedName) {
-    "com.infinum.jsonapix.data.models.PersonModel" -> TypeAdapter_Person()
     "com.infinum.jsonapix.data.models.DogModel" -> TypeAdapter_Dog()
-    "com.infinum.jsonapix.data.models.PersonList" -> TypeAdapterList_Person()
+    "com.infinum.jsonapix.data.models.PersonModel" -> TypeAdapter_Person()
     "com.infinum.jsonapix.data.models.DogList" -> TypeAdapterList_Dog()
+    "com.infinum.jsonapix.data.models.PersonList" -> TypeAdapterList_Person()
     else -> null
   }
 }

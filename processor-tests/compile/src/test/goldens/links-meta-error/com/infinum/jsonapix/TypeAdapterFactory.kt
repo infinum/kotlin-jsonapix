@@ -13,12 +13,12 @@ import kotlin.reflect.KClass
 
 public class TypeAdapterFactory : AdapterFactory {
   override fun getAdapter(type: KClass<out Any>): TypeAdapter<out Any>? = when(type.qualifiedName) {
-    "com.infinum.jsonapix.data.models.TagModel" -> TypeAdapter_Tag()
     "com.infinum.jsonapix.data.models.ArticleModel" -> TypeAdapter_Article()
     "com.infinum.jsonapix.data.models.CommentModel" -> TypeAdapter_Comment()
-    "com.infinum.jsonapix.data.models.TagList" -> TypeAdapterList_Tag()
+    "com.infinum.jsonapix.data.models.TagModel" -> TypeAdapter_Tag()
     "com.infinum.jsonapix.data.models.ArticleList" -> TypeAdapterList_Article()
     "com.infinum.jsonapix.data.models.CommentList" -> TypeAdapterList_Comment()
+    "com.infinum.jsonapix.data.models.TagList" -> TypeAdapterList_Tag()
     else -> null
   }
 }
