@@ -29,11 +29,19 @@ public class JsonApiXGenerator(
         metaHolders: Set<JsonApiXMetaHolder>,
         errorHolders: Set<JsonApiXErrorHolder>,
     ) {
+        // Backends find annotated classes in the order of the file system's directory listings, which
+        // differs between machines and between backends. Sorted by class name, the generated files are
+        // the same everywhere. The sort is stable, so a class's repeated annotations keep their order.
+        val sortedHolders = holders.sortedBy { it.className }.toSet()
+        val sortedLinksHolders = linksHolders.sortedBy { it.className }.toSet()
+        val sortedMetaHolders = metaHolders.sortedBy { it.className }.toSet()
+        val sortedErrorHolders = errorHolders.sortedBy { it.className }.toSet()
+
         // Generate per-holder specs, each originating from its own model
-        holders.forEach { holder ->
-            val metaInfo = metaHolders.toMetaInfo(holder.type)
-            val linksInfo = linksHolders.toLinksInfo(holder.type)
-            val customError = errorHolders.toCustomError(holder.type)
+        sortedHolders.forEach { holder ->
+            val metaInfo = sortedMetaHolders.toMetaInfo(holder.type)
+            val linksInfo = sortedLinksHolders.toLinksInfo(holder.type)
+            val customError = sortedErrorHolders.toCustomError(holder.type)
 
             listOf(
                 AttributesSpecGenerator(holder),
@@ -48,9 +56,9 @@ public class JsonApiXGenerator(
 
         // Generate aggregate specs, each originating from every model
         listOf(
-            JsonXExtensionsSpecGenerator(holders, linksHolders, metaHolders, errorHolders),
-            TypeAdapterFactorySpecGenerator(holders),
-        ).write(originatingModels = holders.mapTo(linkedSetOf()) { it.className }, aggregating = true)
+            JsonXExtensionsSpecGenerator(sortedHolders, sortedLinksHolders, sortedMetaHolders, sortedErrorHolders),
+            TypeAdapterFactorySpecGenerator(sortedHolders),
+        ).write(originatingModels = sortedHolders.mapTo(linkedSetOf()) { it.className }, aggregating = true)
     }
 
     private fun List<SpecGenerator>.write(originatingModels: Set<ClassName>, aggregating: Boolean) {
