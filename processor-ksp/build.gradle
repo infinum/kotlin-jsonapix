@@ -1,0 +1,52 @@
+plugins {
+    id "java-library"
+    id "kotlin"
+}
+
+apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/dokka.gradle"
+apply from: "$rootDir/maven-publish.gradle"
+
+ext.mavenPublishProperties = [
+        group      : releaseConfig.group,
+        version    : releaseConfig.version,
+        artifactId   : "processor-ksp",
+        repository : [
+                url     : sonatype.url,
+                username: sonatype.username,
+                password: sonatype.password
+        ],
+        name       : "JsonApiX KSP Processor",
+        description: "JsonApiX KSP processor module",
+        url        : "https://github.com/infinum/android-jsonapix",
+        scm        : [
+                connection: "https://github.com/infinum/android-jsonapix.git",
+                url       : "https://github.com/infinum/android-jsonapix"
+        ]
+]
+
+dependencies {
+    implementation packages.kotlin.core
+    implementation packages.kotlin.poet
+    implementation packages.kotlin.poet_ksp
+    implementation packages.kotlin.serialization_core
+    implementation project(":annotations")
+    // Must be implementation rather than compileOnly, so that processor-common and its runtime
+    // dependencies end up on consumers' ksp classpath. See the note in processor-common's build file.
+    implementation project(":processor-common")
+    // KSP provides its API at runtime, in the version the consumer applies.
+    compileOnly packages.ksp.api
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs += [
+                '-Xexplicit-api=strict'
+        ]
+    }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}

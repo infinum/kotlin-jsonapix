@@ -27,7 +27,9 @@ def fixtureSourceSets = fixturesDir.listFiles({ it.isDirectory() } as FileFilter
 
 dependencies {
     testImplementation project(":processor")
+    testImplementation project(":processor-ksp")
     testImplementation packages.kctfork.core
+    testImplementation packages.kctfork.ksp
     testImplementation packages.kotlin.serialization_compiler_plugin
     testImplementation packages.diff_utils
     testImplementation packages.junit.api
@@ -67,8 +69,8 @@ test {
         exceptionFormat = "full"
     }
 
-    // The compiler and KAPT run in-process, so they need more memory than the default
-    // and access to javac internals.
+    // The compiler, KAPT and KSP run in-process, so they need more memory than the default,
+    // and KAPT needs access to javac internals.
     maxHeapSize = "2g"
     jvmArgs(
             "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
