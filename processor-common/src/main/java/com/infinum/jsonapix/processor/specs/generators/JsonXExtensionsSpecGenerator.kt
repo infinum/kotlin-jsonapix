@@ -67,7 +67,7 @@ internal class JsonXExtensionsSpecGenerator(
             JsonApiConstants.Prefix.RESOURCE_OBJECT.withName(className.simpleName),
         )
 
-        val attributesClassName = if (holder.primitiveProperties.isNotEmpty()) {
+        val attributesClassName = if (holder.attributes.isNotEmpty()) {
             ClassName(
                 generatedPackage,
                 JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName),
@@ -86,6 +86,9 @@ internal class JsonXExtensionsSpecGenerator(
                 null
             }
 
+        val oneRelationships = holder.oneRelationships.map { it.property }
+        val manyRelationships = holder.manyRelationships.map { it.property }
+
         return ClassInfo(
             type = holder.type,
             metaInfo = metaInfo,
@@ -96,8 +99,8 @@ internal class JsonXExtensionsSpecGenerator(
             resourceObjectClassName = resourceObjectClassName,
             attributesWrapperClassName = attributesClassName,
             relationshipsObjectClassName = relationshipsClassName,
-            includedStatement = IncludedSpecBuilder.build(holder.oneRelationships, holder.manyRelationships),
-            includedListStatement = IncludedSpecBuilder.buildForList(holder.oneRelationships, holder.manyRelationships),
+            includedStatement = IncludedSpecBuilder.build(oneRelationships, manyRelationships),
+            includedListStatement = IncludedSpecBuilder.buildForList(oneRelationships, manyRelationships),
         )
     }
 }

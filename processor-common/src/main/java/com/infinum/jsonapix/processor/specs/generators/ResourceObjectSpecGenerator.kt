@@ -19,9 +19,9 @@ internal class ResourceObjectSpecGenerator(
             metaClassName = metaInfo?.resourceObjectClassName,
             linksInfo = linksInfo,
             type = holder.type,
-            attributes = holder.primitiveProperties,
-            oneRelationships = mapOf(*holder.oneRelationships.map { it.name to it.type }.toTypedArray()),
-            manyRelationships = mapOf(*holder.manyRelationships.map { it.name to it.type }.toTypedArray()),
+            attributes = holder.attributes.map { it.property },
+            oneRelationships = mapOf(*holder.oneRelationships.map { it.property.name to it.property.type }.toTypedArray()),
+            manyRelationships = mapOf(*holder.manyRelationships.map { it.property.name to it.property.type }.toTypedArray()),
         )
 
         return listOf(fileSpec)

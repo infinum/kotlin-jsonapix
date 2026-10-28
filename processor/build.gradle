@@ -30,6 +30,7 @@ dependencies {
     implementation packages.kotlin.core
     implementation packages.kotlin.poet
     implementation packages.kotlin.poet_metadata
+    implementation packages.kotlin.serialization_core
     implementation project(":annotations")
     // Must be implementation rather than compileOnly, so that processor-common and its runtime
     // dependencies end up on consumers' kapt classpath. See the note in processor-common's build file.

@@ -3,7 +3,7 @@ package com.infinum.jsonapix.processor.specs.specbuilders
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Attributes
-import com.infinum.jsonapix.processor.extensions.missingTypeName
+import com.infinum.jsonapix.processor.models.AttributeProperty
 import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
@@ -12,28 +12,26 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 internal object AttributesSpecBuilder {
 
     private val serializableClassName = Serializable::class.asClassName()
-    private val serialNameTypeName = SerialName::class.asTypeName()
 
     fun build(
         className: ClassName,
-        attributes: List<PropertySpec>,
+        attributes: List<AttributeProperty>,
         type: String,
     ): TypeSpec {
         val generatedName = JsonApiConstants.Prefix.ATTRIBUTES.withName(className.simpleName)
-        val parameterSpecs = attributes.map {
-            ParameterSpec.builder(it.name, it.type)
+        val properties = attributes.map { it.property }
+
+        val parameterSpecs = attributes.map { attribute ->
+            val property = attribute.property
+            ParameterSpec.builder(property.name, property.type)
+                .addAnnotation(Specs.getSerialNameSpec(attribute.serialName ?: property.name))
                 .apply {
-                    if (it.annotations.missingTypeName(serialNameTypeName)) {
-                        addAnnotation(Specs.getSerialNameSpec(it.name))
-                    }
-                    if (it.type.isNullable) {
+                    if (property.type.isNullable) {
                         defaultValue("%L", null)
                     }
                 }
@@ -54,10 +52,10 @@ internal object AttributesSpecBuilder {
             )
             .addType(
                 TypeSpec.companionObjectBuilder()
-                    .addFunction(fromOriginalObjectSpec(className, generatedName, attributes))
+                    .addFunction(fromOriginalObjectSpec(className, generatedName, properties))
                     .build(),
             )
-            .addProperties(attributes)
+            .addProperties(properties)
             .build()
     }
 
