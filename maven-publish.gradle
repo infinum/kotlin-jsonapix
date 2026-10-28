@@ -76,6 +76,9 @@ afterEvaluate {
                     }
                 }
                 signing {
+                    // Releases to Sonatype must be signed. Publishing to the local Maven repository
+                    // works without a signing key, so CI can build the sample against it.
+                    required { gradle.taskGraph.hasTask("${project.path}:publishReleasePublicationToSonatypeMavenCentralRepository") }
                     sign publishing.publications.release
                 }
             }

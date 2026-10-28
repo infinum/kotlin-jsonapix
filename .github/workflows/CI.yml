@@ -73,3 +73,27 @@ jobs:
         run: ./gradlew clean test
       - name: Stop Gradle
         run: ./gradlew --stop
+
+  smoke-test:
+    name: Local deploy
+    needs: [ validation ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Save Gradle Caches
+        uses: actions/cache@v6
+        with:
+          path: ~/.gradle/caches/
+          key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-caches-${{ runner.os }}-
+      # Separate invocations, so the sample resolves JsonApiX only after it has been published.
+      - name: Publish to Maven Local
+        run: ./gradlew publishToMavenLocal
+      - name: Build sample with KAPT
+        run: ./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=kapt
+      - name: Build sample with KSP
+        run: ./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=ksp
+      - name: Stop Gradle
+        run: ./gradlew --stop
