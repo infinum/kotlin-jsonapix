@@ -5,6 +5,22 @@ plugins {
     id "dagger.hilt.android.plugin"
 }
 
+// The published-artifact smoke test builds the sample from locally published JsonApiX artifacts,
+// once per backend. By default the sample uses the project modules with KAPT.
+def jsonApiXSource = providers.gradleProperty("jsonApiXSource").getOrElse("project")
+def jsonApiXBackend = providers.gradleProperty("jsonApiXBackend").getOrElse("kapt")
+if (!(jsonApiXSource in ["project", "maven"])) {
+    throw new GradleException("jsonApiXSource must be 'project' or 'maven', not '$jsonApiXSource'")
+}
+if (!(jsonApiXBackend in ["kapt", "ksp"])) {
+    throw new GradleException("jsonApiXBackend must be 'kapt' or 'ksp', not '$jsonApiXBackend'")
+}
+
+// Only JsonApiX switches backends. Hilt stays on KAPT either way.
+if (jsonApiXBackend == "ksp") {
+    apply plugin: "com.google.devtools.ksp"
+}
+
 apply from: "$rootDir/detekt.gradle"
 
 android {
@@ -43,18 +59,32 @@ kotlin {
     }
 }
 
-dependencies {
-    // Comment this out for testing local deploy
-    implementation project(":core")
-    kapt project(":processor")
-    implementation project(":retrofit")
-    lintChecks project(path: ':lint')
+if (jsonApiXSource == "maven") {
+    // JsonApiX resolves only from the local Maven repository, so a version that wasn't published
+    // there fails resolution instead of falling back to a released one from Maven Central.
+    repositories {
+        exclusiveContent {
+            forRepository { mavenLocal() }
+            filter { includeGroup releaseConfig.group }
+        }
+    }
+}
 
-    // Uncomment this for testing local deploy
-//    implementation packages.jsonapix.core
-//    kapt packages.jsonapix.processor
-//    implementation packages.jsonapix.retrofit
-//    lintChecks packages.jsonapix.lint
+// A JsonApiX project module, or in Maven mode its published artifact at the version being built
+// rather than the released version in the dependency catalog.
+def jsonApiX = { String module ->
+    jsonApiXSource == "maven" ? "${releaseConfig.group}:$module:${releaseConfig.version}" : project(":$module")
+}
+
+dependencies {
+    implementation jsonApiX("core")
+    implementation jsonApiX("retrofit")
+    lintChecks jsonApiX("lint")
+    if (jsonApiXBackend == "ksp") {
+        ksp jsonApiX("processor-ksp")
+    } else {
+        kapt jsonApiX("processor")
+    }
 
     implementation packages.retromock.core
     implementation packages.retrofit.core

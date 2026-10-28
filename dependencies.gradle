@@ -79,6 +79,7 @@ ext.packages = [
         "jsonapix" : [
                 "core"     : "com.infinum.jsonapix:core:${versions.jsonapix}",
                 "processor": "com.infinum.jsonapix:processor:${versions.jsonapix}",
+                "processor_ksp": "com.infinum.jsonapix:processor-ksp:${versions.jsonapix}",
                 "retrofit" : "com.infinum.jsonapix:retrofit:${versions.jsonapix}",
                 "lint"     : "com.infinum.jsonapix:lint:${versions.jsonapix}",
         ],
