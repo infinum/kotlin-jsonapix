@@ -45,6 +45,38 @@ When submitting a pull request, please ensure that:
 Try to avoid creating large pull requests that include multiple unrelated changes. Instead, break them down into
 smaller, more focused pull requests. This will make it easier for us to review and merge your changes.
 
+## Building the sample against published artifacts
+
+The sample app can be built against the JsonApiX artifacts as consumers download them, instead of against the project
+modules. Two Gradle properties choose where the sample gets JsonApiX from:
+
+- `jsonApiXSource`: `project` (the default) uses the project modules. `maven` uses the artifacts in your local Maven
+  repository, at the version in `releaseConfig` in `config.gradle`. In this mode JsonApiX never resolves from Maven
+  Central, so an artifact that wasn't published locally at that version fails the build instead of a released one being
+  used.
+- `jsonApiXBackend`: `kapt` (the default) runs `processor` on KAPT. `ksp` runs `processor-ksp` on KSP.
+
+Publish all library modules to your local Maven repository first, in a separate Gradle run, then build the sample once
+per backend:
+
+```bash
+./gradlew publishToMavenLocal
+./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=kapt
+./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=ksp
+```
+
+Publishing to the local Maven repository doesn't need a signing key. Only publishing to Maven Central does.
+
+CI runs these steps as the smoke test job on every pull request and every push to `master`.
+
+## Releasing
+
+All artifacts are released together, at the version in `releaseConfig` in `config.gradle`.
+
+Before publishing a release, set the new version and build the sample against the locally published artifacts with both
+backends, as described in [Building the sample against published artifacts](#building-the-sample-against-published-artifacts).
+Publish only if both builds succeed.
+
 ## Code of conduct
 
 We want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow
