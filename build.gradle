@@ -38,7 +38,9 @@ task detektAll(dependsOn: [
         ':core:detekt',
         ':processor:detekt',
         ':retrofit:detekt',
-        ':lint:detekt'
+        ':lint:detekt',
+        ':processor-tests:compile:detekt',
+        ':processor-tests:kapt:detekt'
 ]) {
     group = "Verification"
     description = "Run detekt on all modules"

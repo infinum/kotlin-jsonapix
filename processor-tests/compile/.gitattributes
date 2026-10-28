@@ -1,0 +1,2 @@
+# Golden files are compared as exact text, so keep them byte-identical on every OS.
+src/test/goldens/** text eol=lf
