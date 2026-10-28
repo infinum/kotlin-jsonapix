@@ -14,6 +14,7 @@
 
 * [Requirements](#requirements)
 * [Getting started](#getting-started)
+  * [KSP setup](#ksp-setup)
 * [Usage](#usage)
 * [JsonApiModel - Handling `links` and `meta` JSON API fields](#jsonapimodel---handling-links-and-meta-json-api-fields)
 * [Retrofit Support](#retrofit-support)
@@ -24,8 +25,25 @@
 
 ## Requirements
 
-The library uses KAPT for annotation processing.
-The setup is different on a Kotlin or Java project.
+The library generates its code with an annotation processor, which runs on either KAPT or KSP.
+Each has its own processor artifact, and each artifact goes on its own Gradle configuration:
+
+| Processor | Gradle configuration | Artifact                             |
+|-----------|----------------------|--------------------------------------|
+| KAPT      | `kapt`               | `com.infinum.jsonapix:processor`     |
+| KSP       | `ksp`                | `com.infinum.jsonapix:processor-ksp` |
+
+An artifact on the other configuration generates nothing, so code that uses the generated classes doesn't compile.
+All other artifacts are the same for both processors.
+
+Both processors generate the same code, so you can move a module from one to the other by changing only its Gradle setup.
+
+KSP support requires KSP2, version 2.3.10 or newer on Kotlin 2.4, and is tested with 2.3.12.
+
+> [!WARNING]
+> Apply only one of the two processors in a module. Applying both generates every class twice, and the build fails with duplicate declarations.
+
+With KAPT, the setup is different on a Kotlin or Java project.
 
 ## Getting started
 
@@ -73,6 +91,35 @@ implementation("com.infinum.jsonapix:lint:<latest-version>")
 
 
 ```
+
+### KSP setup
+
+Include `mavenCentral()` and the serialization plugin as shown above. Then enable the `ksp` plugin instead of `kapt`,
+and put `processor-ksp` on the `ksp` configuration:
+
+```groovy
+plugins {
+    id "kotlinx-serialization"
+    id "com.google.devtools.ksp" version "2.3.12"
+}
+```
+
+```groovy
+implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+
+// Json API X
+implementation("com.infinum.jsonapix:core:<latest-version>")
+ksp("com.infinum.jsonapix:processor-ksp:<latest-version>")
+```
+
+The optional lint checker is added the same way as with KAPT.
+
+The `ksp` plugin works with the built-in Kotlin support in AGP 9. Other annotation processors, such as Hilt, can keep
+running on KAPT in the same module.
+
+To move a module from KAPT to KSP, apply the `ksp` plugin and replace the `kapt` line for `processor` with the `ksp`
+line for `processor-ksp`. Your code doesn't change: the generated classes, their packages and their API stay the same.
+If JsonApiX was the last processor on KAPT in that module, you can remove the KAPT plugin too.
 
 ## Usage
 
