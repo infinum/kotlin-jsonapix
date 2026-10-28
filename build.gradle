@@ -37,6 +37,7 @@ task detektAll(dependsOn: [
         ':annotations:detekt',
         ':core:detekt',
         ':processor:detekt',
+        ':processor-common:detekt',
         ':retrofit:detekt',
         ':lint:detekt',
         ':processor-tests:compile:detekt',

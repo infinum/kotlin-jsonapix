@@ -22,6 +22,14 @@ task deployProcessor(dependsOn: [
     description = "Deploy module to repositories"
 }
 
+task deployProcessorCommon(dependsOn: [
+        ':processor-common:clean',
+        ':processor-common:publishReleasePublicationToSonatypeMavenCentralRepository'
+]) {
+    group = "Deploy"
+    description = "Deploy module to repositories"
+}
+
 task deployRetrofit(dependsOn: [
         ':retrofit:clean',
         ':retrofit:publishReleasePublicationToSonatypeMavenCentralRepository'
@@ -34,6 +42,7 @@ task deployAll(dependsOn: [
         'deployAnnotations',
         'deployCore',
         'deployProcessor',
+        'deployProcessorCommon',
         'deployRetrofit',
 ]) {
     group = "Deploy"
@@ -44,10 +53,12 @@ task deployDebug(dependsOn: [
         ':annotations:clean',
         ':core:clean',
         ':processor:clean',
+        ':processor-common:clean',
         ':retrofit:clean',
         ':annotations:publishToMavenLocal',
         ':core:publishToMavenLocal',
         ':processor:publishToMavenLocal',
+        ':processor-common:publishToMavenLocal',
         ':retrofit:publishToMavenLocal',
 ]) {
     group = "Deploy"
