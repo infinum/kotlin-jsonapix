@@ -43,9 +43,9 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        // According to JSON:API spec, errors and data should not coexist
-        // The adapter should handle error responses by failing
-        assertFailsWith<Exception> {
+        // With no data to read the type from, decoding throws today. Ticket 05 flips this to a
+        // SerializationException, see DocumentsWithoutDataIntegrationTest.
+        assertFailsWith<NoSuchElementException> {
             adapter!!.convertFromString(input = json)
         }
     }
@@ -61,8 +61,9 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        // Parsing null data should fail as it doesn't conform to expected structure
-        assertFailsWith<Exception> {
+        // With no data to read the type from, decoding throws today. Ticket 05 flips this to a
+        // SerializationException, see DocumentsWithoutDataIntegrationTest.
+        assertFailsWith<NoSuchElementException> {
             adapter!!.convertFromString(input = json)
         }
     }
