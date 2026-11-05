@@ -4,15 +4,9 @@ import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
-import com.infinum.jsonapix.data.models.PersonalError
-import com.infinum.jsonapix.retrofit.JsonXHttpException
-import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import kotlinx.serialization.SerializationException
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -464,21 +458,6 @@ internal class ErrorHandlingIntegrationTest {
     }
 
     @Test
-    fun `given JsonXHttpException when created with errors should store them correctly`() {
-        val errors = listOf(
-            PersonalError(desc = "Error 1"),
-            PersonalError(desc = "Error 2"),
-        )
-        val exception = JsonXHttpException<PersonalError>(response = null, errors = errors)
-
-        assertNotNull(exception.errors)
-        assertEquals(2, exception.errors?.size)
-        assertEquals("Error 1", exception.errors?.get(0)?.desc)
-        assertEquals("Error 2", exception.errors?.get(1)?.desc)
-        assertNull(exception.response)
-    }
-
-    @Test
     fun `given a response with array instead of object when parsing should throw exception`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
@@ -498,19 +477,6 @@ internal class ErrorHandlingIntegrationTest {
 
         assertThrows<Exception> {
             adapter!!.convertFromString(json)
-        }
-    }
-
-    @Test
-    fun `given a converter when receiving invalid ResponseBody should handle gracefully`() {
-        val adapter = factory.getAdapter<PersonModel>()
-        assertNotNull(adapter)
-
-        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val responseBody = "invalid json {{{{".toResponseBody("application/json".toMediaTypeOrNull())
-
-        assertThrows<Exception> {
-            converter.convert(value = responseBody)
         }
     }
 }

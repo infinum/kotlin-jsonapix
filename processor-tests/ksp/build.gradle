@@ -9,6 +9,8 @@ apply from: "$rootDir/detekt.gradle"
 
 // The behavior suite lives in a shared directory so that every backend module compiles the same
 // files. Its models are main sources, which this module runs through KSP like a consumer would.
+// Its tests have a shared part in test, and a JVM-only part in jvmTest for everything that needs
+// Retrofit.
 def behaviorDir = file("../behavior/src")
 
 sourceSets {
@@ -16,13 +18,13 @@ sourceSets {
         kotlin.srcDirs = ["$behaviorDir/main/kotlin"]
     }
     test {
-        kotlin.srcDirs = ["$behaviorDir/test/kotlin"]
+        kotlin.srcDirs = ["$behaviorDir/test/kotlin", "$behaviorDir/jvmTest/kotlin"]
         resources.srcDirs = ["$behaviorDir/test/resources"]
     }
 }
 
 detekt {
-    source.setFrom(files("$behaviorDir/main/kotlin", "$behaviorDir/test/kotlin"))
+    source.setFrom(files("$behaviorDir/main/kotlin", "$behaviorDir/test/kotlin", "$behaviorDir/jvmTest/kotlin"))
 }
 
 dependencies {

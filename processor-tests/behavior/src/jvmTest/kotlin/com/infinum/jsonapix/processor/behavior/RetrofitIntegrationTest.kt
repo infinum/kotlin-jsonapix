@@ -7,7 +7,9 @@ import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
+import com.infinum.jsonapix.data.models.PersonalError
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
+import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
@@ -15,9 +17,11 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import retrofit2.Retrofit
 
 /**
@@ -445,6 +449,34 @@ internal class RetrofitIntegrationTest {
         assertEquals(100, result?.data?.size, "Should have 100 persons")
         assertEquals("Person1", result?.data?.get(0)?.data?.name)
         assertEquals("Person100", result?.data?.get(99)?.data?.name)
+    }
+
+    @Test
+    fun `given JsonXHttpException when created with errors should store them correctly`() {
+        val errors = listOf(
+            PersonalError(desc = "Error 1"),
+            PersonalError(desc = "Error 2"),
+        )
+        val exception = JsonXHttpException<PersonalError>(response = null, errors = errors)
+
+        assertNotNull(exception.errors)
+        assertEquals(2, exception.errors?.size)
+        assertEquals("Error 1", exception.errors?.get(0)?.desc)
+        assertEquals("Error 2", exception.errors?.get(1)?.desc)
+        assertNull(exception.response)
+    }
+
+    @Test
+    fun `given a converter when receiving invalid ResponseBody should handle gracefully`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
+        val responseBody = "invalid json {{{{".toResponseBody("application/json".toMediaTypeOrNull())
+
+        assertThrows<Exception> {
+            converter.convert(value = responseBody)
+        }
     }
 
     private fun getFileAsString(filename: String): String {
