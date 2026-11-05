@@ -3,6 +3,18 @@
 
 package com.infinum.jsonapix
 
+import com.infinum.jsonapix.`data`.models.Article
+import com.infinum.jsonapix.`data`.models.ArticleItem
+import com.infinum.jsonapix.`data`.models.ArticleList
+import com.infinum.jsonapix.`data`.models.ArticleModel
+import com.infinum.jsonapix.`data`.models.Comment
+import com.infinum.jsonapix.`data`.models.CommentItem
+import com.infinum.jsonapix.`data`.models.CommentList
+import com.infinum.jsonapix.`data`.models.CommentModel
+import com.infinum.jsonapix.`data`.models.Tag
+import com.infinum.jsonapix.`data`.models.TagItem
+import com.infinum.jsonapix.`data`.models.TagList
+import com.infinum.jsonapix.`data`.models.TagModel
 import com.infinum.jsonapix.core.JsonApiModel
 import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
@@ -10,7 +22,6 @@ import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.discriminators.TypeExtractor.findType
-import com.infinum.jsonapix.core.discriminators.TypeExtractor.guessType
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Errors
 import com.infinum.jsonapix.core.resources.ManyRelationshipMember
@@ -20,11 +31,14 @@ import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import java.lang.IllegalArgumentException
 import kotlin.Function1
+import kotlin.PublishedApi
 import kotlin.String
 import kotlin.collections.Collection
 import kotlin.collections.List
+import kotlin.collections.Map
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
+import kotlin.reflect.KClass
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -59,7 +73,7 @@ public inline fun <reified Data, reified Model> String.decodeJsonApiXString(
   errors: String,
 ): JsonApiX<Data, Model> {
   val type = TypeExtractor.findType(Json.parseToJsonElement(this).jsonObject["data"])
-  val discriminator = JsonApiDiscriminator(type ?: TypeExtractor.guessType(Model::class), rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
+  val discriminator = JsonApiDiscriminator(type ?: jsonApiXTypeOf(Model::class), rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonElement = Json.parseToJsonElement(this)
   val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()
   return format.decodeFromString<JsonApiX<Data,Model>>(jsonStringWithDiscriminator)
@@ -75,9 +89,27 @@ public inline fun <reified Data, reified Model> String.decodeJsonApiXListString(
   errors: String,
 ): JsonApiXList<Data, Model> {
   val de = Json.parseToJsonElement(this).jsonObject["data"]
-  val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) TypeExtractor.guessType(Data::class) else TypeExtractor.findType(de)
-  val discriminator = JsonApiListDiscriminator(type ?: TypeExtractor.guessType(Model::class), rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
+  val type = if((de as? kotlinx.serialization.json.JsonArray)?.size == 0) jsonApiXTypeOf(Data::class) else TypeExtractor.findType(de)
+  val discriminator = JsonApiListDiscriminator(type ?: jsonApiXTypeOf(Model::class), rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonElement = Json.parseToJsonElement(this)
   val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()
   return format.decodeFromString<JsonApiXList<Data,Model>>(jsonStringWithDiscriminator)
 }
+
+private val jsonApiXTypes: Map<KClass<*>, String> = mapOf(
+  Article::class to "article",
+  ArticleModel::class to "article",
+  ArticleList::class to "article",
+  ArticleItem::class to "article",
+  Comment::class to "comment",
+  CommentModel::class to "comment",
+  CommentList::class to "comment",
+  CommentItem::class to "comment",
+  Tag::class to "tag",
+  TagModel::class to "tag",
+  TagList::class to "tag",
+  TagItem::class to "tag",
+)
+
+@PublishedApi
+internal fun jsonApiXTypeOf(kClass: KClass<*>): String = jsonApiXTypes[kClass] ?: throw IllegalArgumentException("${kClass.simpleName} has no JSON:API type. Only @JsonApiX classes and their generated Model, List and Item classes have one.")
