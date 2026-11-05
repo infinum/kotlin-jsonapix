@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Errors
+import com.infinum.jsonapix.processor.specs.ClassNames
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
@@ -115,7 +116,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
                 JsonApiConstants.Members.GENERIC_TYPE_VARIABLE,
                 JsonApiConstants.Members.ERROR_BODY,
             )
-            .nextControlFlow("catch (e: %T)", IllegalArgumentException::class.asClassName())
+            .nextControlFlow("catch (e: %T)", ClassNames.illegalArgumentException)
             .addStatement("emptyList()")
             .endControlFlow()
             .build()

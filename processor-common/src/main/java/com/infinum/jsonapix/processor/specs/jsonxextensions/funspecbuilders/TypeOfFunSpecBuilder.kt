@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.processor.specs.ClassNames
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -28,7 +29,7 @@ internal object TypeOfFunSpecBuilder {
                 "return %N[%N] ?: throw %T(\"\${%N.simpleName} $MISSING_TYPE_MESSAGE\")",
                 JsonApiConstants.Members.JSONX_TYPES,
                 CLASS_PARAMETER,
-                IllegalArgumentException::class.asClassName(),
+                ClassNames.illegalArgumentException,
                 CLASS_PARAMETER,
             )
             .build()

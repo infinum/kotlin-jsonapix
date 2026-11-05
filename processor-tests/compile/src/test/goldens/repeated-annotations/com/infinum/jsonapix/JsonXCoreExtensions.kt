@@ -25,8 +25,8 @@ import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.core.resources.ResourceObject
 import com.infinum.jsonapix.retrofit.JsonXHttpException
-import java.lang.IllegalArgumentException
 import kotlin.Function1
+import kotlin.IllegalArgumentException
 import kotlin.PublishedApi
 import kotlin.String
 import kotlin.collections.Collection

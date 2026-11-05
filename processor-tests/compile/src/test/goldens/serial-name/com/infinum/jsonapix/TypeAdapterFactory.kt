@@ -1,5 +1,9 @@
 package com.infinum.jsonapix
 
+import com.infinum.jsonapix.`data`.models.OwnerList
+import com.infinum.jsonapix.`data`.models.OwnerModel
+import com.infinum.jsonapix.`data`.models.PetList
+import com.infinum.jsonapix.`data`.models.PetModel
 import com.infinum.jsonapix.`data`.models.TypeAdapterList_Owner
 import com.infinum.jsonapix.`data`.models.TypeAdapterList_Pet
 import com.infinum.jsonapix.`data`.models.TypeAdapter_Owner
@@ -10,11 +14,11 @@ import kotlin.Any
 import kotlin.reflect.KClass
 
 public class TypeAdapterFactory : AdapterFactory {
-  override fun getAdapter(type: KClass<out Any>): TypeAdapter<out Any>? = when(type.qualifiedName) {
-    "com.infinum.jsonapix.data.models.OwnerModel" -> TypeAdapter_Owner()
-    "com.infinum.jsonapix.data.models.PetModel" -> TypeAdapter_Pet()
-    "com.infinum.jsonapix.data.models.OwnerList" -> TypeAdapterList_Owner()
-    "com.infinum.jsonapix.data.models.PetList" -> TypeAdapterList_Pet()
+  override fun getAdapter(type: KClass<out Any>): TypeAdapter<out Any>? = when(type) {
+    OwnerModel::class -> TypeAdapter_Owner()
+    PetModel::class -> TypeAdapter_Pet()
+    OwnerList::class -> TypeAdapterList_Owner()
+    PetList::class -> TypeAdapterList_Pet()
     else -> null
   }
 }
