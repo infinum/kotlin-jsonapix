@@ -17,9 +17,9 @@ internal object DeserializeFunSpecMemberProvider {
         JsonApiConstants.Packages.TYPE_EXTRACTOR,
         JsonApiConstants.Members.FIND_TYPE,
     )
-    val guessTypeMember = MemberName(
-        JsonApiConstants.Packages.TYPE_EXTRACTOR,
-        JsonApiConstants.Members.GUESS_TYPE,
+    val typeOfMember = MemberName(
+        JsonApiConstants.Packages.JSONX,
+        JsonApiConstants.Members.JSONX_TYPE_OF,
     )
     val jsonObjectMember = MemberName(
         JsonApiConstants.Packages.KOTLINX_SERIALIZATION_JSON,

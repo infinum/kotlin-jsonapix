@@ -59,11 +59,13 @@ internal object JsonApiXSpecBuilder : BaseJsonApiXSpecBuilder() {
             customError = customError,
         ).toMutableList()
 
+        // A nullable model's document may leave out data, which then decodes like "data": null.
         params.add(
             ParameterSpec.builder(
                 JsonApiConstants.Keys.DATA,
                 resourceObjectClassName.copy(nullable = isNullable),
-            ).build(),
+            ).apply { if (isNullable) defaultValue("%L", "null") }
+                .build(),
         )
 
         properties.add(dataProperty(resourceObjectClassName))

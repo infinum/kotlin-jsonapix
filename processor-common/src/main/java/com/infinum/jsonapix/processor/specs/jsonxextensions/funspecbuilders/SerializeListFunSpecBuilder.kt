@@ -4,7 +4,6 @@ import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
-import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.encodeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.formatMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.SerializeFunSpecMemberProvider.jsonApiListWrapperMember
@@ -13,12 +12,11 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.PolymorphicSerializer
 
 internal object SerializeListFunSpecBuilder {
 
-    fun build(originalClass: ClassName): FunSpec {
+    fun build(originalClass: ClassName, type: String): FunSpec {
         val modelClass = ClassName.bestGuess(
             originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
         )
@@ -50,11 +48,7 @@ internal object SerializeListFunSpecBuilder {
                     .build(),
             )
             .addStatement("val jsonX = this.%M()", jsonApiListWrapperMember)
-            .addStatement(
-                "val type = jsonX.data.firstOrNull()?.type ?: %T.guessType(%T::class)",
-                TypeExtractor::class.asTypeName(),
-                originalClass,
-            )
+            .addStatement("val type = jsonX.data.firstOrNull()?.type ?: %S", type)
             .addStatement(
                 "val discriminator = %T(type, %N, %N, %N, %N, %N, %N, %N)",
                 JsonApiListDiscriminator::class.asClassName(),

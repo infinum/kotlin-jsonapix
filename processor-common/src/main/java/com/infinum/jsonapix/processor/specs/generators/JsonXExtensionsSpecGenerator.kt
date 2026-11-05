@@ -42,7 +42,9 @@ internal class JsonXExtensionsSpecGenerator(
         )
 
         // 3. Build the core extensions file
-        val coreExtensionsFileSpec = JsonXCoreExtensionsSpecBuilder.build()
+        val coreExtensionsFileSpec = JsonXCoreExtensionsSpecBuilder.build(
+            types = holders.associate { it.className to it.type },
+        )
 
         return modelExtensionsFileSpecs + serializerModuleFileSpec + coreExtensionsFileSpec
     }

@@ -15,7 +15,7 @@ import kotlinx.serialization.PolymorphicSerializer
 
 internal object SerializeFunSpecBuilder {
 
-    fun build(originalClass: ClassName, isNullable: Boolean): FunSpec {
+    fun build(originalClass: ClassName, isNullable: Boolean, type: String): FunSpec {
         val modelClass = ClassName.bestGuess(
             originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
         )
@@ -44,9 +44,13 @@ internal object SerializeFunSpecBuilder {
             .addParameter(ParameterSpec.builder(JsonApiConstants.Keys.ERRORS, String::class).build())
             .returns(String::class)
             .addStatement("val jsonX = this.%M()", jsonApiWrapperMember)
-            .addStatement(
-                if (isNullable) "val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)" else "val type = jsonX.data.type",
-            )
+            .apply {
+                if (isNullable) {
+                    addStatement("val type = jsonX.data?.type ?: %S", type)
+                } else {
+                    addStatement("val type = jsonX.data.type")
+                }
+            }
             .addStatement(
                 "val discriminator = %T(type, %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class.asClassName(),

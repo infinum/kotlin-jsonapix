@@ -7,8 +7,11 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Dese
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.TypeOfFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.TypesPropertySpecBuilder
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -27,11 +30,13 @@ import retrofit2.HttpException
  * - asJsonXHttpException() (conditional on retrofit module)
  * - decodeJsonApiXString()
  * - decodeJsonApiXListString()
+ * - jsonApiXTypes, the JSON:API type of each model class and its wrappers
+ * - jsonApiXTypeOf(), which the decode functions use when a document has no data
  */
 internal object JsonXCoreExtensionsSpecBuilder {
 
     @SuppressWarnings("SpreadOperator")
-    fun build(): FileSpec {
+    fun build(types: Map<ClassName, String>): FileSpec {
         val fileSpec = FileSpec.builder(
             JsonApiConstants.Packages.JSONX,
             JsonApiConstants.FileNames.JSON_X_CORE_EXTENSIONS,
@@ -77,6 +82,9 @@ internal object JsonXCoreExtensionsSpecBuilder {
 
         fileSpec.addFunction(DeserializeFunSpecBuilder.build())
         fileSpec.addFunction(DeserializeListFunSpecBuilder.build())
+
+        fileSpec.addProperty(TypesPropertySpecBuilder.build(types))
+        fileSpec.addFunction(TypeOfFunSpecBuilder.build())
 
         return fileSpec.build()
     }
