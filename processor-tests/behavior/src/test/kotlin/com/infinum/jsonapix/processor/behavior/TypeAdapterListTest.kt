@@ -11,7 +11,6 @@ import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.data.models.TypeAdapterList_Person
-import java.io.InputStreamReader
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -66,7 +65,7 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_one_and_many_rel.json")
+        val response = Fixtures.PERSON_LIST_ONE_AND_MANY_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -113,7 +112,7 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_first_person_empty_rel_second_person_full_rel.json")
+        val response = Fixtures.PERSON_LIST_FIRST_PERSON_EMPTY_REL_SECOND_PERSON_FULL_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -160,7 +159,7 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_first_person_full_rel_second_person_no_many_rel.json")
+        val response = Fixtures.PERSON_LIST_FIRST_PERSON_FULL_REL_SECOND_PERSON_NO_MANY_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -204,7 +203,7 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_first_person_no_many_rels_null_one_rel_second_person_full_rels.json")
+        val response = Fixtures.PERSON_LIST_FIRST_PERSON_NO_MANY_RELS_NULL_ONE_REL_SECOND_PERSON_FULL_RELS
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -251,7 +250,7 @@ internal class TypeAdapterListTest {
             data = items,
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
-        val response = getFileAsString(filename = "person_list_no_included_block.json")
+        val response = Fixtures.PERSON_LIST_NO_INCLUDED_BLOCK
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -295,7 +294,7 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_both_person_no_rel.json")
+        val response = Fixtures.PERSON_LIST_BOTH_PERSON_NO_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -335,7 +334,7 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_with_included_block_but_with_rel_values_set_as_null_for_both_persons.json")
+        val response = Fixtures.PERSON_LIST_WITH_INCLUDED_BLOCK_BUT_WITH_REL_VALUES_SET_AS_NULL_FOR_BOTH_PERSONS
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -371,7 +370,7 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString(filename = "person_list_all_links_null.json")
+        val response = Fixtures.PERSON_LIST_ALL_LINKS_NULL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -383,7 +382,7 @@ internal class TypeAdapterListTest {
 
     @Test
     fun `given that there is a null relationship data in response type adapter Person list convertFromString should handle it gracefully`() {
-        val response = getFileAsString(filename = "person_list_invalid_relationship_data.json")
+        val response = Fixtures.PERSON_LIST_INVALID_RELATIONSHIP_DATA
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -434,7 +433,7 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString(filename = "person_list_convert_to_string_all_rels.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_ALL_RELS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -477,7 +476,7 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_SECOND_PERSON_NULL_MY_FAVORITE_DOG
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -516,7 +515,7 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_SECOND_PERSON_NULL_MY_FAVORITE_DOG_EMPTY_ALL_MY_DOGS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -555,7 +554,7 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_SECOND_PERSON_NULL_MY_FAVORITE_DOG_AND_ALL_MY_DOGS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -590,7 +589,7 @@ internal class TypeAdapterListTest {
 
         val personList = PersonList(data = items)
 
-        val response = getFileAsString(filename = "person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_BOTH_PERSONS_NULL_MY_FAVORITE_DOG_AND_ALL_MY_DOGS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -630,7 +629,7 @@ internal class TypeAdapterListTest {
         )
         val personList = PersonList(data = items)
 
-        val response = getFileAsString(filename = "person_list_all_my_dogs_with_id_set_for_each_dog.json")
+        val response = Fixtures.PERSON_LIST_ALL_MY_DOGS_WITH_ID_SET_FOR_EACH_DOG
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -658,7 +657,7 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_ROOT_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -687,7 +686,7 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RESOURCE_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -720,7 +719,7 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RELATIONSHIPS_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -759,7 +758,7 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_all_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_ALL_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -787,7 +786,7 @@ internal class TypeAdapterListTest {
             data = items,
             rootLinks = rootLinks,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_links.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_ROOT_LINKS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -816,7 +815,7 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_links.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RESOURCE_LINKS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -849,7 +848,7 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_links.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RELATIONSHIPS_LINKS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -861,7 +860,7 @@ internal class TypeAdapterListTest {
 
     @Test
     fun `given an empty Person list convertFromString should generate no error`() {
-        val response = getFileAsString(filename = "person_list_blank_data.json")
+        val response = Fixtures.PERSON_LIST_BLANK_DATA
 
         val result = typeListAdapter?.convertFromString(input = response)
 
@@ -874,7 +873,7 @@ internal class TypeAdapterListTest {
     @Test
     fun `given an empty Person list convertToString should generate no error`() {
         val personList = PersonList(data = emptyList())
-        val response = getFileAsString(filename = "person_list_blank_data_encode.json")
+        val response = Fixtures.PERSON_LIST_BLANK_DATA_ENCODE
 
         val result = typeListAdapter?.convertToString(input = personList)
 
@@ -882,11 +881,5 @@ internal class TypeAdapterListTest {
             response,
             result,
         )
-    }
-
-    private fun getFileAsString(filename: String): String {
-        val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
-        val fileReader: InputStreamReader? = fileStream?.reader()
-        return fileReader?.readText() ?: ""
     }
 }

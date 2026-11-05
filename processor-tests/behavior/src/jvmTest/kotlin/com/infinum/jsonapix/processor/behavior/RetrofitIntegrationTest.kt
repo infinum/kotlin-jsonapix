@@ -12,7 +12,6 @@ import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
-import java.io.InputStreamReader
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -202,7 +201,7 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val json = getFileAsString(filename = "person_one_and_many_rel.json")
+        val json = Fixtures.PERSON_ONE_AND_MANY_REL
 
         val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
@@ -308,7 +307,7 @@ internal class RetrofitIntegrationTest {
         assertNotNull(adapter)
 
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
-        val json = getFileAsString(filename = "person_with_root_meta.json")
+        val json = Fixtures.PERSON_WITH_ROOT_META
 
         val responseBody = json.toResponseBody("application/json".toMediaTypeOrNull())
 
@@ -477,11 +476,5 @@ internal class RetrofitIntegrationTest {
         assertFailsWith<Exception> {
             converter.convert(value = responseBody)
         }
-    }
-
-    private fun getFileAsString(filename: String): String {
-        val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
-        val fileReader: InputStreamReader? = fileStream?.reader()
-        return fileReader?.readText() ?: ""
     }
 }

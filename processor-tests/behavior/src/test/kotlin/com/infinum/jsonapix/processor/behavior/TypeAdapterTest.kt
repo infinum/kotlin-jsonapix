@@ -10,7 +10,6 @@ import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
-import java.io.InputStreamReader
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,7 +45,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_one_and_many_rel.json")
+        val response = Fixtures.PERSON_ONE_AND_MANY_REL
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -71,7 +70,7 @@ internal class TypeAdapterTest {
             resourceObjectLinks = DefaultLinks(self = "https://resource.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_no_included_block.json")
+        val response = Fixtures.PERSON_NO_INCLUDED_BLOCK
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -99,7 +98,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_one_rel.json")
+        val response = Fixtures.PERSON_ONE_REL
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -127,7 +126,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_many_rel_null_with_included.json")
+        val response = Fixtures.PERSON_MANY_REL_NULL_WITH_INCLUDED
         val result = typeAdapter?.convertFromString(input = response)
 
         assertEquals(
@@ -154,7 +153,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_many_rel.json")
+        val response = Fixtures.PERSON_MANY_REL
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -175,7 +174,7 @@ internal class TypeAdapterTest {
         )
         val personModel = PersonModel(data = person)
 
-        val response = getFileAsString(filename = "person_all_types_of_links_null.json")
+        val response = Fixtures.PERSON_ALL_TYPES_OF_LINKS_NULL
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -187,7 +186,7 @@ internal class TypeAdapterTest {
 
     @Test
     fun `given that there is a null relationship data in response type adapter Person convertFromString should handle it gracefully`() {
-        val response = getFileAsString(filename = "person_invalid_relationship_data.json")
+        val response = Fixtures.PERSON_INVALID_RELATIONSHIP_DATA
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -215,7 +214,7 @@ internal class TypeAdapterTest {
         val model = PersonModel(
             data = person,
         )
-        val response = getFileAsString(filename = "person_no_links_all_rel.json")
+        val response = Fixtures.PERSON_NO_LINKS_ALL_REL
 
         val result = typeAdapter?.convertToString(input = model)
 
@@ -239,7 +238,7 @@ internal class TypeAdapterTest {
             data = person,
         )
 
-        val response = getFileAsString(filename = "person_one_rel_null_many_rel_empty.json")
+        val response = Fixtures.PERSON_ONE_REL_NULL_MANY_REL_EMPTY
 
         val result = typeAdapter?.convertToString(input = model)
 
@@ -263,7 +262,7 @@ internal class TypeAdapterTest {
             data = person,
         )
 
-        val response = getFileAsString(filename = "person_one_and_many_rel_as_null.json")
+        val response = Fixtures.PERSON_ONE_AND_MANY_REL_AS_NULL
 
         val result = typeAdapter?.convertToString(input = model)
 
@@ -287,7 +286,7 @@ internal class TypeAdapterTest {
             data = person,
         )
 
-        val response = getFileAsString(filename = "person_all_my_dogs_with_id_set_for_each_dog.json")
+        val response = Fixtures.PERSON_ALL_MY_DOGS_WITH_ID_SET_FOR_EACH_DOG
 
         val result = typeAdapter?.convertToString(input = model)
 
@@ -313,7 +312,7 @@ internal class TypeAdapterTest {
             rootMeta = rootMeta,
         )
 
-        val response = getFileAsString(filename = "person_with_root_meta.json")
+        val response = Fixtures.PERSON_WITH_ROOT_META
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -339,7 +338,7 @@ internal class TypeAdapterTest {
             resourceObjectMeta = resourceMeta,
         )
 
-        val response = getFileAsString(filename = "person_with_resource_meta.json")
+        val response = Fixtures.PERSON_WITH_RESOURCE_META
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -365,7 +364,7 @@ internal class TypeAdapterTest {
             relationshipsMeta = mapOf("myFavoriteDog" to relationshipMeta),
         )
 
-        val response = getFileAsString(filename = "person_with_one_rel_meta.json")
+        val response = Fixtures.PERSON_WITH_ONE_REL_META
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -395,7 +394,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_with_many_rel_meta.json")
+        val response = Fixtures.PERSON_WITH_MANY_REL_META
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -430,7 +429,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_with_all_metas.json")
+        val response = Fixtures.PERSON_WITH_ALL_METAS
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -465,7 +464,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_with_all_links.json")
+        val response = Fixtures.PERSON_WITH_ALL_LINKS
 
         val result = typeAdapter?.convertFromString(input = response)
 
@@ -500,7 +499,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_with_all_meta_types_encode.json")
+        val response = Fixtures.PERSON_WITH_ALL_META_TYPES_ENCODE
 
         val result = typeAdapter?.convertToString(input = model)
 
@@ -535,7 +534,7 @@ internal class TypeAdapterTest {
             ),
         )
 
-        val response = getFileAsString(filename = "person_with_all_links_types_encode.json")
+        val response = Fixtures.PERSON_WITH_ALL_LINKS_TYPES_ENCODE
 
         val result = typeAdapter?.convertToString(input = model)
 
@@ -543,10 +542,5 @@ internal class TypeAdapterTest {
             response,
             result,
         )
-    }
-    private fun getFileAsString(filename: String): String {
-        val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
-        val fileReader: InputStreamReader? = fileStream?.reader()
-        return fileReader?.readText() ?: ""
     }
 }

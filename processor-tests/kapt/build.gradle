@@ -6,11 +6,12 @@ plugins {
 }
 
 apply from: "$rootDir/detekt.gradle"
+apply from: "$rootDir/processor-tests/behavior/fixtures.gradle"
 
 // The behavior suite lives in a shared directory so that every backend module compiles the same
 // files. Its models are main sources, which this module runs through KAPT like a consumer would.
 // Its tests have a shared part in test, and a JVM-only part in jvmTest for everything that needs
-// Retrofit.
+// Retrofit. They read their JSON fixtures from a generated source, see fixtures.gradle.
 def behaviorDir = file("../behavior/src")
 
 sourceSets {
@@ -18,8 +19,7 @@ sourceSets {
         kotlin.srcDirs = ["$behaviorDir/main/kotlin"]
     }
     test {
-        kotlin.srcDirs = ["$behaviorDir/test/kotlin", "$behaviorDir/jvmTest/kotlin"]
-        resources.srcDirs = ["$behaviorDir/test/resources"]
+        kotlin.srcDirs = ["$behaviorDir/test/kotlin", "$behaviorDir/jvmTest/kotlin", tasks.named("generateBehaviorFixtures")]
     }
 }
 
