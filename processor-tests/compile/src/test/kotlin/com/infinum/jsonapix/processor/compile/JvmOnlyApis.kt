@@ -25,11 +25,17 @@ private const val RETROFIT_EXTENSION_IMPORT = "import retrofit2.HttpException"
 /**
  * Fails if any file in [generated] uses a JVM-only API, naming each file, line and API. This is a
  * cheap guard: only compiling and running the generated code on every target proves it is common-safe.
+ * Without [retrofitExtensionAllowed], the Retrofit extension's import fails the check too.
  */
-internal fun assertNoJvmOnlyApis(fixture: Fixture, backend: Backend, generated: Map<String, String>) {
+internal fun assertNoJvmOnlyApis(
+    fixture: Fixture,
+    backend: Backend,
+    generated: Map<String, String>,
+    retrofitExtensionAllowed: Boolean = true,
+) {
     val usages = generated.toSortedMap().flatMap { (path, text) ->
         text.lines().withIndex()
-            .filterNot { (_, line) -> isRetrofitExtensionImport(path, line) }
+            .filterNot { (_, line) -> retrofitExtensionAllowed && isRetrofitExtensionImport(path, line) }
             .flatMap { (index, line) ->
                 jvmOnlyApis.mapNotNull { it.find(line) }
                     .map { "$backend/$fixture/$path:${index + 1} uses `${it.value}`: ${line.trim()}" }

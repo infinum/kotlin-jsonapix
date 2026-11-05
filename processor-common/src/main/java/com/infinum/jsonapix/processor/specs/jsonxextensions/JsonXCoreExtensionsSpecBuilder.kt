@@ -10,7 +10,6 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.Many
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.TypeOfFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.TypesPropertySpecBuilder
-import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -28,7 +27,7 @@ import retrofit2.HttpException
  * - toManyRelationshipModel()
  * - toOneRelationshipModel()
  * - decodeJsonApiError()
- * - asJsonXHttpException() (conditional on retrofit module)
+ * - asJsonXHttpException(), if the consumer has the retrofit artifact
  * - decodeJsonApiXString()
  * - decodeJsonApiXListString()
  * - jsonApiXTypes, the JSON:API type of each model class and its wrappers
@@ -37,7 +36,7 @@ import retrofit2.HttpException
 internal object JsonXCoreExtensionsSpecBuilder {
 
     @SuppressWarnings("SpreadOperator")
-    fun build(types: Map<ClassName, String>): FileSpec {
+    fun build(types: Map<ClassName, String>, hasRetrofit: Boolean): FileSpec {
         val fileSpec = FileSpec.builder(
             JsonApiConstants.Packages.JSONX,
             JsonApiConstants.FileNames.JSON_X_CORE_EXTENSIONS,
@@ -73,7 +72,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
 
         fileSpec.addFunction(decodeJsonApiErrorFunSpec())
 
-        if (hasRetrofitModule()) {
+        if (hasRetrofit) {
             fileSpec.addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
                 JsonApiConstants.Imports.ERRORS,
@@ -128,7 +127,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
 
         return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
             .receiver(HttpException::class)
-            .returns(JsonXHttpException::class.asClassName().parameterizedBy(typeVariableName))
+            .returns(ClassNames.jsonXHttpException.parameterizedBy(typeVariableName))
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(
                 typeVariableName.copy(
@@ -144,15 +143,5 @@ internal object JsonXCoreExtensionsSpecBuilder {
             )
             .addStatement("return JsonXHttpException(response, errors)")
             .build()
-    }
-
-    @Suppress("SwallowedException")
-    private fun hasRetrofitModule(): Boolean {
-        return try {
-            Class.forName("com.infinum.jsonapix.retrofit.JsonXHttpException")
-            true
-        } catch (e: Exception) {
-            false
-        }
     }
 }

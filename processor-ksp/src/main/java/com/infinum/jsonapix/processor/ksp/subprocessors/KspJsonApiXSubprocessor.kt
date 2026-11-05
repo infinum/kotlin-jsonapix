@@ -11,6 +11,7 @@ import com.google.devtools.ksp.validate
 import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.generation.JsonApiXGenerator
 import com.infinum.jsonapix.processor.ksp.KspCodeOutput
+import com.infinum.jsonapix.processor.ksp.KspCompileClasspath
 import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXCollector
 import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXErrorCollector
 import com.infinum.jsonapix.processor.ksp.collectors.KspJsonApiXLinksCollector
@@ -59,7 +60,7 @@ internal class KspJsonApiXSubprocessor(
                     // meta and error classes are deferred with the models.
                     models + links + meta + errors
                 } else {
-                    generate(models, links, meta, errors)
+                    generate(resolver, models, links, meta, errors)
                     emptyList()
                 }
             }
@@ -89,12 +90,14 @@ internal class KspJsonApiXSubprocessor(
             .toList()
 
     private fun generate(
+        resolver: Resolver,
         models: List<KSClassDeclaration>,
         links: List<KSClassDeclaration>,
         meta: List<KSClassDeclaration>,
         errors: List<KSClassDeclaration>,
     ) {
-        JsonApiXGenerator(KspCodeOutput(codeGenerator, models, links + meta + errors)).generate(
+        val output = KspCodeOutput(codeGenerator, models, links + meta + errors)
+        JsonApiXGenerator(output, KspCompileClasspath(resolver)).generate(
             holders = collectJsonApiX(models),
             linksHolders = collectLinks(links),
             metaHolders = collectMeta(meta),

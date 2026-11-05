@@ -21,6 +21,7 @@ internal class JsonXExtensionsSpecGenerator(
     private val linksHolders: Set<JsonApiXLinksHolder>,
     private val metaHolders: Set<JsonApiXMetaHolder>,
     private val errorHolders: Set<JsonApiXErrorHolder>,
+    private val hasRetrofit: Boolean,
 ) : SpecGenerator {
 
     override fun generate(): List<FileSpec> {
@@ -44,6 +45,7 @@ internal class JsonXExtensionsSpecGenerator(
         // 3. Build the core extensions file
         val coreExtensionsFileSpec = JsonXCoreExtensionsSpecBuilder.build(
             types = holders.associate { it.className to it.type },
+            hasRetrofit = hasRetrofit,
         )
 
         return modelExtensionsFileSpecs + serializerModuleFileSpec + coreExtensionsFileSpec
