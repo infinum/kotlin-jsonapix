@@ -2,29 +2,38 @@ package com.infinum.jsonapix.processor.behavior
 
 import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
+import com.infinum.jsonapix.data.models.EmptyDataMeta
 import com.infinum.jsonapix.data.models.EmptyDataModel
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
+import com.infinum.jsonapix.data.models.PersonRootMeta
+import com.infinum.jsonapix.data.models.PersonalError
+import com.infinum.jsonapix.decodeJsonApiXString
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlinx.serialization.SerializationException
 
 /**
- * Pins today's behavior for documents without primary data: error-only and meta-only documents,
- * which have no data key, and documents whose data is null. Each is decoded into a nullable model
- * (EmptyData), a non-nullable model (Person) and a list (Person).
+ * Documents without primary data: error-only and meta-only documents, which have no data key, and
+ * documents whose data is null. Each is decoded into a nullable model (EmptyData), a non-nullable
+ * model (Person) and a list (Person).
  *
- * Every decode throws NoSuchElementException today: with no data to read the type from, generated
- * code looks for @JsonApiX on the wrapper class, which doesn't have it. Ticket 05 changes decoding
- * on purpose and flips these tests; the comment in each one says what it becomes. Encoding already
- * succeeds today.
+ * A nullable model decodes to data = null and a list to an empty list, both with the document's
+ * root meta, links and errors. A non-nullable model can't be built without data, so decoding
+ * throws a SerializationException.
  */
+@Suppress("TooManyFunctions")
 internal class DocumentsWithoutDataIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
 
+    // Each error has the fields of both error classes: DefaultError for EmptyData and
+    // PersonalError for Person.
     private val errorOnlyDocument = """
         {
             "errors": [
@@ -32,7 +41,8 @@ internal class DocumentsWithoutDataIntegrationTest {
                     "code": "not_found",
                     "title": "Not Found",
                     "detail": "The requested resource was not found",
-                    "status": "404"
+                    "status": "404",
+                    "desc": "Not found"
                 }
             ]
         }
@@ -66,123 +76,137 @@ internal class DocumentsWithoutDataIntegrationTest {
     // ========== ERROR-ONLY DOCUMENT ==========
 
     @Test
-    fun `given an error-only document when decoding a nullable model should throw NoSuchElementException`() {
+    fun `given an error-only document when decoding a nullable model should return null data with errors`() {
         val adapter = factory.getAdapter<EmptyDataModel>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this: data = null, with errors filled.
-        assertFailsWith<NoSuchElementException> {
-            adapter.convertFromString(input = errorOnlyDocument)
-        }
+        val result = adapter.convertFromString(input = errorOnlyDocument)
+
+        assertNull(result.data)
+        val error = result.errors?.single()
+        assertNotNull(error)
+        assertEquals("not_found", error.code)
+        assertEquals("Not Found", error.title)
+        assertEquals("The requested resource was not found", error.detail)
+        assertEquals("404", error.status)
     }
 
     @Test
-    fun `given an error-only document when decoding a non-nullable model should throw NoSuchElementException`() {
+    fun `given an error-only document when decoding a non-nullable model should throw SerializationException`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this to a SerializationException.
-        assertFailsWith<NoSuchElementException> {
+        assertFailsWith<SerializationException> {
             adapter.convertFromString(input = errorOnlyDocument)
         }
     }
 
     @Test
-    fun `given an error-only document when decoding a list should throw NoSuchElementException`() {
+    fun `given an error-only document when decoding a list should return an empty list with errors`() {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this: an empty list, with errors filled.
-        assertFailsWith<NoSuchElementException> {
-            adapter.convertFromString(input = errorOnlyDocument)
-        }
+        val result = adapter.convertFromString(input = errorOnlyDocument)
+
+        assertTrue(result.data.isEmpty())
+        assertEquals(listOf(PersonalError(desc = "Not found")), result.errors)
     }
 
     // ========== META-ONLY DOCUMENT ==========
 
     @Test
-    fun `given a meta-only document when decoding a nullable model should throw NoSuchElementException`() {
+    fun `given a meta-only document when decoding a nullable model should return null data with root meta`() {
         val adapter = factory.getAdapter<EmptyDataModel>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this: data = null, with root meta filled.
-        assertFailsWith<NoSuchElementException> {
-            adapter.convertFromString(input = metaOnlyDocument)
-        }
+        val result = adapter.convertFromString(input = metaOnlyDocument)
+
+        assertNull(result.data)
+        assertEquals(EmptyDataMeta(owner = "Alice"), result.rootMeta)
     }
 
     @Test
-    fun `given a meta-only document when decoding a non-nullable model should throw NoSuchElementException`() {
+    fun `given a meta-only document when decoding a non-nullable model should throw SerializationException`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this to a SerializationException.
-        assertFailsWith<NoSuchElementException> {
+        assertFailsWith<SerializationException> {
             adapter.convertFromString(input = metaOnlyDocument)
         }
     }
 
     @Test
-    fun `given a meta-only document when decoding a list should throw NoSuchElementException`() {
+    fun `given a meta-only document when decoding a list should return an empty list with root meta`() {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this: an empty list, with root meta filled.
-        assertFailsWith<NoSuchElementException> {
-            adapter.convertFromString(input = metaOnlyDocument)
-        }
+        val result = adapter.convertFromString(input = metaOnlyDocument)
+
+        assertTrue(result.data.isEmpty())
+        assertEquals(PersonRootMeta(owner = "Alice"), result.rootMeta)
     }
 
     // ========== NULL DATA DOCUMENT ==========
 
     @Test
-    fun `given a document with null data when decoding a nullable model should throw NoSuchElementException`() {
+    fun `given a document with null data when decoding a nullable model should return null data with root links and meta`() {
         val adapter = factory.getAdapter<EmptyDataModel>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this: data = null, with root links and meta filled.
-        assertFailsWith<NoSuchElementException> {
-            adapter.convertFromString(input = nullDataDocument)
-        }
+        val result = adapter.convertFromString(input = nullDataDocument)
+
+        assertNull(result.data)
+        assertEquals("https://root.link.com", result.rootLinks?.self)
+        assertEquals(EmptyDataMeta(owner = "Alice"), result.rootMeta)
     }
 
     @Test
-    fun `given a document with null data when decoding a non-nullable model should throw NoSuchElementException`() {
+    fun `given a document with null data when decoding a non-nullable model should throw SerializationException`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this to a SerializationException.
-        assertFailsWith<NoSuchElementException> {
+        assertFailsWith<SerializationException> {
             adapter.convertFromString(input = nullDataDocument)
         }
     }
 
     @Test
-    fun `given a document with null data when decoding a list should throw NoSuchElementException`() {
+    fun `given a document with null data when decoding a list should return an empty list with root links and meta`() {
         val adapter = factory.getAdapter<PersonList>()
         assertNotNull(adapter)
 
-        // Ticket 05 flips this: an empty list, with root links and meta filled.
-        assertFailsWith<NoSuchElementException> {
-            adapter.convertFromString(input = nullDataDocument)
-        }
+        val result = adapter.convertFromString(input = nullDataDocument)
+
+        assertTrue(result.data.isEmpty())
+        assertEquals("https://root.link.com", result.rootLinks?.self)
+        assertEquals(PersonRootMeta(owner = "Alice"), result.rootMeta)
     }
 
     // ========== ENCODING ==========
 
     @Test
-    fun `given a nullable model with null data when encoding should write a placeholder resource`() {
+    fun `given a nullable model with null data when encoding should write null data`() {
         val adapter = factory.getAdapter<EmptyDataModel>()
         assertNotNull(adapter)
 
         val result = adapter.convertToString(input = EmptyDataModel(data = null))
 
-        // Unlike decoding, this doesn't throw today, but it writes data = null as a resource with
-        // id "0" instead of "data": null. Ticket 05 asks only that encoding succeeds, which holds.
         assertEquals(
-            """{"errors":null,"links":null,"meta":null,"included":[],"data":{"type":"emptyData","id":"0","links":null,"meta":null}}""",
+            """{"errors":null,"links":null,"meta":null,"data":null,"included":[]}""",
             result,
         )
+    }
+
+    @Test
+    fun `given a nullable model with null data when doing round-trip should keep null data and root meta`() {
+        val adapter = factory.getAdapter<EmptyDataModel>()
+        assertNotNull(adapter)
+
+        val model = EmptyDataModel(data = null, rootMeta = EmptyDataMeta(owner = "Alice"))
+        val result = adapter.convertFromString(input = adapter.convertToString(input = model))
+
+        assertNull(result.data)
+        assertEquals(EmptyDataMeta(owner = "Alice"), result.rootMeta)
     }
 
     @Test
@@ -192,7 +216,27 @@ internal class DocumentsWithoutDataIntegrationTest {
 
         val result = adapter.convertToString(input = PersonList(data = emptyList()))
 
-        // This already succeeds today, and ticket 05 keeps it.
         assertEquals(Fixtures.PERSON_LIST_BLANK_DATA_ENCODE, result)
     }
+
+    // ========== UNKNOWN CLASS ==========
+
+    @Test
+    fun `given a class without a JSON API type when decoding a document without data should throw naming the class`() {
+        val exception = assertFailsWith<IllegalArgumentException> {
+            errorOnlyDocument.decodeJsonApiXString<NotAModel, NotAModel>(
+                rootLinks = "",
+                resourceObjectLinks = "",
+                relationshipsLinks = "",
+                rootMeta = "",
+                resourceObjectMeta = "",
+                relationshipsMeta = "",
+                errors = "",
+            )
+        }
+
+        assertTrue(exception.message.orEmpty().startsWith("NotAModel "), exception.message)
+    }
+
+    private class NotAModel
 }
