@@ -12,12 +12,12 @@ import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import java.io.InputStreamReader
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Integration tests for Links and Meta handling across all placement strategies.
@@ -28,7 +28,7 @@ internal class LinksAndMetaIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         factory = TypeAdapterFactory()
     }

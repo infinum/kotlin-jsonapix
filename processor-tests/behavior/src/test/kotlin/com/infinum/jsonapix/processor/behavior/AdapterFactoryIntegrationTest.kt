@@ -9,12 +9,12 @@ import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Integration tests for AdapterFactory.getAdapter() function.
@@ -25,7 +25,7 @@ internal class AdapterFactoryIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         factory = TypeAdapterFactory()
     }

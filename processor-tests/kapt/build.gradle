@@ -33,7 +33,7 @@ dependencies {
     implementation packages.kotlin.serialization_core
     kapt project(":processor")
 
-    testImplementation packages.junit.api
+    testImplementation packages.kotlin.test_junit5
     testRuntimeOnly packages.junit.engine
     testRuntimeOnly packages.junit.platform_launcher
 }

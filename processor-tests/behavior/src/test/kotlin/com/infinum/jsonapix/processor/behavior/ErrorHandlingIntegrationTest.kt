@@ -4,13 +4,13 @@ import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlinx.serialization.SerializationException
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 /**
  * Integration tests for error handling scenarios.
@@ -21,7 +21,7 @@ internal class ErrorHandlingIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         factory = TypeAdapterFactory()
     }
@@ -45,7 +45,7 @@ internal class ErrorHandlingIntegrationTest {
 
         // According to JSON:API spec, errors and data should not coexist
         // The adapter should handle error responses by failing
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(input = json)
         }
     }
@@ -62,7 +62,7 @@ internal class ErrorHandlingIntegrationTest {
         """.trimIndent()
 
         // Parsing null data should fail as it doesn't conform to expected structure
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(input = json)
         }
     }
@@ -84,7 +84,7 @@ internal class ErrorHandlingIntegrationTest {
         """.trimIndent()
 
         // Missing required fields (surname, age) should result in a parsing exception
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(input = json)
         }
     }
@@ -103,7 +103,7 @@ internal class ErrorHandlingIntegrationTest {
             }
         """.trimIndent()
 
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(json)
         }
     }
@@ -113,7 +113,7 @@ internal class ErrorHandlingIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(input = "")
         }
     }
@@ -129,7 +129,7 @@ internal class ErrorHandlingIntegrationTest {
                     "type": "person"
         """.trimIndent()
 
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(json)
         }
     }
@@ -153,7 +153,7 @@ internal class ErrorHandlingIntegrationTest {
         """.trimIndent()
 
         // Wrong resource type causes deserialization to fail
-        assertThrows<SerializationException> {
+        assertFailsWith<SerializationException> {
             adapter!!.convertFromString(input = json)
         }
     }
@@ -228,7 +228,7 @@ internal class ErrorHandlingIntegrationTest {
         """.trimIndent()
 
         // Null attributes should result in a parsing failure
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(input = json)
         }
     }
@@ -475,7 +475,7 @@ internal class ErrorHandlingIntegrationTest {
             ]
         """.trimIndent()
 
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             adapter!!.convertFromString(json)
         }
     }

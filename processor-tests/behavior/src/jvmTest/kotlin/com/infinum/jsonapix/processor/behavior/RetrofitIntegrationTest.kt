@@ -13,15 +13,15 @@ import com.infinum.jsonapix.retrofit.JsonXHttpException
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import retrofit2.Retrofit
 
 /**
@@ -34,7 +34,7 @@ internal class RetrofitIntegrationTest {
     private lateinit var factory: TypeAdapterFactory
     private lateinit var converterFactory: JsonXConverterFactory
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         factory = TypeAdapterFactory()
         converterFactory = JsonXConverterFactory(adapterFactory = factory)
@@ -474,7 +474,7 @@ internal class RetrofitIntegrationTest {
         val converter = JsonXResponseBodyConverter(typeAdapter = adapter!!)
         val responseBody = "invalid json {{{{".toResponseBody("application/json".toMediaTypeOrNull())
 
-        assertThrows<Exception> {
+        assertFailsWith<Exception> {
             converter.convert(value = responseBody)
         }
     }
