@@ -23,6 +23,3 @@ ext.mavenPublishProperties = [
                 url       : "https://github.com/infinum/android-jsonapix"
         ]
 ]
-
-// Until the sources move to src/commonMain/kotlin, the common source set reads them where they are.
-kotlin.sourceSets.commonMain.kotlin.srcDir("src/main/java")
