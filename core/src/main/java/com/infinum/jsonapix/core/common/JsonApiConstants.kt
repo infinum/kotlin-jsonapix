@@ -98,6 +98,8 @@ object JsonApiConstants {
 
     object FileNames {
         const val JSON_X_EXTENSIONS = "JsonXExtensions"
+        const val JSON_X_CORE_EXTENSIONS = "JsonXCoreExtensions"
+        const val JSON_X_SERIALIZER_MODULE = "JsonXSerializerModule"
         const val TYPE_ADAPTER_FACTORY = "TypeAdapterFactory"
     }
 
