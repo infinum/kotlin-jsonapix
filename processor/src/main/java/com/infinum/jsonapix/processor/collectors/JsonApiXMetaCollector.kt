@@ -1,10 +1,10 @@
 package com.infinum.jsonapix.processor.collectors
 
 import com.infinum.jsonapix.annotations.JsonApiXMeta
-import com.infinum.jsonapix.annotations.JsonApiXMetaList
 import com.infinum.jsonapix.annotations.MetaPlacementStrategy
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValues
+import com.infinum.jsonapix.processor.extensions.repeatableContainer
 import com.infinum.jsonapix.processor.models.JsonApiXMetaHolder
 import com.squareup.kotlinpoet.ClassName
 import javax.annotation.processing.RoundEnvironment
@@ -19,7 +19,7 @@ internal class JsonApiXMetaCollector(
         val holders = mutableSetOf<JsonApiXMetaHolder>()
 
         // Collect from repeated annotations
-        roundEnvironment.getElementsAnnotatedWith(JsonApiXMetaList::class.java)?.forEach { element ->
+        roundEnvironment.getElementsAnnotatedWith(JsonApiXMeta::class.repeatableContainer)?.forEach { element ->
             val typeAndPlacementList =
                 element.getAnnotationParameterValues<JsonApiXMeta, List<Pair<String, MetaPlacementStrategy>>> {
                     this.map { annotation -> annotation.type to annotation.placementStrategy }
@@ -64,7 +64,7 @@ internal class JsonApiXMetaCollector(
     companion object {
         val SUPPORTED = setOf(
             JsonApiXMeta::class.java.name,
-            JsonApiXMetaList::class.java.name,
+            JsonApiXMeta::class.repeatableContainer.canonicalName,
         )
     }
 }

@@ -7,6 +7,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
+import java.lang.annotation.Repeatable as JavaRepeatable
 
 internal fun AnnotationSpec.getStringParameterValue(name: String): String {
     val annotationMirror = checkNotNull(tag<AnnotationMirror>()) { "$typeName wasn't read from an AnnotationMirror" }
@@ -22,6 +23,15 @@ public inline fun <reified T : Annotation, reified R : Any> Element.getAnnotatio
 public inline fun <reified T : Annotation, reified R : Any> Element.getAnnotationParameterValues(
     f: Array<T>.() -> R,
 ): R = getAnnotationsByType(T::class.java).f()
+
+/**
+ * The container annotation Kotlin generates for this repeatable annotation. javac reports a class that
+ * repeats the annotation as annotated with the container, not with the annotation itself.
+ */
+internal val KClass<out Annotation>.repeatableContainer: Class<out Annotation>
+    get() = checkNotNull(java.getAnnotation(JavaRepeatable::class.java)) {
+        "$qualifiedName isn't repeatable"
+    }.value.java
 
 @SuppressWarnings("TooGenericExceptionThrown")
 public inline fun <reified T : Annotation> Element.getAnnotationClassValue(

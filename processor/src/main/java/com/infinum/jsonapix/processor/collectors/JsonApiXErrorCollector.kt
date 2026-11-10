@@ -1,9 +1,9 @@
 package com.infinum.jsonapix.processor.collectors
 
 import com.infinum.jsonapix.annotations.JsonApiXError
-import com.infinum.jsonapix.annotations.JsonApiXErrorList
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValues
+import com.infinum.jsonapix.processor.extensions.repeatableContainer
 import com.infinum.jsonapix.processor.models.JsonApiXErrorHolder
 import com.squareup.kotlinpoet.ClassName
 import javax.annotation.processing.RoundEnvironment
@@ -18,7 +18,7 @@ internal class JsonApiXErrorCollector(
         val holders = mutableSetOf<JsonApiXErrorHolder>()
 
         // Collect from repeated annotations
-        roundEnvironment.getElementsAnnotatedWith(JsonApiXErrorList::class.java)?.forEach { element ->
+        roundEnvironment.getElementsAnnotatedWith(JsonApiXError::class.repeatableContainer)?.forEach { element ->
             val types = element.getAnnotationParameterValues<JsonApiXError, List<String>> {
                 this.map { annotation -> annotation.type }
             }
@@ -57,7 +57,7 @@ internal class JsonApiXErrorCollector(
     companion object {
         val SUPPORTED = setOf(
             JsonApiXError::class.java.name,
-            JsonApiXErrorList::class.java.name,
+            JsonApiXError::class.repeatableContainer.canonicalName,
         )
     }
 }
