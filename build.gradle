@@ -30,9 +30,9 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+// The base plugin's clean task deletes the root build directory. The Kotlin JS and Wasm targets
+// apply the base plugin to the root project too, so a clean task declared here would clash with it.
+apply plugin: "base"
 
 task detektAll(dependsOn: [
         ':annotations:detekt',

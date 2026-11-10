@@ -69,6 +69,15 @@ jobs:
           key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-caches-${{ runner.os }}-
+      # Kotlin/Native downloads its compiler and toolchain to ~/.konan when it first compiles native
+      # code. Its version follows the Kotlin version in dependencies.gradle.
+      - name: Save Kotlin/Native Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('dependencies.gradle') }}
+          restore-keys: |
+            konan-${{ runner.os }}-
       - name: Unit tests
         run: ./gradlew clean test
       - name: Stop Gradle
@@ -88,6 +97,15 @@ jobs:
           key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-caches-${{ runner.os }}-
+      # Kotlin/Native downloads its compiler and toolchain to ~/.konan when it first compiles native
+      # code. Its version follows the Kotlin version in dependencies.gradle.
+      - name: Save Kotlin/Native Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('dependencies.gradle') }}
+          restore-keys: |
+            konan-${{ runner.os }}-
       # Separate invocations, so the sample resolves JsonApiX only after it has been published.
       - name: Publish to Maven Local
         run: ./gradlew publishToMavenLocal

@@ -1,8 +1,8 @@
 plugins {
-    id "java-library"
-    id "kotlin"
+    id "org.jetbrains.kotlin.multiplatform"
 }
 
+apply from: "$rootDir/multiplatform.gradle"
 apply from: "$rootDir/detekt.gradle"
 apply from: "$rootDir/dokka.gradle"
 apply from: "$rootDir/maven-publish.gradle"
@@ -10,7 +10,6 @@ apply from: "$rootDir/maven-publish.gradle"
 ext.mavenPublishProperties = [
         group      : releaseConfig.group,
         version    : releaseConfig.version,
-        artifactId   : "annotations",
         repository : [
                 url     : sonatype.url,
                 username: sonatype.username,
@@ -25,21 +24,5 @@ ext.mavenPublishProperties = [
         ]
 ]
 
-dependencies {
-    implementation packages.kotlin.core
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
+// Until the sources move to src/commonMain/kotlin, the common source set reads them where they are.
+kotlin.sourceSets.commonMain.kotlin.srcDir("src/main/java")

@@ -1,0 +1,65 @@
+// A script plugin can't import the Kotlin plugin's classes, so this loads the one it needs from the
+// root build script's classpath, which has the plugin.
+def JvmTarget = rootProject.buildscript.classLoader.loadClass("org.jetbrains.kotlin.gradle.dsl.JvmTarget")
+
+// The targets of JsonApiX's multiplatform modules, which apply the Kotlin Multiplatform plugin and
+// then this script. Their sources live in src/commonMain/kotlin.
+//
+// Only the targets someone needs are published (ADR 0007). Adding a target breaks no one, removing
+// a published one breaks everyone who uses it. Android builds use the jvm artifact, so there's no
+// androidTarget() (ADR 0005).
+kotlin {
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
+    }
+    iosArm64()
+    iosSimulatorArm64()
+    js {
+        browser()
+        nodejs()
+    }
+    wasmJs {
+        browser()
+        nodejs()
+    }
+    linuxX64()
+}
+
+// The Kotlin plugin compiles every target on any host, but linking and running Apple test binaries
+// needs Xcode. On a Mac without it, for example with only the Command Line Tools, those tasks are
+// skipped, so everything else still builds, tests and publishes. On Linux, the Kotlin plugin skips
+// them itself and says so.
+if (System.getProperty("os.name").startsWith("Mac")) {
+    // The same check Kotlin/Native runs before it links. It respects DEVELOPER_DIR.
+    def xcodeCheck = providers.exec {
+        commandLine "xcrun", "xcodebuild", "-version"
+        ignoreExitValue = true
+    }
+    if (xcodeCheck.result.get().exitValue != 0) {
+        def skippedTasks = []
+        kotlin.targets.matching { it.platformType.name() == "native" && it.konanTarget.family.appleFamily }.configureEach { target ->
+            target.binaries.configureEach { binary ->
+                skippedTasks << binary.linkTaskName
+                binary.linkTaskProvider.configure { onlyIf("Xcode is available") { false } }
+            }
+            // Device targets such as iosArm64 have no test runs.
+            if (target.hasProperty("testRuns")) {
+                target.testRuns.configureEach { testRun ->
+                    skippedTasks << testRun.executionTask.name
+                    testRun.executionTask.configure { onlyIf("Xcode is available") { false } }
+                }
+            }
+        }
+        gradle.taskGraph.whenReady { graph ->
+            def scheduled = graph.allTasks.findAll { it.project == project && it.name in skippedTasks }
+            if (scheduled) {
+                logger.warn(
+                        "Skipping ${scheduled*.path.join(", ")}: Xcode isn't available, because `xcrun xcodebuild -version` failed. " +
+                                "To run them, install Xcode, and select it with xcode-select or point DEVELOPER_DIR at its Developer folder."
+                )
+            }
+        }
+    }
+}

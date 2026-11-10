@@ -1,6 +1,7 @@
+// A multiplatform module has a publication per target plus a root one, and deploys all of them.
 task deployAnnotations(dependsOn: [
         ':annotations:clean',
-        ':annotations:publishReleasePublicationToSonatypeMavenCentralRepository'
+        ':annotations:publishAllPublicationsToSonatypeMavenCentralRepository'
 ]) {
     group = "Deploy"
     description = "Deploy module to repositories"
