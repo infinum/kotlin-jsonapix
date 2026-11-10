@@ -1,8 +1,6 @@
 package com.infinum.jsonapix.core.discriminators
 
-import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
-import kotlin.reflect.KAnnotatedElement
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -17,10 +15,7 @@ import kotlinx.serialization.json.jsonPrimitive
  * Only use with JSON Arrays that contain objects of the same type
  */
 object TypeExtractor {
-    fun guessType(clazz: KAnnotatedElement): String =
-        (clazz.annotations.first { it is JsonApiX } as? JsonApiX)?.type!!
-
-    @SuppressWarnings("SwallowedException")
+    @Suppress("SwallowedException")
     fun findType(jsonElement: JsonElement?): String? {
         if (jsonElement == null || jsonElement is JsonNull) {
             return null

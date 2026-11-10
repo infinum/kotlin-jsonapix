@@ -28,7 +28,6 @@ ext.packages = [
         "kotlin"   : [
                 "plugin"              : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                 "core"                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
-                "reflect"             : "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
                 "test_junit5"         : "org.jetbrains.kotlin:kotlin-test-junit5:${versions.kotlin}",
                 "poet"                : "com.squareup:kotlinpoet:${versions.poet}",
                 "poet_metadata"       : "com.squareup:kotlinpoet-metadata:${versions.poet}",

@@ -23,7 +23,7 @@ class JsonApiListDiscriminator(
 ) : BaseJsonApiDiscriminator(rootType, relationshipsLinks, relationshipsMeta, error) {
 
     // TODO Handle those in a future PR
-    @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught", "LongMethod")
+    @Suppress("SwallowedException", "TooGenericExceptionCaught", "LongMethod")
     override fun inject(jsonElement: JsonElement): JsonElement {
         try {
             val dataArray = getDataObject(jsonElement)
@@ -117,7 +117,7 @@ class JsonApiListDiscriminator(
     }
 
     // TODO Handle those in a future PR
-    @SuppressWarnings("SwallowedException", "TooGenericExceptionCaught")
+    @Suppress("SwallowedException", "TooGenericExceptionCaught")
     override fun extract(jsonElement: JsonElement): JsonElement {
         try {
             val dataArray = getDataObject(jsonElement)?.let {
