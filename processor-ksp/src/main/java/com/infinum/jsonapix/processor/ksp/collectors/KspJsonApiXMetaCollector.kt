@@ -17,8 +17,8 @@ internal class KspJsonApiXMetaCollector(
         declarations.flatMapTo(linkedSetOf()) { declaration ->
             declaration.getRepeatableAnnotations(JsonApiXMeta::class).map { annotation ->
                 JsonApiXMetaHolder(
-                    type = annotation.getArgumentValue(JsonApiXMeta::type.name),
-                    placementStrategy = annotation.getEnumArgumentValue(JsonApiXMeta::placementStrategy.name),
+                    type = annotation.getArgumentValue(JsonApiXMeta::type),
+                    placementStrategy = annotation.getEnumArgumentValue(JsonApiXMeta::placementStrategy),
                     className = declaration.holderClassName(),
                 )
             }

@@ -17,8 +17,8 @@ internal class KspJsonApiXLinksCollector(
         declarations.flatMapTo(linkedSetOf()) { declaration ->
             declaration.getRepeatableAnnotations(JsonApiXLinks::class).map { annotation ->
                 JsonApiXLinksHolder(
-                    type = annotation.getArgumentValue(JsonApiXLinks::type.name),
-                    placementStrategy = annotation.getEnumArgumentValue(JsonApiXLinks::placementStrategy.name),
+                    type = annotation.getArgumentValue(JsonApiXLinks::type),
+                    placementStrategy = annotation.getEnumArgumentValue(JsonApiXLinks::placementStrategy),
                     className = declaration.holderClassName(),
                 )
             }
