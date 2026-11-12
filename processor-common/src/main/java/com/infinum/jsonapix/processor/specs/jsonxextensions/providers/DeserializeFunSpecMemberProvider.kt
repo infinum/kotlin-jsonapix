@@ -5,10 +5,6 @@ import com.squareup.kotlinpoet.MemberName
 
 internal object DeserializeFunSpecMemberProvider {
 
-    val decodeMember = MemberName(
-        JsonApiConstants.Packages.KOTLINX_SERIALIZATION,
-        JsonApiConstants.Members.DECODE_FROM_STRING,
-    )
     val formatMember = MemberName(
         JsonApiConstants.Packages.JSONX,
         JsonApiConstants.Members.FORMAT,
