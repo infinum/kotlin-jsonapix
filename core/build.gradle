@@ -51,8 +51,3 @@ tasks.named("jvmTest", Test) {
         events("PASSED", "FAILED", "SKIPPED")
     }
 }
-
-// Until the sources move to src/commonMain/kotlin and src/jvmTest/kotlin, the source sets read them
-// where they are.
-kotlin.sourceSets.commonMain.kotlin.srcDir("src/main/java")
-kotlin.sourceSets.jvmTest.kotlin.srcDir("src/test/kotlin")
