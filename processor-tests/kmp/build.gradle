@@ -1,0 +1,95 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "kotlinx-serialization"
+    id "com.google.devtools.ksp"
+}
+
+// This module proves that JsonApiX works for a KMP consumer, on every target JsonApiX publishes.
+// It isn't published. It's the only check of KSP's metadata compilation, of generated code on
+// Kotlin/Native, JS and Wasm, and of the consumer setup the README describes.
+apply from: "$rootDir/multiplatform.gradle"
+apply from: "$rootDir/processor-tests/behavior/fixtures.gradle"
+
+// The behavior suite lives in a shared directory so that every backend module compiles the same
+// files. Its models are commonMain sources, which this module runs through KSP like a KMP consumer
+// would. The shared part of its tests runs from commonTest, on every target the host can run. The
+// JVM-only part, which needs Retrofit, isn't compiled here. The tests read their JSON fixtures from
+// a generated source, see fixtures.gradle. The KSP and KAPT modules run detekt on these files.
+def behaviorDir = file("../behavior/src")
+
+kotlin {
+    // The suite runs on Node only. Running it in a browser would also need Karma and a browser.
+    js {
+        browser {
+            testTask { enabled = false }
+        }
+    }
+    wasmJs {
+        browser {
+            testTask { enabled = false }
+        }
+    }
+
+    sourceSets {
+        commonMain {
+            kotlin.srcDir("$behaviorDir/main/kotlin")
+        }
+        commonTest {
+            kotlin.srcDirs = ["$behaviorDir/test/kotlin", tasks.named("generateBehaviorFixtures")]
+            dependencies {
+                implementation packages.kotlin.test
+            }
+        }
+        jvmTest {
+            dependencies {
+                runtimeOnly packages.junit.engine
+                runtimeOnly packages.junit.platform_launcher
+            }
+        }
+    }
+}
+
+// The consumer setup from the README's KMP section (ADR 0004). Keep the two in sync.
+// - core in commonMain only. annotations comes through it.
+// - processor-ksp on kspCommonMainMetadata only. Per-target KSP configurations would generate the
+//   aggregate files once per target, and the build would fail with duplicate declarations.
+// - KSP's metadata output folder in commonMain's Kotlin sources, so every target compiles the
+//   generated code.
+// - Every Kotlin compilation, and any per-target KSP task, runs after the metadata KSP task, so the
+//   generated code exists before anything compiles against it.
+kotlin {
+    sourceSets {
+        commonMain {
+            kotlin.srcDir(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
+            dependencies {
+                implementation project(":core")
+            }
+        }
+    }
+}
+
+dependencies {
+    kspCommonMainMetadata project(":processor-ksp")
+}
+
+tasks.withType(KotlinCompilationTask).configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+
+// The JVM tests run on JUnit 5, like the KAPT and KSP modules.
+tasks.named("jvmTest", Test) {
+    useJUnitPlatform()
+}
+
+tasks.withType(AbstractTestTask).configureEach {
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+    }
+}
