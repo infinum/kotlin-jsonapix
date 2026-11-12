@@ -78,8 +78,10 @@ jobs:
           key: konan-${{ runner.os }}-${{ hashFiles('dependencies.gradle') }}
           restore-keys: |
             konan-${{ runner.os }}-
+      # Multiplatform modules have no test task. allTests runs their tests on every target the host
+      # can run: here, JVM, Linux native, JS and Wasm.
       - name: Unit tests
-        run: ./gradlew clean test
+        run: ./gradlew clean test allTests
       - name: Stop Gradle
         run: ./gradlew --stop
 
