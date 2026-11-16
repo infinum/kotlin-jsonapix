@@ -1,4 +1,6 @@
 import com.infinum.jsonapix.TypeAdapterFactory
+import com.infinum.jsonapix.core.adapters.AdapterFactory
+import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
@@ -8,6 +10,7 @@ import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
+import com.infinum.jsonapix.retrofit.JsonXMediaTypes
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
@@ -165,6 +168,61 @@ internal class RetrofitIntegrationTest {
 
         assertNotNull(requestBody, "Request body should not be null")
         assertEquals("application/json; charset=UTF-8".toMediaTypeOrNull(), requestBody?.contentType())
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter built with the JSON API media type should send it with no charset`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!, mediaType = JsonXMediaTypes.JSON_API)
+        val person = Person(name = "Dave", surname = "Brown", age = 35, allMyDogs = null, myFavoriteDog = null)
+        val model = PersonModel(data = person)
+
+        val requestBody = converter.convert(value = model)
+
+        assertNotNull(requestBody, "Request body should not be null")
+        assertEquals("application/vnd.api+json".toMediaTypeOrNull(), requestBody?.contentType())
+    }
+
+    // The media type parameter has a default, so Kotlin callers compile either way. These pin the
+    // constructors that callers compiled against an earlier release, and Java callers, bind to.
+    @Test
+    fun `given the converters when the media type is not passed should still expose the single argument constructors`() {
+        assertNotNull(
+            JsonXConverterFactory::class.java.getConstructor(AdapterFactory::class.java),
+            "JsonXConverterFactory(AdapterFactory) should still exist",
+        )
+        assertNotNull(
+            JsonXRequestBodyConverter::class.java.getConstructor(TypeAdapter::class.java),
+            "JsonXRequestBodyConverter(TypeAdapter) should still exist",
+        )
+    }
+
+    @Test
+    fun `given a JsonXConverterFactory built with a request media type should hand it to the request converter`() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.example.com/")
+            .addConverterFactory(converterFactory)
+            .build()
+        val factoryWithMediaType = JsonXConverterFactory(
+            adapterFactory = factory,
+            requestMediaType = JsonXMediaTypes.JSON_API,
+        )
+
+        val converter = factoryWithMediaType.requestBodyConverter(
+            type = PersonModel::class.java,
+            parameterAnnotations = emptyArray(),
+            methodAnnotations = emptyArray(),
+            retrofit = retrofit,
+        )
+
+        @Suppress("UNCHECKED_CAST")
+        val typedConverter = converter as JsonXRequestBodyConverter<PersonModel>
+        val person = Person(name = "Dave", surname = "Brown", age = 35, allMyDogs = null, myFavoriteDog = null)
+        val requestBody = typedConverter.convert(value = PersonModel(data = person))
+
+        assertEquals("application/vnd.api+json".toMediaTypeOrNull(), requestBody?.contentType())
     }
 
     @Test

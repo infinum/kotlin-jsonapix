@@ -364,6 +364,23 @@ set is indistinguishable from one set to `null`, and sending it as `null` would 
 `TypeAdapter.convertToString` is unaffected and still writes the full document. If you build request bodies yourself, call
 `String.toJsonApiRequestDocument()` on its output to get the same shape.
 
+### Request Content-Type
+
+Request bodies are sent as `application/json; charset=UTF-8`.
+
+The JSON API specification defines its own media type, `application/vnd.api+json`, and servers are free to answer `415 Unsupported Media
+Type` to anything else. If your server is one of them, pass it to the converter factory:
+
+```kotlin
+Retrofit.Builder()
+    .addConverterFactory(JsonXConverterFactory(TypeAdapterFactory(), JsonXMediaTypes.JSON_API))
+    .baseUrl("https://www.example.com")
+    .build()
+```
+
+Note that `JsonXMediaTypes.JSON_API` carries no `charset` parameter, on purpose: the specification has servers answer `415` to
+`application/vnd.api+json` with any media type parameter. Any `MediaType` of your own is sent verbatim, so leave the charset off yours too.
+
 ## List of libraries used in the project
 
 This chapter lists all the libraries that make a bigger contribution to the project. It is essential for any future
