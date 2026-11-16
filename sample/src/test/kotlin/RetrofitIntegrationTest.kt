@@ -3,14 +3,17 @@ import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
+import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -212,7 +215,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() {
+    fun `given a JsonXRequestBodyConverter when converting a model with relationships should write a request document with no nulls and no included`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -228,16 +231,69 @@ internal class RetrofitIntegrationTest {
         ).apply { setId(id = "10") }
         val model = PersonModel(data = person)
 
-        val requestBody = converter.convert(value = model)
-        assertNotNull(requestBody)
+        val content = converter.convert(value = model).asString()
 
-        val buffer = okio.Buffer()
-        requestBody?.writeTo(buffer)
-        val content = buffer.readUtf8()
+        assertEquals(getFileAsString(filename = "person_request_body_with_relationships.json"), content)
+    }
 
-        assertTrue(content.contains("relationships"), "Should contain relationships")
-        assertTrue(content.contains("myFavoriteDog"), "Should contain myFavoriteDog relationship")
-        assertTrue(content.contains("allMyDogs"), "Should contain allMyDogs relationship")
+    @Test
+    fun `given a JsonXRequestBodyConverter when converting a model with no relationships should write a request document with no nulls and no included`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val person = Person(
+            name = "Frank",
+            surname = "Miller",
+            age = 40,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply { setId(id = "10") }
+        val model = PersonModel(data = person)
+
+        val content = converter.convert(value = model).asString()
+
+        assertEquals(getFileAsString(filename = "person_request_body_no_relationships.json"), content)
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter when the model has a root meta should keep meta in the request document`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val person = Person(
+            name = "Frank",
+            surname = "Miller",
+            age = 40,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply { setId(id = "10") }
+        val model = PersonModel(data = person, rootMeta = PersonRootMeta(owner = "Frank"))
+
+        val content = converter.convert(value = model).asString()
+
+        assertEquals(getFileAsString(filename = "person_request_body_with_root_meta.json"), content)
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter when converting a list model should write a request document with no nulls and no included`() {
+        val adapter = factory.getAdapter<PersonList>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val person = Person(
+            name = "Frank",
+            surname = "Miller",
+            age = 40,
+            allMyDogs = listOf(Dog(name = "Max", age = 3).apply { setId(id = "1") }),
+            myFavoriteDog = null,
+        ).apply { setId(id = "10") }
+        val personList = PersonList(data = listOf(PersonItem(person)))
+
+        val content = converter.convert(value = personList).asString()
+
+        assertEquals(getFileAsString(filename = "person_list_request_body.json"), content)
     }
 
     @Test
@@ -445,6 +501,12 @@ internal class RetrofitIntegrationTest {
         assertEquals(100, result?.data?.size, "Should have 100 persons")
         assertEquals("Person1", result?.data?.get(0)?.data?.name)
         assertEquals("Person100", result?.data?.get(99)?.data?.name)
+    }
+
+    private fun RequestBody?.asString(): String {
+        val buffer = okio.Buffer()
+        requireNotNull(this) { "Request body should not be null" }.writeTo(buffer)
+        return buffer.readUtf8()
     }
 
     private fun getFileAsString(filename: String): String {
