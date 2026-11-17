@@ -18,3 +18,16 @@ data class Owner(
     @HasOne("dog")
     val myFavoriteDog: Relationship<Dog> = Relationship.Unset,
 ) : JsonApiModel()
+
+/**
+ * Declares the same relationship as a nullable [Relationship]. The declaration says "leave this
+ * alone" twice over, once as `null` and once as [Relationship.Unset], and both read that way.
+ * [Owner] is the shape to copy.
+ */
+@Serializable
+@JsonApiX("shelter")
+data class Shelter(
+    val name: String,
+    @HasOne("dog")
+    val featuredDog: Relationship<Dog>? = null,
+) : JsonApiModel()

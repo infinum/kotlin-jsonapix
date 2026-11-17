@@ -195,7 +195,11 @@ internal object RelationshipsSpecBuilder {
      */
     private fun oneRelationshipFromWrapper(property: PropertySpec): String {
         val local = "${property.name}Relationship"
+        // A property declared Relationship<T>? carries one spelling of "leave this alone" too
+        // many. Both of them read as Unset rather than failing to compile.
+        val nullBranch = if (property.type.isNullable) "null -> null; " else ""
         return "${property.name} = when (val $local = originalObject.${property.name}) {" +
+            nullBranch +
             "is Relationship.Unset -> null; " +
             "is Relationship.Clear -> OneRelationshipMember(); " +
             "is Relationship.Linked -> OneRelationshipMember(data = $local.id); " +

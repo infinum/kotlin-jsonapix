@@ -33,7 +33,7 @@ internal object LinkRelationshipFunSpecBuilder {
             .addParameter("id", String::class)
             .returns(className)
             .addStatement(
-                "return copy(%N = %T.Linked(%T(%L, id))).also { it.setType(type()); it.setId(this.id()) }",
+                "return copy(%N = %T.Linked(%T(%L, id))).also { it.setType(this.type()); it.setId(this.id()) }",
                 property.name,
                 Relationship::class,
                 ResourceIdentifier::class,

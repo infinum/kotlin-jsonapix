@@ -7,6 +7,10 @@ import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Owner
 import com.infinum.jsonapix.data.models.OwnerModel
+import com.infinum.jsonapix.data.models.ShelterModel
+import com.infinum.jsonapix.data.models.Shelter
+import com.infinum.jsonapix.data.models.OwnerList
+import com.infinum.jsonapix.data.models.OwnerItem
 import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
@@ -728,6 +732,45 @@ internal class RetrofitIntegrationTest {
         val content = ownerRequestConverter().convert(value = OwnerModel(data = read!!.data)).asString()
 
         assertEquals(getFileAsString(filename = "owner_request_body_linked_resource.json"), content)
+    }
+
+    @Test
+    fun `given a list whose items are in different relationship states should write each one`() {
+        val listAdapter = requireNotNull(factory.getAdapter<OwnerList>())
+        val converter = JsonXRequestBodyConverter(typeAdapter = listAdapter)
+        val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val list = OwnerList(
+            data = listOf(
+                OwnerItem(data = Owner(name = "Ana", myFavoriteDog = Relationship.To(dog)).apply { setId(id = "5") }),
+                OwnerItem(data = Owner(name = "Bo", myFavoriteDog = Relationship.Clear).apply { setId(id = "6") }),
+            ),
+        )
+
+        val content = converter.convert(value = list).asString()
+
+        assertEquals(getFileAsString(filename = "owner_list_request_body_mixed_states.json"), content)
+    }
+
+    @Test
+    fun `given a nullable Relationship property holding null should leave the member out`() {
+        val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<ShelterModel>()))
+        val shelter = Shelter(name = "Haven").apply { setId(id = "9") }
+
+        val content = converter.convert(value = ShelterModel(data = shelter)).asString()
+
+        // A Relationship<T>? property spells "leave this alone" twice, as null and as Unset.
+        // Both read that way rather than failing to compile.
+        assertEquals(getFileAsString(filename = "shelter_request_body_null_property.json"), content)
+    }
+
+    @Test
+    fun `given a nullable Relationship property holding Clear should write a null data member`() {
+        val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<ShelterModel>()))
+        val shelter = Shelter(name = "Haven", featuredDog = Relationship.Clear).apply { setId(id = "9") }
+
+        val content = converter.convert(value = ShelterModel(data = shelter)).asString()
+
+        assertEquals(getFileAsString(filename = "shelter_request_body_clear.json"), content)
     }
 
     private fun ownerRequestConverter(): JsonXRequestBodyConverter<OwnerModel> =

@@ -95,6 +95,9 @@ internal object IncludedSpecBuilder {
      * relationship points at a resource the caller never materialized, which is exactly a
      * relationship whose resource does not belong in `included`.
      */
-    private fun PropertySpec.relatedResource(): String =
-        if (isRelationshipWrapper) ".${JsonApiConstants.Imports.RELATIONSHIP_VALUE}" else ""
+    private fun PropertySpec.relatedResource(): String = when {
+        !isRelationshipWrapper -> ""
+        type.isNullable -> "?.${JsonApiConstants.Imports.RELATIONSHIP_VALUE}"
+        else -> ".${JsonApiConstants.Imports.RELATIONSHIP_VALUE}"
+    }
 }
