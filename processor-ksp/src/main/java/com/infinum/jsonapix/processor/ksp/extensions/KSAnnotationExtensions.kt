@@ -30,17 +30,8 @@ internal inline fun <reified E : Enum<E>> KSAnnotation.getEnumArgumentValue(name
 }
 
 /**
- * Returns the [annotationClass] annotations on this symbol in declaration order, including the ones
- * inside a [containerClass] annotation, the container that repeated annotations are stored in.
+ * Returns the [annotationClass] annotations on this symbol in declaration order. KSP reports repeated
+ * annotations as written, not inside the container annotation the JVM stores them in.
  */
-internal fun KSAnnotated.getRepeatableAnnotations(
-    annotationClass: KClass<out Annotation>,
-    containerClass: KClass<out Annotation>,
-): List<KSAnnotation> =
-    annotations.flatMap { annotation ->
-        when {
-            annotation.isOfType(annotationClass) -> sequenceOf(annotation)
-            annotation.isOfType(containerClass) -> annotation.getArgumentValue<List<KSAnnotation>>("value").asSequence()
-            else -> emptySequence()
-        }
-    }.toList()
+internal fun KSAnnotated.getRepeatableAnnotations(annotationClass: KClass<out Annotation>): List<KSAnnotation> =
+    annotations.filter { it.isOfType(annotationClass) }.toList()
