@@ -15,10 +15,11 @@ class JsonXRequestBodyConverter<Model> @JvmOverloads constructor(
     // The body is handed over as bytes rather than as a String because String.toRequestBody
     // appends `charset=utf-8` to a media type that carries no charset, and JSON:API servers answer
     // 415 to a Content-Type of application/vnd.api+json with any media type parameter. Bytes send
-    // the configured media type verbatim.
+    // the configured media type verbatim, encoded in the charset it declares so that the bytes and
+    // the header agree. One that declares none, which every JSON:API media type does, gets UTF-8.
     override fun convert(value: Model): RequestBody? =
         typeAdapter.convertToString(value)
             .toJsonApiRequestDocument()
-            .toByteArray(Charsets.UTF_8)
+            .toByteArray(mediaType.charset() ?: Charsets.UTF_8)
             .toRequestBody(mediaType)
 }

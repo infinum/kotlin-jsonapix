@@ -14,7 +14,9 @@ import com.infinum.jsonapix.retrofit.JsonXMediaTypes
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
+import java.nio.charset.Charset
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -183,6 +185,29 @@ internal class RetrofitIntegrationTest {
 
         assertNotNull(requestBody, "Request body should not be null")
         assertEquals("application/vnd.api+json".toMediaTypeOrNull(), requestBody?.contentType())
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter built with a media type that declares a charset should encode the body in it`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(
+            typeAdapter = adapter!!,
+            mediaType = "application/json; charset=ISO-8859-1".toMediaType(),
+        )
+        // One byte in ISO-8859-1 and two in UTF-8, so reading the body back as ISO-8859-1 only
+        // yields this name if the body was written in the charset the media type declares.
+        val name = "Jos\u00E9"
+        val person = Person(name = name, surname = "Brown", age = 35, allMyDogs = null, myFavoriteDog = null)
+        val model = PersonModel(data = person)
+
+        val requestBody = converter.convert(value = model)
+
+        assertTrue(
+            requestBody.asString(charset = Charsets.ISO_8859_1).contains("\"name\":\"$name\""),
+            "Body should be encoded in the charset the media type declares",
+        )
     }
 
     // The media type parameter has a default, so Kotlin callers compile either way. These pin the
@@ -561,10 +586,10 @@ internal class RetrofitIntegrationTest {
         assertEquals("Person100", result?.data?.get(99)?.data?.name)
     }
 
-    private fun RequestBody?.asString(): String {
+    private fun RequestBody?.asString(charset: Charset = Charsets.UTF_8): String {
         val buffer = okio.Buffer()
         requireNotNull(this) { "Request body should not be null" }.writeTo(buffer)
-        return buffer.readUtf8()
+        return buffer.readString(charset)
     }
 
     private fun getFileAsString(filename: String): String {
