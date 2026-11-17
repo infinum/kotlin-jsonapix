@@ -47,15 +47,12 @@ internal class JsonXExtensionsSpecBuilder {
     /**
      * Adds a `link<Relationship>` helper for every `Relationship<T>` property of [className].
      *
-     * The helper is built on `copy`, so a model that is not a data class gets none. The nullable
-     * relationship shape gets none either: it has no state to point anywhere.
+     * The nullable relationship shape gets none: it has no state to point anywhere.
      */
-    fun addRelationshipLinks(className: ClassName, oneRelationships: List<PropertySpec>, isDataClass: Boolean) {
-        if (!isDataClass) return
-
-        oneRelationships
+    fun addRelationshipLinks(className: ClassName, allProperties: List<PropertySpec>) {
+        allProperties
             .filter { it.isRelationshipWrapper }
-            .forEach { relationshipLinkFunSpecs.add(LinkRelationshipFunSpecBuilder.build(className, it)) }
+            .forEach { relationshipLinkFunSpecs.add(LinkRelationshipFunSpecBuilder.build(className, it, allProperties)) }
     }
 
     @SuppressWarnings("LongParameterList")

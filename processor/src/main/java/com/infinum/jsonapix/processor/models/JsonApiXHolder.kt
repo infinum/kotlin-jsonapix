@@ -7,7 +7,6 @@ internal data class JsonApiXHolder(
     val className: ClassName,
     val type: String,
     val isNullable: Boolean,
-    val isDataClass: Boolean,
     val primitiveProperties: List<PropertySpec>,
     val oneRelationships: List<PropertySpec>,
     val manyRelationships: List<PropertySpec>,

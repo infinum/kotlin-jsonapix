@@ -5,6 +5,8 @@ import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.core.resources.Relationship
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
+import com.infinum.jsonapix.data.models.Kennel
+import com.infinum.jsonapix.data.models.KennelModel
 import com.infinum.jsonapix.data.models.Owner
 import com.infinum.jsonapix.data.models.OwnerModel
 import com.infinum.jsonapix.data.models.ShelterModel
@@ -17,6 +19,7 @@ import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.linkMyFavoriteDog
+import com.infinum.jsonapix.linkResidentDog
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXMediaTypes
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
@@ -771,6 +774,18 @@ internal class RetrofitIntegrationTest {
         val content = converter.convert(value = ShelterModel(data = shelter)).asString()
 
         assertEquals(getFileAsString(filename = "shelter_request_body_clear.json"), content)
+    }
+
+    @Test
+    fun `given a model that is not a data class when linking should rebuild it through its constructor`() {
+        val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<KennelModel>()))
+        val kennel = Kennel(name = "Paws").apply { setId(id = "3") }.linkResidentDog(id = "2")
+
+        val content = converter.convert(value = KennelModel(data = kennel)).asString()
+
+        // The asserted id also pins that the helper carries type and id over, which neither a
+        // constructor call nor copy does on its own.
+        assertEquals(getFileAsString(filename = "kennel_request_body_linked_resource.json"), content)
     }
 
     private fun ownerRequestConverter(): JsonXRequestBodyConverter<OwnerModel> =

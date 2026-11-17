@@ -31,3 +31,16 @@ data class Shelter(
     @HasOne("dog")
     val featuredDog: Relationship<Dog>? = null,
 ) : JsonApiModel()
+
+/**
+ * A plain class rather than a data class. JsonApiX never needed `data`, and the generated link
+ * helper rebuilds the model through its constructor rather than through `copy`, so a model like
+ * this gets one too.
+ */
+@Serializable
+@JsonApiX("kennel")
+class Kennel(
+    val name: String,
+    @HasOne("dog")
+    val residentDog: Relationship<Dog> = Relationship.Unset,
+) : JsonApiModel()

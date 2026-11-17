@@ -139,8 +139,9 @@ api.update(OwnerModel(data = owner.copy(myFavoriteDog = Relationship.Unlink)))
 api.update(OwnerModel(data = owner.linkMyFavoriteDog(id = "1")))
 ```
 
-`linkMyFavoriteDog` is generated for every `Relationship` property of a data class, named `link` plus the property name. It exists because
-the JSON API type comes off the `@HasOne` annotation, so the generated code can fill it in and the call site does not have to repeat it.
+`linkMyFavoriteDog` is generated for every `Relationship` property, named `link` plus the property name. It exists because the JSON API
+type comes off the `@HasOne` annotation, so the generated code can fill it in and the call site does not have to repeat it. The model does
+not have to be a data class: the helper rebuilds it through its constructor, and carries the type and id over.
 
 Read the related model back with `value`, which gives the model for an `Included` and `null` for the other three states:
 

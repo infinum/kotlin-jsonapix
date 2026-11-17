@@ -6,7 +6,6 @@ import com.infinum.jsonapix.annotations.JsonApiX
 import com.infinum.jsonapix.processor.extensions.getAnnotationParameterValue
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
@@ -58,7 +57,6 @@ internal class JsonApiXCollector(
             className = className,
             type = type,
             isNullable = isNullable,
-            isDataClass = typeSpec.modifiers.contains(KModifier.DATA),
             primitiveProperties = primitiveProperties,
             oneRelationships = oneRelationships,
             manyRelationships = manyRelationships,

@@ -4,6 +4,7 @@ import com.infinum.jsonapix.core.resources.Relationship
 import com.infinum.jsonapix.core.resources.ResourceIdentifier
 import com.infinum.jsonapix.processor.extensions.relationshipType
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
 
@@ -19,26 +20,64 @@ import com.squareup.kotlinpoet.PropertySpec
  */
 internal object LinkRelationshipFunSpecBuilder {
 
-    fun build(className: ClassName, property: PropertySpec): FunSpec {
+    private const val ID_PARAMETER = "id"
+
+    /**
+     * @param className the annotated model.
+     * @param property the `Relationship<T>` property this helper points.
+     * @param allProperties every property of the model, in any order, since the generated call
+     * names its arguments.
+     */
+    fun build(className: ClassName, property: PropertySpec, allProperties: List<PropertySpec>): FunSpec {
         val name = property.name.replaceFirstChar { it.uppercaseChar() }
 
         return FunSpec.builder("link$name")
             .addKdoc(
                 "Points %N at the resource with this id, without materializing it. The resource " +
                     "is not added to `included`.\n\nThe returned copy keeps the type and id of " +
-                    "the receiver, which `copy` on its own drops.",
+                    "the receiver, which a plain constructor call drops.",
                 property.name,
             )
             .receiver(className)
-            .addParameter("id", String::class)
+            .addParameter(ID_PARAMETER, String::class)
             .returns(className)
             .addStatement(
-                "return copy(%N = %T.Linked(%T(%L, id))).also { it.setType(this.type()); it.setId(this.id()) }",
-                property.name,
-                Relationship::class,
-                ResourceIdentifier::class,
-                property.relationshipType(),
+                "return %T(%L).also { it.setType(this.type()); it.setId(this.id()) }",
+                className,
+                constructorArguments(property, allProperties),
             )
             .build()
+    }
+
+    /**
+     * Rebuilds the model through its constructor rather than through `copy`, so that a model which
+     * is not a data class is supported too. This is the same call the generated `original()` makes.
+     *
+     * Every carried over property is read as `this.<name>`, because the model is free to declare a
+     * property called `id`, which would otherwise bind to this helper's own parameter.
+     */
+    private fun constructorArguments(property: PropertySpec, allProperties: List<PropertySpec>): CodeBlock {
+        val arguments = CodeBlock.builder()
+
+        allProperties.forEachIndexed { index, current ->
+            if (current.name == property.name) {
+                arguments.add(
+                    "%N = %T.Linked(%T(%L, %N))",
+                    current.name,
+                    Relationship::class,
+                    ResourceIdentifier::class,
+                    property.relationshipType(),
+                    ID_PARAMETER,
+                )
+            } else {
+                arguments.add("%N = this.%N", current.name, current.name)
+            }
+
+            if (index != allProperties.lastIndex) {
+                arguments.add(", ")
+            }
+        }
+
+        return arguments.build()
     }
 }
