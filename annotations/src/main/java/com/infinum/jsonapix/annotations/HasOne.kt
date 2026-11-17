@@ -7,7 +7,7 @@ package com.infinum.jsonapix.annotations
  *
  * ```kotlin
  * @HasOne("dog") val dog: Dog?                 // legacy, null means "leave this alone"
- * @HasOne("dog") val dog: Relationship<Dog>    // Unset, Clear, Linked and To
+ * @HasOne("dog") val dog: Relationship<Dog>    // Unset, Unlink, Linked and Included
  * ```
  *
  * A nullable property cannot tell "leave this relationship alone" apart from "clear it", because

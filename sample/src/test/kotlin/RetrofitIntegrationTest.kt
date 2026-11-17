@@ -685,8 +685,8 @@ internal class RetrofitIntegrationTest {
 
         val relationship = result?.data?.myFavoriteDog
         assertTrue(relationship is Relationship.Linked, "Expected Linked but was $relationship")
-        assertEquals("1", (relationship as Relationship.Linked).id.id)
-        assertEquals("dog", relationship.id.type)
+        assertEquals("1", (relationship as Relationship.Linked).identifier.id)
+        assertEquals("dog", relationship.identifier.type)
     }
 
     @Test

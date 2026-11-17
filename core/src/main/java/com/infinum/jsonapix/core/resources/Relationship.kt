@@ -19,8 +19,13 @@ import kotlinx.serialization.Serializable
  * ) : JsonApiModel()
  * ```
  *
- * The nullable form stays supported and keeps its current behaviour, which is [Unset] for `null`
- * and [Included] otherwise. It is legacy and will be dropped in the next major release.
+ * Declaring the property as `T?` stays supported and keeps its current wire output: the member is
+ * left out for `null`, and carries linkage plus an `included` entry otherwise. That shape produces
+ * none of the states below, which is why it cannot ask for [Unlink]. It is legacy and will be
+ * dropped in the next major release.
+ *
+ * A property declared `Relationship<T>?` is accepted as well, where `null` reads as [Unset]. It
+ * says "leave this relationship alone" twice over, so prefer the non-nullable declaration.
  *
  * @param T the type of the related model.
  */
@@ -54,10 +59,10 @@ sealed interface Relationship<out T> {
      * without a matching entry in `included`, which a nullable property has no way to express and
      * so discards.
      *
-     * @property id the type and id the relationship points at.
+     * @property identifier the type and id the relationship points at.
      */
     @Serializable
-    data class Linked(val id: ResourceIdentifier) : Relationship<Nothing>
+    data class Linked(val identifier: ResourceIdentifier) : Relationship<Nothing>
 
     /**
      * The relationship points at [value], and the resource itself is present. Writes linkage and
