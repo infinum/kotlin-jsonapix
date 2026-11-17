@@ -85,6 +85,39 @@ jobs:
       - name: Stop Gradle
         run: ./gradlew --stop
 
+  # Linux can't run Apple test binaries, so the iOS simulator tests get their own job on macOS. It
+  # runs only those. The Tests job runs every other target.
+  ios-tests:
+    name: iOS simulator tests
+    needs: [ validation ]
+    # macos-latest is an Apple Silicon runner, which iosSimulatorArm64 needs.
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Save Gradle Caches
+        uses: actions/cache@v6
+        with:
+          path: ~/.gradle/caches/
+          key: gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-caches-${{ runner.os }}-
+      # Kotlin/Native downloads its compiler and toolchain to ~/.konan when it first compiles native
+      # code. Its version follows the Kotlin version in dependencies.gradle.
+      - name: Save Kotlin/Native Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('dependencies.gradle') }}
+          restore-keys: |
+            konan-${{ runner.os }}-
+      # Runs in every module that has the task: annotations, core and processor-tests:kmp. The
+      # runner's selected Xcode comes with iOS simulators, and Kotlin picks Xcode's default device.
+      - name: iOS simulator tests
+        run: ./gradlew iosSimulatorArm64Test
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
   smoke-test:
     name: Local deploy
     needs: [ validation ]
@@ -115,5 +148,9 @@ jobs:
         run: ./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=kapt
       - name: Build sample with KSP
         run: ./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=ksp
+      # A KMP consumer of the multiplatform publications and their Gradle module metadata. allTests
+      # runs its JVM, Linux native, JS and Wasm tests.
+      - name: Test KMP module
+        run: ./gradlew :processor-tests:kmp:allTests -PjsonApiXSource=maven
       - name: Stop Gradle
         run: ./gradlew --stop

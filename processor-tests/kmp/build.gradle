@@ -12,6 +12,31 @@ plugins {
 apply from: "$rootDir/multiplatform.gradle"
 apply from: "$rootDir/processor-tests/behavior/fixtures.gradle"
 
+// The published-artifact smoke test builds and tests this module from locally published JsonApiX
+// artifacts, which proves the multiplatform publications and their Gradle module metadata. By
+// default it uses the project modules. The sample reads the same property.
+def jsonApiXSource = providers.gradleProperty("jsonApiXSource").getOrElse("project")
+if (!(jsonApiXSource in ["project", "maven"])) {
+    throw new GradleException("jsonApiXSource must be 'project' or 'maven', not '$jsonApiXSource'")
+}
+
+if (jsonApiXSource == "maven") {
+    // JsonApiX resolves only from the local Maven repository, so a version that wasn't published
+    // there fails resolution instead of falling back to a released one from Maven Central.
+    repositories {
+        exclusiveContent {
+            forRepository { mavenLocal() }
+            filter { includeGroup releaseConfig.group }
+        }
+    }
+}
+
+// A JsonApiX project module, or in Maven mode its published artifact at the version being built
+// rather than the released version in the dependency catalog.
+def jsonApiX = { String module ->
+    jsonApiXSource == "maven" ? "${releaseConfig.group}:$module:${releaseConfig.version}" : project(":$module")
+}
+
 // The behavior suite lives in a shared directory so that every backend module compiles the same
 // files. Its models are commonMain sources, which this module runs through KSP like a KMP consumer
 // would. The shared part of its tests runs from commonTest, on every target the host can run. The
@@ -64,14 +89,14 @@ kotlin {
         commonMain {
             kotlin.srcDir(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
             dependencies {
-                implementation project(":core")
+                implementation jsonApiX("core")
             }
         }
     }
 }
 
 dependencies {
-    kspCommonMainMetadata project(":processor-ksp")
+    kspCommonMainMetadata jsonApiX("processor-ksp")
 }
 
 tasks.withType(KotlinCompilationTask).configureEach {
