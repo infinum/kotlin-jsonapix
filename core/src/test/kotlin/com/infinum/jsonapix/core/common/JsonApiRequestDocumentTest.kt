@@ -139,4 +139,72 @@ internal class JsonApiRequestDocumentTest {
             result,
         )
     }
+
+    @Test
+    fun `given a null data member outside a relationship object when converting should drop it`() {
+        val document = """
+            {"data":{"type":"person","id":"1","attributes":{"data":null},"meta":{"data":null}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals("""{"data":{"type":"person","id":"1","attributes":{},"meta":{}}}""", result)
+    }
+
+    @Test
+    fun `given a relationship object carrying meta with a null member when converting should drop only the meta member`() {
+        val document = """
+            {"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":{"data":null,"meta":{"note":null}}}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals(
+            """{"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":{"data":null,"meta":{}}}}}""",
+            result,
+        )
+    }
+
+    @Test
+    fun `given a relationship object with links and no data when converting should leave it alone`() {
+        val document = """
+            {"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":{"links":{"self":"/a"},"meta":null}}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals(
+            """{"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":{"links":{"self":"/a"}}}}}""",
+            result,
+        )
+    }
+
+    @Test
+    fun `given a to-many relationship with a null data when converting should keep it like a to-one`() {
+        val document = """
+            {"data":{"type":"person","id":"1","relationships":{"allMyDogs":{"data":null}}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals(
+            """{"data":{"type":"person","id":"1","relationships":{"allMyDogs":{"data":null}}}}""",
+            result,
+        )
+    }
+
+    @Test
+    fun `given a relationships key outside a resource object when converting should still treat its data as structural`() {
+        val document = """
+            {"meta":{"relationships":{"anything":{"data":null}}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        // The filter dispatches on the member name rather than on position in the document, so a
+        // key called relationships is read as one wherever it appears. JSON:API has no such member
+        // outside a resource object, and treating it as one keeps a null that would otherwise have
+        // been dropped, which is the harmless direction.
+        assertEquals("""{"meta":{"relationships":{"anything":{"data":null}}}}""", result)
+    }
 }

@@ -1,0 +1,1 @@
+{"data":{"type":"registration","id":"res-id","attributes":{"id":"attr-id","type":"attr-type"},"relationships":{"dog":{"data":{"type":"dog","id":"5"}}}}}

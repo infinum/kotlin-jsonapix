@@ -3,6 +3,11 @@ import com.infinum.jsonapix.core.adapters.AdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.core.resources.Relationship
+import com.infinum.jsonapix.core.resources.ResourceIdentifier
+import com.infinum.jsonapix.data.models.Breeder
+import com.infinum.jsonapix.data.models.BreederModel
+import com.infinum.jsonapix.data.models.Registration
+import com.infinum.jsonapix.data.models.RegistrationModel
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Kennel
@@ -18,6 +23,7 @@ import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRootMeta
+import com.infinum.jsonapix.linkDog
 import com.infinum.jsonapix.linkMyFavoriteDog
 import com.infinum.jsonapix.linkResidentDog
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
@@ -786,6 +792,87 @@ internal class RetrofitIntegrationTest {
         // The asserted id also pins that the helper carries type and id over, which neither a
         // constructor call nor copy does on its own.
         assertEquals(getFileAsString(filename = "kennel_request_body_linked_resource.json"), content)
+    }
+
+    @Test
+    fun `given a model with both relationship shapes should omit the legacy null and keep the unlinked one`() {
+        val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<BreederModel>()))
+        val breeder = Breeder(
+            name = "Ana",
+            legacyDog = null,
+            wrappedDog = Relationship.Unlink,
+            allDogs = null,
+        ).apply { setId(id = "7") }
+
+        val content = converter.convert(value = BreederModel(data = breeder)).asString()
+
+        // The two shapes have to disagree here: a null legacy property cannot say anything, while
+        // Unlink has to survive the filter that drops the legacy one.
+        assertEquals(
+            getFileAsString(filename = "breeder_request_body_legacy_null_wrapper_unlinked.json"),
+            content,
+        )
+    }
+
+    @Test
+    fun `given a model with id and type attributes when linking should keep them out of the resource identity`() {
+        val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<RegistrationModel>()))
+        val registration = Registration(id = "attr-id", type = "attr-type")
+            .apply { setId(id = "res-id") }
+            .linkDog(id = "5")
+
+        val content = converter.convert(value = RegistrationModel(data = registration)).asString()
+
+        // The helper takes a parameter called id, and the model declares a property of that name.
+        // Reading the carried over properties through `this` is what keeps the two apart.
+        assertEquals(getFileAsString(filename = "registration_request_body_linked.json"), content)
+    }
+
+    @Test
+    fun `given included carrying a different type with the same id should read a Relationship Linked`() {
+        val json = """
+            {
+                "data": {
+                    "type": "owner",
+                    "id": "5",
+                    "attributes": { "name": "Ana" },
+                    "relationships": { "myFavoriteDog": { "data": { "type": "dog", "id": "1" } } }
+                },
+                "included": [
+                    { "type": "person", "id": "1", "attributes": { "age": 1, "surname": "Decoy" } }
+                ]
+            }
+        """.trimIndent()
+
+        val result = ownerResponseConverter().convert(value = json.toResponseBody())
+
+        val relationship = result?.data?.myFavoriteDog
+        assertTrue(relationship is Relationship.Linked, "Expected Linked but was $relationship")
+    }
+
+    @Test
+    fun `given a Relationship Included when writing a full document should put the resource in included`() {
+        val adapter = requireNotNull(factory.getAdapter<OwnerModel>())
+        val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.Included(dog)).apply { setId(id = "5") }
+
+        val document = adapter.convertToString(OwnerModel(data = owner))
+
+        assertEquals(getFileAsString(filename = "owner_document_included_resource.json"), document)
+    }
+
+    @Test
+    fun `given a Relationship Linked when writing a full document should leave included empty`() {
+        val adapter = requireNotNull(factory.getAdapter<OwnerModel>())
+        val owner = Owner(
+            name = "Ana",
+            myFavoriteDog = Relationship.Linked(ResourceIdentifier(type = "dog", id = "9")),
+        ).apply { setId(id = "5") }
+
+        val document = adapter.convertToString(OwnerModel(data = owner))
+
+        // This is what separates Linked from Included: linkage goes out, the resource does not.
+        assertEquals(getFileAsString(filename = "owner_document_linked_without_included.json"), document)
     }
 
     private fun ownerRequestConverter(): JsonXRequestBodyConverter<OwnerModel> =
