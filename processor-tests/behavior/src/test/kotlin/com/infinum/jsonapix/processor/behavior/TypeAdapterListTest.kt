@@ -11,17 +11,18 @@ import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.data.models.TypeAdapterList_Person
-import java.io.InputStreamReader
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @Suppress("LargeClass", "TooManyFunctions")
 internal class TypeAdapterListTest {
 
     private var typeListAdapter: TypeAdapter<PersonList>? = null
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         typeListAdapter = TypeAdapterFactory().getAdapter(type = PersonList::class) as? TypeAdapterList_Person
     }
@@ -64,17 +65,17 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_one_and_many_rel.json")
+        val response = Fixtures.PERSON_LIST_ONE_AND_MANY_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that the response has an included block but first person not having allMyDogs rel type adapter Person convertFromString should generate a Person class list with first person allMyDogs as null and second person with full rels`() {
         val items = listOf(
             PersonItem(
@@ -111,17 +112,17 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_first_person_empty_rel_second_person_full_rel.json")
+        val response = Fixtures.PERSON_LIST_FIRST_PERSON_EMPTY_REL_SECOND_PERSON_FULL_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that the response has included block but second person has no allMyDogs rel type adapter Person convertFromString should generate a Person class list class with first person full rels and second person with allMyDogs as null`() {
         val items = listOf(
             PersonItem(
@@ -158,17 +159,17 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_first_person_full_rel_second_person_no_many_rel.json")
+        val response = Fixtures.PERSON_LIST_FIRST_PERSON_FULL_REL_SECOND_PERSON_NO_MANY_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that response has an included block but first person no allMyDogs rel and myFavoriteDog set as null type adapter Person convertFromString should generate a Person class list with first person allMyDogs and myFavoriteDog set as null`() {
         val items = listOf(
             PersonItem(
@@ -202,17 +203,17 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_first_person_no_many_rels_null_one_rel_second_person_full_rels.json")
+        val response = Fixtures.PERSON_LIST_FIRST_PERSON_NO_MANY_RELS_NULL_ONE_REL_SECOND_PERSON_FULL_RELS
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that there is no included block in response type adapter Person list convertFromString should generate a Person class list with allMyDogs null and myFavoriteDog null for both Persons`() {
         val items = listOf(
             PersonItem(
@@ -249,17 +250,17 @@ internal class TypeAdapterListTest {
             data = items,
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
-        val response = getFileAsString(filename = "person_list_no_included_block.json")
+        val response = Fixtures.PERSON_LIST_NO_INCLUDED_BLOCK
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that there is an included block but both persons have no rel in response type adapter Person list convertFromString should generate a Person class list with allMyDogs null and myFavoriteDog null for both Persons`() {
         val items = listOf(
             PersonItem(
@@ -293,17 +294,17 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_both_person_no_rel.json")
+        val response = Fixtures.PERSON_LIST_BOTH_PERSON_NO_REL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that there is an included block but both persons have both rel set as null in response type adapter Person list convertFromString should generate a Person class list with allMyDogs null and myFavoriteDog null for both Persons`() {
         val items = listOf(
             PersonItem(
@@ -333,17 +334,17 @@ internal class TypeAdapterListTest {
             rootLinks = DefaultLinks(self = "https://root.link.com"),
         )
 
-        val response = getFileAsString(filename = "person_list_with_included_block_but_with_rel_values_set_as_null_for_both_persons.json")
+        val response = Fixtures.PERSON_LIST_WITH_INCLUDED_BLOCK_BUT_WITH_REL_VALUES_SET_AS_NULL_FOR_BOTH_PERSONS
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that there is an included block but all link types in response are set as null type adapter Person list convertFromString should generate a valid Person list with no illegal argument exception`() {
         val items = listOf(
             PersonItem(
@@ -369,38 +370,38 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString(filename = "person_list_all_links_null.json")
+        val response = Fixtures.PERSON_LIST_ALL_LINKS_NULL
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             personList,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that there is a null relationship data in response type adapter Person list convertFromString should handle it gracefully`() {
-        val response = getFileAsString(filename = "person_list_invalid_relationship_data.json")
+        val response = Fixtures.PERSON_LIST_INVALID_RELATIONSHIP_DATA
 
         val result = typeListAdapter?.convertFromString(input = response)
 
         // Verify that null relationship data is handled gracefully
-        Assertions.assertNotNull(result)
-        Assertions.assertEquals(2, result?.data?.size)
+        assertNotNull(result)
+        assertEquals(2, result?.data?.size)
 
         // First person should have myFavoriteDog set
-        Assertions.assertEquals("Jason", result?.data?.get(0)?.data?.name)
-        Assertions.assertNotNull(result?.data?.get(0)?.data?.myFavoriteDog)
-        Assertions.assertEquals(2, result?.data?.get(0)?.data?.allMyDogs?.size)
+        assertEquals("Jason", result?.data?.get(0)?.data?.name)
+        assertNotNull(result?.data?.get(0)?.data?.myFavoriteDog)
+        assertEquals(2, result?.data?.get(0)?.data?.allMyDogs?.size)
 
         // Second person should have myFavoriteDog as null (per JSON:API spec, null is valid)
-        Assertions.assertEquals("Jasminka", result?.data?.get(1)?.data?.name)
-        Assertions.assertNull(result?.data?.get(1)?.data?.myFavoriteDog) // null is acceptable
-        Assertions.assertEquals(2, result?.data?.get(1)?.data?.allMyDogs?.size)
+        assertEquals("Jasminka", result?.data?.get(1)?.data?.name)
+        assertNull(result?.data?.get(1)?.data?.myFavoriteDog) // null is acceptable
+        assertEquals(2, result?.data?.get(1)?.data?.allMyDogs?.size)
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that person list has allMyDogs and myFavoriteDog set type adapter Person list convertToString should generate a json with 2 persons having allMyDogs and myFavouriteDog relationships set with no links`() {
         val items = listOf(
             PersonItem(
@@ -432,17 +433,17 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString(filename = "person_list_convert_to_string_all_rels.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_ALL_RELS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that person list second person has null myFavoriteDog type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog rel`() {
         val items = listOf(
             PersonItem(
@@ -475,17 +476,17 @@ internal class TypeAdapterListTest {
             data = items,
         )
 
-        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_SECOND_PERSON_NULL_MY_FAVORITE_DOG
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that person list second person has null myFavoriteDog and empty allMyDogs type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog and empty allMyDogs rels`() {
         val items = listOf(
             PersonItem(
@@ -514,17 +515,17 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_empty_all_my_dogs.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_SECOND_PERSON_NULL_MY_FAVORITE_DOG_EMPTY_ALL_MY_DOGS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that person list second person has null myFavoriteDog and empty allMyDogs type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog and allMyDogs rels`() {
         val items = listOf(
             PersonItem(
@@ -553,17 +554,17 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_second_person_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_SECOND_PERSON_NULL_MY_FAVORITE_DOG_AND_ALL_MY_DOGS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given that person list both persons has null myFavoriteDog and allMyDogs type adapter Person list convertToString should generate a json with first person having allMyDogs relationships myFavouriteDog relationships and second person with null myFavoriteDog and allMyDogs rels`() {
         val items = listOf(
             PersonItem(
@@ -588,17 +589,17 @@ internal class TypeAdapterListTest {
 
         val personList = PersonList(data = items)
 
-        val response = getFileAsString(filename = "person_list_convert_to_string_both_persons_null_my_favorite_dog_and_all_my_dogs.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_BOTH_PERSONS_NULL_MY_FAVORITE_DOG_AND_ALL_MY_DOGS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given a Person list with allMyDogs with id set type adapter list Person convertToString should generate a json with person array and allMyDogs many rel and correct id set for each dog in both included and relationship blocks`() {
         val items = listOf(
             PersonItem(
@@ -628,11 +629,11 @@ internal class TypeAdapterListTest {
         )
         val personList = PersonList(data = items)
 
-        val response = getFileAsString(filename = "person_list_all_my_dogs_with_id_set_for_each_dog.json")
+        val response = Fixtures.PERSON_LIST_ALL_MY_DOGS_WITH_ID_SET_FOR_EACH_DOG
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -656,11 +657,11 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_ROOT_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -685,11 +686,11 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RESOURCE_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -718,11 +719,11 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RELATIONSHIPS_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -757,11 +758,11 @@ internal class TypeAdapterListTest {
             data = items,
             rootMeta = rootMeta,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_all_meta.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_ALL_META
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -785,11 +786,11 @@ internal class TypeAdapterListTest {
             data = items,
             rootLinks = rootLinks,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_root_links.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_ROOT_LINKS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -814,11 +815,11 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_resource_links.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RESOURCE_LINKS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
@@ -847,44 +848,38 @@ internal class TypeAdapterListTest {
         val personList = PersonList(
             data = items,
         )
-        val response = getFileAsString(filename = "person_list_convert_to_string_with_relationships_links.json")
+        val response = Fixtures.PERSON_LIST_CONVERT_TO_STRING_WITH_RELATIONSHIPS_LINKS
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given an empty Person list convertFromString should generate no error`() {
-        val response = getFileAsString(filename = "person_list_blank_data.json")
+        val response = Fixtures.PERSON_LIST_BLANK_DATA
 
         val result = typeListAdapter?.convertFromString(input = response)
 
-        Assertions.assertEquals(
+        assertEquals(
             result?.data?.isEmpty(),
             true,
         )
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `given an empty Person list convertToString should generate no error`() {
         val personList = PersonList(data = emptyList())
-        val response = getFileAsString(filename = "person_list_blank_data_encode.json")
+        val response = Fixtures.PERSON_LIST_BLANK_DATA_ENCODE
 
         val result = typeListAdapter?.convertToString(input = personList)
 
-        Assertions.assertEquals(
+        assertEquals(
             response,
             result,
         )
-    }
-
-    private fun getFileAsString(filename: String): String {
-        val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
-        val fileReader: InputStreamReader? = fileStream?.reader()
-        return fileReader?.readText() ?: ""
     }
 }

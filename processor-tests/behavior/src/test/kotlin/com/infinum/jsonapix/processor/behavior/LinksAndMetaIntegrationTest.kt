@@ -11,13 +11,12 @@ import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRelationshipMeta
 import com.infinum.jsonapix.data.models.PersonResourceMeta
 import com.infinum.jsonapix.data.models.PersonRootMeta
-import java.io.InputStreamReader
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Integration tests for Links and Meta handling across all placement strategies.
@@ -28,7 +27,7 @@ internal class LinksAndMetaIntegrationTest {
 
     private lateinit var factory: TypeAdapterFactory
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         factory = TypeAdapterFactory()
     }
@@ -78,7 +77,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString(filename = "person_with_root_meta.json")
+        val json = Fixtures.PERSON_WITH_ROOT_META
         val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.rootMeta, "Root meta should be parsed")
@@ -111,7 +110,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString(filename = "person_with_resource_meta.json")
+        val json = Fixtures.PERSON_WITH_RESOURCE_META
         val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.resourceObjectMeta, "Resource meta should be parsed")
@@ -199,7 +198,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString(filename = "person_with_one_rel_meta.json")
+        val json = Fixtures.PERSON_WITH_ONE_REL_META
         val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.relationshipsMeta)
@@ -249,7 +248,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString(filename = "person_with_all_metas.json")
+        val json = Fixtures.PERSON_WITH_ALL_METAS
         val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.rootMeta, "Root meta should be present")
@@ -362,7 +361,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString(filename = "person_with_all_links.json")
+        val json = Fixtures.PERSON_WITH_ALL_LINKS
         val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result.rootLinks)
@@ -435,7 +434,7 @@ internal class LinksAndMetaIntegrationTest {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
-        val json = getFileAsString(filename = "person_all_types_of_links_null.json")
+        val json = Fixtures.PERSON_ALL_TYPES_OF_LINKS_NULL
         val result = adapter!!.convertFromString(input = json)
 
         assertNotNull(result, "Should parse successfully with null links")
@@ -489,11 +488,5 @@ internal class LinksAndMetaIntegrationTest {
         // Verify data integrity
         assertEquals("Nancy", result.data.name)
         assertEquals("Oscar", result.data.myFavoriteDog?.name)
-    }
-
-    private fun getFileAsString(filename: String): String {
-        val fileStream = javaClass.classLoader?.getResourceAsStream(filename)
-        val fileReader: InputStreamReader? = fileStream?.reader()
-        return fileReader?.readText() ?: ""
     }
 }
