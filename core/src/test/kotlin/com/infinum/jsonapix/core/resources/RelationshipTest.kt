@@ -28,7 +28,7 @@ internal class RelationshipTest {
     @Test
     fun `given any state other than To when reading value should return null`() {
         assertNull(Relationship.Unset.value)
-        assertNull(Relationship.Clear.value)
+        assertNull(Relationship.Unlink.value)
         assertNull(Relationship.Linked(ResourceIdentifier(type = "dog", id = "1")).value)
     }
 

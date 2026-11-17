@@ -37,12 +37,14 @@ sealed interface Relationship<out T> {
     data object Unset : Relationship<Nothing>
 
     /**
-     * Clear the relationship. Writes `{"data": null}`, which JSON:API defines as removing the
-     * relationship. A server is not allowed to read an absent member this way, so [Unset] and
-     * [Clear] are not interchangeable.
+     * Remove whatever this relationship points at, the opposite of [Linked].
+     *
+     * Writes `{"data": null}`, which JSON:API defines as removing the relationship. A server is
+     * not allowed to read an absent member that way, so [Unset] and [Unlink] are not
+     * interchangeable: one leaves the relationship as it is, the other empties it.
      */
     @Serializable
-    data object Clear : Relationship<Nothing>
+    data object Unlink : Relationship<Nothing>
 
     /**
      * The relationship points at a resource that has not been materialized.
@@ -74,7 +76,7 @@ sealed interface Relationship<out T> {
  *
  * This is the counterpart of reading a nullable `@HasOne` property, and collapses the states the
  * same way: a caller that only wants the model cannot tell [Relationship.Unset],
- * [Relationship.Clear] and [Relationship.Linked] apart. Match on the relationship itself where
+ * [Relationship.Unlink] and [Relationship.Linked] apart. Match on the relationship itself where
  * that distinction matters.
  */
 val <T> Relationship<T>.value: T?

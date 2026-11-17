@@ -32,7 +32,7 @@ private val RESPONSE_ONLY_MEMBERS = setOf(
  * The one exception is the `data` member of a relationship object, which is structural: JSON:API
  * reads `{"data": null}` as "clear this relationship", and reads an absent member as "leave this
  * relationship alone". Those are different instructions, so a null `data` inside `relationships`
- * is kept. Only a `Relationship.Clear` produces one.
+ * is kept. Only a `Relationship.Unlink` produces one.
  */
 fun String.toJsonApiRequestDocument(): String {
     val document = Json.parseToJsonElement(this).jsonObject

@@ -122,7 +122,7 @@ into `null`. `Relationship<Dog>` separates them:
 | State | Written as | Means |
 |---|---|---|
 | `Relationship.Unset` | member left out | leave this relationship alone |
-| `Relationship.Clear` | `"dog": {"data": null}` | remove the relationship |
+| `Relationship.Unlink` | `"dog": {"data": null}` | remove the relationship |
 | `Relationship.Linked(ResourceIdentifier("dog", "1"))` | `"dog": {"data": {"type": "dog", "id": "1"}}` | point at a resource, without sending it in `included` |
 | `Relationship.Included(dog)` | `"dog": {"data": {...}}` plus `included` | point at a resource and send it |
 
@@ -135,23 +135,23 @@ data class Owner(
     val myFavoriteDog: Relationship<Dog> = Relationship.Unset,
 ) : JsonApiModel()
 
-api.update(OwnerModel(data = owner.copy(myFavoriteDog = Relationship.Clear)))
+api.update(OwnerModel(data = owner.copy(myFavoriteDog = Relationship.Unlink)))
 api.update(OwnerModel(data = owner.linkMyFavoriteDog(id = "1")))
 ```
 
 `linkMyFavoriteDog` is generated for every `Relationship` property of a data class, named `link` plus the property name. It exists because
 the JSON API type comes off the `@HasOne` annotation, so the generated code can fill it in and the call site does not have to repeat it.
 
-Read the related model back with `value`, which gives the model for a `To` and `null` for the other three states:
+Read the related model back with `value`, which gives the model for an `Included` and `null` for the other three states:
 
 ```kotlin
 val dog: Dog? = owner.myFavoriteDog.value
 ```
 
-Deserialization produces `To` when the linkage resolves against `included`, and `Linked` when it does not, so a relationship whose resource
+Deserialization produces `Included` when the linkage resolves against `included`, and `Linked` when it does not, so a relationship whose resource
 was not included survives instead of being read as `null`. Everything else reads as `Unset`, including a member whose `data` is `null`: a
 response cannot ask a client to clear anything, and a relationship object carrying only `links` or `meta` says nothing about the linkage, so
-reading either as `Clear` would turn an ordinary response into a request that deletes the relationship on the next write.
+reading either as `Unlink` would turn an ordinary response into a request that deletes the relationship on the next write.
 
 The nullable shape keeps working exactly as before and produces byte-identical output. It is legacy, and will be dropped in the next major
 release.
@@ -397,7 +397,7 @@ specification defines for responses only, so they are left out, and so is every 
 set is indistinguishable from one set to `null`, and sending it as `null` would tell the server to clear the value.
 
 The one `null` that survives is the `data` member of a relationship object, which is structural: `{"data": null}` is how JSON API spells
-"clear this relationship". Only a [`Relationship.Clear`](#to-one-relationships) produces one.
+"clear this relationship". Only a [`Relationship.Unlink`](#to-one-relationships) produces one.
 
 ```json
 {

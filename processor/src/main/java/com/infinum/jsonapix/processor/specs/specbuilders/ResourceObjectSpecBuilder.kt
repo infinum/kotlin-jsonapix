@@ -302,7 +302,7 @@ internal object ResourceObjectSpecBuilder {
      *
      * Everything else reads as `Relationship.Unset`, including a member whose `data` is null. A
      * response cannot ask a client to clear anything, and a relationship object that carries only
-     * `links` or `meta` says nothing about the linkage, so reading either as `Relationship.Clear`
+     * `links` or `meta` says nothing about the linkage, so reading either as `Relationship.Unlink`
      * would turn an ordinary response into a request that deletes the relationship on the next
      * write.
      */

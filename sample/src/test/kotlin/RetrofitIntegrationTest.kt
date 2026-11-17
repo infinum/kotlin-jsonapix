@@ -607,7 +607,7 @@ internal class RetrofitIntegrationTest {
     @Test
     fun `given a Relationship Clear when converting should write a null data member`() {
         val converter = ownerRequestConverter()
-        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.Clear).apply { setId(id = "5") }
+        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.Unlink).apply { setId(id = "5") }
 
         val content = converter.convert(value = OwnerModel(data = owner)).asString()
 
@@ -742,7 +742,7 @@ internal class RetrofitIntegrationTest {
         val list = OwnerList(
             data = listOf(
                 OwnerItem(data = Owner(name = "Ana", myFavoriteDog = Relationship.Included(dog)).apply { setId(id = "5") }),
-                OwnerItem(data = Owner(name = "Bo", myFavoriteDog = Relationship.Clear).apply { setId(id = "6") }),
+                OwnerItem(data = Owner(name = "Bo", myFavoriteDog = Relationship.Unlink).apply { setId(id = "6") }),
             ),
         )
 
@@ -766,7 +766,7 @@ internal class RetrofitIntegrationTest {
     @Test
     fun `given a nullable Relationship property holding Clear should write a null data member`() {
         val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<ShelterModel>()))
-        val shelter = Shelter(name = "Haven", featuredDog = Relationship.Clear).apply { setId(id = "9") }
+        val shelter = Shelter(name = "Haven", featuredDog = Relationship.Unlink).apply { setId(id = "9") }
 
         val content = converter.convert(value = ShelterModel(data = shelter)).asString()
 

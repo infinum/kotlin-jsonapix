@@ -190,7 +190,7 @@ internal object RelationshipsSpecBuilder {
      * The four states of a `Relationship<T>`, mapped onto the member that goes into the document.
      *
      * `Unset` yields a null member, which the request document filter then leaves out entirely.
-     * `Clear` yields a member with a null `data`, which the same filter keeps because `data` is
+     * `Unlink` yields a member with a null `data`, which the same filter keeps because `data` is
      * structural inside a relationship object.
      */
     private fun oneRelationshipFromWrapper(property: PropertySpec): String {
@@ -201,7 +201,7 @@ internal object RelationshipsSpecBuilder {
         return "${property.name} = when (val $local = originalObject.${property.name}) {" +
             nullBranch +
             "is Relationship.Unset -> null; " +
-            "is Relationship.Clear -> OneRelationshipMember(); " +
+            "is Relationship.Unlink -> OneRelationshipMember(); " +
             "is Relationship.Linked -> OneRelationshipMember(data = $local.id); " +
             "is Relationship.Included -> $local.value.toOneRelationshipModel(" +
             "%L, ($local.value as? JsonApiModel)?.id().orEmpty()) }"
