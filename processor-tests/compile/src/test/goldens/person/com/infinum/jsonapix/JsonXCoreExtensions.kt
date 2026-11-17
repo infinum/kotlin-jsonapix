@@ -29,6 +29,7 @@ import kotlin.Function1
 import kotlin.IllegalArgumentException
 import kotlin.PublishedApi
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.Collection
 import kotlin.collections.List
 import kotlin.collections.Map
@@ -59,6 +60,7 @@ public inline fun <reified Model : Error> HttpException.asJsonXHttpException(): 
   return JsonXHttpException(response, errors)
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <reified Data, reified Model> String.decodeJsonApiXString(
   rootLinks: String,
   resourceObjectLinks: String,
@@ -72,9 +74,10 @@ public inline fun <reified Data, reified Model> String.decodeJsonApiXString(
   val discriminator = JsonApiDiscriminator(type ?: jsonApiXTypeOf(Model::class), rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonElement = Json.parseToJsonElement(this)
   val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()
-  return format.decodeFromString<JsonApiX<Data,Model>>(jsonStringWithDiscriminator)
+  return format.decodeFromString(PolymorphicSerializer(JsonApiX::class), jsonStringWithDiscriminator) as JsonApiX<Data, Model>
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <reified Data, reified Model> String.decodeJsonApiXListString(
   rootLinks: String,
   resourceObjectLinks: String,
@@ -89,7 +92,7 @@ public inline fun <reified Data, reified Model> String.decodeJsonApiXListString(
   val discriminator = JsonApiListDiscriminator(type ?: jsonApiXTypeOf(Model::class), rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonElement = Json.parseToJsonElement(this)
   val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()
-  return format.decodeFromString<JsonApiXList<Data,Model>>(jsonStringWithDiscriminator)
+  return format.decodeFromString(PolymorphicSerializer(JsonApiXList::class), jsonStringWithDiscriminator) as JsonApiXList<Data, Model>
 }
 
 private val jsonApiXTypes: Map<KClass<*>, String> = mapOf(

@@ -4,11 +4,11 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.TypeExtractor
-import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.decodeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.findTypeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.formatMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.jsonObjectMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.typeOfMember
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
@@ -16,6 +16,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json
 
 internal object DeserializeFunSpecBuilder {
@@ -42,6 +43,7 @@ internal object DeserializeFunSpecBuilder {
         return FunSpec.builder(JsonApiConstants.Members.JSONX_DESERIALIZE)
             .receiver(String::class)
             .addModifiers(KModifier.INLINE)
+            .addAnnotation(AnnotationSpec.builder(Suppress::class).addMember("%S", "UNCHECKED_CAST").build())
             .addTypeVariable(dataVariableName.copy(reified = true))
             .addTypeVariable(typeVariableName.copy(reified = true))
             .addParameters(linksParams)
@@ -78,10 +80,14 @@ internal object DeserializeFunSpecBuilder {
             .addStatement(
                 "val jsonStringWithDiscriminator = discriminator.inject(jsonElement).toString()",
             )
+            // The serializer is passed explicitly, because only the JVM and JS can look up the serializer
+            // of an interface at runtime. The discriminator picks the model's class, so the cast is safe.
             .addStatement(
-                "return %M.%M<%T<%T,%T>>(jsonStringWithDiscriminator)",
+                "return %M.%L(%T(%T::class), jsonStringWithDiscriminator) as %T<%T, %T>",
                 formatMember,
-                decodeMember,
+                JsonApiConstants.Members.DECODE_FROM_STRING,
+                PolymorphicSerializer::class,
+                JsonApiX::class,
                 JsonApiX::class,
                 dataVariableName,
                 typeVariableName,

@@ -45,25 +45,85 @@ When submitting a pull request, please ensure that:
 Try to avoid creating large pull requests that include multiple unrelated changes. Instead, break them down into
 smaller, more focused pull requests. This will make it easier for us to review and merge your changes.
 
-## Building the sample against published artifacts
+## Building and testing
 
-The sample app can be built against the JsonApiX artifacts as consumers download them, instead of against the project
-modules. Two Gradle properties choose where the sample gets JsonApiX from:
+Run every test your machine can run:
 
-- `jsonApiXSource`: `project` (the default) uses the project modules. `maven` uses the artifacts in your local Maven
-  repository, at the version in `releaseConfig` in `config.gradle`. In this mode JsonApiX never resolves from Maven
-  Central, so an artifact that wasn't published locally at that version fails the build instead of a released one being
-  used.
-- `jsonApiXBackend`: `kapt` (the default) runs `processor` on KAPT. `ksp` runs `processor-ksp` on KSP.
+```bash
+./gradlew test allTests
+```
 
-Publish all library modules to your local Maven repository first, in a separate Gradle run, then build the sample once
-per backend:
+`test` runs the tests of the JVM modules. The multiplatform modules, `annotations`, `core` and `processor-tests:kmp`,
+have no `test` task. `allTests` runs their tests on every target your machine can run.
+
+You don't need Xcode. Without it, on Linux or on a Mac with only the Command Line Tools, everything except the Apple
+targets builds and tests:
+
+- Kotlin compiles every target on any host, so the iOS libraries still build and publish;
+- linking and running the iOS test binaries needs Xcode. On a Mac without it, the build skips those tasks and warns
+  which ones it skipped. To run them, see [Running the iOS simulator tests](#running-the-ios-simulator-tests);
+- the Linux native tests, `linuxX64Test`, run only on Linux. On a Mac, Kotlin skips them with a warning. CI runs them.
+
+The JS and Wasm tests run on Node.js, which Gradle downloads. The npm packages for the JS tests are locked in
+`kotlin-js-store/yarn.lock`, which is committed. When a Kotlin update changes those packages, the build fails with
+"Lock file was changed. Run the `kotlinUpgradeYarnLock` task to actualize lock file". Run that task, and commit the
+updated lock with the Kotlin update:
+
+```bash
+./gradlew kotlinUpgradeYarnLock
+```
+
+## Running the iOS simulator tests
+
+CI runs the iOS simulator tests on macOS on every pull request and every push to `master`. To run them yourself, you
+need a Mac with Apple Silicon, and:
+
+- Xcode;
+- an iOS simulator runtime. Install it once, in Xcode → Settings → Components.
+
+Then run the tests in every module that has them:
+
+```bash
+./gradlew iosSimulatorArm64Test
+```
+
+Gradle uses the developer directory that `xcode-select -p` prints. If that's the Command Line Tools, the build skips
+the iOS tests with a warning. To point Gradle at Xcode for one run, without changing the system setting, set
+`DEVELOPER_DIR`:
+
+```bash
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./gradlew iosSimulatorArm64Test
+```
+
+To select Xcode for every run instead, run `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`.
+
+If the tests fail with "Xcode does not support simulator tests for ios_simulator_arm64", the iOS simulator runtime
+isn't installed.
+
+## Building against published artifacts
+
+Two modules can be built against the JsonApiX artifacts as consumers download them, instead of against the project
+modules: the sample app, an Android consumer, and `processor-tests:kmp`, a Kotlin Multiplatform consumer that runs the
+behavior tests. Two Gradle properties choose where they get JsonApiX from:
+
+- `jsonApiXSource`, for both: `project` (the default) uses the project modules. `maven` uses the artifacts in your local
+  Maven repository, at the version in `releaseConfig` in `config.gradle`. In this mode JsonApiX never resolves from
+  Maven Central, so an artifact that wasn't published locally at that version fails the build instead of a released one
+  being used.
+- `jsonApiXBackend`, for the sample only: `kapt` (the default) runs `processor` on KAPT. `ksp` runs `processor-ksp` on
+  KSP.
+
+Publish all library modules to your local Maven repository first, in a separate Gradle run. Then build the sample once
+per backend, and run the KMP module's tests:
 
 ```bash
 ./gradlew publishToMavenLocal
 ./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=kapt
 ./gradlew :sample:assembleDebug -PjsonApiXSource=maven -PjsonApiXBackend=ksp
+./gradlew :processor-tests:kmp:allTests -PjsonApiXSource=maven
 ```
+
+`allTests` runs the KMP module's tests on every target your machine can run.
 
 Publishing to the local Maven repository doesn't need a signing key. Only publishing to Maven Central does.
 
@@ -73,9 +133,12 @@ CI runs these steps as the smoke test job on every pull request and every push t
 
 All artifacts are released together, at the version in `releaseConfig` in `config.gradle`.
 
-Before publishing a release, set the new version and build the sample against the locally published artifacts with both
-backends, as described in [Building the sample against published artifacts](#building-the-sample-against-published-artifacts).
-Publish only if both builds succeed.
+Releases can be made from any machine. Kotlin compiles every target JsonApiX publishes, the Apple ones included, on any
+host, and publishing doesn't need Xcode.
+
+Before publishing a release, set the new version. Then build the sample with both backends and run the KMP module's
+tests, all against the locally published artifacts, as described in
+[Building against published artifacts](#building-against-published-artifacts). Publish only if all three succeed.
 
 ## Code of conduct
 

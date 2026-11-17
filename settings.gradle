@@ -1,2 +1,2 @@
-include ":processor", ":processor-common", ":processor-ksp", ":annotations", ":core", ":sample", ":retrofit", ':lint', ':processor-tests:compile', ':processor-tests:kapt', ':processor-tests:ksp'
+include ":processor", ":processor-common", ":processor-ksp", ":annotations", ":core", ":sample", ":retrofit", ':lint', ':processor-tests:compile', ':processor-tests:kapt', ':processor-tests:ksp', ':processor-tests:kmp'
 rootProject.name = "android-jsonapix"

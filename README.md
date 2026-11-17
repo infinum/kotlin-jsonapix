@@ -6,7 +6,7 @@
 
 ## Description
 
-- JSON API X is an Android, annotation processor library with the intention of extending it to a KMP library in due time
+- JSON API X is an annotation processor library for Android and Kotlin Multiplatform
 - Implements a parser between Kotlin classes and JSON API specification strings in both directions
 - Includes Retrofit module for easy API implementations
 
@@ -15,9 +15,11 @@
 * [Requirements](#requirements)
 * [Getting started](#getting-started)
   * [KSP setup](#ksp-setup)
+  * [Kotlin Multiplatform setup](#kotlin-multiplatform-setup)
 * [Usage](#usage)
 * [JsonApiModel - Handling `links` and `meta` JSON API fields](#jsonapimodel---handling-links-and-meta-json-api-fields)
 * [Retrofit Support](#retrofit-support)
+  * [Models in a Kotlin Multiplatform module](#models-in-a-kotlin-multiplatform-module)
 * [List of libraries used in the project](#list-of-libraries-used-in-the-project)
 * [Contributing](#contributing)
 * [License](#license)
@@ -39,6 +41,8 @@ All other artifacts are the same for both processors.
 Both processors generate the same code, so you can move a module from one to the other by changing only its Gradle setup.
 
 KSP support requires KSP2, version 2.3.10 or newer on Kotlin 2.4, and is tested with 2.3.12.
+
+Kotlin Multiplatform modules need KSP. See [Kotlin Multiplatform setup](#kotlin-multiplatform-setup).
 
 > [!WARNING]
 > Apply only one of the two processors in a module. Applying both generates every class twice, and the build fails with duplicate declarations.
@@ -121,6 +125,102 @@ To move a module from KAPT to KSP, apply the `ksp` plugin and replace the `kapt`
 line for `processor-ksp`. Your code doesn't change: the generated classes, their packages and their API stay the same.
 If JsonApiX was the last processor on KAPT in that module, you can remove the KAPT plugin too.
 
+### Kotlin Multiplatform setup
+
+In a Kotlin Multiplatform (KMP) module, you declare your models in `commonMain`, and JsonApiX generates their code into
+`commonMain` too. Encoding and decoding then work the same on every target, from common code.
+
+`annotations` and `core` are multiplatform libraries, published for six targets:
+
+- `jvm`, which Android uses too;
+- `iosArm64` and `iosSimulatorArm64`;
+- `js` and `wasmJs`, for the browser and Node.js;
+- `linuxX64`.
+
+Your module can declare any of them. A target that isn't on the list fails dependency resolution with "No matching
+variant of com.infinum.jsonapix:core". If you need another target, [open an issue](CONTRIBUTING.md#issue-reporting).
+Adding a target doesn't break existing users.
+
+The other artifacts are JVM-only. This is where each artifact goes:
+
+| Artifact        | Platforms     | Where it goes                                                                                          |
+|-----------------|---------------|--------------------------------------------------------------------------------------------------------|
+| `core`          | Multiplatform | `commonMain`. It brings `annotations` and `kotlinx-serialization-json` with it.                        |
+| `annotations`   | Multiplatform | Nowhere, it comes with `core`.                                                                         |
+| `processor-ksp` | JVM only      | `kspCommonMainMetadata`. It runs in your build, so it works for every target.                          |
+| `processor`     | JVM only      | Not in KMP modules. It runs on KAPT, which can't process `commonMain`.                                 |
+| `retrofit`      | JVM only      | Android code. See [Models in a Kotlin Multiplatform module](#models-in-a-kotlin-multiplatform-module). |
+| `lint`          | JVM only      | Android modules.                                                                                       |
+
+Apply the Kotlin Multiplatform, kotlinx-serialization and KSP plugins to the module. Then put `core` in `commonMain`,
+put `processor-ksp` on `kspCommonMainMetadata`, add the generated code to `commonMain`'s sources, and make every
+compilation wait for it. In the module's `build.gradle.kts`:
+
+```kotlin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+
+plugins {
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
+    id("com.google.devtools.ksp")
+}
+
+kotlin {
+    // Your targets, from the list above
+    jvm()
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain {
+            // The code JsonApiX generates for commonMain
+            kotlin.srcDir(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
+            dependencies {
+                api("com.infinum.jsonapix:core:<latest-version>")
+            }
+        }
+    }
+}
+
+dependencies {
+    // Only this KSP configuration, see below
+    add("kspCommonMainMetadata", "com.infinum.jsonapix:processor-ksp:<latest-version>")
+}
+
+// Generate the code before anything compiles against it
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+// KSP also registers a task for every target, which reads commonMain's sources, the generated code included
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+```
+
+Apply the plugins the way your build already does, for example with versions from your version catalog. JsonApiX is
+built with Kotlin 2.4.20, and its KMP setup is tested with KSP 2.3.12.
+
+`core` is an `api` dependency because the generated classes, such as `TypeAdapterFactory` and `PersonModel`, use
+`core`'s types in their public API. Every module that uses them, such as your Android app, needs `core` on its compile
+classpath too.
+
+Then use the generated classes from common code, as described in [Usage](#usage).
+
+> [!WARNING]
+> Put `processor-ksp` on `kspCommonMainMetadata` only. Configurations for single targets, such as `kspAndroid`,
+> `kspJvm` or `kspIosArm64`, generate the code once more for those targets, and the build fails with "Redeclaration"
+> and "Conflicting overloads" errors.
+
+A few more rules apply:
+
+- Declare your models in `commonMain`. JsonApiX doesn't process models in platform source sets, such as `androidMain`
+  or `iosMain`.
+- Use KSP. KAPT can't process `commonMain`, so `processor` stays for Android-only modules.
+- Generate in one module per build, as on Android. The generated `TypeAdapterFactory`, `format` and the other shared
+  files always use the package `com.infinum.jsonapix`, so two modules that generate them clash.
+
 ## Usage
 
 Let's take the example of a class named `Person`.
@@ -136,17 +236,17 @@ data class Person(
     val friends: List<Friend>,
     @HasOne(type = "dog")
     val dog: Dog?
-)
+) : JsonApiModel()
 ```
 
 `@JsonApiX` annotation takes a String type parameter and it must be combined with `@Serializable` from KotlinX Serialization. Type is later
-used as a value for the `type` key in the JSON API specification.
+used as a value for the `type` key in the JSON API specification. The class must also extend `JsonApiModel`.
 
 `@HasOne` and `@HasMany` indicate the class relationships. They also take the type parameter, that must be the same as the one indicated in
 the class definition.
 
 In this case, `Dog` must also be annotated with `@Serializable` and `@JsonApiX(type = "dog")`, where `"dog"` is the type defined for
-the `Dog` class.
+the `Dog` class, and extend `JsonApiModel`.
 
 All non-primitive fields of a class should be some kind of relationship.
 
@@ -276,8 +376,8 @@ try {
 JSON API specification includes resources that are not necessarily a part of the original models.
 JsonApiX provides a way to retrieve the `links` and `meta` values from the JSON API input, without including those fields in your model.
 
-To achieve this, your model need to extend `JsonApiModel` abstract class.
-
+The links and meta live in the generated classes, such as `PersonModel` and `PersonList`, so your model only extends `JsonApiModel`,
+as every model must (see [Usage](#usage)):
 
 ```kotlin
 @Serializable
@@ -291,7 +391,8 @@ data class Person(
 ) : JsonApiModel()
 ```
 
-`JsonApiModel` is an abstract class that provides getters and setters for id and type.
+`JsonApiModel` is an abstract class that holds the resource's `id` and `type`, with getters and setters. Decoding sets both from the
+JSON API input. Encoding writes `id()` as the resource's `id`, or `"0"` when it's `null`.
 
 The generated `PersonModel` and `PersonList` classes come with default meta and links, but we've provided options for customization. This allows you to tailor these elements to fit your specific project needs, enhancing flexibility and control.
 
@@ -381,6 +482,33 @@ Retrofit.Builder()
     .baseUrl("https://www.example.com")
     .build()
 ```
+
+### Models in a Kotlin Multiplatform module
+
+`retrofit` is JVM-only, so JsonApiX generates no Retrofit code into a multiplatform module. Android code can still use
+Retrofit with those models, in an Android module that depends on the multiplatform one, or in the multiplatform
+module's `androidMain` or `jvmMain`:
+
+- add `retrofit` to it. It also needs `core`, which comes from the multiplatform module when that declares `core` with
+  `api`, as in [Kotlin Multiplatform setup](#kotlin-multiplatform-setup);
+- add the converter with the generated `TypeAdapterFactory`, as shown above;
+- read errors with the `asJsonXHttpException` from `retrofit`, and pass it the `format` that JsonApiX generated. The
+  generated `asJsonXHttpException()` without arguments from [Errors](#errors) doesn't exist for these models.
+
+```kotlin
+import com.infinum.jsonapix.format
+import com.infinum.jsonapix.retrofit.asJsonXHttpException
+
+try {
+    val person = io { sampleApiService.fetchPerson() }
+} catch (exception: HttpException) {
+    val errors = exception.asJsonXHttpException<PersonalError>(format).errors // List<PersonalError>?
+    // handle errors
+    ...
+}
+```
+
+For the default error model, use `asJsonXHttpException<DefaultError>(format)`.
 
 ## List of libraries used in the project
 

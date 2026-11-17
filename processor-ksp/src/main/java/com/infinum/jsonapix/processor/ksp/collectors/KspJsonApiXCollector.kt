@@ -34,8 +34,8 @@ internal class KspJsonApiXCollector(
 
         return JsonApiXHolder(
             className = declaration.holderClassName(),
-            type = annotation.getArgumentValue<String>(JsonApiX::type.name),
-            isNullable = annotation.getArgumentValue<Boolean>(JsonApiX::isNullable.name),
+            type = annotation.getArgumentValue(JsonApiX::type),
+            isNullable = annotation.getArgumentValue(JsonApiX::isNullable),
             attributes = attributes,
             oneRelationships = oneRelationships,
             manyRelationships = manyRelationships,
@@ -59,7 +59,7 @@ internal class KspJsonApiXCollector(
             val hasOneAnnotation = annotations.firstOrNull { it.isOfType(HasOne::class) }
             val hasManyAnnotation = annotations.firstOrNull { it.isOfType(HasMany::class) }
             val serialName = annotations.firstOrNull { it.isOfType(SerialName::class) }
-                ?.getArgumentValue<String>(SerialName::value.name)
+                ?.getArgumentValue(SerialName::value)
 
             val property = propertyDeclaration.toPropertySpec(
                 isConstructorProperty = propertyDeclaration.simpleName.asString() in constructorParameterNames,
@@ -70,7 +70,7 @@ internal class KspJsonApiXCollector(
                 hasOneAnnotation != null -> oneRelationships.add(
                     RelationshipProperty(
                         property = property,
-                        type = hasOneAnnotation.getArgumentValue(HasOne::type.name),
+                        type = hasOneAnnotation.getArgumentValue(HasOne::type),
                         serialName = serialName,
                     ),
                 )
@@ -78,7 +78,7 @@ internal class KspJsonApiXCollector(
                 hasManyAnnotation != null -> manyRelationships.add(
                     RelationshipProperty(
                         property = property,
-                        type = hasManyAnnotation.getArgumentValue(HasMany::type.name),
+                        type = hasManyAnnotation.getArgumentValue(HasMany::type),
                         serialName = serialName,
                     ),
                 )

@@ -16,7 +16,7 @@ internal class KspJsonApiXErrorCollector(
         declarations.flatMapTo(linkedSetOf()) { declaration ->
             declaration.getRepeatableAnnotations(JsonApiXError::class).map { annotation ->
                 JsonApiXErrorHolder(
-                    type = annotation.getArgumentValue(JsonApiXError::type.name),
+                    type = annotation.getArgumentValue(JsonApiXError::type),
                     className = declaration.holderClassName(),
                 )
             }
