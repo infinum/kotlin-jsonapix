@@ -137,6 +137,8 @@ object JsonApiConstants {
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
         const val JSON_API_MODEL = "JsonApiModel"
+        const val RELATIONSHIP = "Relationship"
+        const val RELATIONSHIP_VALUE = "value"
 
         const val REQUIRE_NOT_NULL = "requireNotNull"
         const val MAP_SAFE = "mapSafe"

@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.specs.specbuilders
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
+import com.infinum.jsonapix.processor.extensions.isRelationshipWrapper
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.PropertySpec
 import java.lang.StringBuilder
@@ -16,7 +17,7 @@ internal object IncludedSpecBuilder {
         oneRelationships.forEachIndexed { index, prop ->
 
             statement.append(
-                """data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                """data.${prop.name}${prop.relatedResource()}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                     relationshipsMeta?.get("${prop.name}"),
                     relationshipsLinks?.get("${prop.name}")
                 )}
@@ -54,7 +55,7 @@ internal object IncludedSpecBuilder {
         oneRelationships.forEachIndexed { index, prop ->
             statement.append(
                 """*data.mapSafe {item ->
-                    item.data.${prop.name}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
+                    item.data.${prop.name}${prop.relatedResource()}?.let{it.${JsonApiConstants.Members.TO_RESOURCE_OBJECT}(
                         item.relationshipsMeta?.get("${prop.name}"),
                         item.relationshipsLinks?.get("${prop.name}")
                     )} }.toTypedArray()
@@ -85,4 +86,15 @@ internal object IncludedSpecBuilder {
 
         return CodeBlock.of(statement.toString())
     }
+
+    /**
+     * How to reach the related model from the property.
+     *
+     * Only a `Relationship.To` carries one, so a `Relationship<T>` property goes through the
+     * `value` accessor and the other three states contribute nothing to `included`. A `Linked`
+     * relationship points at a resource the caller never materialized, which is exactly a
+     * relationship whose resource does not belong in `included`.
+     */
+    private fun PropertySpec.relatedResource(): String =
+        if (isRelationshipWrapper) ".${JsonApiConstants.Imports.RELATIONSHIP_VALUE}" else ""
 }

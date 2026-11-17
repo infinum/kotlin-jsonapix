@@ -86,4 +86,57 @@ internal class JsonApiRequestDocumentTest {
 
         assertEquals(document, result)
     }
+
+    @Test
+    fun `given a relationship with a null data when converting should keep it`() {
+        val document = """
+            {"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":{"data":null,"links":null,"meta":null}}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals(
+            """{"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":{"data":null}}}}""",
+            result,
+        )
+    }
+
+    @Test
+    fun `given a null relationship member when converting should still drop it`() {
+        val document = """
+            {"data":{"type":"person","id":"1","relationships":{"myFavoriteDog":null,"allMyDogs":{"data":[]}}}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals(
+            """{"data":{"type":"person","id":"1","relationships":{"allMyDogs":{"data":[]}}}}""",
+            result,
+        )
+    }
+
+    @Test
+    fun `given a null data outside a relationship object when converting should drop it`() {
+        val document = """
+            {"data":null,"meta":{"data":null}}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals("""{"meta":{}}""", result)
+    }
+
+    @Test
+    fun `given a list document when converting should keep a null relationship data in every item`() {
+        val document = """
+            {"data":[{"type":"person","id":"1","relationships":{"myFavoriteDog":{"data":null}}},{"type":"person","id":"2","relationships":{"myFavoriteDog":null}}]}
+        """.trimIndent()
+
+        val result = document.toJsonApiRequestDocument()
+
+        assertEquals(
+            """{"data":[{"type":"person","id":"1","relationships":{"myFavoriteDog":{"data":null}}},{"type":"person","id":"2","relationships":{}}]}""",
+            result,
+        )
+    }
 }

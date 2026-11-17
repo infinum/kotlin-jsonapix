@@ -2,13 +2,17 @@ import com.infinum.jsonapix.TypeAdapterFactory
 import com.infinum.jsonapix.core.adapters.AdapterFactory
 import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
+import com.infinum.jsonapix.core.resources.Relationship
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
+import com.infinum.jsonapix.data.models.Owner
+import com.infinum.jsonapix.data.models.OwnerModel
 import com.infinum.jsonapix.data.models.Person
 import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRootMeta
+import com.infinum.jsonapix.linkMyFavoriteDog
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
 import com.infinum.jsonapix.retrofit.JsonXMediaTypes
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
@@ -585,6 +589,155 @@ internal class RetrofitIntegrationTest {
         assertEquals("Person1", result?.data?.get(0)?.data?.name)
         assertEquals("Person100", result?.data?.get(99)?.data?.name)
     }
+
+    @Test
+    fun `given a Relationship Unset when converting should leave the relationship member out`() {
+        val converter = ownerRequestConverter()
+        val owner = Owner(name = "Ana").apply { setId(id = "5") }
+
+        val content = converter.convert(value = OwnerModel(data = owner)).asString()
+
+        assertEquals(getFileAsString(filename = "owner_request_body_unset.json"), content)
+    }
+
+    @Test
+    fun `given a Relationship Clear when converting should write a null data member`() {
+        val converter = ownerRequestConverter()
+        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.Clear).apply { setId(id = "5") }
+
+        val content = converter.convert(value = OwnerModel(data = owner)).asString()
+
+        assertEquals(getFileAsString(filename = "owner_request_body_clear.json"), content)
+    }
+
+    @Test
+    fun `given a Relationship To when converting should write linkage and no included`() {
+        val converter = ownerRequestConverter()
+        val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.To(dog)).apply { setId(id = "5") }
+
+        val content = converter.convert(value = OwnerModel(data = owner)).asString()
+
+        assertEquals(getFileAsString(filename = "owner_request_body_to_resource.json"), content)
+    }
+
+    @Test
+    fun `given a Relationship Linked when converting should write linkage for a resource it never fetched`() {
+        val converter = ownerRequestConverter()
+        val owner = Owner(name = "Ana").apply { setId(id = "5") }.linkMyFavoriteDog(id = "7")
+
+        val content = converter.convert(value = OwnerModel(data = owner)).asString()
+
+        assertEquals(getFileAsString(filename = "owner_request_body_linked_resource.json"), content)
+    }
+
+    @Test
+    fun `given a response with linkage and a matching included resource should read a Relationship To`() {
+        val json = """
+            {
+                "data": {
+                    "type": "owner",
+                    "id": "5",
+                    "attributes": { "name": "Ana" },
+                    "relationships": { "myFavoriteDog": { "data": { "type": "dog", "id": "1" } } }
+                },
+                "included": [
+                    { "type": "dog", "id": "1", "attributes": { "name": "Max", "age": 3 } }
+                ]
+            }
+        """.trimIndent()
+
+        val result = ownerResponseConverter().convert(value = json.toResponseBody())
+
+        val relationship = result?.data?.myFavoriteDog
+        assertTrue(relationship is Relationship.To, "Expected To but was $relationship")
+        assertEquals("Max", (relationship as Relationship.To).value.name)
+    }
+
+    @Test
+    fun `given a response with linkage but no matching included resource should read a Relationship Linked`() {
+        val json = """
+            {
+                "data": {
+                    "type": "owner",
+                    "id": "5",
+                    "attributes": { "name": "Ana" },
+                    "relationships": { "myFavoriteDog": { "data": { "type": "dog", "id": "1" } } }
+                },
+                "included": []
+            }
+        """.trimIndent()
+
+        val result = ownerResponseConverter().convert(value = json.toResponseBody())
+
+        val relationship = result?.data?.myFavoriteDog
+        assertTrue(relationship is Relationship.Linked, "Expected Linked but was $relationship")
+        assertEquals("1", (relationship as Relationship.Linked).id.id)
+        assertEquals("dog", relationship.id.type)
+    }
+
+    @Test
+    fun `given a response with no relationship member should read a Relationship Unset`() {
+        val json = """
+            {
+                "data": { "type": "owner", "id": "5", "attributes": { "name": "Ana" } }
+            }
+        """.trimIndent()
+
+        val result = ownerResponseConverter().convert(value = json.toResponseBody())
+
+        assertEquals(Relationship.Unset, result?.data?.myFavoriteDog)
+    }
+
+    @Test
+    fun `given a response whose relationship carries a null data should read a Relationship Unset`() {
+        val json = """
+            {
+                "data": {
+                    "type": "owner",
+                    "id": "5",
+                    "attributes": { "name": "Ana" },
+                    "relationships": { "myFavoriteDog": { "data": null } }
+                }
+            }
+        """.trimIndent()
+
+        val result = ownerResponseConverter().convert(value = json.toResponseBody())
+
+        // A response never asks a client to clear anything, and a relationship object that carries
+        // only links or meta says nothing about the linkage. Reading either as Clear would turn an
+        // ordinary response into a request that deletes the relationship on the next write.
+        assertEquals(Relationship.Unset, result?.data?.myFavoriteDog)
+    }
+
+    @Test
+    fun `given a Relationship Linked when round tripping through a request should keep pointing at the same resource`() {
+        val json = """
+            {
+                "data": {
+                    "type": "owner",
+                    "id": "5",
+                    "attributes": { "name": "Ana" },
+                    "relationships": { "myFavoriteDog": { "data": { "type": "dog", "id": "7" } } }
+                },
+                "included": []
+            }
+        """.trimIndent()
+
+        val read = ownerResponseConverter().convert(value = json.toResponseBody())
+        val content = ownerRequestConverter().convert(value = OwnerModel(data = read!!.data)).asString()
+
+        assertEquals(getFileAsString(filename = "owner_request_body_linked_resource.json"), content)
+    }
+
+    private fun ownerRequestConverter(): JsonXRequestBodyConverter<OwnerModel> =
+        JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<OwnerModel>()))
+
+    private fun ownerResponseConverter(): JsonXResponseBodyConverter<OwnerModel> =
+        JsonXResponseBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<OwnerModel>()))
+
+    private fun String.toResponseBody(): ResponseBody =
+        toResponseBody(contentType = "application/json".toMediaTypeOrNull())
 
     private fun RequestBody?.asString(charset: Charset = Charsets.UTF_8): String {
         val buffer = okio.Buffer()

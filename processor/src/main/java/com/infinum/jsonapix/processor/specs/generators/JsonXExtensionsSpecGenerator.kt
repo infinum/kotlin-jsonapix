@@ -75,6 +75,12 @@ internal class JsonXExtensionsSpecGenerator(
                 null
             }
 
+        builder.addRelationshipLinks(
+            className = className,
+            oneRelationships = holder.oneRelationships,
+            isDataClass = holder.isDataClass,
+        )
+
         builder.add(
             type = holder.type,
             metaInfo = metaInfo,

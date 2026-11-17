@@ -2,8 +2,10 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Errors
+import com.infinum.jsonapix.processor.extensions.isRelationshipWrapper
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.LinkRelationshipFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ListItemResourceObjectFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
@@ -27,6 +29,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
@@ -36,9 +39,24 @@ import retrofit2.HttpException
 internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
+    private val relationshipLinkFunSpecs = mutableListOf<FunSpec>()
     private val customLinks = mutableListOf<ClassName>()
     private val customErrors = mutableMapOf<String, ClassName>()
     private val customMeta = mutableListOf<ClassName>()
+
+    /**
+     * Adds a `link<Relationship>` helper for every `Relationship<T>` property of [className].
+     *
+     * The helper is built on `copy`, so a model that is not a data class gets none. The nullable
+     * relationship shape gets none either: it has no state to point anywhere.
+     */
+    fun addRelationshipLinks(className: ClassName, oneRelationships: List<PropertySpec>, isDataClass: Boolean) {
+        if (!isDataClass) return
+
+        oneRelationships
+            .filter { it.isRelationshipWrapper }
+            .forEach { relationshipLinkFunSpecs.add(LinkRelationshipFunSpecBuilder.build(className, it)) }
+    }
 
     @SuppressWarnings("LongParameterList")
     fun add(
@@ -195,6 +213,12 @@ internal class JsonXExtensionsSpecBuilder {
             JsonApiConstants.Imports.FLAT_MAP_SAFE,
         )
 
+        // Reaches the related model of a Relationship<T> property when building `included`.
+        fileSpec.addImport(
+            JsonApiConstants.Packages.CORE_RESOURCES,
+            JsonApiConstants.Imports.RELATIONSHIP_VALUE,
+        )
+
         specsMap.entries.forEach {
             fileSpec.addFunction(
                 OriginalDataResourceObjectFunSpecBuilder.build(
@@ -252,6 +276,8 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addProperty(FormatPropertySpecBuilder.build())
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
+
+        relationshipLinkFunSpecs.forEach { fileSpec.addFunction(it) }
 
         fileSpec.addFunction(decodeJsonApiErrorFunSpec())
 
