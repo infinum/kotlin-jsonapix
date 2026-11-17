@@ -22,7 +22,7 @@ internal class RelationshipTest {
     fun `given a To relationship when reading value should return the model`() {
         val dog = TestDog(name = "Max")
 
-        assertEquals(dog, Relationship.To(dog).value)
+        assertEquals(dog, Relationship.Included(dog).value)
     }
 
     @Test
@@ -37,7 +37,7 @@ internal class RelationshipTest {
         val identifier = ResourceIdentifier(type = "dog", id = "1")
 
         assertEquals(Relationship.Linked(identifier), Relationship.Linked(identifier))
-        assertEquals(Relationship.To(TestDog(name = "Max")), Relationship.To(TestDog(name = "Max")))
+        assertEquals(Relationship.Included(TestDog(name = "Max")), Relationship.Included(TestDog(name = "Max")))
     }
 
     // A model declaring a Relationship property has to keep compiling under @Serializable, which
@@ -47,9 +47,9 @@ internal class RelationshipTest {
     fun `given a serializable model holding a Relationship should resolve a serializer`() {
         val json = Json { encodeDefaults = true }
 
-        val encoded = json.encodeToString(TestOwner(name = "Ana", favorite = Relationship.To(TestDog(name = "Max"))))
+        val encoded = json.encodeToString(TestOwner(name = "Ana", favorite = Relationship.Included(TestDog(name = "Max"))))
 
         assertNotNull(encoded)
-        assertEquals(TestOwner(name = "Ana", favorite = Relationship.To(TestDog(name = "Max"))), json.decodeFromString<TestOwner>(encoded))
+        assertEquals(TestOwner(name = "Ana", favorite = Relationship.Included(TestDog(name = "Max"))), json.decodeFromString<TestOwner>(encoded))
     }
 }

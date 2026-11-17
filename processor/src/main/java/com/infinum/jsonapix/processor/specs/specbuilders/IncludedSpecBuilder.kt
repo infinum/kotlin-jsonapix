@@ -90,7 +90,7 @@ internal object IncludedSpecBuilder {
     /**
      * How to reach the related model from the property.
      *
-     * Only a `Relationship.To` carries one, so a `Relationship<T>` property goes through the
+     * Only a `Relationship.Included` carries one, so a `Relationship<T>` property goes through the
      * `value` accessor and the other three states contribute nothing to `included`. A `Linked`
      * relationship points at a resource the caller never materialized, which is exactly a
      * relationship whose resource does not belong in `included`.

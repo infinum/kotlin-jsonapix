@@ -124,7 +124,7 @@ into `null`. `Relationship<Dog>` separates them:
 | `Relationship.Unset` | member left out | leave this relationship alone |
 | `Relationship.Clear` | `"dog": {"data": null}` | remove the relationship |
 | `Relationship.Linked(ResourceIdentifier("dog", "1"))` | `"dog": {"data": {"type": "dog", "id": "1"}}` | point at a resource, without sending it in `included` |
-| `Relationship.To(dog)` | `"dog": {"data": {...}}` plus `included` | point at a resource and send it |
+| `Relationship.Included(dog)` | `"dog": {"data": {...}}` plus `included` | point at a resource and send it |
 
 ```kotlin
 @Serializable

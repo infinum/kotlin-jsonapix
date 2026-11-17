@@ -203,7 +203,7 @@ internal object RelationshipsSpecBuilder {
             "is Relationship.Unset -> null; " +
             "is Relationship.Clear -> OneRelationshipMember(); " +
             "is Relationship.Linked -> OneRelationshipMember(data = $local.id); " +
-            "is Relationship.To -> $local.value.toOneRelationshipModel(" +
+            "is Relationship.Included -> $local.value.toOneRelationshipModel(" +
             "%L, ($local.value as? JsonApiModel)?.id().orEmpty()) }"
     }
 

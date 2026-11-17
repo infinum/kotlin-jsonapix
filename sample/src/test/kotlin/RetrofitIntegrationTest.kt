@@ -618,7 +618,7 @@ internal class RetrofitIntegrationTest {
     fun `given a Relationship To when converting should write linkage and no included`() {
         val converter = ownerRequestConverter()
         val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
-        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.To(dog)).apply { setId(id = "5") }
+        val owner = Owner(name = "Ana", myFavoriteDog = Relationship.Included(dog)).apply { setId(id = "5") }
 
         val content = converter.convert(value = OwnerModel(data = owner)).asString()
 
@@ -654,8 +654,8 @@ internal class RetrofitIntegrationTest {
         val result = ownerResponseConverter().convert(value = json.toResponseBody())
 
         val relationship = result?.data?.myFavoriteDog
-        assertTrue(relationship is Relationship.To, "Expected To but was $relationship")
-        assertEquals("Max", (relationship as Relationship.To).value.name)
+        assertTrue(relationship is Relationship.Included, "Expected Included but was $relationship")
+        assertEquals("Max", (relationship as Relationship.Included).value.name)
     }
 
     @Test
@@ -741,7 +741,7 @@ internal class RetrofitIntegrationTest {
         val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
         val list = OwnerList(
             data = listOf(
-                OwnerItem(data = Owner(name = "Ana", myFavoriteDog = Relationship.To(dog)).apply { setId(id = "5") }),
+                OwnerItem(data = Owner(name = "Ana", myFavoriteDog = Relationship.Included(dog)).apply { setId(id = "5") }),
                 OwnerItem(data = Owner(name = "Bo", myFavoriteDog = Relationship.Clear).apply { setId(id = "6") }),
             ),
         )

@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
  * ```
  *
  * The nullable form stays supported and keeps its current behaviour, which is [Unset] for `null`
- * and [To] otherwise. It is legacy and will be dropped in the next major release.
+ * and [Included] otherwise. It is legacy and will be dropped in the next major release.
  *
  * @param T the type of the related model.
  */
@@ -65,12 +65,12 @@ sealed interface Relationship<out T> {
      * @property value the related model.
      */
     @Serializable
-    data class To<out T>(val value: T) : Relationship<T>
+    data class Included<out T>(val value: T) : Relationship<T>
 }
 
 /**
- * The related model when this relationship is a [Relationship.To], and `null` for every other
- * state.
+ * The related model when this relationship is a [Relationship.Included], and `null` for every
+ * other state.
  *
  * This is the counterpart of reading a nullable `@HasOne` property, and collapses the states the
  * same way: a caller that only wants the model cannot tell [Relationship.Unset],
@@ -78,4 +78,4 @@ sealed interface Relationship<out T> {
  * that distinction matters.
  */
 val <T> Relationship<T>.value: T?
-    get() = (this as? Relationship.To)?.value
+    get() = (this as? Relationship.Included)?.value

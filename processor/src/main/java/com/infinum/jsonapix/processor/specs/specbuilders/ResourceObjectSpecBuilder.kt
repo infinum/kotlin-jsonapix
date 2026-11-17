@@ -296,7 +296,7 @@ internal object ResourceObjectSpecBuilder {
     /**
      * Reads a `Relationship<T>` property back out of a document.
      *
-     * Linkage that resolves against `included` becomes a `Relationship.To`, and linkage that does
+     * Linkage that resolves against `included` becomes a `Relationship.Included`, and linkage that does
      * not becomes a `Relationship.Linked`, which is how a relationship whose resource was not
      * included survives the round trip instead of collapsing to null.
      *
@@ -312,7 +312,7 @@ internal object ResourceObjectSpecBuilder {
         addStatement("included?.firstOrNull { identifier == ResourceIdentifier(it.type, it.id) }")
         indent()
         addStatement(
-            "?.let { %T.To(it.${JsonApiConstants.Members.ORIGINAL}(included) as %T) }",
+            "?.let { %T.Included(it.${JsonApiConstants.Members.ORIGINAL}(included) as %T) }",
             Relationship::class,
             relatedType,
         )
