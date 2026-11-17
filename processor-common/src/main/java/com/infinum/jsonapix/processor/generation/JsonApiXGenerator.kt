@@ -7,6 +7,7 @@ import com.infinum.jsonapix.processor.models.JsonApiXErrorHolder
 import com.infinum.jsonapix.processor.models.JsonApiXHolder
 import com.infinum.jsonapix.processor.models.JsonApiXLinksHolder
 import com.infinum.jsonapix.processor.models.JsonApiXMetaHolder
+import com.infinum.jsonapix.processor.specs.ClassNames
 import com.infinum.jsonapix.processor.specs.generators.AttributesSpecGenerator
 import com.infinum.jsonapix.processor.specs.generators.JsonXExtensionsSpecGenerator
 import com.infinum.jsonapix.processor.specs.generators.ListSpecsGenerator
@@ -19,8 +20,14 @@ import com.infinum.jsonapix.processor.specs.generators.TypeAdapterSpecsGenerator
 import com.infinum.jsonapix.processor.specs.generators.WrapperSpecsGenerator
 import com.squareup.kotlinpoet.ClassName
 
+/**
+ * Generates the code for all models. The Retrofit extension is generated only when JsonApiX's `retrofit`
+ * artifact is on the [classpath], because the consumer couldn't compile it otherwise. A KMP `commonMain`
+ * compilation never has it.
+ */
 public class JsonApiXGenerator(
     private val output: CodeOutput,
+    private val classpath: CompileClasspath,
 ) {
 
     public fun generate(
@@ -56,7 +63,13 @@ public class JsonApiXGenerator(
 
         // Generate aggregate specs, each originating from every model
         listOf(
-            JsonXExtensionsSpecGenerator(sortedHolders, sortedLinksHolders, sortedMetaHolders, sortedErrorHolders),
+            JsonXExtensionsSpecGenerator(
+                sortedHolders,
+                sortedLinksHolders,
+                sortedMetaHolders,
+                sortedErrorHolders,
+                hasRetrofit = classpath.hasClass(ClassNames.jsonXHttpException),
+            ),
             TypeAdapterFactorySpecGenerator(sortedHolders),
         ).write(originatingModels = sortedHolders.mapTo(linkedSetOf()) { it.className }, aggregating = true)
     }

@@ -11,6 +11,7 @@ internal object WrapperFunSpecBuilder {
         originalClass: ClassName,
         wrapperClass: ClassName,
         includedListStatement: String?,
+        isNullable: Boolean,
     ): FunSpec {
         val modelClass = ClassName.bestGuess(
             originalClass.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
@@ -19,8 +20,15 @@ internal object WrapperFunSpecBuilder {
         val builderArgs =
             mutableListOf<Any>(wrapperClass)
 
+        // A nullable model without data is written as "data": null, not as a resource object.
+        val dataStatement = if (isNullable) {
+            "${JsonApiConstants.Keys.DATA}?.let { ${JsonApiConstants.Members.TO_RESOURCE_OBJECT}() }"
+        } else {
+            "${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()"
+        }
+
         val returnStatement = StringBuilder(
-            "return %T(data = ${JsonApiConstants.Members.TO_RESOURCE_OBJECT}()",
+            "return %T(data = $dataStatement",
         )
 
         if (includedListStatement != null) {

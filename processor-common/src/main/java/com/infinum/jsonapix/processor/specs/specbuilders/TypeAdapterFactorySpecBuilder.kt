@@ -43,19 +43,19 @@ public class TypeAdapterFactorySpecBuilder {
                     .parameterizedBy(WildcardTypeName.producerOf(Any::class))
                     .copy(nullable = true),
             )
-            .beginControlFlow("return when(type.qualifiedName)")
+            .beginControlFlow("return when(type)")
             .apply {
                 classNames.forEach {
                     addStatement(
-                        "%S -> TypeAdapter_${it.simpleName}()",
-                        it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL),
+                        "%T::class -> TypeAdapter_${it.simpleName}()",
+                        ClassName.bestGuess(it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_MODEL)),
                     )
                 }
 
                 classNames.forEach {
                     addStatement(
-                        "%S -> TypeAdapterList_${it.simpleName}()",
-                        it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST),
+                        "%T::class -> TypeAdapterList_${it.simpleName}()",
+                        ClassName.bestGuess(it.canonicalName.withName(JsonApiConstants.Suffix.JSON_API_LIST)),
                     )
                 }
             }

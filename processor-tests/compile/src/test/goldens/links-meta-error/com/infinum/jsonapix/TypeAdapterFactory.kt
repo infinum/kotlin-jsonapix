@@ -1,5 +1,11 @@
 package com.infinum.jsonapix
 
+import com.infinum.jsonapix.`data`.models.ArticleList
+import com.infinum.jsonapix.`data`.models.ArticleModel
+import com.infinum.jsonapix.`data`.models.CommentList
+import com.infinum.jsonapix.`data`.models.CommentModel
+import com.infinum.jsonapix.`data`.models.TagList
+import com.infinum.jsonapix.`data`.models.TagModel
 import com.infinum.jsonapix.`data`.models.TypeAdapterList_Article
 import com.infinum.jsonapix.`data`.models.TypeAdapterList_Comment
 import com.infinum.jsonapix.`data`.models.TypeAdapterList_Tag
@@ -12,13 +18,13 @@ import kotlin.Any
 import kotlin.reflect.KClass
 
 public class TypeAdapterFactory : AdapterFactory {
-  override fun getAdapter(type: KClass<out Any>): TypeAdapter<out Any>? = when(type.qualifiedName) {
-    "com.infinum.jsonapix.data.models.ArticleModel" -> TypeAdapter_Article()
-    "com.infinum.jsonapix.data.models.CommentModel" -> TypeAdapter_Comment()
-    "com.infinum.jsonapix.data.models.TagModel" -> TypeAdapter_Tag()
-    "com.infinum.jsonapix.data.models.ArticleList" -> TypeAdapterList_Article()
-    "com.infinum.jsonapix.data.models.CommentList" -> TypeAdapterList_Comment()
-    "com.infinum.jsonapix.data.models.TagList" -> TypeAdapterList_Tag()
+  override fun getAdapter(type: KClass<out Any>): TypeAdapter<out Any>? = when(type) {
+    ArticleModel::class -> TypeAdapter_Article()
+    CommentModel::class -> TypeAdapter_Comment()
+    TagModel::class -> TypeAdapter_Tag()
+    ArticleList::class -> TypeAdapterList_Article()
+    CommentList::class -> TypeAdapterList_Comment()
+    TagList::class -> TypeAdapterList_Tag()
     else -> null
   }
 }

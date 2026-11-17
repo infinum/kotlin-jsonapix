@@ -8,6 +8,7 @@ import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.Deserializ
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.findTypeMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.formatMember
 import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.jsonObjectMember
+import com.infinum.jsonapix.processor.specs.jsonxextensions.providers.DeserializeFunSpecMemberProvider.typeOfMember
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
@@ -57,9 +58,10 @@ internal object DeserializeFunSpecBuilder {
                 JsonApiConstants.Keys.DATA,
             )
             .addStatement(
-                "val discriminator = %T(%L ?: TypeExtractor.guessType(Model::class), %L, %L, %L, %L, %L, %L, %L)",
+                "val discriminator = %T(%L ?: %M(Model::class), %L, %L, %L, %L, %L, %L, %L)",
                 JsonApiDiscriminator::class,
                 JsonApiConstants.Keys.TYPE,
+                typeOfMember,
                 JsonApiConstants.Members.ROOT_LINKS,
                 JsonApiConstants.Members.RESOURCE_OBJECT_LINKS,
                 JsonApiConstants.Members.RELATIONSHIPS_LINKS,

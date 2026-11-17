@@ -3,12 +3,15 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Error
 import com.infinum.jsonapix.core.resources.Errors
+import com.infinum.jsonapix.processor.specs.ClassNames
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
-import com.infinum.jsonapix.retrofit.JsonXHttpException
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.TypeOfFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.propertyspecbuilders.TypesPropertySpecBuilder
 import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -24,14 +27,16 @@ import retrofit2.HttpException
  * - toManyRelationshipModel()
  * - toOneRelationshipModel()
  * - decodeJsonApiError()
- * - asJsonXHttpException() (conditional on retrofit module)
+ * - asJsonXHttpException(), if the consumer has the retrofit artifact
  * - decodeJsonApiXString()
  * - decodeJsonApiXListString()
+ * - jsonApiXTypes, the JSON:API type of each model class and its wrappers
+ * - jsonApiXTypeOf(), which the decode functions use when a document has no data
  */
 internal object JsonXCoreExtensionsSpecBuilder {
 
     @SuppressWarnings("SpreadOperator")
-    fun build(): FileSpec {
+    fun build(types: Map<ClassName, String>, hasRetrofit: Boolean): FileSpec {
         val fileSpec = FileSpec.builder(
             JsonApiConstants.Packages.JSONX,
             JsonApiConstants.FileNames.JSON_X_CORE_EXTENSIONS,
@@ -67,7 +72,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
 
         fileSpec.addFunction(decodeJsonApiErrorFunSpec())
 
-        if (hasRetrofitModule()) {
+        if (hasRetrofit) {
             fileSpec.addImport(
                 JsonApiConstants.Packages.CORE_RESOURCES,
                 JsonApiConstants.Imports.ERRORS,
@@ -77,6 +82,9 @@ internal object JsonXCoreExtensionsSpecBuilder {
 
         fileSpec.addFunction(DeserializeFunSpecBuilder.build())
         fileSpec.addFunction(DeserializeListFunSpecBuilder.build())
+
+        fileSpec.addProperty(TypesPropertySpecBuilder.build(types))
+        fileSpec.addFunction(TypeOfFunSpecBuilder.build())
 
         return fileSpec.build()
     }
@@ -107,7 +115,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
                 JsonApiConstants.Members.GENERIC_TYPE_VARIABLE,
                 JsonApiConstants.Members.ERROR_BODY,
             )
-            .nextControlFlow("catch (e: %T)", IllegalArgumentException::class.asClassName())
+            .nextControlFlow("catch (e: %T)", ClassNames.illegalArgumentException)
             .addStatement("emptyList()")
             .endControlFlow()
             .build()
@@ -119,7 +127,7 @@ internal object JsonXCoreExtensionsSpecBuilder {
 
         return FunSpec.builder(JsonApiConstants.Members.AS_JSON_X_HTTP_EXCEPTION)
             .receiver(HttpException::class)
-            .returns(JsonXHttpException::class.asClassName().parameterizedBy(typeVariableName))
+            .returns(ClassNames.jsonXHttpException.parameterizedBy(typeVariableName))
             .addModifiers(KModifier.INLINE)
             .addTypeVariable(
                 typeVariableName.copy(
@@ -135,15 +143,5 @@ internal object JsonXCoreExtensionsSpecBuilder {
             )
             .addStatement("return JsonXHttpException(response, errors)")
             .build()
-    }
-
-    @Suppress("SwallowedException")
-    private fun hasRetrofitModule(): Boolean {
-        return try {
-            Class.forName("com.infinum.jsonapix.retrofit.JsonXHttpException")
-            true
-        } catch (e: Exception) {
-            false
-        }
     }
 }

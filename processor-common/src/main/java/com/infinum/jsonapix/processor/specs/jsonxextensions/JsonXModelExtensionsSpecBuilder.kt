@@ -50,11 +50,6 @@ internal object JsonXModelExtensionsSpecBuilder {
         )
 
         fileSpec.addImport(
-            JsonApiConstants.Packages.CORE_DISCRIMINATORS,
-            *JsonApiConstants.Imports.CORE_EXTENSIONS,
-        )
-
-        fileSpec.addImport(
             JsonApiConstants.Packages.JSONX,
             *JsonApiConstants.Imports.JSON_X,
         )
@@ -100,6 +95,7 @@ internal object JsonXModelExtensionsSpecBuilder {
                 originalClass,
                 classInfo.jsonWrapperClassName,
                 classInfo.includedStatement?.toString(),
+                classInfo.isNullable,
             ),
         )
         fileSpec.addFunction(
@@ -109,8 +105,8 @@ internal object JsonXModelExtensionsSpecBuilder {
                 classInfo.includedListStatement?.toString(),
             ),
         )
-        fileSpec.addFunction(SerializeFunSpecBuilder.build(originalClass, classInfo.isNullable))
-        fileSpec.addFunction(SerializeListFunSpecBuilder.build(originalClass))
+        fileSpec.addFunction(SerializeFunSpecBuilder.build(originalClass, classInfo.isNullable, classInfo.type))
+        fileSpec.addFunction(SerializeListFunSpecBuilder.build(originalClass, classInfo.type))
 
         return fileSpec.build()
     }

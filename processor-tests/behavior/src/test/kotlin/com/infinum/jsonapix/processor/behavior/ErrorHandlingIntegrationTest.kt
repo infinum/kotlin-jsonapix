@@ -27,48 +27,6 @@ internal class ErrorHandlingIntegrationTest {
     }
 
     @Test
-    fun `given a response with errors field when parsing should not throw exception`() {
-        val adapter = factory.getAdapter<PersonModel>()
-        assertNotNull(adapter)
-
-        val json = """
-            {
-                "errors": [
-                    {
-                        "status": "404",
-                        "title": "Not Found",
-                        "detail": "The requested resource was not found"
-                    }
-                ]
-            }
-        """.trimIndent()
-
-        // With no data to read the type from, decoding throws today. Ticket 05 flips this to a
-        // SerializationException, see DocumentsWithoutDataIntegrationTest.
-        assertFailsWith<NoSuchElementException> {
-            adapter!!.convertFromString(input = json)
-        }
-    }
-
-    @Test
-    fun `given a response with null data when parsing should handle gracefully`() {
-        val adapter = factory.getAdapter<PersonModel>()
-        assertNotNull(adapter)
-
-        val json = """
-            {
-                "data": null
-            }
-        """.trimIndent()
-
-        // With no data to read the type from, decoding throws today. Ticket 05 flips this to a
-        // SerializationException, see DocumentsWithoutDataIntegrationTest.
-        assertFailsWith<NoSuchElementException> {
-            adapter!!.convertFromString(input = json)
-        }
-    }
-
-    @Test
     fun `given a response with missing required fields when parsing should handle appropriately`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)

@@ -1,6 +1,7 @@
 package com.infinum.jsonapix.processor.subprocessors
 
 import com.infinum.jsonapix.processor.KaptCodeOutput
+import com.infinum.jsonapix.processor.KaptCompileClasspath
 import com.infinum.jsonapix.processor.collectors.JsonApiXCollector
 import com.infinum.jsonapix.processor.collectors.JsonApiXErrorCollector
 import com.infinum.jsonapix.processor.collectors.JsonApiXLinksCollector
@@ -26,7 +27,7 @@ internal class JsonApiXSubprocessor : CommonSubprocessor() {
         val metaHolders = collectMeta(roundEnvironment)
         val errorHolders = collectErrors(roundEnvironment)
 
-        JsonApiXGenerator(KaptCodeOutput(filer, elementUtils)).generate(
+        JsonApiXGenerator(KaptCodeOutput(filer, elementUtils), KaptCompileClasspath(elementUtils)).generate(
             holders = holders,
             linksHolders = linksHolders,
             metaHolders = metaHolders,

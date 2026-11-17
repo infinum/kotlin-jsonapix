@@ -8,20 +8,22 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 /**
- * Compiles every fixture with every backend and compares the generated sources with the
- * checked-in golden files. Run with `-PupdateGoldens=true` to rewrite the golden files instead.
+ * Compiles every fixture with every backend, checks that the generated sources use no JVM-only API,
+ * and compares them with the checked-in golden files. Run with `-PupdateGoldens=true` to rewrite the
+ * golden files instead of comparing them.
  */
 internal class GeneratedSourcesTest {
 
     @ParameterizedTest(name = "{0} with {1}")
     @MethodSource("fixturesAndBackends")
-    fun `generated sources compile and match the golden files`(
+    fun `generated sources compile, use no JVM-only API and match the golden files`(
         fixture: Fixture,
         backend: Backend,
         @TempDir workingDir: File,
     ) {
         val generated = compile(fixture.sources(), backend, workingDir)
         assertTrue(generated.isNotEmpty()) { "$backend generated no files for fixture '$fixture'." }
+        assertNoJvmOnlyApis(fixture, backend, generated)
 
         // KAPT is the reference backend, so only its output becomes the golden files. Each fixture
         // runs on KAPT first, so the other backends are compared with the golden files it just wrote.

@@ -62,6 +62,8 @@ object JsonApiConstants {
         const val GUESS_TYPE = "guessType"
         const val PARSE_TO_JSON_ELEMENT = "parseToJsonElement"
         const val JSONX_SERIALIZER_MODULE = "jsonApiXSerializerModule"
+        const val JSONX_TYPES = "jsonApiXTypes"
+        const val JSONX_TYPE_OF = "jsonApiXTypeOf"
         const val AS_JSON_X_HTTP_EXCEPTION = "asJsonXHttpException"
         const val DECODE_JSON_API_ERROR = "decodeJsonApiError"
         const val ERROR_BODY = "errorBody"

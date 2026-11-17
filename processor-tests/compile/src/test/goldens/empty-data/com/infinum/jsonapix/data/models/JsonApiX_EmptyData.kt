@@ -25,7 +25,7 @@ public class JsonApiX_EmptyData(
   @SerialName(value = "meta")
   override val meta: EmptyDataMeta? = null,
   @SerialName(value = "data")
-  override val `data`: ResourceObject_EmptyData?,
+  override val `data`: ResourceObject_EmptyData? = null,
 ) : JsonApiX<EmptyData, EmptyDataModel> {
   @Transient
   override val original: EmptyDataModel

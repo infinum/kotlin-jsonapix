@@ -15,7 +15,6 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
-import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
@@ -37,7 +36,7 @@ public fun EmptyDataModel.toResourceObject(): ResourceObject_EmptyData = Resourc
 
 public fun EmptyDataItem.toResourceObject(): ResourceObject_EmptyData = ResourceObject_EmptyData(id = data?.id() ?: "0", meta = resourceObjectMeta, links = resourceObjectLinks)
 
-public fun EmptyDataModel.toJsonApiX(): JsonApiX_EmptyData = JsonApiX_EmptyData(data = toResourceObject(), included = listOfNotNull(), meta = rootMeta, links = rootLinks)
+public fun EmptyDataModel.toJsonApiX(): JsonApiX_EmptyData = JsonApiX_EmptyData(data = data?.let { toResourceObject() }, included = listOfNotNull(), meta = rootMeta, links = rootLinks)
 
 public fun EmptyDataList.toJsonApiXList(): JsonApiXList_EmptyData = JsonApiXList_EmptyData(
                 meta = rootMeta,
@@ -55,7 +54,7 @@ public fun EmptyDataModel.toJsonApiXString(
   errors: String,
 ): String {
   val jsonX = this.toJsonApiX()
-  val type = jsonX.data?.type ?: TypeExtractor.guessType(this::class)
+  val type = jsonX.data?.type ?: "emptyData"
   val discriminator = JsonApiDiscriminator(type, rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonString = format.encodeToString(PolymorphicSerializer(JsonApiX::class), jsonX)
   return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()
@@ -72,7 +71,7 @@ public fun EmptyDataList.toJsonApiXString(
   errors: String,
 ): String {
   val jsonX = this.toJsonApiXList()
-  val type = jsonX.data.firstOrNull()?.type ?: TypeExtractor.guessType(EmptyData::class)
+  val type = jsonX.data.firstOrNull()?.type ?: "emptyData"
   val discriminator = JsonApiListDiscriminator(type, rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonString = format.encodeToString(PolymorphicSerializer(JsonApiXList::class), jsonX)
   return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()

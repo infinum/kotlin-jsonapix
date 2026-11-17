@@ -16,7 +16,6 @@ import com.infinum.jsonapix.core.JsonApiX
 import com.infinum.jsonapix.core.JsonApiXList
 import com.infinum.jsonapix.core.discriminators.JsonApiDiscriminator
 import com.infinum.jsonapix.core.discriminators.JsonApiListDiscriminator
-import com.infinum.jsonapix.core.discriminators.TypeExtractor
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Links
 import com.infinum.jsonapix.core.resources.Meta
@@ -94,7 +93,7 @@ public fun CompanyList.toJsonApiXString(
   errors: String,
 ): String {
   val jsonX = this.toJsonApiXList()
-  val type = jsonX.data.firstOrNull()?.type ?: TypeExtractor.guessType(Company::class)
+  val type = jsonX.data.firstOrNull()?.type ?: "company"
   val discriminator = JsonApiListDiscriminator(type, rootLinks, resourceObjectLinks, relationshipsLinks, rootMeta, resourceObjectMeta, relationshipsMeta, errors)
   val jsonString = format.encodeToString(PolymorphicSerializer(JsonApiXList::class), jsonX)
   return discriminator.extract(Json.parseToJsonElement(jsonString)).toString()
