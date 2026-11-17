@@ -5,14 +5,24 @@ dokka {
         outputDirectory.set(project.layout.buildDirectory.dir("javadoc"))
     }
 
-    dokkaSourceSets.named("main") {
+    // A JVM module has one source set, main. A multiplatform module has one per Kotlin source set,
+    // in src/<source set>/kotlin, and its code is in commonMain.
+    dokkaSourceSets.configureEach { sourceSet ->
         skipDeprecated.set(false)
         reportUndocumented.set(true)
         skipEmptyPackages.set(true)
 
+        // Links each declaration to its source on GitHub. A JVM module's docs get no links: its
+        // sources are in src/main/java, so Dokka finds no files in src/main/kotlin.
         sourceLink {
-            localDirectory.set(file("src/main/kotlin"))
-            remoteUrl.set(uri("https://github.com/infinum/android-jsonapix/"))
+            if (sourceSet.name == "main") {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(uri("https://github.com/infinum/android-jsonapix/"))
+            } else {
+                def sourceDir = "src/${sourceSet.name}/kotlin"
+                localDirectory.set(file(sourceDir))
+                remoteUrl.set(uri("https://github.com/infinum/android-jsonapix/tree/master/${project.name}/$sourceDir"))
+            }
             remoteLineSuffix.set("#L")
         }
 

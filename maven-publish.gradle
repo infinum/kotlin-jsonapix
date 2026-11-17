@@ -1,14 +1,23 @@
 apply plugin: "maven-publish"
 apply plugin: "signing"
 
-task javadocsJar(type: Jar, dependsOn: "dokkaGenerate") {
-    getArchiveClassifier().set("javadoc")
-    from layout.buildDirectory.dir("javadoc")
-}
+// A JVM module gets one publication, release, which this script creates from the Java component.
+// A multiplatform module gets the publications the Kotlin plugin creates: a root one, and one per
+// target. The plugin names their artifacts (annotations, annotations-jvm, annotations-iosarm64, …)
+// and gives each a sources jar. Either way, this script gives every publication the POM, a javadoc
+// jar and a signature.
+def multiplatform = plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
 
-task sourcesJar(type: Jar) {
-    getArchiveClassifier().set("sources")
-    from sourceSets.main.allJava
+if (!multiplatform) {
+    task javadocsJar(type: Jar, dependsOn: "dokkaGenerate") {
+        getArchiveClassifier().set("javadoc")
+        from layout.buildDirectory.dir("javadoc")
+    }
+
+    task sourcesJar(type: Jar) {
+        getArchiveClassifier().set("sources")
+        from sourceSets.main.allJava
+    }
 }
 
 afterEvaluate {
@@ -25,63 +34,84 @@ afterEvaluate {
                 }
             }
         }
-        publications {
-            release(MavenPublication) {
-                from components.java
+        if (!multiplatform) {
+            publications {
+                release(MavenPublication) {
+                    from components.java
 
-                groupId = properties.group
-                version = properties.version
-                artifactId = properties.artifactId
+                    artifactId = properties.artifactId
 
-                artifact sourcesJar
-                artifact javadocsJar
-
-                pom {
-                    name = properties.name
-                    description = properties.description
-                    url = properties.url
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'stjepanbanek'
-                            name = 'Stjepan Banek'
-                            email = 'stjepan.banek@infinum.com'
-                        }
-                        developer {
-                            id = 'nikolagobovic'
-                            name = 'Nikola Gobovic'
-                            email = 'nikola.gobovic@infinum.com'
-                        }
-                        developer {
-                            id = 'thisAAY'
-                            name = 'Ahmed Ali'
-                            email = 'ahmedali.abdelghany.yousef@infinum.com'
-                        }
-
-                        developer {
-                            id = 'DrakslerT'
-                            name = 'Tim Draksler'
-                            email = 'tim.draksler@infinum.com'
-                        }
-                    }
-                    scm {
-                        connection.set(properties.scm.connection)
-                        developerConnection.set(properties.scm.connection)
-                        url.set(properties.scm.url)
-                    }
-                }
-                signing {
-                    // Releases to Sonatype must be signed. Publishing to the local Maven repository
-                    // works without a signing key, so CI can build the sample against it.
-                    required { gradle.taskGraph.hasTask("${project.path}:publishReleasePublicationToSonatypeMavenCentralRepository") }
-                    sign publishing.publications.release
+                    artifact sourcesJar
+                    artifact javadocsJar
                 }
             }
         }
+
+        publications.withType(MavenPublication).configureEach { publication ->
+            groupId = properties.group
+            version = properties.version
+
+            if (multiplatform) {
+                // One javadoc jar per publication. Each publication's signing task writes a
+                // signature next to every file it signs, so two publications can't share a file.
+                artifact(tasks.register("${publication.name}JavadocJar", Jar) {
+                    dependsOn "dokkaGenerate"
+                    archiveClassifier = "javadoc"
+                    archiveAppendix = publication.name
+                    from layout.buildDirectory.dir("javadoc")
+                })
+            }
+
+            pom {
+                name = properties.name
+                description = properties.description
+                url = properties.url
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'stjepanbanek'
+                        name = 'Stjepan Banek'
+                        email = 'stjepan.banek@infinum.com'
+                    }
+                    developer {
+                        id = 'nikolagobovic'
+                        name = 'Nikola Gobovic'
+                        email = 'nikola.gobovic@infinum.com'
+                    }
+                    developer {
+                        id = 'thisAAY'
+                        name = 'Ahmed Ali'
+                        email = 'ahmedali.abdelghany.yousef@infinum.com'
+                    }
+
+                    developer {
+                        id = 'DrakslerT'
+                        name = 'Tim Draksler'
+                        email = 'tim.draksler@infinum.com'
+                    }
+                }
+                scm {
+                    connection.set(properties.scm.connection)
+                    developerConnection.set(properties.scm.connection)
+                    url.set(properties.scm.url)
+                }
+            }
+        }
+    }
+
+    signing {
+        // Releases to Sonatype must be signed. Publishing to the local Maven repository works
+        // without a signing key, so CI can build the sample against it.
+        required {
+            publishing.publications.any {
+                gradle.taskGraph.hasTask("${project.path}:publish${it.name.capitalize()}PublicationToSonatypeMavenCentralRepository")
+            }
+        }
+        sign publishing.publications
     }
 }

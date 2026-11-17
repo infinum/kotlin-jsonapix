@@ -1,9 +1,9 @@
 plugins {
-    id "java-library"
-    id "kotlin"
+    id "org.jetbrains.kotlin.multiplatform"
     id "kotlinx-serialization"
 }
 
+apply from: "$rootDir/multiplatform.gradle"
 apply from: "$rootDir/detekt.gradle"
 apply from: "$rootDir/dokka.gradle"
 apply from: "$rootDir/maven-publish.gradle"
@@ -11,7 +11,6 @@ apply from: "$rootDir/maven-publish.gradle"
 ext.mavenPublishProperties = [
         group      : releaseConfig.group,
         version    : releaseConfig.version,
-        artifactId   : "core",
         repository : [
                 url     : sonatype.url,
                 username: sonatype.username,
@@ -26,35 +25,27 @@ ext.mavenPublishProperties = [
         ]
 ]
 
-dependencies {
-    implementation packages.kotlin.core
-    api project(":annotations")
-    api packages.kotlin.serialization_core
-    
-    testImplementation packages.junit.api
-    testRuntimeOnly packages.junit.engine
-    testRuntimeOnly packages.junit.platform_launcher
-    testImplementation packages.junit.params
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":annotations")
+                api packages.kotlin.serialization_core
+            }
+        }
+        // core's own tests are JVM tests, on JUnit 5.
+        jvmTest {
+            dependencies {
+                implementation packages.junit.api
+                implementation packages.junit.params
+                runtimeOnly packages.junit.engine
+                runtimeOnly packages.junit.platform_launcher
+            }
+        }
     }
 }
 
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-test {
+tasks.named("jvmTest", Test) {
     useJUnitPlatform()
     testLogging {
         events("PASSED", "FAILED", "SKIPPED")

@@ -39,6 +39,9 @@ out/
 .gradle/
 build/
 
+# Kotlin Gradle plugin data, such as the IDE's extracted metadata of multiplatform dependencies
+.kotlin/
+
 # Local configuration file (sdk path, etc)
 local.properties
 

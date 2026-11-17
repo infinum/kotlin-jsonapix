@@ -1,6 +1,8 @@
+// The multiplatform modules, annotations and core, have a publication per target plus a root one,
+// and deploy all of them.
 task deployAnnotations(dependsOn: [
         ':annotations:clean',
-        ':annotations:publishReleasePublicationToSonatypeMavenCentralRepository'
+        ':annotations:publishAllPublicationsToSonatypeMavenCentralRepository'
 ]) {
     group = "Deploy"
     description = "Deploy module to repositories"
@@ -8,7 +10,7 @@ task deployAnnotations(dependsOn: [
 
 task deployCore(dependsOn: [
         ':core:clean',
-        ':core:publishReleasePublicationToSonatypeMavenCentralRepository'
+        ':core:publishAllPublicationsToSonatypeMavenCentralRepository'
 ]) {
     group = "Deploy"
     description = "Deploy module to repositories"
