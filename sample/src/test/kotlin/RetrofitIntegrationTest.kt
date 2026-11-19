@@ -1,16 +1,24 @@
 import com.infinum.jsonapix.TypeAdapterFactory
+import com.infinum.jsonapix.core.adapters.AdapterFactory
+import com.infinum.jsonapix.core.adapters.TypeAdapter
 import com.infinum.jsonapix.core.adapters.getAdapter
 import com.infinum.jsonapix.data.models.Dog
 import com.infinum.jsonapix.data.models.DogModel
 import com.infinum.jsonapix.data.models.Person
+import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
+import com.infinum.jsonapix.data.models.PersonRootMeta
 import com.infinum.jsonapix.retrofit.JsonXConverterFactory
+import com.infinum.jsonapix.retrofit.JsonXMediaTypes
 import com.infinum.jsonapix.retrofit.JsonXRequestBodyConverter
 import com.infinum.jsonapix.retrofit.JsonXResponseBodyConverter
 import java.io.InputStreamReader
+import java.nio.charset.Charset
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -165,6 +173,84 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
+    fun `given a JsonXRequestBodyConverter built with the JSON API media type should send it with no charset`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!, mediaType = JsonXMediaTypes.JSON_API)
+        val person = Person(name = "Dave", surname = "Brown", age = 35, allMyDogs = null, myFavoriteDog = null)
+        val model = PersonModel(data = person)
+
+        val requestBody = converter.convert(value = model)
+
+        assertNotNull(requestBody, "Request body should not be null")
+        assertEquals("application/vnd.api+json".toMediaTypeOrNull(), requestBody?.contentType())
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter built with a media type that declares a charset should encode the body in it`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(
+            typeAdapter = adapter!!,
+            mediaType = "application/json; charset=ISO-8859-1".toMediaType(),
+        )
+        // One byte in ISO-8859-1 and two in UTF-8, so reading the body back as ISO-8859-1 only
+        // yields this name if the body was written in the charset the media type declares.
+        val name = "Jos\u00E9"
+        val person = Person(name = name, surname = "Brown", age = 35, allMyDogs = null, myFavoriteDog = null)
+        val model = PersonModel(data = person)
+
+        val requestBody = converter.convert(value = model)
+
+        assertTrue(
+            requestBody.asString(charset = Charsets.ISO_8859_1).contains("\"name\":\"$name\""),
+            "Body should be encoded in the charset the media type declares",
+        )
+    }
+
+    // The media type parameter has a default, so Kotlin callers compile either way. These pin the
+    // constructors that callers compiled against an earlier release, and Java callers, bind to.
+    @Test
+    fun `given the converters when the media type is not passed should still expose the single argument constructors`() {
+        assertNotNull(
+            JsonXConverterFactory::class.java.getConstructor(AdapterFactory::class.java),
+            "JsonXConverterFactory(AdapterFactory) should still exist",
+        )
+        assertNotNull(
+            JsonXRequestBodyConverter::class.java.getConstructor(TypeAdapter::class.java),
+            "JsonXRequestBodyConverter(TypeAdapter) should still exist",
+        )
+    }
+
+    @Test
+    fun `given a JsonXConverterFactory built with a request media type should hand it to the request converter`() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.example.com/")
+            .addConverterFactory(converterFactory)
+            .build()
+        val factoryWithMediaType = JsonXConverterFactory(
+            adapterFactory = factory,
+            requestMediaType = JsonXMediaTypes.JSON_API,
+        )
+
+        val converter = factoryWithMediaType.requestBodyConverter(
+            type = PersonModel::class.java,
+            parameterAnnotations = emptyArray(),
+            methodAnnotations = emptyArray(),
+            retrofit = retrofit,
+        )
+
+        @Suppress("UNCHECKED_CAST")
+        val typedConverter = converter as JsonXRequestBodyConverter<PersonModel>
+        val person = Person(name = "Dave", surname = "Brown", age = 35, allMyDogs = null, myFavoriteDog = null)
+        val requestBody = typedConverter.convert(value = PersonModel(data = person))
+
+        assertEquals("application/vnd.api+json".toMediaTypeOrNull(), requestBody?.contentType())
+    }
+
+    @Test
     fun `given a JsonXRequestBodyConverter when converting model should create valid JSON content`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
@@ -212,7 +298,7 @@ internal class RetrofitIntegrationTest {
     }
 
     @Test
-    fun `given a JsonXRequestBodyConverter when converting model with relationships should include relationship data`() {
+    fun `given a JsonXRequestBodyConverter when converting a model with relationships should write a request document with no nulls and no included`() {
         val adapter = factory.getAdapter<PersonModel>()
         assertNotNull(adapter)
 
@@ -228,16 +314,69 @@ internal class RetrofitIntegrationTest {
         ).apply { setId(id = "10") }
         val model = PersonModel(data = person)
 
-        val requestBody = converter.convert(value = model)
-        assertNotNull(requestBody)
+        val content = converter.convert(value = model).asString()
 
-        val buffer = okio.Buffer()
-        requestBody?.writeTo(buffer)
-        val content = buffer.readUtf8()
+        assertEquals(getFileAsString(filename = "person_request_body_with_relationships.json"), content)
+    }
 
-        assertTrue(content.contains("relationships"), "Should contain relationships")
-        assertTrue(content.contains("myFavoriteDog"), "Should contain myFavoriteDog relationship")
-        assertTrue(content.contains("allMyDogs"), "Should contain allMyDogs relationship")
+    @Test
+    fun `given a JsonXRequestBodyConverter when converting a model with no relationships should write a request document with no nulls and no included`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val person = Person(
+            name = "Frank",
+            surname = "Miller",
+            age = 40,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply { setId(id = "10") }
+        val model = PersonModel(data = person)
+
+        val content = converter.convert(value = model).asString()
+
+        assertEquals(getFileAsString(filename = "person_request_body_no_relationships.json"), content)
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter when the model has a root meta should keep meta in the request document`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val person = Person(
+            name = "Frank",
+            surname = "Miller",
+            age = 40,
+            allMyDogs = null,
+            myFavoriteDog = null,
+        ).apply { setId(id = "10") }
+        val model = PersonModel(data = person, rootMeta = PersonRootMeta(owner = "Frank"))
+
+        val content = converter.convert(value = model).asString()
+
+        assertEquals(getFileAsString(filename = "person_request_body_with_root_meta.json"), content)
+    }
+
+    @Test
+    fun `given a JsonXRequestBodyConverter when converting a list model should write a request document with no nulls and no included`() {
+        val adapter = factory.getAdapter<PersonList>()
+        assertNotNull(adapter)
+
+        val converter = JsonXRequestBodyConverter(typeAdapter = adapter!!)
+        val person = Person(
+            name = "Frank",
+            surname = "Miller",
+            age = 40,
+            allMyDogs = listOf(Dog(name = "Max", age = 3).apply { setId(id = "1") }),
+            myFavoriteDog = null,
+        ).apply { setId(id = "10") }
+        val personList = PersonList(data = listOf(PersonItem(person)))
+
+        val content = converter.convert(value = personList).asString()
+
+        assertEquals(getFileAsString(filename = "person_list_request_body.json"), content)
     }
 
     @Test
@@ -445,6 +584,12 @@ internal class RetrofitIntegrationTest {
         assertEquals(100, result?.data?.size, "Should have 100 persons")
         assertEquals("Person1", result?.data?.get(0)?.data?.name)
         assertEquals("Person100", result?.data?.get(99)?.data?.name)
+    }
+
+    private fun RequestBody?.asString(charset: Charset = Charsets.UTF_8): String {
+        val buffer = okio.Buffer()
+        requireNotNull(this) { "Request body should not be null" }.writeTo(buffer)
+        return buffer.readString(charset)
     }
 
     private fun getFileAsString(filename: String): String {
