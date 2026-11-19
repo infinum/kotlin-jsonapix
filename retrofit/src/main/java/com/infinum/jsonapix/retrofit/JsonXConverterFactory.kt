@@ -2,12 +2,21 @@ package com.infinum.jsonapix.retrofit
 
 import com.infinum.jsonapix.core.adapters.AdapterFactory
 import java.lang.reflect.Type
+import okhttp3.MediaType
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Converter.Factory() {
+/**
+ * `requestMediaType` is the Content-Type request bodies are sent as. The default is what the
+ * converter has always sent. Pass [JsonXMediaTypes.JSON_API] to send the media type the JSON:API
+ * specification defines, which strict servers require.
+ */
+class JsonXConverterFactory @JvmOverloads constructor(
+    private val adapterFactory: AdapterFactory,
+    private val requestMediaType: MediaType = JsonXMediaTypes.JSON,
+) : Converter.Factory() {
 
     override fun responseBodyConverter(
         type: Type,
@@ -29,7 +38,7 @@ class JsonXConverterFactory(private val adapterFactory: AdapterFactory) : Conver
     ): Converter<*, RequestBody>? =
         when (type) {
             is Class<*> -> adapterFactory.getAdapter(type.kotlin)?.let {
-                JsonXRequestBodyConverter(it)
+                JsonXRequestBodyConverter(it, requestMediaType)
             }
             else -> null
         }
