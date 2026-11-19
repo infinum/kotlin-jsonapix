@@ -263,7 +263,7 @@ internal object ResourceObjectSpecBuilder {
                 )
             } else {
                 codeBlockBuilder.indent().addStatement(
-                    "safeRelationships.%N.data.contains(ResourceIdentifier(it.type, it.id))",
+                    "safeRelationships.%N.data?.contains(ResourceIdentifier(it.type, it.id)) == true",
                     it.key,
                 )
             }

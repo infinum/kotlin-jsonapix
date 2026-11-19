@@ -524,4 +524,119 @@ internal class ComplexRelationshipsIntegrationTest {
         assertEquals("Employee1", result.data.personel[0].name)
         assertEquals("Employee5", result.data.personel[4].name)
     }
+
+    @Test
+    fun `given a HasMany relationship carrying only meta when deserializing should not require data`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        // A relationship object is valid with only `meta`: servers use it to say the relationship exists
+        // but is not included in this document.
+        val json = """
+            {
+                "data": {
+                    "type": "person",
+                    "id": "142765",
+                    "attributes": {
+                        "name": "Test",
+                        "surname": "User",
+                        "age": 30
+                    },
+                    "relationships": {
+                        "allMyDogs": {
+                            "meta": {"user": "someone"}
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val result = adapter!!.convertFromString(json)
+
+        assertEquals("142765", result.data.id())
+        assertNull(result.data.allMyDogs, "A relationship without data holds no related resources")
+    }
+
+    @Test
+    fun `given a HasMany relationship carrying only links when deserializing should not require data`() {
+        val adapter = factory.getAdapter<PersonModel>()
+        assertNotNull(adapter)
+
+        val json = """
+            {
+                "data": {
+                    "type": "person",
+                    "id": "1",
+                    "attributes": {
+                        "name": "Test",
+                        "surname": "User",
+                        "age": 30
+                    },
+                    "relationships": {
+                        "allMyDogs": {
+                            "links": {"related": "https://example.com/person/1/dogs"}
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val result = adapter!!.convertFromString(json)
+
+        assertNull(result.data.allMyDogs)
+    }
+
+    @Test
+    fun `given an included resource with a meta only relationship when deserializing should not require data`() {
+        val adapter = factory.getAdapter<CompanyModel>()
+        assertNotNull(adapter)
+
+        // Shape a strict JSON:API server returns for an included resource whose own relationships were not
+        // included: the relationship object says the relationship exists, but carries no data.
+        val json = """
+            {
+                "data": {
+                    "type": "company",
+                    "id": "1",
+                    "relationships": {
+                        "personel": {"data": [{"type": "person", "id": "10"}]},
+                        "manager": {"data": {"type": "person", "id": "10"}},
+                        "address": {"data": {"type": "address", "id": "20"}}
+                    }
+                },
+                "included": [
+                    {
+                        "type": "person",
+                        "id": "10",
+                        "attributes": {
+                            "name": "Alice",
+                            "surname": "Smith",
+                            "age": 30
+                        },
+                        "relationships": {
+                            "allMyDogs": {"meta": {"included": false}},
+                            "myFavoriteDog": {"meta": {"included": false}}
+                        }
+                    },
+                    {
+                        "type": "address",
+                        "id": "20",
+                        "attributes": {
+                            "street": "Main St",
+                            "number": 1,
+                            "country": "USA",
+                            "city": "New York"
+                        }
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = adapter!!.convertFromString(json)
+
+        assertEquals(1, result.data.personel.size)
+        assertEquals("Alice", result.data.personel.first().name)
+        assertNull(result.data.personel.first().allMyDogs)
+        assertEquals("Main St", result.data.address.street)
+    }
 }
