@@ -18,13 +18,18 @@ private const val COPY = "copy"
 private const val COPY_MODEL = "copyModel"
 
 /**
- * Reports `copy` on a model that extends `JsonApiModel`, and points at the generated `copyModel`.
+ * Reports `copy` on a class annotated `@JsonApiX`, and points at the `copyModel` generated beside
+ * it.
  *
  * A model's JSON:API `type` and `id` live in private fields on `JsonApiModel` and are set after
  * construction, so they are not constructor parameters. `copy` builds a new instance through the
  * constructor and leaves both behind, and the copy then serializes through the `id() ?: "0"`
  * fallback. The request goes out claiming to be resource `0` rather than failing, which is why
  * this is worth a check: nothing else catches it.
+ *
+ * The condition is the annotation rather than the `JsonApiModel` supertype, because `copyModel`
+ * exists only where the processor ran. A class that extends `JsonApiModel` without the annotation
+ * has none, so reporting it would recommend a function that is not there.
  */
 @Suppress("UnstableApiUsage")
 class JsonApiXCopyDetector : Detector(), SourceCodeScanner {
@@ -34,11 +39,12 @@ class JsonApiXCopyDetector : Detector(), SourceCodeScanner {
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
         val containingClass = method.containingClass ?: return
 
-        // Keyed off the annotation rather than the JsonApiModel supertype. Walking the supertypes
-        // from here sends lint through PsiClass.getExtendsListTypes, which fails to resolve Kotlin
-        // source classes under this AGP and brings the whole analysis down. The annotation is also
-        // the more precise condition: it leaves the generated wrappers alone, and OwnerModel holds
-        // no identity of its own, so copying one is safe.
+        // Do not swap this for a supertype check. Walking the supertypes from here sends lint
+        // through PsiClass.getExtendsListTypes, which fails to resolve Kotlin source classes under
+        // this AGP and brings the whole analysis down.
+        //
+        // It also keeps the generated wrappers out: a Model holds no identity of its own, so
+        // copying one is safe.
         if (containingClass.annotations.none { it.qualifiedName == JSON_API_X_QUALIFIED_NAME }) return
 
         context.report(
@@ -47,14 +53,23 @@ class JsonApiXCopyDetector : Detector(), SourceCodeScanner {
             location = context.getLocation(node),
             message = "`$COPY` drops the JSON:API `type` and `id`, so the copy serializes as " +
                 "resource `0`. Use the generated `$COPY_MODEL` instead.",
-            quickfixData = quickFix(),
+            quickfixData = quickFix(context, node),
         )
     }
 
-    private fun quickFix(): LintFix = LintFix.create()
+    /**
+     * Scoped to the method name.
+     *
+     * The replacement is textual, and the reported location spans the whole call including its
+     * receiver, so an unscoped fix lands on the first `copy` anywhere in the expression. On
+     * `copyOfDog.copy(name = "Rex")` that renames the receiver and leaves the call alone, which
+     * breaks the build and keeps the bug.
+     */
+    private fun quickFix(context: JavaContext, node: UCallExpression): LintFix = LintFix.create()
         .name("Replace with $COPY_MODEL")
         .replace()
-        .text(COPY)
+        .range(context.getNameLocation(node))
+        .all()
         .with(COPY_MODEL)
         .build()
 

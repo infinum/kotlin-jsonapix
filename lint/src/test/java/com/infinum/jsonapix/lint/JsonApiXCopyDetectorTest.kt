@@ -3,6 +3,8 @@ package com.infinum.jsonapix.lint
 import com.android.tools.lint.checks.infrastructure.TestFiles.kotlin
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 internal class JsonApiXCopyDetectorTest {
 
@@ -51,8 +53,12 @@ internal class JsonApiXCopyDetectorTest {
         """,
     ).indented()
 
-    @Test
-    fun `given copy on a JsonApiModel should report`() {
+    // The receivers matter: the fix rewrites text, so one of them has to contain the word the fix
+    // searches for. With a receiver of `dog` a whole-call replacement and a name-scoped one give
+    // the same answer, which is how a broken fix passed review.
+    @ParameterizedTest(name = "receiver {0}")
+    @ValueSource(strings = ["dog", "copyOfDog"])
+    fun `given copy on a JsonApiModel should report and offer a fix that rewrites only the call`(receiver: String) {
         lint()
             .files(
                 annotation,
@@ -64,7 +70,7 @@ internal class JsonApiXCopyDetectorTest {
 
                     import com.infinum.jsonapix.data.Dog
 
-                    fun rename(dog: Dog) = dog.copy(name = "Rex")
+                    fun rename($receiver: Dog) = $receiver.copy(name = "Rex")
                     """,
                 ).indented(),
             )
@@ -78,8 +84,8 @@ internal class JsonApiXCopyDetectorTest {
                 """
                 Fix for src/com/infinum/jsonapix/usage/test.kt line 5: Replace with copyModel:
                 @@ -5 +5
-                - fun rename(dog: Dog) = dog.copy(name = "Rex")
-                + fun rename(dog: Dog) = dog.copyModel(name = "Rex")
+                - fun rename($receiver: Dog) = $receiver.copy(name = "Rex")
+                + fun rename($receiver: Dog) = $receiver.copyModel(name = "Rex")
                 """.trimIndent(),
             )
     }
@@ -128,6 +134,46 @@ internal class JsonApiXCopyDetectorTest {
             .issues(JsonApiXCopyDetector.ISSUE)
             .run()
             // A wrapper has no type or id of its own, so copying one loses nothing.
+            .expectClean()
+    }
+
+    @Test
+    fun `given a method whose name merely contains copy should not report`() {
+        lint()
+            .files(
+                annotation,
+                jsonApiModel,
+                kotlin(
+                    """
+                    package com.infinum.jsonapix.named
+
+                    import com.infinum.jsonapix.annotations.JsonApiX
+                    import com.infinum.jsonapix.core.JsonApiModel
+
+                    @JsonApiX("dog")
+                    data class Dog(val name: String) : JsonApiModel() {
+                        fun copyOf(): Dog = Dog(name)
+                        fun copies(): Int = 1
+                        fun recopy(): Dog = Dog(name)
+                    }
+                    """,
+                ).indented(),
+                kotlin(
+                    """
+                    package com.infinum.jsonapix.usage
+
+                    import com.infinum.jsonapix.named.Dog
+
+                    fun a(dog: Dog) = dog.copyOf()
+                    fun b(dog: Dog) = dog.copies()
+                    fun c(dog: Dog) = dog.recopy()
+                    """,
+                ).indented(),
+            )
+            .issues(JsonApiXCopyDetector.ISSUE)
+            .run()
+            // The name is matched whole, not as a prefix. Switching to something like
+            // methodName.startsWith("copy") would report all three of these.
             .expectClean()
     }
 
