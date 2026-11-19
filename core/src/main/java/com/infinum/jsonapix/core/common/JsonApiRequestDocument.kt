@@ -28,6 +28,11 @@ private val RESPONSE_ONLY_MEMBERS = setOf(
  * An unset member of a JsonApiX model is indistinguishable from one explicitly set to `null`, so
  * writing it out as `null` would tell the server to clear the value. Omitting it is the only
  * reading that matches the model.
+ *
+ * The one exception is the `data` member of a relationship object, which is structural: JSON:API
+ * reads `{"data": null}` as "clear this relationship", and reads an absent member as "leave this
+ * relationship alone". Those are different instructions, so a null `data` inside `relationships`
+ * is kept. Only a `Relationship.Unlink` produces one.
  */
 fun String.toJsonApiRequestDocument(): String {
     val document = Json.parseToJsonElement(this).jsonObject
@@ -40,7 +45,13 @@ private fun JsonElement.withoutNullMembers(): JsonElement = when (this) {
     is JsonObject -> JsonObject(
         entries
             .filter { it.value !is JsonNull }
-            .associate { it.key to it.value.withoutNullMembers() },
+            .associate { (key, value) ->
+                key to if (key == JsonApiConstants.Keys.RELATIONSHIPS) {
+                    value.asRelationshipsObject()
+                } else {
+                    value.withoutNullMembers()
+                }
+            },
     )
 
     // Array entries are positional, so a null entry is dropped only when it is a member of an
@@ -48,4 +59,31 @@ private fun JsonElement.withoutNullMembers(): JsonElement = when (this) {
     is JsonArray -> JsonArray(map { it.withoutNullMembers() })
 
     else -> this
+}
+
+/**
+ * The `relationships` object. Every one of its members is a relationship object, and a null member
+ * is still dropped: a relationship the caller never touched carries no instruction for the server.
+ */
+private fun JsonElement.asRelationshipsObject(): JsonElement = when (this) {
+    is JsonObject -> JsonObject(
+        entries
+            .filter { it.value !is JsonNull }
+            .associate { (key, value) -> key to value.asRelationshipObject() },
+    )
+
+    else -> withoutNullMembers()
+}
+
+/**
+ * A single relationship object, the only place where a null `data` survives.
+ */
+private fun JsonElement.asRelationshipObject(): JsonElement = when (this) {
+    is JsonObject -> JsonObject(
+        entries
+            .filter { it.value !is JsonNull || it.key == JsonApiConstants.Keys.DATA }
+            .associate { (key, value) -> key to value.withoutNullMembers() },
+    )
+
+    else -> withoutNullMembers()
 }

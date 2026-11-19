@@ -1,7 +1,5 @@
 package com.infinum.jsonapix.processor.specs.specbuilders
 
-import com.infinum.jsonapix.annotations.HasMany
-import com.infinum.jsonapix.annotations.HasOne
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.common.JsonApiConstants.withName
 import com.infinum.jsonapix.core.resources.Links
@@ -10,6 +8,9 @@ import com.infinum.jsonapix.core.resources.Meta
 import com.infinum.jsonapix.core.resources.OneRelationshipMember
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.processor.extensions.findAnnotationWithTypeName
+import com.infinum.jsonapix.processor.extensions.hasNullableMember
+import com.infinum.jsonapix.processor.extensions.isRelationshipWrapper
+import com.infinum.jsonapix.processor.extensions.relationshipType
 import com.infinum.jsonapix.processor.specs.Specs
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -40,7 +41,9 @@ internal object RelationshipsSpecBuilder {
         val generatedName = JsonApiConstants.Prefix.RELATIONSHIPS.withName(className.simpleName)
 
         val properties: MutableList<PropertySpec> = oneRelationships.map {
-            val builder = if (it.type.isNullable) {
+            // A Relationship<T> property carries Unset, which has to leave the member out of the
+            // document altogether, so its generated member is nullable whatever the declared type.
+            val builder = if (it.hasNullableMember) {
                 PropertySpec.builder(it.name, OneRelationshipMember::class.asTypeName().copy(nullable = true))
             } else {
                 PropertySpec.builder(it.name, OneRelationshipMember::class)
@@ -132,19 +135,23 @@ internal object RelationshipsSpecBuilder {
         val constructorStringBuilder = StringBuilder()
         val builderArgs = mutableListOf<Any>(generatedName)
         oneRelationships.forEachIndexed { index, property ->
-            if (property.type.isNullable) {
-                constructorStringBuilder.append(
+            when {
+                property.isRelationshipWrapper -> constructorStringBuilder.append(
+                    oneRelationshipFromWrapper(property),
+                )
+
+                property.type.isNullable -> constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}" +
                         "?.toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
                 )
-            } else {
-                constructorStringBuilder.append(
+
+                else -> constructorStringBuilder.append(
                     "${property.name} = originalObject.${property.name}." +
                         "toOneRelationshipModel(%L, (originalObject.${property.name} as? JsonApiModel)?.id().orEmpty())",
                 )
             }
 
-            builderArgs.add(getTypeOfRelationship(property))
+            builderArgs.add(property.relationshipType())
             if (index != oneRelationships.lastIndex ||
                 (index == oneRelationships.lastIndex && manyRelationships.isNotEmpty())
             ) {
@@ -164,7 +171,7 @@ internal object RelationshipsSpecBuilder {
                         ".toManyRelationshipModel(%L, { (it as? JsonApiModel)?.id().orEmpty() })",
                 )
             }
-            builderArgs.add(getTypeOfRelationship(property))
+            builderArgs.add(property.relationshipType())
             if (index != manyRelationships.lastIndex) {
                 constructorStringBuilder.append(", ")
             }
@@ -179,20 +186,41 @@ internal object RelationshipsSpecBuilder {
             .build()
     }
 
+    /**
+     * The four states of a `Relationship<T>`, mapped onto the member that goes into the document.
+     *
+     * `Unset` yields a null member, which the request document filter then leaves out entirely.
+     * `Unlink` yields a member with a null `data`, which the same filter keeps because `data` is
+     * structural inside a relationship object.
+     */
+    private fun oneRelationshipFromWrapper(property: PropertySpec): String {
+        val local = "${property.name}Relationship"
+        // A property declared Relationship<T>? carries one spelling of "leave this alone" too
+        // many. Both of them read as Unset rather than failing to compile.
+        val nullBranch = if (property.type.isNullable) "null -> null; " else ""
+        return "${property.name} = when (val $local = originalObject.${property.name}) {" +
+            nullBranch +
+            "is Relationship.Unset -> null; " +
+            "is Relationship.Unlink -> OneRelationshipMember(); " +
+            "is Relationship.Linked -> OneRelationshipMember(data = $local.identifier); " +
+            "is Relationship.Included -> $local.value.toOneRelationshipModel(" +
+            "%L, ($local.value as? JsonApiModel)?.id().orEmpty()) }"
+    }
+
     private fun linksPropertySpec(
         oneRelationships: List<PropertySpec>,
         manyRelationships: List<PropertySpec>,
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
+            returnStatement += if (it.hasNullableMember) {
                 "\"${it.name}\" to ${it.name}?.links, "
             } else {
                 "\"${it.name}\" to ${it.name}.links, "
             }
         }
         manyRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
+            returnStatement += if (it.hasNullableMember) {
                 "\"${it.name}\" to ${it.name}?.links, "
             } else {
                 "\"${it.name}\" to ${it.name}.links, "
@@ -220,14 +248,14 @@ internal object RelationshipsSpecBuilder {
     ): PropertySpec {
         var returnStatement = "mapOf("
         oneRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
+            returnStatement += if (it.hasNullableMember) {
                 "\"${it.name}\" to ${it.name}?.meta, "
             } else {
                 "\"${it.name}\" to ${it.name}.meta, "
             }
         }
         manyRelationships.forEach {
-            returnStatement += if (it.type.isNullable) {
+            returnStatement += if (it.hasNullableMember) {
                 "\"${it.name}\" to ${it.name}?.meta, "
             } else {
                 "\"${it.name}\" to ${it.name}.meta, "
@@ -247,14 +275,5 @@ internal object RelationshipsSpecBuilder {
         ).addAnnotation(AnnotationSpec.builder(Transient::class.asClassName()).build())
 
         return builder.initializer(returnStatement).build()
-    }
-
-    private fun getTypeOfRelationship(property: PropertySpec): String {
-        return property.annotations.first { annotation ->
-            annotation.typeName == HasOne::class.asTypeName() ||
-                annotation.typeName == HasMany::class.asTypeName()
-        }.members.first { member ->
-            member.toString().trim().startsWith("type")
-        }.toString().split("=")[1].trim()
     }
 }

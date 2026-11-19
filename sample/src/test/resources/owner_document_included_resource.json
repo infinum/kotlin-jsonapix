@@ -1,0 +1,1 @@
+{"errors":null,"links":null,"meta":null,"included":[{"type":"dog","id":"1","attributes":{"age":3,"name":"Max"},"links":null,"meta":null}],"data":{"type":"owner","id":"5","attributes":{"name":"Ana"},"relationships":{"myFavoriteDog":{"data":{"type":"dog","id":"1"},"links":null,"meta":null}},"links":null,"meta":null}}

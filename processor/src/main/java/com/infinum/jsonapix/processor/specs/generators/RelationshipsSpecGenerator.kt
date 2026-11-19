@@ -24,6 +24,7 @@ internal class RelationshipsSpecGenerator(
         val fileSpec = FileSpec.builder(holder.className.packageName, typeSpec.name!!)
             .addType(typeSpec)
             .addImport(JsonApiConstants.Packages.CORE, JsonApiConstants.Imports.JSON_API_MODEL)
+            .addImport(JsonApiConstants.Packages.CORE_RESOURCES, JsonApiConstants.Imports.RELATIONSHIP)
             .addImport(JsonApiConstants.Packages.JSONX, *JsonApiConstants.Imports.RELATIONSHIP_EXTENSIONS)
             .build()
 

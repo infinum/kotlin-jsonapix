@@ -66,6 +66,8 @@ object JsonApiConstants {
         const val DECODE_JSON_API_ERROR = "decodeJsonApiError"
         const val ERROR_BODY = "errorBody"
 
+        const val COPY_MODEL = "copyModel"
+
         const val TO_ONE_RELATIONSHIP_MODEL = "toOneRelationshipModel"
         const val TO_MANY_RELATIONSHIP_MODEL = "toManyRelationshipModel"
 
@@ -137,6 +139,8 @@ object JsonApiConstants {
 
         const val RESOURCE_IDENTIFIER = "ResourceIdentifier"
         const val JSON_API_MODEL = "JsonApiModel"
+        const val RELATIONSHIP = "Relationship"
+        const val RELATIONSHIP_VALUE = "value"
 
         const val REQUIRE_NOT_NULL = "requireNotNull"
         const val MAP_SAFE = "mapSafe"

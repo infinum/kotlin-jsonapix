@@ -2,8 +2,11 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Errors
+import com.infinum.jsonapix.processor.extensions.isRelationshipWrapper
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.CopyModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.LinkRelationshipFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ListItemResourceObjectFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.ManyRelationshipModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.OneRelationshipModelFunSpecBuilder
@@ -27,6 +30,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
@@ -36,9 +40,24 @@ import retrofit2.HttpException
 internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
+    private val modelHelperFunSpecs = mutableListOf<FunSpec>()
     private val customLinks = mutableListOf<ClassName>()
     private val customErrors = mutableMapOf<String, ClassName>()
     private val customMeta = mutableListOf<ClassName>()
+
+    /**
+     * Adds the helpers that work on the model itself: `copyModel` for every annotated class, and a
+     * `link<Relationship>` for each of its `Relationship<T>` properties.
+     *
+     * The nullable relationship shape gets no link helper: it has no state to point anywhere.
+     */
+    fun addModelHelpers(className: ClassName, allProperties: List<PropertySpec>) {
+        modelHelperFunSpecs.add(CopyModelFunSpecBuilder.build(className, allProperties))
+
+        allProperties
+            .filter { it.isRelationshipWrapper }
+            .forEach { modelHelperFunSpecs.add(LinkRelationshipFunSpecBuilder.build(className, it)) }
+    }
 
     @SuppressWarnings("LongParameterList")
     fun add(
@@ -195,6 +214,12 @@ internal class JsonXExtensionsSpecBuilder {
             JsonApiConstants.Imports.FLAT_MAP_SAFE,
         )
 
+        // Reaches the related model of a Relationship<T> property when building `included`.
+        fileSpec.addImport(
+            JsonApiConstants.Packages.CORE_RESOURCES,
+            JsonApiConstants.Imports.RELATIONSHIP_VALUE,
+        )
+
         specsMap.entries.forEach {
             fileSpec.addFunction(
                 OriginalDataResourceObjectFunSpecBuilder.build(
@@ -252,6 +277,8 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addProperty(FormatPropertySpecBuilder.build())
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
+
+        modelHelperFunSpecs.forEach { fileSpec.addFunction(it) }
 
         fileSpec.addFunction(decodeJsonApiErrorFunSpec())
 

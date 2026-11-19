@@ -6,8 +6,10 @@ import com.infinum.jsonapix.core.common.JsonApiXMissingArgumentException
 import com.infinum.jsonapix.core.resources.Attributes
 import com.infinum.jsonapix.core.resources.DefaultLinks
 import com.infinum.jsonapix.core.resources.Meta
+import com.infinum.jsonapix.core.resources.Relationship
 import com.infinum.jsonapix.core.resources.Relationships
 import com.infinum.jsonapix.core.resources.ResourceObject
+import com.infinum.jsonapix.processor.extensions.relationshipValueType
 import com.infinum.jsonapix.processor.specs.Specs
 import com.infinum.jsonapix.processor.specs.models.LinksInfo
 import com.squareup.kotlinpoet.ClassName
@@ -220,29 +222,34 @@ internal object ResourceObjectSpecBuilder {
         }
 
         oneRelationships.forEach {
-            codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
-            codeBlockBuilder.indent().addStatement("included?.firstOrNull {")
-            if (it.value.isNullable) {
-                codeBlockBuilder.indent().addStatement(
-                    "safeRelationships.%N?.data == ResourceIdentifier(it.type, it.id)",
-                    it.key,
-                )
+            val relatedType = it.value.relationshipValueType()
+            if (relatedType != null) {
+                codeBlockBuilder.addRelationshipWrapper(it.key, relatedType)
             } else {
-                codeBlockBuilder.indent().addStatement(
-                    "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
-                    it.key,
-                )
-            }
-            codeBlockBuilder.unindent()
-            codeBlockBuilder.addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
-            if (it.value.isNullable) {
-                codeBlockBuilder.unindent().addStatement("},")
-            } else {
-                codeBlockBuilder.unindent().addStatement(
-                    "} ?: throw %T(%S),",
-                    JsonApiXMissingArgumentException::class,
-                    it.key,
-                )
+                codeBlockBuilder.addStatement("%N = relationships?.let { safeRelationships ->", it.key)
+                codeBlockBuilder.indent().addStatement("included?.firstOrNull {")
+                if (it.value.isNullable) {
+                    codeBlockBuilder.indent().addStatement(
+                        "safeRelationships.%N?.data == ResourceIdentifier(it.type, it.id)",
+                        it.key,
+                    )
+                } else {
+                    codeBlockBuilder.indent().addStatement(
+                        "safeRelationships.%N.data == ResourceIdentifier(it.type, it.id)",
+                        it.key,
+                    )
+                }
+                codeBlockBuilder.unindent()
+                codeBlockBuilder.addStatement("}?.${JsonApiConstants.Members.ORIGINAL}(included) as %T", it.value)
+                if (it.value.isNullable) {
+                    codeBlockBuilder.unindent().addStatement("},")
+                } else {
+                    codeBlockBuilder.unindent().addStatement(
+                        "} ?: throw %T(%S),",
+                        JsonApiXMissingArgumentException::class,
+                        it.key,
+                    )
+                }
             }
         }
 
@@ -284,6 +291,35 @@ internal object ResourceObjectSpecBuilder {
         codeBlockBuilder.addStatement("return $tempVariableName")
 
         return builder.addCode(codeBlockBuilder.build().toString()).build()
+    }
+
+    /**
+     * Reads a `Relationship<T>` property back out of a document.
+     *
+     * Linkage that resolves against `included` becomes a `Relationship.Included`, and linkage that does
+     * not becomes a `Relationship.Linked`, which is how a relationship whose resource was not
+     * included survives the round trip instead of collapsing to null.
+     *
+     * Everything else reads as `Relationship.Unset`, including a member whose `data` is null. A
+     * response cannot ask a client to clear anything, and a relationship object that carries only
+     * `links` or `meta` says nothing about the linkage, so reading either as `Relationship.Unlink`
+     * would turn an ordinary response into a request that deletes the relationship on the next
+     * write.
+     */
+    private fun CodeBlock.Builder.addRelationshipWrapper(name: String, relatedType: TypeName) {
+        addStatement("%N = relationships?.%N?.data?.let { identifier ->", name, name)
+        indent()
+        addStatement("included?.firstOrNull { identifier == ResourceIdentifier(it.type, it.id) }")
+        indent()
+        addStatement(
+            "?.let { %T.Included(it.${JsonApiConstants.Members.ORIGINAL}(included) as %T) }",
+            Relationship::class,
+            relatedType,
+        )
+        addStatement("?: %T.Linked(identifier)", Relationship::class)
+        unindent()
+        unindent()
+        addStatement("} ?: %T.Unset,", Relationship::class)
     }
 
     private fun idProperty(): PropertySpec = PropertySpec.builder(

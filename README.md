@@ -103,6 +103,80 @@ the `Dog` class.
 
 All non-primitive fields of a class should be some kind of relationship.
 
+#### To-one relationships
+
+A `@HasOne` property can be declared in one of two shapes, and the declared type is what decides which one the property uses.
+
+```kotlin
+@HasOne(type = "dog")
+val dog: Dog?                 // legacy: null means "leave this relationship alone"
+
+@HasOne(type = "dog")
+val dog: Relationship<Dog>    // all four states
+```
+
+The nullable shape cannot say "clear this relationship". JSON API reads an absent `relationships` member as "leave it alone" and
+`{"data": null}` as "remove it", and forbids a server from treating the first as the second, but a single nullable property collapses both
+into `null`. `Relationship<Dog>` separates them:
+
+| State | Written as | Means |
+|---|---|---|
+| `Relationship.Unset` | member left out | leave this relationship alone |
+| `Relationship.Unlink` | `"dog": {"data": null}` | remove the relationship |
+| `Relationship.Linked(ResourceIdentifier("dog", "1"))` | `"dog": {"data": {"type": "dog", "id": "1"}}` | point at a resource, without sending it in `included` |
+| `Relationship.Included(dog)` | `"dog": {"data": {...}}` plus `included` | point at a resource and send it |
+
+```kotlin
+@Serializable
+@JsonApiX(type = "owner")
+data class Owner(
+    val name: String,
+    @HasOne(type = "dog")
+    val myFavoriteDog: Relationship<Dog> = Relationship.Unset,
+) : JsonApiModel()
+
+api.update(OwnerModel(data = owner.copyModel(myFavoriteDog = Relationship.Unlink)))
+api.update(OwnerModel(data = owner.linkMyFavoriteDog(id = "1")))
+```
+
+#### Use `copyModel`, not `copy`
+
+A model's JSON API `type` and `id` live in private fields on `JsonApiModel` and are set after construction, so they are not constructor
+parameters. `copy` rebuilds the model through its constructor and leaves both behind, and the copy then serializes through the `id() ?: "0"`
+fallback. The request goes out claiming to be resource `0` instead of failing, so nothing tells you it happened:
+
+```kotlin
+owner.copy(myFavoriteDog = Relationship.Unlink)      // -> "id": "0"
+owner.copyModel(myFavoriteDog = Relationship.Unlink) // -> "id": "5"
+```
+
+`copyModel` is generated for every annotated model. It takes the same named arguments as `copy`, defaults each to the current value, and
+carries the `type` and `id` across. This is not specific to relationships: `copy` loses the identity when you change an attribute too.
+Models that are not data classes have no `copy` at all and have always needed this.
+
+The [lint module](#getting-started) ships a `JsonApiXCopyLosesIdentity` check that flags `copy` on a `JsonApiModel` and offers to replace
+it with `copyModel`.
+
+`linkMyFavoriteDog` is generated for every `Relationship` property, named `link` plus the property name. It exists because the JSON API
+type comes off the `@HasOne` annotation, so the generated code can fill it in and the call site does not have to repeat it. It delegates to
+`copyModel`, so it carries the identity too.
+
+Read the related model back with `value`, which gives the model for an `Included` and `null` for the other three states:
+
+```kotlin
+val dog: Dog? = owner.myFavoriteDog.value
+```
+
+Deserialization produces `Included` when the linkage resolves against `included`, and `Linked` when it does not, so a relationship whose resource
+was not included survives instead of being read as `null`. Everything else reads as `Unset`, including a member whose `data` is `null`: a
+response cannot ask a client to clear anything, and a relationship object carrying only `links` or `meta` says nothing about the linkage, so
+reading either as `Unlink` would turn an ordinary response into a request that deletes the relationship on the next write.
+
+The nullable shape keeps working exactly as before and produces byte-identical output. It is legacy, and will be dropped in the next major
+release.
+
+To-many relationships are unchanged. An empty list already means "clear" for those.
+
 Once you hit build, `PersonModel`, `PersonItem`, and `PersonList` are automatically generated. These wrappers facilitate the serialization and deserialization of your classes into and from JSON API strings.
 
 For example, for a single `Person` instance, `PersonModel` is generated as follows:
@@ -340,6 +414,9 @@ Retrofit.Builder()
 The converter writes a request document, not a full JSON API document. `included` and `errors` are top level members that the JSON API
 specification defines for responses only, so they are left out, and so is every member whose value is `null`. A model field that was never
 set is indistinguishable from one set to `null`, and sending it as `null` would tell the server to clear the value.
+
+The one `null` that survives is the `data` member of a relationship object, which is structural: `{"data": null}` is how JSON API spells
+"clear this relationship". Only a [`Relationship.Unlink`](#to-one-relationships) produces one.
 
 ```json
 {
