@@ -30,11 +30,20 @@ task deployRetrofit(dependsOn: [
     description = "Deploy module to repositories"
 }
 
+task deployLint(dependsOn: [
+        ':lint:clean',
+        ':lint:publishReleasePublicationToSonatypeMavenCentralRepository'
+]) {
+    group = "Deploy"
+    description = "Deploy module to repositories"
+}
+
 task deployAll(dependsOn: [
         'deployAnnotations',
         'deployCore',
         'deployProcessor',
         'deployRetrofit',
+        'deployLint',
 ]) {
     group = "Deploy"
     description = "Deploy all modules to repositories"
@@ -45,10 +54,12 @@ task deployDebug(dependsOn: [
         ':core:clean',
         ':processor:clean',
         ':retrofit:clean',
+        ':lint:clean',
         ':annotations:publishToMavenLocal',
         ':core:publishToMavenLocal',
         ':processor:publishToMavenLocal',
         ':retrofit:publishToMavenLocal',
+        ':lint:publishToMavenLocal',
 ]) {
     group = "Deploy"
     description = "Deploy all modules to Mavel Local repository"
