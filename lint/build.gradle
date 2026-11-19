@@ -40,8 +40,9 @@ dependencies {
     compileOnly packages.lint.checks
     compileOnly packages.kotlin.core
 
-    testImplementation packages.junit.engine
     testImplementation packages.junit.api
+    testRuntimeOnly packages.junit.engine
+    testRuntimeOnly packages.junit.platform_launcher
     testImplementation packages.junit.params
     testImplementation packages.lint.core
     testImplementation packages.lint.tests
@@ -57,4 +58,11 @@ jar {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+    }
 }

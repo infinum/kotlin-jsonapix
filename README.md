@@ -135,13 +135,31 @@ data class Owner(
     val myFavoriteDog: Relationship<Dog> = Relationship.Unset,
 ) : JsonApiModel()
 
-api.update(OwnerModel(data = owner.copy(myFavoriteDog = Relationship.Unlink)))
+api.update(OwnerModel(data = owner.copyModel(myFavoriteDog = Relationship.Unlink)))
 api.update(OwnerModel(data = owner.linkMyFavoriteDog(id = "1")))
 ```
 
+#### Use `copyModel`, not `copy`
+
+A model's JSON API `type` and `id` live in private fields on `JsonApiModel` and are set after construction, so they are not constructor
+parameters. `copy` rebuilds the model through its constructor and leaves both behind, and the copy then serializes through the `id() ?: "0"`
+fallback. The request goes out claiming to be resource `0` instead of failing, so nothing tells you it happened:
+
+```kotlin
+owner.copy(myFavoriteDog = Relationship.Unlink)      // -> "id": "0"
+owner.copyModel(myFavoriteDog = Relationship.Unlink) // -> "id": "5"
+```
+
+`copyModel` is generated for every annotated model. It takes the same named arguments as `copy`, defaults each to the current value, and
+carries the `type` and `id` across. This is not specific to relationships: `copy` loses the identity when you change an attribute too.
+Models that are not data classes have no `copy` at all and have always needed this.
+
+The [lint module](#getting-started) ships a `JsonApiXCopyLosesIdentity` check that flags `copy` on a `JsonApiModel` and offers to replace
+it with `copyModel`.
+
 `linkMyFavoriteDog` is generated for every `Relationship` property, named `link` plus the property name. It exists because the JSON API
-type comes off the `@HasOne` annotation, so the generated code can fill it in and the call site does not have to repeat it. The model does
-not have to be a data class: the helper rebuilds it through its constructor, and carries the type and id over.
+type comes off the `@HasOne` annotation, so the generated code can fill it in and the call site does not have to repeat it. It delegates to
+`copyModel`, so it carries the identity too.
 
 Read the related model back with `value`, which gives the model for an `Included` and `null` for the other three states:
 

@@ -23,6 +23,7 @@ import com.infinum.jsonapix.data.models.PersonItem
 import com.infinum.jsonapix.data.models.PersonList
 import com.infinum.jsonapix.data.models.PersonModel
 import com.infinum.jsonapix.data.models.PersonRootMeta
+import com.infinum.jsonapix.copyModel
 import com.infinum.jsonapix.linkDog
 import com.infinum.jsonapix.linkMyFavoriteDog
 import com.infinum.jsonapix.linkResidentDog
@@ -873,6 +874,57 @@ internal class RetrofitIntegrationTest {
 
         // This is what separates Linked from Included: linkage goes out, the resource does not.
         assertEquals(getFileAsString(filename = "owner_document_linked_without_included.json"), document)
+    }
+
+    @Test
+    fun `given copyModel when unlinking should keep the resource id that copy would drop`() {
+        val converter = ownerRequestConverter()
+        val owner = Owner(name = "Ana").apply { setId(id = "5") }
+
+        val content = converter.convert(
+            value = OwnerModel(data = owner.copyModel(myFavoriteDog = Relationship.Unlink)),
+        ).asString()
+
+        // copy() would send "id":"0" here, because type and id are private fields on JsonApiModel
+        // rather than constructor parameters, and toResourceObject falls back to id() ?: "0".
+        assertEquals(getFileAsString(filename = "owner_request_body_clear.json"), content)
+    }
+
+    @Test
+    fun `given copyModel when setting a relationship should keep the resource id`() {
+        val converter = ownerRequestConverter()
+        val dog = Dog(name = "Max", age = 3).apply { setId(id = "1") }
+        val owner = Owner(name = "Ana").apply { setId(id = "5") }
+
+        val content = converter.convert(
+            value = OwnerModel(data = owner.copyModel(myFavoriteDog = Relationship.Included(dog))),
+        ).asString()
+
+        assertEquals(getFileAsString(filename = "owner_request_body_to_resource.json"), content)
+    }
+
+    @Test
+    fun `given copyModel when changing only an attribute should keep the resource id`() {
+        val converter = ownerRequestConverter()
+        val owner = Owner(name = "Ana").apply { setId(id = "5") }
+
+        val content = converter.convert(value = OwnerModel(data = owner.copyModel(name = "Bo"))).asString()
+
+        // The identity is lost by copy() for any change, not only a relationship one.
+        assertEquals(getFileAsString(filename = "owner_request_body_attribute_changed.json"), content)
+    }
+
+    @Test
+    fun `given a model that is not a data class when using copyModel should keep the resource id`() {
+        val converter = JsonXRequestBodyConverter(typeAdapter = requireNotNull(factory.getAdapter<KennelModel>()))
+        val kennel = Kennel(name = "Paws").apply { setId(id = "3") }
+
+        val content = converter.convert(
+            value = KennelModel(data = kennel.copyModel(residentDog = Relationship.Unlink)),
+        ).asString()
+
+        // Kennel has no copy() at all, so copyModel is the only way to reach Unlink on it.
+        assertEquals(getFileAsString(filename = "kennel_request_body_unlinked.json"), content)
     }
 
     private fun ownerRequestConverter(): JsonXRequestBodyConverter<OwnerModel> =

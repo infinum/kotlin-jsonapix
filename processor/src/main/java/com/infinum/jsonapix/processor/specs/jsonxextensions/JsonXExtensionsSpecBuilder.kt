@@ -3,6 +3,7 @@ package com.infinum.jsonapix.processor.specs.jsonxextensions
 import com.infinum.jsonapix.core.common.JsonApiConstants
 import com.infinum.jsonapix.core.resources.Errors
 import com.infinum.jsonapix.processor.extensions.isRelationshipWrapper
+import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.CopyModelFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.DeserializeListFunSpecBuilder
 import com.infinum.jsonapix.processor.specs.jsonxextensions.funspecbuilders.LinkRelationshipFunSpecBuilder
@@ -39,20 +40,23 @@ import retrofit2.HttpException
 internal class JsonXExtensionsSpecBuilder {
 
     private val specsMap = hashMapOf<ClassName, ClassInfo>()
-    private val relationshipLinkFunSpecs = mutableListOf<FunSpec>()
+    private val modelHelperFunSpecs = mutableListOf<FunSpec>()
     private val customLinks = mutableListOf<ClassName>()
     private val customErrors = mutableMapOf<String, ClassName>()
     private val customMeta = mutableListOf<ClassName>()
 
     /**
-     * Adds a `link<Relationship>` helper for every `Relationship<T>` property of [className].
+     * Adds the helpers that work on the model itself: `copyModel` for every annotated class, and a
+     * `link<Relationship>` for each of its `Relationship<T>` properties.
      *
-     * The nullable relationship shape gets none: it has no state to point anywhere.
+     * The nullable relationship shape gets no link helper: it has no state to point anywhere.
      */
-    fun addRelationshipLinks(className: ClassName, allProperties: List<PropertySpec>) {
+    fun addModelHelpers(className: ClassName, allProperties: List<PropertySpec>) {
+        modelHelperFunSpecs.add(CopyModelFunSpecBuilder.build(className, allProperties))
+
         allProperties
             .filter { it.isRelationshipWrapper }
-            .forEach { relationshipLinkFunSpecs.add(LinkRelationshipFunSpecBuilder.build(className, it, allProperties)) }
+            .forEach { modelHelperFunSpecs.add(LinkRelationshipFunSpecBuilder.build(className, it)) }
     }
 
     @SuppressWarnings("LongParameterList")
@@ -274,7 +278,7 @@ internal class JsonXExtensionsSpecBuilder {
         fileSpec.addFunction(ManyRelationshipModelFunSpecBuilder.build())
         fileSpec.addFunction(OneRelationshipModelFunSpecBuilder.build())
 
-        relationshipLinkFunSpecs.forEach { fileSpec.addFunction(it) }
+        modelHelperFunSpecs.forEach { fileSpec.addFunction(it) }
 
         fileSpec.addFunction(decodeJsonApiErrorFunSpec())
 
