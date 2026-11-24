@@ -1,0 +1,1 @@
+{"data":{"type":"person","id":"10","attributes":{"age":40,"name":"Frank","surname":"Miller"},"relationships":{"myFavoriteDog":{"data":{"type":"dog","id":"1"}},"allMyDogs":{"data":[{"type":"dog","id":"1"},{"type":"dog","id":"2"}]}}}}

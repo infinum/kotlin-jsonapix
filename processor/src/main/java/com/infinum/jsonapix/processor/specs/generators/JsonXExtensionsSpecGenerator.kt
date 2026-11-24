@@ -75,6 +75,11 @@ internal class JsonXExtensionsSpecGenerator(
                 null
             }
 
+        builder.addModelHelpers(
+            className = className,
+            allProperties = holder.primitiveProperties + holder.oneRelationships + holder.manyRelationships,
+        )
+
         builder.add(
             type = holder.type,
             metaInfo = metaInfo,
